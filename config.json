@@ -1,0 +1,15 @@
+{
+	"port"   : 8000,
+	"root"   : "./sites",
+	"index"  : ["index.htm", "index.html"],
+	"vhosts" : [
+		{
+			"hostname"  : "test",
+			"directory" : "test"
+		},
+		{
+			"hostname"  : "test2",
+			"directory" : "test2"
+		}
+	]
+}
