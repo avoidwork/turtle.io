@@ -4,12 +4,22 @@
  * @return {Object} Instance
  */
 factory.prototype.stop = function () {
+	// Announcing intention
 	this.fire("beforeStop");
-	this.active = false;
-	if (this.server !== null) this.server.close();
-	this.config.data.teardown();
+
+	// Tearing down server (if applicable)
+	if (this.server !== null) {
+		this.active = false;
+		this.server.close();
+		this.server = null;
+	}
+
+	// Wiping config & observer
 	this.vhosts.data.teardown();
+
+	// Announcing shut down
 	this.fire("afterStop");
 	if (this.debug) $.log("Stopped turtle.io instance: " + this.id);
+
 	return this;
 };

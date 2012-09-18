@@ -4,15 +4,19 @@
  * @return {Object} Status
  */
 factory.prototype.status = function () {
-	var state = {config: {}};
+	var state = {
+		config  : {},
+		process : {}
+	};
 
 	// Startup parameters
-	this.config.data.get().each(function (rec) {
-		state.config[rec.key] = rec.data.value;
+	$.iterate(this.config, function (v, k) {
+		state.config[k] = v;
 	});
 
-	state.memory = process.memoryUsage();
-	state.pid    = process.pid;
+	// Process information
+	state.process.memory = process.memoryUsage();
+	state.process.pid    = process.pid;
 
 	// Virtual hosts
 	state.vhosts = {
