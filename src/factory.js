@@ -15,6 +15,7 @@ var factory = function (args) {
 	this.id     = config.id || $.genId();
 	this.config = $.store({id: this.id + "-config"}, null, {key: "name"});
 	this.params = config;
+	this.server = null;
 	this.vhosts = $.store({id: this.id + "-vhosts"}, null, {key: "hostname"});
 
 	$.iterate(this.params, function (v, k) {
