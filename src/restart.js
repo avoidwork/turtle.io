@@ -5,8 +5,7 @@
  */
 factory.prototype.restart = function () {
 	if (this.debug) $.log("Restarting turtle.io instance: " + this.id);
-	this.stop();
-	this.config.data.teardown();
-	this.vhosts.data.teardown();
-	this.start();
+	this.fire("beforeRestart");
+	this.stop().start();
+	this.fire("afterRestart");
 };

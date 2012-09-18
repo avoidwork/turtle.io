@@ -9,16 +9,19 @@ var factory = function (args) {
 	    self    = this,
 	    regex   = /^vhosts$/;
 
-	args        = args    || {};
+	$.merge(config, (args || {}));
+
 	this.active = false;
-	this.id     = args.id || $.genId();
+	this.id     = config.id || $.genId();
 	this.config = $.store({id: this.id + "-config"}, null, {key: "name"});
-	this.params = args;
+	this.params = config;
 	this.vhosts = $.store({id: this.id + "-vhosts"}, null, {key: "hostname"});
 
-	$.iterate(config, function (v, k) {
-		if (!regex.test(k)) this[k] = v;
+	$.iterate(this.params, function (v, k) {
+		if (!regex.test(k)) self[k] = v;
 	});
+
+	$.observer.hook(this);
 
 	if (this.vhosts.data.total === 0 && config.vhosts instanceof Array) this.vhosts.data.batch("set", config.vhosts);
 
