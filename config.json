@@ -2,7 +2,7 @@
 	"port"   : 8000,
 	"logs" : {
 		"date" : "YYYYMMDD",
-		"file" : "./logs/error_{{date}}.log"
+		"file" : "error_{{date}}.log"
 	},
 	"root"   : "./sites",
 	"index"  : ["index.htm", "index.html"],

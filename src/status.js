@@ -10,7 +10,7 @@ factory.prototype.status = function () {
 	};
 
 	// Startup parameters
-	$.iterate(this.config, function (v, k) {
+	$.iterate(this.settings, function (v, k) {
 		state.config[k] = v;
 	});
 
