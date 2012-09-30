@@ -7,11 +7,11 @@
 var factory = function (args) {
 	var self = this;
 
-	this.active   = false;
-	this.id       = "";
-	this.settings = {};
-	this.server   = null;
-	this.version  = "{{VERSION}}";
+	this.active  = false;
+	this.id      = "";
+	this.config  = {};
+	this.server  = null;
+	this.version = "{{VERSION}}";
 
 	bootstrap.call(self, args);
 

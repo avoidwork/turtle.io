@@ -14,10 +14,10 @@ factory.prototype.log = function (err, display) {
 	if (display) $.log(err);
 
 	// Writing to log file if config is loaded
-	if (typeof this.settings.logs !== "undefined") {
+	if (typeof this.config.logs !== "undefined") {
 		date     = new Date();
 		text     = moment(date).format("HH:MM:SS") + " " + err + "\n" + (typeof err.stack !== "undefined" ? err.stack + "\n" : "");
-		filename = this.settings.logs.file.replace(/\{\{date\}\}/, moment(date).format(this.settings.logs.date));
+		filename = this.config.logs.file.replace(/\{\{date\}\}/, moment(date).format(this.config.logs.date));
 		fs.appendFile(("./logs/" + filename), text, function (e) {
 			if (e) return $.log("Could not write to error log");
 
