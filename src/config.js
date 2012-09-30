@@ -8,19 +8,17 @@ var config = function (args) {
 	if (!(args instanceof Object)) args = {};
 
 	var config = require("../config.json"),
-	    id     = args.id || (config.id || $.genId());
+	    id     = this.id || (args.id || (config.id || $.genId()));
 
 	// Merging args into config
 	$.merge(config, args);
 	delete config.id;
 
-	// Initial execution
-	if (this.id.isEmpty()) {
+	// Loading if first execution or config has changed
+	if (this.id !== id || $.encode(this.config) !== $.encode(config)) {
 		this.id     = id;
 		this.config = config;
 	}
-
-	if (this.config.debug) this.log("Loaded configuration");
 
 	return this;
 };

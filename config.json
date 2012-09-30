@@ -1,19 +1,17 @@
 {
+	"debug"  : true,
 	"port"   : 8000,
+	"headers" : {
+		"Cache-Control" : "max-age=3600 must-revalidate"
+	},
 	"logs" : {
 		"date" : "YYYYMMDD",
 		"file" : "error_{{date}}.log"
 	},
 	"root"   : "./sites",
 	"index"  : ["index.htm", "index.html"],
-	"vhosts" : [
-		{
-			"hostname"  : "test",
-			"directory" : "test"
-		},
-		{
-			"hostname"  : "test2",
-			"directory" : "test2"
-		}
-	]
+	"vhosts" : {
+		"test"   : "test",
+		"test2"  : "test2"
+	}
 }

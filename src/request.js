@@ -6,7 +6,8 @@
  * @return {Object}     Instance
  * @todo Implement an async fsRead if the file is found, have error strategy
  */
-factory.prototype.request = function (req, res) {
-	this.respond(res, req, messages.SUCCESSFUL, codes.SUCCESSFUL);
-	return this;
+factory.prototype.request = function (res, req) {
+	var parsed = url.parse(req.url);
+
+	return this.respond(res, req, messages.SUCCESS, codes.SUCCESS);
 };
