@@ -30,7 +30,7 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 				responseHeaders.Etag = crypto.createHash("md5").update(output).digest("hex");
 				break;
 			case !end:
-				responseHeaders["Data"] = "chunked";
+				responseHeaders["Transfer-Encoding"] = "chunked";
 				break;
 		}
 		responseHeaders["Content-Length"] = String(output).length;

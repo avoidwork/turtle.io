@@ -8,7 +8,6 @@ var headers = {
 	"Allow"                        : "GET, HEAD, OPTIONS",
 	"Content-Type"                 : "text/html",
 	"Date"                         : "",
-	"Transfer-Encoding"            : "chunked",
 	"Server"                       : "turtle.io/{{VERSION}} abaaso/" + $.version + " node.js/" + process.versions.node.replace(/^v/, "") + " (" + process.platform.capitalize() + " V8/" + process.versions.v8 + ")",
 	"Access-Control-Allow-Methods" : "GET, HEAD, OPTIONS",
 	"Access-Control-Allow-Origin"  : "*",
