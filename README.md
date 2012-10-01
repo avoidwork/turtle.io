@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/avoidwork/turtle.io.png)](http://travis-ci.org/avoidwork/turtle.io)
 # turtle.io
 
 Simple HTTP 1.1 webserver built on abaaso & node.js, making serving (static) websites easy.
@@ -10,7 +11,9 @@ var turtle_io = require("turtle.io"),
     server    = new turtle_io(),
     params    = {};
 
+// You can edit "node_modules/turtle.io/config.json", or override with an arguments Object
 params.debug  = true;
+params.port   = 80;           // default is 8000
 params.root   = "/var/www";   // default is "node_modules/turtle.io/sites"
 params.vhosts = {
 	"demo1.tld" : "demo1.tld" // hostname : directory
