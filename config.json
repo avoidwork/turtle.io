@@ -1,0 +1,17 @@
+{
+	"debug"  : true,
+	"port"   : 8000,
+	"headers" : {
+		"Cache-Control" : "max-age=3600 must-revalidate"
+	},
+	"logs" : {
+		"date" : "YYYYMMDD",
+		"file" : "error_{{date}}.log"
+	},
+	"root"   : "./node_modules/turtle.io/sites",
+	"index"  : ["index.htm", "index.html"],
+	"vhosts" : {
+		"test"   : "test",
+		"test2"  : "test2"
+	}
+}

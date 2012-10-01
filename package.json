@@ -1,0 +1,42 @@
+{
+  "name": "turtle.io",
+  "description": "Easy to use webserver with virtual hosts, built on abaaso & node.js.",
+  "version": "0.0.1a",
+  "homepage": "https://github.com/avoidwork/turtle.io",
+  "author": {
+    "name": "Jason Mulligan",
+    "email": "jason.mulligan@avoidwork.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/avoidwork/turtle.io.git"
+  },
+  "bugs": {
+    "url": "https://github.com/avoidwork/turtle.io/issues"
+  },
+  "licenses": [
+    {
+      "type": "BSD-3",
+      "url": "http://opensource.org/licenses/BSD-3-Clause"
+    }
+  ],
+  "main": "lib/turtle.io",
+  "engines": {
+    "node": ">= 0.6.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "dependencies": {
+    "abaaso": ">= 2.9.1",
+    "mmmagic": ">= 0.2.1",
+    "moment": ">= 1.7.0"
+  },
+  "devDependencies": {
+    "grunt": "~0.3.14",
+    "abaaso": ">= 2.9.1",
+    "mmmagic": ">= 0.2.1",
+    "moment": ">= 1.7.0"
+  },
+  "keywords": ["webserver", "http", "https", "web", "server"]
+}
