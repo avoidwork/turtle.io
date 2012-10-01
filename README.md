@@ -1,26 +1,29 @@
 # turtle.io
 
-Webserver built on  abaaso & node.js
+Simple HTTP 1.1 webserver built on abaaso & node.js, making serving (static) websites easy.
 
 ## Getting Started
 Install the module with: `npm install turtle.io`
 
 ```javascript
-var turtle_io = require('turtle.io');
-turtle_io.awesome(); // "awesome"
+var turtle_io = require("turtle.io"),
+    server    = new turtle_io(),
+    params    = {};
+
+params.debug  = true;
+params.root   = "/var/www";   // default is "node_modules/turtle.io/sites"
+params.vhosts = {
+	"demo1.tld" : "demo1.tld" // hostname : directory
+}
+
+server.start(params);
 ```
 
 ## Documentation
-_(Coming soon)_
+Please reference the [wiki](https://github.com/avoidwork/turtle.io/wiki)
 
 ## Examples
 _(Coming soon)_
-
-## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [grunt](https://github.com/cowboy/grunt).
-
-## Release History
-_(Nothing yet)_
 
 ## License
 Copyright (c) 2012 Jason Mulligan  
