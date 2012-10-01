@@ -18,11 +18,5 @@ factory.prototype.status = function () {
 	state.process.memory = process.memoryUsage();
 	state.process.pid    = process.pid;
 
-	// Virtual hosts
-	state.vhosts = {
-		servers : this.vhosts.data.get(),
-		total   : this.vhosts.data.total
-	};
-
 	return state;
 };
