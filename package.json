@@ -1,6 +1,6 @@
 {
   "name": "turtle.io",
-  "description": "Easy to use webserver with virtual hosts, built on abaaso & node.js.",
+  "description": "Easy to use web server with virtual hosts",
   "version": "0.0.1a",
   "homepage": "https://github.com/avoidwork/turtle.io",
   "author": {
