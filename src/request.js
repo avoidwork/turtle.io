@@ -17,8 +17,13 @@ factory.prototype.request = function (res, req) {
 	    },
 	    path    = [],
 	    handled = false,
-	    root    = this.config.root + "/" + host,
-	    handle, nth, count;
+	    root, handle, nth, count;
+
+	// Invalid hostname for the server
+	if (!this.config.vhosts.hasOwnProperty(host)) error();
+
+	// Creating root dir path
+	root = this.config.root + "/" + host;
 
 	if (!parsed.hasOwnProperty("host"))     parsed.host     = req.headers.host;
 	if (!parsed.hasOwnProperty("protocol")) parsed.protocol = "http:";
@@ -80,19 +85,16 @@ factory.prototype.request = function (res, req) {
 		});
 	}
 
-	if (!this.config.vhosts.hasOwnProperty(host)) error();
+	if (!/\/$/.test(parsed.pathname)) handle(root + parsed.pathname);
 	else {
-		if (!/\/$/.test(parsed.pathname)) handle(root + parsed.pathname);
-		else {
-			nth   = this.config.index.length;
-			count = 0;
-			this.config.index.each(function (i) {
-				fs.exists(root + "/" + i, function (exists) {
-					if (exists && !handled) handle(root + "/" + i);
-					else if (!exists && ++count === nth) self.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND);
-				});
+		nth   = this.config.index.length;
+		count = 0;
+		this.config.index.each(function (i) {
+			fs.exists(root + "/" + i, function (exists) {
+				if (exists && !handled) handle(root + "/" + i);
+				else if (!exists && ++count === nth) self.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND);
 			});
-		}
+		});
 	}
 
 	return this;
