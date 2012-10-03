@@ -18,9 +18,8 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 	if (!(responseHeaders instanceof Object)) responseHeaders = {};
 	end = (end !== false);
 
-	// Merging default headers for response
-	$.merge(responseHeaders, headers);
-	if (this.config.headers instanceof Object) $.merge(responseHeaders, this.config.headers);
+	// Setting default headers
+	$.merge(responseHeaders, this.config.headers instanceof Object ? this.config.headers : headers);
 
 	// Setting headers
 	responseHeaders["Date"] = new Date().toUTCString();

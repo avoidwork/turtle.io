@@ -21,21 +21,30 @@ var bootstrap = function (args) {
 		// Loading config
 		config.call(this, (newArgs || args));
 
+		// Applying default headers (if not overridden)
+		$.iterate(headers, function (v, k) {
+			if (typeof self.config.headers[k] === "undefined") self.config.headers[k] = v;
+		});
+
 		// Preparing parameters
 		params.port = this.config.port;
 		if (typeof this.config.csr !== "undefined") params.csr = this.config.csr;
 		if (typeof this.config.key !== "undefined") params.csr = this.config.key;
 
-		// Setting up server
-		$.route.set("/.*",   function (res, req) { self.request(res, req); });
+		// Setting error route
 		$.route.set("error", function (res, req) { self.error(res, req); });
-		this.server = $.route.server(params, this.error);
+
+		// Setting default response route
+		this.get("/.*", function (res, req) { self.request(res, req); });
+
+		// Creating a server
+		this.server = $.route.server(params, function (e) { self.log(e, true); });
 		this.active = true;
 	}, "server");
 
 	// After start listener
 	this.on("afterStart", function () {
-		if (this.config.debug) $.log("Started turtle.io on port " + this.config.port);
+		this.log("Started turtle.io on port " + this.config.port);
 	}, "logging");
 
 	// Restart listener
@@ -45,23 +54,23 @@ var bootstrap = function (args) {
 
 	// After restart listener
 	this.on("afterRestart", function () {
-		if (this.config.debug) $.log("Restarted turtle.io: " + this.id);
+		this.log("Restarted turtle.io on port " + this.config.port);
 	});
 
 	// Stop listener
 	this.on("beforeStop", function () {
 		if (this.server !== null) {
-			$.route.del("/.*");
-			$.route.del("error");
-			this.server.close();
-			this.server = null;
+			try { this.server.close(); }
+			catch (e) { void 0; }
 			this.active = false;
+			this.server = null;
+			this.unset("*");
 		}
 	}, "vhosts");
 
 	// After stop listener
 	this.on("afterStop", function () {
-		if (this.config.debug) $.log("Stopped turtle.io: " + this.id);
+		this.log("Stopped turtle.io on port " + this.config.port);
 	}, "logging");
 
 	return this;

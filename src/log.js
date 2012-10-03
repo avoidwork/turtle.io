@@ -1,31 +1,33 @@
 /**
- * Logs an exception
+ * Logs a message
  * 
- * @param  {Mixed}   err     Error Object or String
- * @param  {Boolean} display [Optional] Displays error on the console
+ * @param  {Mixed}   msg     Error Object or String
+ * @param  {Boolean} error   [Optional] Write to error log (default: false)
+ * @param  {Boolean} display [Optional] Displays msgor on the console (default: true)
  * @return {Undefined}       undefined
  */
-factory.prototype.log = function (err, display) {
+factory.prototype.log = function (msg, error, display) {
+	error   = (error   === true);
 	display = (display !== false);
 
 	var date, filename, text;
 
 	// Displaying on the console
-	if (display) $.log(err);
+	if (display) $.log(msg);
 
 	// Writing to log file if config is loaded
 	if (typeof this.config.logs !== "undefined") {
 		date     = new Date();
-		text     = moment(date).format("HH:MM:SS") + " " + err + "\n" + (typeof err.stack !== "undefined" ? err.stack + "\n" : "");
-		filename = this.config.logs.file.replace(/\{\{date\}\}/, moment(date).format(this.config.logs.date));
+		text     = moment(date).format("HH:MM:SS") + " " + msg + "\n" + (typeof msg.stack !== "undefined" ? msg.stack + "\n" : "");
+		filename = this.config.logs[error ? "error" : "daemon"].replace(/\{\{date\}\}/, moment(date).format(this.config.logs.date));
 		fs.appendFile(("./logs/" + filename), text, function (e) {
-			if (e) return $.log("Could not write to error log");
+			if (e) return $.log("Could not write to msgor log");
 
-			// Halting on fundamental error
-			if (REGEX_HALT.test(err)) process.exit(0);
+			// Halting on fundamental msgor
+			if (REGEX_HALT.test(msg)) process.exit(0);
 		});
 	}
-	else if (REGEX_HALT.test(err)) process.exit(0);
+	else if (REGEX_HALT.test(msg)) process.exit(0);
 
 	return this;
 };

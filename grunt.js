@@ -19,6 +19,7 @@ module.exports = function (grunt) {
 				src : [
 					"<banner>",
 					"src/intro.js",
+					"src/allowed.js",
 					"src/bootstrap.js",
 					"src/codes.js",
 					"src/config.js",
@@ -32,6 +33,8 @@ module.exports = function (grunt) {
 					"src/start.js",
 					"src/status.js",
 					"src/stop.js",
+					"src/unset.js",
+					"src/verbs.js",
 					"src/headers.js",
 					"src/messages.js",
 					"src/outro.js"

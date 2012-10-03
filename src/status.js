@@ -6,7 +6,8 @@
 factory.prototype.status = function () {
 	var state = {
 		config  : {},
-		process : {}
+		process : {},
+		server  : {}
 	};
 
 	// Startup parameters
@@ -18,11 +19,10 @@ factory.prototype.status = function () {
 	state.process.memory = process.memoryUsage();
 	state.process.pid    = process.pid;
 
-	// Virtual hosts
-	state.vhosts = {
-		servers : this.vhosts.data.get(),
-		total   : this.vhosts.data.total
-	};
+	// Server information
+	state.server.address        = this.server.address();
+	state.server.connections    = this.server.connections;
+	state.server.maxConnections = this.server.macConnections;
 
 	return state;
 };
