@@ -10,7 +10,7 @@ factory.prototype.request = function (res, req) {
 	var self    = this,
 	    host    = req.headers.host.indexOf(":") > -1 ? (/(.*)?:/.exec(req.headers.host)[1]) : req.headers.host,
 	    parsed  = url.parse(req.url, true),
-	    method  = REGEX_GET.test(req.method) ? "get" : req.method,
+	    method  = REGEX_GET.test(req.method) ? "get" : req.method.toLowerCase(),
 	    error   = function (err) {
 	    	if (typeof err !== "undefined") self.log(err, true, true);
 	    	self.respond(res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION);
@@ -18,7 +18,7 @@ factory.prototype.request = function (res, req) {
 	    path    = [],
 	    handled = false,
 	    port    = this.config.port,
-	    allow, count, handle, mimetype, nth, root;
+	    count, handle, nth, root;
 
 	if (!this.config.vhosts.hasOwnProperty(host)) return error();
 
@@ -29,13 +29,16 @@ factory.prototype.request = function (res, req) {
 
 	// Handles the request after determining the path
 	handle = function (path, url) {
+		var allow = allows(req.url),
+		    mimetype;
+
 		handled = true;
 		url     = parsed.protocol + "//" + req.headers.host.replace(/:.*/, "") + ":" + port + url;
-		allow   = allows(req.url);
 
-		if (self.config.debug) self.log("[" + method.toUpperCase() + "] " + url);
+		if (self.config.debug) self.log("[" + req.method + "] " + url);
 
-		fs.exists(path, function (exists) {
+		if (method === "put") allowed(req.method, req.url) ? self.write(path, res, req) : self.respond(res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {"Allow": allow});
+		else fs.exists(path, function (exists) {
 			switch (true) {
 				case !exists:
 					self.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND);
@@ -44,11 +47,11 @@ factory.prototype.request = function (res, req) {
 					self.respond(res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {"Allow": allow});
 					break;
 				default:
-					switch (req.method.toLowerCase()) {
+					switch (method) {
 						case "delete":
 							fs.unlink(path, function (err) {
 								if (err) error(err);
-								else self.respond(res, req, messages.NO_CONTENT, codes.NO_CONTENT)
+								else self.respond(res, req, messages.NO_CONTENT, codes.NO_CONTENT);
 							});
 							break;
 						case "get":
@@ -66,6 +69,9 @@ factory.prototype.request = function (res, req) {
 								});
 							}
 							else self.respond(res, req, null, codes.SUCCESS, {"Allow" : allow, "Content-Type": mimetype});
+							break;
+						case "post":
+							this.write(path, res, req);
 							break;
 						default:
 							self.error(res, req);

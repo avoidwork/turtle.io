@@ -3,6 +3,8 @@
 
 var $          = require("abaaso"),
     crypto     = require("crypto"),
+    filesize   = require("filesize"),
+    formidable = require("formidable"),
     fs         = require("fs"),
     mime       = require("mime"),
     moment     = require("moment"),

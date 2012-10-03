@@ -7,7 +7,7 @@ var messages = {
 	SUCCESS           : "Successful",
 	CREATED           : "Created",
 	ACCEPTED          : "Accepted",
-	NO_CONTENT        : "No content",
+	NO_CONTENT        : "",
 	INVALID_ARGUMENTS : "Invalid arguments",
 	INVALID_AUTH      : "Invalid authorization or OAuth token",
 	FORBIDDEN         : "Forbidden",
