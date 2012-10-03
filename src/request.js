@@ -4,7 +4,7 @@
  * @param  {Object} req HTTP(S) request Object
  * @param  {Object} res HTTP(S) response Object
  * @return {Object}     Instance
- * @todo  Implement POST & PUT
+ * @todo  implement POST & PUT
  */
 factory.prototype.request = function (res, req) {
 	var self    = this,
@@ -18,7 +18,7 @@ factory.prototype.request = function (res, req) {
 	    path    = [],
 	    handled = false,
 	    port    = this.config.port,
-	    root, handle, nth, count;
+	    allows, count, handle, mimetype, nth, root;
 
 	if (!this.config.vhosts.hasOwnProperty(host)) return error();
 
@@ -26,6 +26,18 @@ factory.prototype.request = function (res, req) {
 
 	if (!parsed.hasOwnProperty("host"))     parsed.host     = req.headers.host;
 	if (!parsed.hasOwnProperty("protocol")) parsed.protocol = "http:";
+
+	// Determines which verbs are allowed against a URL
+	allows = function (url) {
+		var result = "",
+		    verbs  = ["DELETE", "GET", "POST", "PUT"];
+
+		verbs.each(function (i) {
+			if (allowed(i, url)) result += (result.length > 0 ? ", " : "") + i;
+		});
+
+		return result.replace("GET", "GET, HEAD, OPTIONS");
+	};
 
 	// Handles the request after determining the path
 	handle = function (path, url) {
@@ -48,18 +60,18 @@ factory.prototype.request = function (res, req) {
 					case "get":
 					case "head":
 					case "options":
-						magic.detectFile(path, function (err, mimetype) {
-							if (err) error(err);
-							else {
-								if (req.method.toLowerCase() === "get") {
-									fs.readFile(path, function (err, data) {
-										if (err) error(err);
-										else self.respond(res, req, data, codes.SUCCESS, {"Content-Type": mimetype});
-									});
-								}
-								else self.respond(res, req, null, codes.SUCCESS, {"Content-Type": mimetype});
-							}
-						});
+						mimetype = mime.lookup(path);
+						if (req.method.toLowerCase() === "get") {
+							fs.stat(path, function (err, data) {
+								var size = data.size;
+
+								fs.readFile(path, function (err, data) {
+									if (err) error(err);
+									else self.respond(res, req, data, codes.SUCCESS, {"Allow" : allows(req.url), "Content-Length": size, "Content-Type": mimetype});
+								});
+							});
+						}
+						else self.respond(res, req, null, codes.SUCCESS, {"Allow" : allows(req.url), "Content-Type": mimetype});
 						break;
 
 					default:

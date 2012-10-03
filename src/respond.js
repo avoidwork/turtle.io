@@ -3,46 +3,48 @@
  * 
  * @param  {Object}  res             Response object
  * @param  {Object}  req             Request object
- * @param  {Mixed}   output          [Optional] String or Object (automatically encoded as JSON, triggers application/json content-type header)
+ * @param  {Mixed}   output          [Optional] Response
  * @param  {Number}  status          [Optional] HTTP status code, default is 200
  * @param  {Object}  responseHeaders [Optional] HTTP headers to decorate the response with
  * @param  {Boolean} end             Signal the end of transmission, default is true
  * @return {Objet}                   Instance
  */
 factory.prototype.respond = function (res, req, output, status, responseHeaders, end) {
-	var body = !REGEX_BODY.test(req.method),
-	    get  = REGEX_GET.test(req.method);
+	var body    = !REGEX_BODY.test(req.method),
+	    get     = REGEX_GET.test(req.method),
+	    headers = $.clone(this.config.headers);
 
 	// Setting optional params
 	if (typeof status === "undefined") status = codes.SUCCESS;
 	if (!(responseHeaders instanceof Object)) responseHeaders = {};
 	end = (end !== false);
 
-	// Setting default headers
-	$.merge(responseHeaders, this.config.headers instanceof Object ? this.config.headers : headers);
+	// Decorating response headers
+	$.merge(headers, responseHeaders);
 
 	// Setting headers
-	responseHeaders["Date"] = new Date().toUTCString();
+	headers["Date"]                         = new Date().toUTCString();
+	headers["Access-Control-Allow-Methods"] = headers.Allow;
+
 	if (body && get) {
 		switch (true) {
 			case end && status === codes.SUCCESS:
-				responseHeaders.Etag = crypto.createHash("md5").update(output).digest("hex");
+				headers.Etag = crypto.createHash("md5").update(output).digest("hex");
 				break;
 			case !end:
-				responseHeaders["Transfer-Encoding"] = "chunked";
+				headers["Transfer-Encoding"] = "chunked";
 				break;
 		}
-		responseHeaders["Content-Length"] = String(output).length;
 	}
 
 	// Setting the response status code
 	res.statusCode = status;
 
 	// Removing cache centric header, we don't want these responses cached
-	if (!get || status >= codes.INVALID_ARGUMENTS) delete responseHeaders["Cache-Control"];
+	if (!get || status >= codes.INVALID_ARGUMENTS) delete headers["Cache-Control"];
 
 	// Decorating response with headers
-	$.iterate(responseHeaders, function (v, k) {
+	$.iterate(headers, function (v, k) {
 		res.setHeader(k, v);
 	});
 
