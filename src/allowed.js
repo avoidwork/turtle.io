@@ -6,7 +6,15 @@
  * @return {Boolean}       Boolean indicating if method is allowed
  */
 var allowed = function (method, uri) {
-	var result = true;
+	var result = false;
+
+	$.route.list(method).each(function (route) {
+		if (RegExp("^" + route + "$").test(uri)) return !(result = true);
+	});
+
+	if (!result) $.route.list("all").each(function (route) {
+		if (RegExp("^" + route + "$").test(uri)) return !(result = true);
+	});
 
 	return result;
 };

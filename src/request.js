@@ -33,7 +33,7 @@ factory.prototype.request = function (res, req) {
 		url     = parsed.protocol + "//" + req.headers.host.replace(/:.*/, "") + ":" + port + url;
 
 		if (self.config.debug) self.log("[" + method.toUpperCase() + "] " + url);
-		if (!allowed(method, url)) self.respond(res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED);
+		if (!allowed(method, req.url)) self.respond(res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED);
 		else fs.exists(path, function (exists) {
 			if (!exists) self.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND);
 			else {
