@@ -6,7 +6,9 @@
  * @return {Object}         Instance
  */
 factory.prototype.delete = function (route, fn) {
-	$.route.set(route, fn, "delete");
+	var self = this;
+
+	$.route.set(route, function (res, req) { fn.call(self, res, req); }, "delete");
 	return this;
 };
 
@@ -18,7 +20,9 @@ factory.prototype.delete = function (route, fn) {
  * @return {Object}         Instance
  */
 factory.prototype.get = function (route, fn) {
-	$.route.set(route, fn, "get");
+	var self = this;
+
+	$.route.set(route, function (res, req) { fn.call(self, res, req); }, "get");
 	return this;
 };
 
@@ -30,7 +34,9 @@ factory.prototype.get = function (route, fn) {
  * @return {Object}         Instance
  */
 factory.prototype.post = function (route, fn) {
-	$.route.set(route, fn, "post");
+	var self = this;
+
+	$.route.set(route, function (res, req) { fn.call(self, res, req); }, "post");
 	return this;
 };
 
@@ -42,6 +48,8 @@ factory.prototype.post = function (route, fn) {
  * @return {Object}         Instance
  */
 factory.prototype.put = function (route, fn) {
-	$.route.set(route, fn, "put");
+	var self = this;
+
+	$.route.set(route, function (res, req) { fn.call(self, res, req); }, "put");
 	return this;
 };

@@ -35,7 +35,7 @@ var bootstrap = function (args) {
 		$.route.set("error", function (res, req) { self.error(res, req); });
 
 		// Setting default response route
-		this.get("/.*", function (res, req) { self.request(res, req); });
+		this.get("/.*", this.request);
 
 		// Creating a server
 		this.server = $.route.server(params, function (e) { self.log(e, true); });
