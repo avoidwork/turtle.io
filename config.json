@@ -5,8 +5,9 @@
 		"Cache-Control" : "max-age=3600 must-revalidate"
 	},
 	"logs" : {
-		"date" : "YYYYMMDD",
-		"file" : "error_{{date}}.log"
+		"date"   : "YYYYMMDD",
+		"daemon" : "turtle_{{date}}.log",
+		"error"  : "error_{{date}}.log"
 	},
 	"root"   : "./sites",
 	"index"  : ["index.htm", "index.html"],

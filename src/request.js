@@ -4,7 +4,7 @@
  * @param  {Object} req HTTP(S) request Object
  * @param  {Object} res HTTP(S) response Object
  * @return {Object}     Instance
- * @todo  implement allowed()
+ * @todo  Implement POST & PUT
  */
 factory.prototype.request = function (res, req) {
 	var self    = this,
@@ -12,7 +12,7 @@ factory.prototype.request = function (res, req) {
 	    parsed  = url.parse(req.url, true),
 	    method  = REGEX_GET.test(req.method) ? "get" : req.method,
 	    error   = function (err) {
-	    	if (typeof err !== "undefined") this.log(err);
+	    	if (typeof err !== "undefined") self.log(err, true, true);
 	    	self.respond(res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION);
 	    },
 	    path    = [],
@@ -32,7 +32,7 @@ factory.prototype.request = function (res, req) {
 		handled = true;
 		url     = parsed.protocol + "//" + req.headers.host.replace(/:.*/, "") + ":" + port + url;
 
-		if (self.config.debug) $.log("[" + method + "] " + url)
+		if (self.config.debug) self.log("[" + method.toUpperCase() + "] " + url);
 		if (!allowed(method, url)) self.respond(res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED);
 		else fs.exists(path, function (exists) {
 			if (!exists) self.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND);
@@ -60,14 +60,6 @@ factory.prototype.request = function (res, req) {
 								else self.respond(res, req, null, codes.SUCCESS, {"Content-Type": mimetype});
 							}
 						});
-						break;
-
-					case "post":
-						self.error(res, req);
-						break;
-
-					case "put":
-						self.error(res, req);
 						break;
 
 					default:
