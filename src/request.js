@@ -18,7 +18,7 @@ factory.prototype.request = function (res, req) {
 	    path    = [],
 	    handled = false,
 	    port    = this.config.port,
-	    allows, count, handle, mimetype, nth, root;
+	    allow, count, handle, mimetype, nth, root;
 
 	if (!this.config.vhosts.hasOwnProperty(host)) return error();
 
@@ -27,59 +27,52 @@ factory.prototype.request = function (res, req) {
 	if (!parsed.hasOwnProperty("host"))     parsed.host     = req.headers.host;
 	if (!parsed.hasOwnProperty("protocol")) parsed.protocol = "http:";
 
-	// Determines which verbs are allowed against a URL
-	allows = function (url) {
-		var result = "",
-		    verbs  = ["DELETE", "GET", "POST", "PUT"];
-
-		verbs.each(function (i) {
-			if (allowed(i, url)) result += (result.length > 0 ? ", " : "") + i;
-		});
-
-		return result.replace("GET", "GET, HEAD, OPTIONS");
-	};
-
 	// Handles the request after determining the path
 	handle = function (path, url) {
 		handled = true;
 		url     = parsed.protocol + "//" + req.headers.host.replace(/:.*/, "") + ":" + port + url;
+		allow   = allows(req.url);
 
 		if (self.config.debug) self.log("[" + method.toUpperCase() + "] " + url);
-		if (!allowed(method, req.url)) self.respond(res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED);
-		else fs.exists(path, function (exists) {
-			if (!exists) self.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND);
-			else {
-				switch (req.method.toLowerCase()) {
-					case "delete":
-						fs.unlink(path, function (err) {
-							if (err) error(err);
-							else self.respond(res, req, messages.NO_CONTENT, codes.NO_CONTENT)
-						});
-						break;
 
-					case "get":
-					case "head":
-					case "options":
-						mimetype = mime.lookup(path);
-						if (req.method.toLowerCase() === "get") {
-							fs.stat(path, function (err, data) {
-								var size = data.size;
-
-								fs.readFile(path, function (err, data) {
-									if (err) error(err);
-									else self.respond(res, req, data, codes.SUCCESS, {"Allow" : allows(req.url), "Content-Length": size, "Content-Type": mimetype});
-								});
+		fs.exists(path, function (exists) {
+			switch (true) {
+				case !exists:
+					self.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND);
+					break;
+				case !allowed(method, req.url):
+					self.respond(res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {"Allow": allow});
+					break;
+				default:
+					switch (req.method.toLowerCase()) {
+						case "delete":
+							fs.unlink(path, function (err) {
+								if (err) error(err);
+								else self.respond(res, req, messages.NO_CONTENT, codes.NO_CONTENT)
 							});
-						}
-						else self.respond(res, req, null, codes.SUCCESS, {"Allow" : allows(req.url), "Content-Type": mimetype});
-						break;
+							break;
+						case "get":
+						case "head":
+						case "options":
+							mimetype = mime.lookup(path);
+							if (req.method.toLowerCase() === "get") {
+								fs.stat(path, function (err, data) {
+									var size = data.size;
 
-					default:
-						self.error(res, req);
-				}
+									fs.readFile(path, function (err, data) {
+										if (err) error(err);
+										else self.respond(res, req, data, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype});
+									});
+								});
+							}
+							else self.respond(res, req, null, codes.SUCCESS, {"Allow" : allow, "Content-Type": mimetype});
+							break;
+						default:
+							self.error(res, req);
+					}
 			}
 		});
-	}
+	};
 
 	if (!/\/$/.test(parsed.pathname)) handle(root + parsed.pathname, parsed.pathname);
 	else {
