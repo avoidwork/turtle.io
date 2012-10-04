@@ -43,7 +43,7 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 	// Removing headers not wanted in the response
 	if (!get || status >= codes.INVALID_ARGUMENTS) delete headers["Cache-Control"];
 	switch (true) {
-		case status >= codes.FORBIDDEN && status <= codes.NOT_FOUND:
+		case status >= codes.FORBIDDEN && status < codes.NOT_FOUND:
 		case status >= codes.ERROR_APPLICATION:
 			delete headers.Allow;
 			delete headers["Access-Control-Allow-Methods"];

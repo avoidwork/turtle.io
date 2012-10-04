@@ -4,7 +4,6 @@
  * @param  {Object} req HTTP(S) request Object
  * @param  {Object} res HTTP(S) response Object
  * @return {Object}     Instance
- * @todo  implement POST & PUT
  */
 factory.prototype.request = function (res, req) {
 	var self    = this,
@@ -30,6 +29,8 @@ factory.prototype.request = function (res, req) {
 	// Handles the request after determining the path
 	handle = function (path, url) {
 		var allow = allows(req.url),
+		    del   = allowed("DELETE", req.url),
+		    post  = allowed("POST", req.url),
 		    mimetype;
 
 		handled = true;
@@ -37,16 +38,19 @@ factory.prototype.request = function (res, req) {
 
 		if (self.config.debug) self.log("[" + req.method + "] " + url);
 
-		if (method === "put") allowed(req.method, req.url) ? self.write(path, res, req) : self.respond(res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {"Allow": allow});
-		else fs.exists(path, function (exists) {
+		fs.exists(path, function (exists) {
 			switch (true) {
+				case !exists && method === "post":
+					allowed(req.method, req.url) ? self.write(path, res, req) : self.respond(res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {"Allow": allow});
+					break;
 				case !exists:
-					self.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND);
+					self.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND, (post ? {"Allow": "POST"} : undefined));
 					break;
 				case !allowed(method, req.url):
 					self.respond(res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {"Allow": allow});
 					break;
 				default:
+					if (!/\/$/.test(req.url)) allow = allow.explode().remove("POST").join(", ");
 					switch (method) {
 						case "delete":
 							fs.unlink(path, function (err) {
@@ -70,11 +74,11 @@ factory.prototype.request = function (res, req) {
 							}
 							else self.respond(res, req, null, codes.SUCCESS, {"Allow" : allow, "Content-Type": mimetype});
 							break;
-						case "post":
-							this.write(path, res, req);
+						case "put":
+							self.write(path, res, req);
 							break;
 						default:
-							self.error(res, req);
+							self.respond(res, req, (del ? messages.CONFLICT : messages.ERROR_APPLICATION), (del ? codes.CONFLICT : codes.ERROR_APPLICATION), {"Allow": allow});
 					}
 			}
 		});
@@ -87,7 +91,7 @@ factory.prototype.request = function (res, req) {
 		this.config.index.each(function (i) {
 			fs.exists(root + parsed.pathname + i, function (exists) {
 				if (exists && !handled) handle(root + parsed.pathname + i, parsed.pathname + i);
-				else if (!exists && ++count === nth) self.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND);
+				else if (!exists && ++count === nth) self.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND, (post ? {"Allow": "POST"} : undefined));
 			});
 		});
 	}

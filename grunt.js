@@ -36,6 +36,7 @@ module.exports = function (grunt) {
 					"src/stop.js",
 					"src/unset.js",
 					"src/verbs.js",
+					"src/write.js",
 					"src/headers.js",
 					"src/messages.js",
 					"src/outro.js"
