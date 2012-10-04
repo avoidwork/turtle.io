@@ -20,6 +20,7 @@ module.exports = function (grunt) {
 					"<banner>",
 					"src/intro.js",
 					"src/allowed.js",
+					"src/allows.js",
 					"src/bootstrap.js",
 					"src/codes.js",
 					"src/config.js",
@@ -35,6 +36,7 @@ module.exports = function (grunt) {
 					"src/stop.js",
 					"src/unset.js",
 					"src/verbs.js",
+					"src/write.js",
 					"src/headers.js",
 					"src/messages.js",
 					"src/outro.js"

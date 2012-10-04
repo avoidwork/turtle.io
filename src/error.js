@@ -14,8 +14,8 @@ factory.prototype.error = function (res, req) {
 
 	uri = parsed.protocol + "//" + req.headers.host.replace(/:.*/, "") + ":" + this.config.port + req.url;
 
-	REGEX_GET.test(req.method) ? this.respond(res, req, messages.NOT_FOUND,   codes.NOT_FOUND)
-	                           : this.respond(res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED);
+	REGEX_GET.test(req.method) ? this.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND, (allowed("POST") ? {"Allow": "POST"} : undefined))
+	                           : this.respond(res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {"Allow": allows(req.url)});
 
 	if (this.config.debug) this.log("[" + req.method.toUpperCase() + "] " + uri);
 };

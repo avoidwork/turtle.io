@@ -1,4 +1,18 @@
 /**
+ * Sets a route for all methods
+ * 
+ * @param  {RegExp}   route Route
+ * @param  {Function} fn    Handler
+ * @return {Object}         Instance
+ */
+factory.prototype.all = function (route, fn) {
+	var self = this;
+
+	$.route.set(route, function (res, req) { fn.call(self, res, req); }, "all");
+	return this;
+};
+
+/**
  * Sets a DELETE route
  * 
  * @param  {RegExp}   route Route
