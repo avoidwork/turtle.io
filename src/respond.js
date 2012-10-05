@@ -26,6 +26,12 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 	headers["Date"]                         = new Date().toUTCString();
 	headers["Access-Control-Allow-Methods"] = headers.Allow;
 
+	// Encoding as JSON if not prepared
+	if (typeof output === "object") {
+		headers["Content-Type"] = "application/json";
+		output = $.encode(output);
+	}
+
 	if (body && get) {
 		switch (true) {
 			case end && status === codes.SUCCESS:
