@@ -27,7 +27,7 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 	headers["Access-Control-Allow-Methods"] = headers.Allow;
 
 	// Encoding as JSON if not prepared
-	if (typeof output === "object") {
+	if ((output instanceof Array) || String(output) === "[object Object]") {
 		headers["Content-Type"] = "application/json";
 		output = $.encode(output);
 	}
