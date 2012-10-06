@@ -35,7 +35,7 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 	if (body && get) {
 		switch (true) {
 			case end && status === codes.SUCCESS:
-				headers.Etag = crypto.createHash("md5").update(output).digest("hex");
+				headers.Etag = "\"" + this.hash(output) + "\"";
 				break;
 			case !end:
 				headers["Transfer-Encoding"] = "chunked";
@@ -53,6 +53,7 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 		case status >= codes.ERROR_APPLICATION:
 			delete headers.Allow;
 			delete headers["Access-Control-Allow-Methods"];
+			delete headers["Last-Modified"];
 			break;
 	}
 

@@ -1,18 +1,19 @@
 {
-	"debug"  : false,
-	"port"   : 8000,
+	"debug"   : false,
+	"port"    : 8000,
 	"headers" : {
-		"Cache-Control" : "max-age=3600 must-revalidate"
+		"Cache-Control"                : "max-age=3600 must-revalidate",
+		"Access-Control-Allow-Origin"  : "*"
 	},
-	"index"  : ["index.htm", "index.html"],
-	"logs" : {
+	"index"   : ["index.htm", "index.html"],
+	"logs"    : {
 		"dir"    : "./logs",
 		"date"   : "YYYYMMDD",
 		"daemon" : "turtle_{{date}}.log",
 		"error"  : "error_{{date}}.log"
 	},
-	"root"   : "./sites",
-	"vhosts" : {
+	"root"    : "./sites",
+	"vhosts"  : {
 		"localhost" : "test",
 		"test"      : "test",
 		"test2"     : "test2"

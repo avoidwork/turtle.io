@@ -64,11 +64,20 @@ factory.prototype.request = function (res, req) {
 							mimetype = mime.lookup(path);
 							if (req.method.toLowerCase() === "get") {
 								fs.stat(path, function (err, data) {
-									var size = data.size;
+									var size     = data.size,
+									    modified = data.mtime.toUTCString();
 
 									fs.readFile(path, function (err, data) {
-										if (err) error(err);
-										else self.respond(res, req, data, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype});
+										switch (true) {
+											case (err):
+												error(err);
+												break;
+											case req.headers.hasOwnProperty("if-none-match") && req.headers["if-none-match"] === ("\"" + self.hash(data) + "\""):
+												self.respond(res, req, null, codes.NOT_MODIFIED, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: req.headers["if-none-match"], "Last-Modified": modified});
+												break;
+											default:
+												self.respond(res, req, data, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, "Last-Modified": modified});
+										}
 									});
 								});
 							}

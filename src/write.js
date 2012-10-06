@@ -22,9 +22,19 @@ factory.prototype.write = function (path, res, req) {
 		});
 
 		req.on("end", function () {
-			fs.writeFile(path, body, function (err) {
-				if (err) self.respond(res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION);
-				else self.respond(res, req, (put ? messages.NO_CONTENT : messages.CREATED), (put ? codes.NO_CONTENT : codes.CREATED), {"Allow" : allow});
+			fs.readFile(path, function (e, data) {
+				if (e) self.respond(res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION);
+				switch (true) {
+					case !req.headers.hasOwnProperty(etag):
+					case req.headers.etag === self.hash(data):
+						fs.writeFile(path, body, function (e) {
+							if (e) self.respond(res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION);
+							else self.respond(res, req, (put ? messages.NO_CONTENT : messages.CREATED), (put ? codes.NO_CONTENT : codes.CREATED), {"Allow" : allow});
+						});
+						break;
+					default:
+						self.respond(res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION);
+				}
 			});
 		});
 	}
