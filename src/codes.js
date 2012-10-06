@@ -15,6 +15,7 @@ var codes = {
 	NOT_FOUND         : 404,
 	NOT_ALLOWED       : 405,
 	CONFLICT          : 409,
+	FAILED            : 412,
 	ERROR_APPLICATION : 500,
 	ERROR_SERVICE     : 503
 };
