@@ -8,8 +8,9 @@ var headers = {
 	"Allow"                        : "",
 	"Content-Type"                 : "text/html",
 	"Date"                         : "",
+	"Last-Modified"                : "",
 	"Server"                       : (function () { return ("turtle.io/{{VERSION}} [abaaso/" + $.version + " node.js/" + process.versions.node.replace(/^v/, "") + " (" + process.platform.capitalize() + " V8/" + process.versions.v8 + ")]"); })(),
 	"Access-Control-Allow-Headers" : "Accept, Allow, Cache-Control, Content-Type, Date, Etag, Transfer-Encoding, Server",
 	"Access-Control-Allow-Methods" : "",
-	"Access-Control-Allow-Origin"  : "*"
+	"Access-Control-Allow-Origin"  : ""
 };

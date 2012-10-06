@@ -27,6 +27,7 @@ module.exports = function (grunt) {
 					"src/factory.js",
 					"src/echo.js",
 					"src/error.js",
+					"src/hash.js",
 					"src/log.js",
 					"src/request.js",
 					"src/respond.js",
