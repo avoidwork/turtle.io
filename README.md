@@ -38,10 +38,9 @@ server.start(params);
 The /api route acts as a proxy to another service. This example also utilizes a `config.json` file local to the server script, for easy DevOps management.
 
 ```javascript
-var $      = require("abaaso"),
-    config = require("./config.json"),
-    turtle = require("turtle.io"),
-    server = new turtle();
+var config    = require("./config.json"),
+    turtle_io = require("turtle.io"),
+    server    = new turtle_io();
 
 // Setting proxy routes
 server.proxy(server.config.api, "/v1");
