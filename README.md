@@ -33,24 +33,21 @@ server.start(params);
 
 ### API proxy
 
-The /api route would acts as a proxy to another service on a different internal port.
+The /api route acts as a proxy to another service.
 
 This example also utilizes a `config.json` file local to the server script, for easy DevOps management.
 
 ```javascript
 var $      = require("abaaso"),
-    turtle = require("turtle.io"),
     config = require("./config.json"),
-    server = new turtle(),
-    verbs  = ["delete", "get", "put", "post"];
+    turtle = require("turtle.io"),
+    server = new turtle();
 
 // Setting proxy routes
-verbs.each(function (i) {
-	server[i]("/api", server.proxy, server.config.api);
-	server[i]("/api/[a-z]+", server.proxy, server.config.api);
-	server[i]("/api/[a-z]+/[a-z0-9]+", server.proxy, server.config.api);
-	server[i]("/api/reports/[a-z0-9]+/[a-z0-9-]+", server.proxy, server.config.api);
-});
+server.all("/api", server.proxy, server.config.api);
+server.all("/api/[a-z]+", server.proxy, server.config.api);
+server.all("/api/[a-z]+/[a-z0-9]+", server.proxy, server.config.api);
+server.all("/api/reports/[a-z0-9]+/[a-z0-9-]+", server.proxy, server.config.api);
 
 server.start(config);
 ```
