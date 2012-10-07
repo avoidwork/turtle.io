@@ -8,8 +8,8 @@ All you need to do is install it, and tell it what directory holds your web site
 ## Getting Started
 
 1. Install the module with: `npm install turtle.io`
-2. Create a script to load & start a server turtle.io. You could use `sample.js` in the turtle.io directory (./node_modules/turtle.io) as a template, or see the examples below
-3. [Optional] Edit config.json in turtle.io directory to configure server defaults; this is optional because you can start the server with a configuration Object to override defaults
+2. Create a script to load & start a server. You could use `sample.js` in the turtle.io directory (./node_modules/turtle.io) as a template, or see the examples below
+3. [Optional] Edit `config.json` in the turtle.io directory to configure server defaults; you can override defaults by passing server.start() an Object
 
 ## Examples
 
@@ -33,7 +33,7 @@ params.vhosts = {
 server.start(params);
 ```
 
-### API proxy
+### Proxy routes
 
 The /api route acts as a proxy to another service. This example also utilizes a `config.json` file local to the server script, for easy DevOps management.
 
@@ -43,9 +43,9 @@ var config    = require("./config.json"),
     server    = new turtle_io();
 
 // Setting proxy routes
-server.proxy(server.config.api, "/v1");
-server.proxy(server.config.api, "/v1/[a-z]+");
-server.proxy(server.config.api, "/v1/[a-z]+/[a-z0-9]+");
+server.proxy(server.config.api, "/api");
+server.proxy(server.config.api, "/api/[a-z]+");
+server.proxy(server.config.api, "/api/[a-z]+/[a-z0-9]+");
 
 server.start(config);
 ```
