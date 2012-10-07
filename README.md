@@ -42,70 +42,14 @@ var $      = require("abaaso"),
     turtle = require("turtle.io"),
     config = require("./config.json"),
     server = new turtle(),
-    verbs  = ["delete", "get", "put", "post"],
-    headers, proxy;
-
-/**
- * Capitalizes HTTP headers
- * 
- * @param  {Object} args Response headers
- * @return {Object}      Reshaped response headers
- */
-headers = function (args) {
-	var result = {},
-	    rvalue  = /.*:\s+/,
-	    rheader = /:.*/;
-
-	args.trim().split("\n").each(function (i) {
-		var header, value;
-
-		value          = i.replace(rvalue, "");
-		header         = i.replace(rheader, "");
-		header         = header.indexOf("-") === -1 ? header.capitalize() : (function () { var x = []; header.explode("-").each(function (i) { x.push(i.capitalize()) }); return x.join("-"); })();
-		result[header] = value;
-	});
-
-	return result;
-};
-
-/**
- * Proxy handler
- * 
- * @param  {Object} res HTTP response Object
- * @param  {Object} req HTTP request Object
- * @return {Undefined}  undefined
- */
-proxy = function (res, req) {
-	var uri = server.config.api + req.url,
-	    failure, success;
-
-	failure = function (arg, xhr) {
-		var headerz;
-
-		xhr     = xhr || {};
-		headerz = typeof xhr.getAllResponseHeaders === "function" ? headers(xhr.getAllResponseHeaders()) : {};
-
-		server.respond(res, req, arg, xhr.status || 500, headerz);
-	};
-
-	success = function (arg, xhr) {
-		var headerz;
-
-		xhr     = xhr || {};
-		headerz = typeof xhr.getAllResponseHeaders === "function" ? headers(xhr.getAllResponseHeaders()) : {};
-
-		server.respond(res, req, arg, xhr.status || 200, headerz);
-	};
-
-	uri[req.method.toLowerCase()](success, failure);
-};
+    verbs  = ["delete", "get", "put", "post"];
 
 // Setting proxy routes
 verbs.each(function (i) {
-	server[i]("/api", proxy);
-	server[i]("/api/[a-z]+", proxy);
-	server[i]("/api/[a-z]+/[a-z0-9]+", proxy);
-	server[i]("/api/reports/[a-z0-9]+/[a-z0-9-]+", proxy);
+	server[i]("/api", server.proxy, server.config.api);
+	server[i]("/api/[a-z]+", server.proxy, server.config.api);
+	server[i]("/api/[a-z]+/[a-z0-9]+", server.proxy, server.config.api);
+	server[i]("/api/reports/[a-z0-9]+/[a-z0-9-]+", server.proxy, server.config.api);
 });
 
 server.start(config);
