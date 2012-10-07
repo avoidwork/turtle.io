@@ -4,7 +4,6 @@
  * @param  {String} origin Host to proxy (e.g. http://hostname)
  * @param  {String} route  Route to proxy
  * @return {Object}        Instance
- * @todo  fix stale res & req objects upon second request
  */
 factory.prototype.proxy = function (origin, route) {
 	var self  = this,
@@ -52,11 +51,7 @@ factory.prototype.proxy = function (origin, route) {
 		self[i](route, function (res, req) {
 			var url = origin + req.url;
 
-			url[req.method.toLowerCase()](function (arg, xhr) {
-				handle (arg, xhr, res, req);
-			}, function (arg, xhr) {
-				handle (arg, xhr, res, req);
-			});
+			url[req.method.toLowerCase()](function (arg, xhr) { handle (arg, xhr, res, req); }, function (arg, xhr) { handle (arg, xhr, res, req); });
 		});
 	});
 
