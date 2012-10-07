@@ -1,14 +1,15 @@
 /**
  * Proxies a request to another host
  * 
- * @param  {Object} res    HTTP response Object
- * @param  {Object} req    HTTP request Object
  * @param  {String} origin Host to proxy (e.g. http://hostname)
- * @return {Undefined}  undefined
+ * @param  {String} route  Route to proxy
+ * @return {Object}        Instance
+ * @todo  fix stale res & req objects upon second request
  */
 factory.prototype.proxy = function (origin, route) {
-	var self = this,
-	    headers, handle;
+	var self  = this,
+	    verbs = ["delete", "get", "post", "put"],
+	    handle, headers;
 
 	/**
 	 * Response handler
@@ -20,12 +21,7 @@ factory.prototype.proxy = function (origin, route) {
 	 * @return {Undefined}  undefined
 	 */
 	handle = function (arg, xhr, res, req) {
-		var headerz = {};
-
-		if (typeof xhr === "undefined") xhr = {};
-		if (typeof xhr.getAllResponseHeaders === "function") headerz = headers(xhr.getAllResponseHeaders())
-
-		self.respond(res, req, arg, xhr.status || 500, headerz);
+		self.respond(res, req, arg, xhr.status, headers(xhr.getAllResponseHeaders()));
 	};
 
 	/**
@@ -52,9 +48,17 @@ factory.prototype.proxy = function (origin, route) {
 	};
 
 	// Setting route
-	this.all(route, function (res, req) {
-		var fn = function (arg, xhr) { handle(arg, xhr, res, req); };
+	verbs.each(function (i) {
+		self[i](route, function (res, req) {
+			var url = origin + req.url;
 
-		(origin + req.url)[req.method.toLowerCase()](fn, fn);
+			url[req.method.toLowerCase()](function (arg, xhr) {
+				handle (arg, xhr, res, req);
+			}, function (arg, xhr) {
+				handle (arg, xhr, res, req);
+			});
+		});
 	});
+
+	return this;
 };
