@@ -15,6 +15,8 @@ All you need to do is install it, and tell it what directory holds your web site
 
 ### Virtual hosts
 
+Virtual hosts keys are hostname, and value is the directory relative to "root".
+
 ```javascript
 var turtle_io = require("turtle.io"),
     server    = new turtle_io(),
@@ -33,9 +35,7 @@ server.start(params);
 
 ### API proxy
 
-The /api route acts as a proxy to another service.
-
-This example also utilizes a `config.json` file local to the server script, for easy DevOps management.
+The /api route acts as a proxy to another service. This example also utilizes a `config.json` file local to the server script, for easy DevOps management.
 
 ```javascript
 var $      = require("abaaso"),
@@ -44,10 +44,9 @@ var $      = require("abaaso"),
     server = new turtle();
 
 // Setting proxy routes
-server.all("/api", server.proxy, server.config.api);
-server.all("/api/[a-z]+", server.proxy, server.config.api);
-server.all("/api/[a-z]+/[a-z0-9]+", server.proxy, server.config.api);
-server.all("/api/reports/[a-z0-9]+/[a-z0-9-]+", server.proxy, server.config.api);
+server.proxy(server.config.api, "/v1");
+server.proxy(server.config.api, "/v1/[a-z]+");
+server.proxy(server.config.api, "/v1/[a-z]+/[a-z0-9]+");
 
 server.start(config);
 ```

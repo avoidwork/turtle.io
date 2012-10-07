@@ -6,25 +6,26 @@
  * @param  {String} origin Host to proxy (e.g. http://hostname)
  * @return {Undefined}  undefined
  */
-factory.prototype.proxy = function (res, req, origin) {
-	var uri = origin + req.url,
+factory.prototype.proxy = function (origin, route) {
+	var self = this,
 	    headers, handle;
 
 	/**
 	 * Response handler
 	 * 
-	 * @param  {Mixed}  arg  Proxy response
-	 * @param  {Object} xhr  XmlHttpRequest
-	 * @param  {Number} code Default status code
-	 * @return {Undefined}   undefined
+	 * @param  {Mixed}  arg Proxy response
+	 * @param  {Object} xhr XmlHttpRequest
+	 * @param  {Object} res HTTP response Object
+	 * @param  {Object} req HTTP request Object
+	 * @return {Undefined}  undefined
 	 */
-	handle = function (arg, xhr, code) {
-		var headerz;
+	handle = function (arg, xhr, res, req) {
+		var headerz = {};
 
-		xhr     = xhr || {};
-		headerz = typeof xhr.getAllResponseHeaders === "function" ? headers(xhr.getAllResponseHeaders()) : {};
+		if (typeof xhr === "undefined") xhr = {};
+		if (typeof xhr.getAllResponseHeaders === "function") headerz = headers(xhr.getAllResponseHeaders())
 
-		server.respond(res, req, arg, xhr.status || code, headerz);
+		self.respond(res, req, arg, xhr.status || 500, headerz);
 	};
 
 	/**
@@ -50,6 +51,10 @@ factory.prototype.proxy = function (res, req, origin) {
 		return result;
 	};
 
-	// Making proxy request - uri.verb(success, failure)
-	uri[req.method.toLowerCase()](function (arg, xhr) { handle(arg, xhr, 200); }, function (arg, xhr) { handle(arg, xhr, 500); });
+	// Setting route
+	this.all(route, function (res, req) {
+		var fn = function (arg, xhr) { handle(arg, xhr, res, req); };
+
+		(origin + req.url)[req.method.toLowerCase()](fn, fn);
+	});
 };
