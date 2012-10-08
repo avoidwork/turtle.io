@@ -7,7 +7,7 @@
  * @return {String}         Hash of arg
  */
 factory.prototype.hash = function (arg, encrypt, digest) {
-	if (arg === null) arg = "";
+	if (/null|undefined/.test(arg))     arg     = "";
 	if (typeof encrypt === "undefined") encrypt = "md5";
 	if (typeof digest  === "undefined") digest  = "hex";
 
