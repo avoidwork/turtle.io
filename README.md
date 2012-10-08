@@ -11,6 +11,10 @@ All you need to do is install it, and tell it what directory holds your web site
 2. Create a script to load & start a server. You could use `sample.js` in the turtle.io directory (./node_modules/turtle.io) as a template, or see the examples below
 3. [Optional] Edit `config.json` in the turtle.io directory to configure server defaults; you can override defaults by passing server.start() an Object
 
+## Documentation
+
+Please visit the [wiki](https://github.com/avoidwork/turtle.io/wiki).
+
 ## Examples
 
 ### Virtual hosts
