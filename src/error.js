@@ -1,5 +1,5 @@
 /**
- * Error handler for all requests
+ * Error handler for requests
  * 
  * @param  {Object} res Response Object
  * @param  {Object} req Request Object

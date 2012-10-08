@@ -1,5 +1,7 @@
 /**
- * Request handler
+ * Request handler which provides RESTful CRUD operations
+ * 
+ * Default route is for GET only
  * 
  * @param  {Object} req HTTP(S) request Object
  * @param  {Object} res HTTP(S) response Object

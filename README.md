@@ -19,7 +19,7 @@ Please visit the [wiki](https://github.com/avoidwork/turtle.io/wiki).
 
 ### Virtual hosts
 
-Virtual hosts keys are hostname, and value is the directory relative to "root".
+Virtual host keys are the hostname, and the value is the directory relative to "root".
 
 ```javascript
 var turtle_io = require("turtle.io"),

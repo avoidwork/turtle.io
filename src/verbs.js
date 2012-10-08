@@ -1,5 +1,5 @@
 /**
- * Sets a route for all methods
+ * Sets a route for all verbs
  * 
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler

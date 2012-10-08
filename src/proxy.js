@@ -1,5 +1,5 @@
 /**
- * Proxies a request to another host
+ * Proxies a request to a Server
  * 
  * @param  {String} origin Host to proxy (e.g. http://hostname)
  * @param  {String} route  Route to proxy

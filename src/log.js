@@ -4,7 +4,7 @@
  * @param  {Mixed}   msg     Error Object or String
  * @param  {Boolean} error   [Optional] Write to error log (default: false)
  * @param  {Boolean} display [Optional] Displays msgor on the console (default: true)
- * @return {Undefined}       undefined
+ * @return {Object}          Instance
  */
 factory.prototype.log = function (msg, error, display) {
 	error   = (error   === true);
