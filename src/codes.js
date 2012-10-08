@@ -8,6 +8,7 @@ var codes = {
 	CREATED           : 201,
 	ACCEPTED          : 202,
 	NO_CONTENT        : 204,
+	MOVED             : 301,
 	NOT_MODIFIED      : 304,
 	INVALID_ARGUMENTS : 400,
 	INVALID_AUTH      : 401,

@@ -100,16 +100,19 @@ factory.prototype.request = function (res, req) {
 		else {
 			if (!stats.isDirectory()) handle(root + parsed.pathname, parsed.pathname);
 			else {
-				nth   = self.config.index.length;
-				count = 0;
-				path  = !/\/$/.test(parsed.pathname) ? parsed.pathname + "/" : parsed.pathname;
+				// Adding a trailing slash for relative paths
+				if (stats.isDirectory() && !/\/$/.test(parsed.pathname)) self.respond(res, req, messages.NO_CONTENT, codes.MOVED, {"Location": parsed.pathname + "/"});
+				else {
+					nth   = self.config.index.length;
+					count = 0;
 
-				self.config.index.each(function (i) {
-					fs.exists(root + path + i, function (exists) {
-						if (exists && !handled) handle(root + path + i, path + i);
-						else if (!exists && ++count === nth) self.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND, (allowed("POST", req.url) ? {"Allow": "POST"} : undefined));
+					self.config.index.each(function (i) {
+						fs.exists(root + parsed.pathname + i, function (exists) {
+							if (exists && !handled) handle(root + parsed.pathname + i, parsed.pathname + i);
+							else if (!exists && ++count === nth) self.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND, (allowed("POST", req.url) ? {"Allow": "POST"} : undefined));
+						});
 					});
-				});
+				}
 			}
 		}
 	});
