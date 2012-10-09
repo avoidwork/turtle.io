@@ -47,9 +47,9 @@ var config    = require("./config.json"),
     server    = new turtle_io();
 
 // Setting proxy routes
-server.proxy(server.config.api, "/api");
-server.proxy(server.config.api, "/api/[a-z]+");
-server.proxy(server.config.api, "/api/[a-z]+/[a-z0-9]+");
+server.proxy(config.api, "/api");
+server.proxy(config.api, "/api/[a-z]+");
+server.proxy(config.api, "/api/[a-z]+/[a-z0-9]+");
 
 server.start(config);
 ```
