@@ -10,4 +10,5 @@ var $          = require("abaaso"),
     util       = require("util"),
     REGEX_HALT = new RegExp("ReferenceError|" + $.label.error.invalidArguments),
     REGEX_BODY = /head|options/i,
-    REGEX_GET  = /get|head|options/i;
+    REGEX_GET  = /get|head|options/i,
+    REGEX_DEL  = /del/i;

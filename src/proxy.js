@@ -1,5 +1,5 @@
 /**
- * Proxies a request to another host
+ * Proxies a request to a Server
  * 
  * @param  {String} origin Host to proxy (e.g. http://hostname)
  * @param  {String} route  Route to proxy
@@ -20,6 +20,7 @@ factory.prototype.proxy = function (origin, route) {
 	 * @return {Undefined}  undefined
 	 */
 	handle = function (arg, xhr, res, req) {
+		xhr = xhr || {status: 502, getAllResponseHeaders: function () { return ""; }};
 		self.respond(res, req, arg, xhr.status, headers(xhr.getAllResponseHeaders()));
 	};
 
@@ -48,7 +49,7 @@ factory.prototype.proxy = function (origin, route) {
 
 	// Setting route
 	verbs.each(function (i) {
-		self[i](route, function (res, req) {
+		self[REGEX_DEL.test(i) ? "delete" : i](route, function (res, req) {
 			var url = origin + req.url;
 
 			url[req.method.toLowerCase()](function (arg, xhr) { handle (arg, xhr, res, req); }, function (arg, xhr) { handle (arg, xhr, res, req); });
