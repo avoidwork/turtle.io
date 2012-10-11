@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Easy to use web server with virtual hosts",
-  "version": "0.0.8a",
+  "version": "0.0.9a",
   "homepage": "https://github.com/avoidwork/turtle.io",
   "author": {
     "name": "Jason Mulligan",
@@ -28,7 +28,7 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "abaaso": ">= 2.9.9",
+    "abaaso": ">= 2.9.13",
     "mime": ">= 1.2.7",
     "moment": ">= 1.7.0"
   },

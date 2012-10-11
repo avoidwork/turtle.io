@@ -20,6 +20,7 @@ factory.prototype.proxy = function (origin, route) {
 	 * @return {Undefined}  undefined
 	 */
 	handle = function (arg, xhr, res, req) {
+		xhr = xhr || {status: 502, getAllResponseHeaders: function () { return ""; }};
 		self.respond(res, req, arg, xhr.status, headers(xhr.getAllResponseHeaders()));
 	};
 
@@ -48,6 +49,7 @@ factory.prototype.proxy = function (origin, route) {
 
 	// Setting route
 	verbs.each(function (i) {
+		if (REGEX_DEL.test(i)) i = "delete";
 		self[i](route, function (res, req) {
 			var url = origin + req.url;
 
