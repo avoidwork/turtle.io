@@ -49,8 +49,7 @@ factory.prototype.proxy = function (origin, route) {
 
 	// Setting route
 	verbs.each(function (i) {
-		if (REGEX_DEL.test(i)) i = "delete";
-		self[i](route, function (res, req) {
+		self[REGEX_DEL.test(i) ? "delete" : i](route, function (res, req) {
 			var url = origin + req.url;
 
 			url[req.method.toLowerCase()](function (arg, xhr) { handle (arg, xhr, res, req); }, function (arg, xhr) { handle (arg, xhr, res, req); });
