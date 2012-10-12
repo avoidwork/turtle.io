@@ -20,8 +20,13 @@ factory.prototype.proxy = function (origin, route) {
 	 * @return {Undefined}  undefined
 	 */
 	handle = function (arg, xhr, res, req) {
-		xhr = xhr || {status: 502, getAllResponseHeaders: function () { return ""; }};
-		self.respond(res, req, arg, xhr.status, headers(xhr.getAllResponseHeaders()));
+		try {
+			self.respond(res, req, arg, xhr.status, headers(xhr.getAllResponseHeaders()));
+		}
+		catch (e) {
+			self.log(e);
+			self.respond(res, req, arg, 502, {});
+		}
 	};
 
 	/**
