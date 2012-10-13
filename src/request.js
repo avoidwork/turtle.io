@@ -31,11 +31,11 @@ factory.prototype.request = function (res, req) {
 
 	// Handles the request after determining the path
 	handle = function (path, url) {
-		var allow = allows(req.url),
-		    del   = allowed("DELETE", req.url),
-		    post  = allowed("POST", req.url),
-		    mimetype;
+		var allow, del, post, mimetype;
 
+		allow   = allows(req.url),
+		del     = allowed("DELETE", req.url),
+		post    = allowed("POST", req.url),
 		handled = true;
 		url     = parsed.protocol + "//" + req.headers.host.replace(/:.*/, "") + ":" + port + url;
 
@@ -65,26 +65,42 @@ factory.prototype.request = function (res, req) {
 						case "head":
 						case "options":
 							mimetype = mime.lookup(path);
-							if (req.method.toLowerCase() === "get") {
-								fs.stat(path, function (err, data) {
-									var size     = data.size,
-									    modified = data.mtime.toUTCString();
+							fs.stat(path, function (err, stat) {
+								var size, modified, etag, raw;
 
-									fs.readFile(path, function (err, data) {
+								if (err) error(err);
+								else {
+									size     = stat.size;
+									modified = stat.mtime.toUTCString();
+									etag     = "\"" + self.hash(stat.size + "-" + stat.mtime) + "\"";
+
+									if (req.method === "GET") {
 										switch (true) {
-											case (err):
-												error(err);
-												break;
-											case req.headers.hasOwnProperty("if-none-match") && req.headers["if-none-match"] === ("\"" + self.hash(data) + "\""):
-												self.respond(res, req, null, codes.NOT_MODIFIED, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: req.headers["if-none-match"], "Last-Modified": modified});
+											case Date.parse(req.headers["if-modified-since"]) >= stat.mtime:
+											case req.headers["if-none-match"] === etag:
+												self.headers(res, req, codes.NOT_MODIFIED, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified});
+												res.end();
 												break;
 											default:
-												self.respond(res, req, data, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, "Last-Modified": modified});
+												self.headers(res, req, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified, "Transfer-Encoding": "chunked"});
+												raw = fs.createReadStream(path);
+												switch (true) {
+													case REGEX_DEF.test(req.headers["accept-encoding"]):
+														res.setHeader("Content-Encoding", "deflate");
+														raw.pipe(zlib.createDeflate()).pipe(res);
+														break;
+													case REGEX_GZIP.test(req.headers["accept-encoding"]):
+														res.setHeader("Content-Encoding", "gzip");
+														raw.pipe(zlib.createGzip()).pipe(res);
+														break;
+													default:
+														util.pump(raw, res);
+												}
 										}
-									});
-								});
-							}
-							else self.respond(res, req, null, codes.SUCCESS, {"Allow" : allow, "Content-Type": mimetype});
+									}
+									else self.respond(res, req, null, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified});
+								}
+							});
 							break;
 						case "put":
 							self.write(path, res, req);
