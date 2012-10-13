@@ -73,16 +73,16 @@ factory.prototype.request = function (res, req) {
 									else {
 										size     = stat.size;
 										modified = stat.mtime.toUTCString();
-										etag     = self.hash(stat.size + "-" + stat.mtime);
+										etag     = "\"" + self.hash(stat.size + "-" + stat.mtime) + "\"";
 
 										switch (true) {
 											case Date.parse(req.headers["if-modified-since"]) >= stat.mtime:
-											case req.headers["if-none-match"] === ("\"" + etag + "\""):
-												self.headers(res, req, codes.NOT_MODIFIED, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: req.headers["if-none-match"], "Last-Modified": modified});
+											case req.headers["if-none-match"] === etag:
+												self.headers(res, req, codes.NOT_MODIFIED, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified});
 												res.end();
 												break;
 											default:
-												self.headers(res, req, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: ("\"" + etag + "\""), "Last-Modified": modified, "Transfer-Encoding": "chunked"});
+												self.headers(res, req, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified, "Transfer-Encoding": "chunked"});
 												raw = fs.createReadStream(path);
 												//raw.pipe(zlib.createDeflate()).pipe(res);
 												raw.on("data", function (data) {
