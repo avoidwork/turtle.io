@@ -65,26 +65,32 @@ factory.prototype.request = function (res, req) {
 						case "head":
 						case "options":
 							mimetype = mime.lookup(path);
-							if (req.method.toLowerCase() === "get") {
-								fs.stat(path, function (err, data) {
+							if (method === "get") {
+								fs.stat(path, function (err, stat) {
 									var size, modified, etag, raw;
 
 									if (err) error(err);
 									else {
-										size     = data.size;
-										modified = data.mtime.toUTCString();
-										etag     = self.hash(modified + "-" + size);
+										size     = stat.size;
+										modified = stat.mtime.toUTCString();
+										etag     = self.hash(stat.size + "-" + stat.mtime);
 
-										// No change, instructing to use cached version
-										if (req.headers["if-none-match"] === ("\"" + etag + "\"")) {
-											self.headers(res, req, codes.NOT_MODIFIED, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: req.headers["if-none-match"], "Last-Modified": modified});
-											res.end();
-										}
-										else {
-											fs.readFile(path, function (err, data) {
-												if (err) error(err);
-												else self.respond(res, req, data, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: ("\"" + etag + "\""), "Last-Modified": modified});
-											});
+										switch (true) {
+											case Date.parse(req.headers["if-modified-since"]) >= stat.mtime:
+											case req.headers["if-none-match"] === ("\"" + etag + "\""):
+												self.headers(res, req, codes.NOT_MODIFIED, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: req.headers["if-none-match"], "Last-Modified": modified});
+												res.end();
+												break;
+											default:
+												self.headers(res, req, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: ("\"" + etag + "\""), "Last-Modified": modified, "Transfer-Encoding": "chunked"});
+												raw = fs.createReadStream(path);
+												//raw.pipe(zlib.createDeflate()).pipe(res);
+												raw.on("data", function (data) {
+													res.write(data);
+												});
+												raw.on("end", function () {
+													res.end();
+												});
 										}
 									}
 								});
