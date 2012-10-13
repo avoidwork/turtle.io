@@ -84,13 +84,18 @@ factory.prototype.request = function (res, req) {
 											default:
 												self.headers(res, req, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified, "Transfer-Encoding": "chunked"});
 												raw = fs.createReadStream(path);
-												//raw.pipe(zlib.createDeflate()).pipe(res);
-												raw.on("data", function (data) {
-													res.write(data);
-												});
-												raw.on("end", function () {
-													res.end();
-												});
+												switch (true) {
+													case REGEX_DEF.test(req.headers["accept-encoding"]):
+														res.setHeader("Content-Encoding", "deflate");
+														raw.pipe(zlib.createDeflate()).pipe(res);
+														break;
+													case REGEX_GZIP.test(req.headers["accept-encoding"]):
+														res.setHeader("Content-Encoding", "gzip");
+														raw.pipe(zlib.createGzip()).pipe(res);
+														break;
+													default:
+														util.pump(raw, res);
+												}
 										}
 									}
 								});
