@@ -31,11 +31,11 @@ factory.prototype.request = function (res, req) {
 
 	// Handles the request after determining the path
 	handle = function (path, url) {
-		var allow = allows(req.url),
-		    del   = allowed("DELETE", req.url),
-		    post  = allowed("POST", req.url),
-		    mimetype;
+		var allow, del, post, mimetype;
 
+		allow   = allows(req.url),
+		del     = allowed("DELETE", req.url),
+		post    = allowed("POST", req.url),
 		handled = true;
 		url     = parsed.protocol + "//" + req.headers.host.replace(/:.*/, "") + ":" + port + url;
 
@@ -67,21 +67,26 @@ factory.prototype.request = function (res, req) {
 							mimetype = mime.lookup(path);
 							if (req.method.toLowerCase() === "get") {
 								fs.stat(path, function (err, data) {
-									var size     = data.size,
-									    modified = data.mtime.toUTCString();
+									var size, modified, etag, raw;
 
-									fs.readFile(path, function (err, data) {
-										switch (true) {
-											case (err):
-												error(err);
-												break;
-											case req.headers.hasOwnProperty("if-none-match") && req.headers["if-none-match"] === ("\"" + self.hash(data) + "\""):
-												self.respond(res, req, null, codes.NOT_MODIFIED, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: req.headers["if-none-match"], "Last-Modified": modified});
-												break;
-											default:
-												self.respond(res, req, data, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, "Last-Modified": modified});
+									if (err) error(err);
+									else {
+										size     = data.size;
+										modified = data.mtime.toUTCString();
+										etag     = self.hash(modified + "-" + size);
+
+										// No change, instructing to use cached version
+										if (req.headers["if-none-match"] === ("\"" + etag + "\"")) {
+											self.headers(res, req, codes.NOT_MODIFIED, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: req.headers["if-none-match"], "Last-Modified": modified});
+											res.end();
 										}
-									});
+										else {
+											fs.readFile(path, function (err, data) {
+												if (err) error(err);
+												else self.respond(res, req, data, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: ("\"" + etag + "\""), "Last-Modified": modified});
+											});
+										}
+									}
 								});
 							}
 							else self.respond(res, req, null, codes.SUCCESS, {"Allow" : allow, "Content-Type": mimetype});

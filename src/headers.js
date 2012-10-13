@@ -1,16 +1,44 @@
 /**
- * Default response headers
+ * Sets response headers
  * 
- * @type {Object}
+ * @param  {Object}  res             Response object
+ * @param  {Object}  req             Request object
+ * @param  {Number}  status          [Optional] HTTP status code, default is 200
+ * @param  {Object}  responseHeaders [Optional] HTTP headers to decorate the response with
+ * @return {Objet}                   Instance
  */
-var headers = {
-	"Accept"                       : "text/html, text/plain",
-	"Allow"                        : "",
-	"Content-Type"                 : "text/html",
-	"Date"                         : "",
-	"Last-Modified"                : "",
-	"Server"                       : (function () { return ("turtle.io/{{VERSION}} [abaaso/" + $.version + " node.js/" + process.versions.node.replace(/^v/, "") + " (" + process.platform.capitalize() + " V8/" + process.versions.v8 + ")]"); })(),
-	"Access-Control-Allow-Headers" : "Accept, Allow, Cache-Control, Content-Type, Date, Etag, Transfer-Encoding, Server",
-	"Access-Control-Allow-Methods" : "",
-	"Access-Control-Allow-Origin"  : ""
+factory.prototype.headers = function (res, req, status, responseHeaders) {
+	var get      = REGEX_GET.test(req.method),
+	    headers  = $.clone(this.config.headers),
+	    compression;
+
+	// Setting optional params
+	if (typeof status === "undefined") status = codes.SUCCESS;
+	if (!(responseHeaders instanceof Object)) responseHeaders = {};
+
+	// Decorating response headers
+	$.merge(headers, responseHeaders);
+
+	// Setting headers
+	headers["Date"]                         = new Date().toUTCString();
+	headers["Access-Control-Allow-Methods"] = headers.Allow;
+
+	// Setting the response status code
+	res.statusCode = status;
+
+	// Removing headers not wanted in the response
+	if (!get || status >= codes.INVALID_ARGUMENTS) delete headers["Cache-Control"];
+	switch (true) {
+		case status >= codes.FORBIDDEN && status < codes.NOT_FOUND:
+		case status >= codes.ERROR_APPLICATION:
+			delete headers.Allow;
+			delete headers["Access-Control-Allow-Methods"];
+			delete headers["Last-Modified"];
+			break;
+	}
+
+	// Decorating response with headers
+	$.iterate(headers, function (v, k) { res.setHeader(k, v); });
+
+	return this;
 };
