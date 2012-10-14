@@ -47,7 +47,7 @@ factory.prototype.request = function (res, req) {
 					allowed(req.method, req.url) ? self.write(path, res, req) : self.respond(res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {"Allow": allow});
 					break;
 				case !exists:
-					self.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND, (post ? {"Allow": "POST"} : undefined));
+					self.respond(res, req, messages.NO_CONTENT, codes.NOT_FOUND, (post ? {"Allow": "POST"} : undefined));
 					break;
 				case !allowed(method, req.url):
 					self.respond(res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {"Allow": allow});
@@ -98,7 +98,7 @@ factory.prototype.request = function (res, req) {
 												}
 										}
 									}
-									else self.respond(res, req, null, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified});
+									else self.respond(res, req, messages.NO_CONTENT, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified});
 								}
 							});
 							break;
@@ -114,7 +114,7 @@ factory.prototype.request = function (res, req) {
 
 	// Determining if the request is valid
 	fs.stat(root + parsed.pathname, function (err, stats) {
-		if (err) self.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND, (allowed("POST", req.url) ? {"Allow": "POST"} : undefined));
+		if (err) self.respond(res, req, messages.NO_CONTENT, codes.NOT_FOUND, (allowed("POST", req.url) ? {"Allow": "POST"} : undefined));
 		else {
 			if (!stats.isDirectory()) handle(root + parsed.pathname, parsed.pathname);
 			else {
@@ -127,7 +127,7 @@ factory.prototype.request = function (res, req) {
 					self.config.index.each(function (i) {
 						fs.exists(root + parsed.pathname + i, function (exists) {
 							if (exists && !handled) handle(root + parsed.pathname + i, parsed.pathname + i);
-							else if (!exists && ++count === nth) self.respond(res, req, messages.NOT_FOUND, codes.NOT_FOUND, (allowed("POST", req.url) ? {"Allow": "POST"} : undefined));
+							else if (!exists && ++count === nth) self.respond(res, req, messages.NO_CONTENT, codes.NOT_FOUND, (allowed("POST", req.url) ? {"Allow": "POST"} : undefined));
 						});
 					});
 				}

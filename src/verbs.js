@@ -3,12 +3,13 @@
  * 
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
+ * @param  {String}   host  [Optional] Hostname this route is for (default is all)
  * @return {Object}         Instance
  */
-factory.prototype.all = function (route, fn) {
+factory.prototype.all = function (route, fn, host) {
 	var self = this;
 
-	$.route.set(route, function (res, req) { fn.call(self, res, req); }, "all");
+	$.route.set(route, function (res, req) { fn.call(self, res, req); }, "all", host);
 	return this;
 };
 
@@ -17,12 +18,13 @@ factory.prototype.all = function (route, fn) {
  * 
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
+ * @param  {String}   host  [Optional] Hostname this route is for (default is all)
  * @return {Object}         Instance
  */
-factory.prototype.delete = function (route, fn) {
+factory.prototype.delete = function (route, fn, host) {
 	var self = this;
 
-	$.route.set(route, function (res, req) { fn.call(self, res, req); }, "delete");
+	$.route.set(route, function (res, req) { fn.call(self, res, req); }, "delete", host);
 	return this;
 };
 
@@ -31,12 +33,13 @@ factory.prototype.delete = function (route, fn) {
  * 
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
+ * @param  {String}   host  [Optional] Hostname this route is for (default is all)
  * @return {Object}         Instance
  */
-factory.prototype.get = function (route, fn) {
+factory.prototype.get = function (route, fn, host) {
 	var self = this;
 
-	$.route.set(route, function (res, req) { fn.call(self, res, req); }, "get");
+	$.route.set(route, function (res, req) { fn.call(self, res, req); }, "get", host);
 	return this;
 };
 
@@ -45,12 +48,13 @@ factory.prototype.get = function (route, fn) {
  * 
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
+ * @param  {String}   host  [Optional] Hostname this route is for (default is all)
  * @return {Object}         Instance
  */
-factory.prototype.post = function (route, fn) {
+factory.prototype.post = function (route, fn, host) {
 	var self = this;
 
-	$.route.set(route, function (res, req) { fn.call(self, res, req); }, "post");
+	$.route.set(route, function (res, req) { fn.call(self, res, req); }, "post", host);
 	return this;
 };
 
@@ -59,11 +63,12 @@ factory.prototype.post = function (route, fn) {
  * 
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
+ * @param  {String}   host  [Optional] Hostname this route is for (default is all)
  * @return {Object}         Instance
  */
-factory.prototype.put = function (route, fn) {
+factory.prototype.put = function (route, fn, host) {
 	var self = this;
 
-	$.route.set(route, function (res, req) { fn.call(self, res, req); }, "put");
+	$.route.set(route, function (res, req) { fn.call(self, res, req); }, "put", host);
 	return this;
 };
