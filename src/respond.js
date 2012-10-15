@@ -13,17 +13,28 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders)
 	if (!(responseHeaders instanceof Object)) responseHeaders = {};
 
 	var body     = !REGEX_BODY.test(req.method),
-	    compress = false,
-	    get      = REGEX_GET.test(req.method);
+	    encoding = req.headers["accept-encoding"],
+	    compress = body && (REGEX_DEF.test(encoding) || REGEX_GZIP.test(encoding)),
+	    encoding = "",
+	    self     = this;
 
 	// Encoding as JSON if not prepared
-	if (get && ((output instanceof Array) || String(output) === "[object Object]")) {
+	if (body && ((output instanceof Array) || String(output) === "[object Object]")) {
 		responseHeaders["Content-Type"] = "application/json";
 		output = $.encode(output);
 	}
 
 	if (compress) {
-		void 0;
+		encoding = REGEX_DEF.test(encoding) ? "deflate" : "gzip";
+		responseHeaders["Content-Encoding"] = encoding;
+		zlib.deflate(output, function (err, compressed) {
+			if (err) self.error(res, req);
+			else {
+				self.headers(res, req, status, responseHeaders);
+				res.write(compressed);
+				res.end();
+			}
+		});
 	}
 	else {
 		this.headers(res, req, status, responseHeaders);

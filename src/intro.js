@@ -14,4 +14,5 @@ var $          = require("abaaso"),
     REGEX_GET  = /get|head|options/i,
     REGEX_DEL  = /del/i,
     REGEX_DEF  = /deflate/,
-    REGEX_GZIP = /gzip/;
+    REGEX_GZIP = /gzip/,
+    REGEX_IE   = /msie/i;

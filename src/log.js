@@ -28,7 +28,7 @@ factory.prototype.log = function (msg, error, display) {
 	// Writing to log file if config is loaded
 	if (typeof this.config.logs !== "undefined") {
 		date     = new Date();
-		text     = moment(date).format("HH:MM:SS") + " " + msg + "\n" + (typeof msg.stack !== "undefined" ? msg.stack + "\n" : "");
+		text     = msg + "\n" + (typeof msg.stack !== "undefined" ? msg.stack + "\n" : "");
 		filename = this.config.logs[error ? "error" : "daemon"].replace(/\{\{date\}\}/, moment(date).format(this.config.logs.date));
 
 		fs.exists(dir, function (exists) {

@@ -40,7 +40,9 @@ module.exports = function (grunt) {
 					"src/unset.js",
 					"src/verbs.js",
 					"src/write.js",
+					"src/handler.js",
 					"src/messages.js",
+					"src/prep.js",
 					"src/outro.js"
 				],
 				dest : "lib/turtle.io.js"

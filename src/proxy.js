@@ -3,9 +3,10 @@
  * 
  * @param  {String} origin Host to proxy (e.g. http://hostname)
  * @param  {String} route  Route to proxy
+ * @param  {String} host   [Optional] Hostname this route is for (default is all)
  * @return {Object}        Instance
  */
-factory.prototype.proxy = function (origin, route) {
+factory.prototype.proxy = function (origin, route, host) {
 	var self  = this,
 	    verbs = ["delete", "get", "post", "put"],
 	    handle, headers;
@@ -58,7 +59,7 @@ factory.prototype.proxy = function (origin, route) {
 			var url = origin + req.url;
 
 			url[req.method.toLowerCase()](function (arg, xhr) { handle (arg, xhr, res, req); }, function (arg, xhr) { handle (arg, xhr, res, req); });
-		});
+		}, host);
 	});
 
 	return this;

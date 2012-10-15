@@ -10,7 +10,8 @@
 		"dir"    : "./logs",
 		"date"   : "YYYYMMDD",
 		"daemon" : "turtle_{{date}}.log",
-		"error"  : "error_{{date}}.log"
+		"error"  : "error_{{date}}.log",
+		"format" : "{{host}} [{{time}}] \"{{method}} {{path}} HTTP/1.1\" {{status}} \"{{user-agent}}\""
 	},
 	"root"    : "./sites",
 	"vhosts"  : {
