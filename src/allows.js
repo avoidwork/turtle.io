@@ -6,8 +6,6 @@
  * @return {String}      Allowed methods
  */
 var allows = function (url, host) {
-	console.log(host);
-
 	var result = "",
 	    verbs  = ["DELETE", "GET", "POST", "PUT"];
 
