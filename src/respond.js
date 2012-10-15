@@ -14,8 +14,7 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders)
 
 	var body     = !REGEX_BODY.test(req.method),
 	    encoding = req.headers["accept-encoding"],
-	    compress = body && (REGEX_DEF.test(encoding) || REGEX_GZIP.test(encoding)),
-	    encoding = "",
+	    compress = body && !REGEX_IE.test(req.headers["user-agent"]) && (REGEX_DEF.test(encoding) || REGEX_GZIP.test(encoding)),
 	    self     = this;
 
 	// Encoding as JSON if not prepared
@@ -27,7 +26,7 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders)
 	if (compress) {
 		encoding = REGEX_DEF.test(encoding) ? "deflate" : "gzip";
 		responseHeaders["Content-Encoding"] = encoding;
-		zlib.deflate(output, function (err, compressed) {
+		zlib[encoding](output, function (err, compressed) {
 			if (err) self.error(res, req);
 			else {
 				self.headers(res, req, status, responseHeaders);
