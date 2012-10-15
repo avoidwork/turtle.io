@@ -14,7 +14,7 @@ var bootstrap = function (args) {
 		"Date"                         : "",
 		"Last-Modified"                : "",
 		"Server"                       : "turtle.io/{{VERSION}}",
-		"X-Powered-By"                 : (function () { return ("abaaso/" + $.version + " (node.js/" + process.versions.node.replace(/^v/, "") + " (" + process.platform.capitalize() + " V8/" + process.versions.v8 + ")"); })(),
+		"X-Powered-By"                 : (function () { return ("abaaso/" + $.version + " node.js/" + process.versions.node.replace(/^v/, "") + " (" + process.platform.capitalize() + " V8/" + process.versions.v8 + ")"); })(),
 		"Access-Control-Allow-Headers" : "Accept, Allow, Cache-Control, Content-Type, Date, Etag, Transfer-Encoding, Server",
 		"Access-Control-Allow-Methods" : "",
 		"Access-Control-Allow-Origin"  : ""

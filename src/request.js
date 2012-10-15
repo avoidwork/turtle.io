@@ -9,11 +9,11 @@
  */
 factory.prototype.request = function (res, req) {
 	var self    = this,
-	    host    = req.headers.host.indexOf(":") > -1 ? (/(.*)?:/.exec(req.headers.host)[1]) : req.headers.host,
+	    host    = req.headers.host.replace(/:.*/, ""),
 	    parsed  = url.parse(req.url, true),
 	    method  = REGEX_GET.test(req.method) ? "get" : req.method.toLowerCase(),
 	    error   = function (err) {
-	    	if (typeof err !== "undefined") self.log(err, true, true);
+	    	if (typeof err !== "undefined") self.log(err, true, self.config.debug);
 	    	self.respond(res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION);
 	    },
 	    path    = [],
@@ -31,20 +31,22 @@ factory.prototype.request = function (res, req) {
 
 	// Handles the request after determining the path
 	handle = function (path, url) {
-		var allow, del, post, mimetype;
+		var allow, del, post, mimetype, status;
 
-		allow   = allows(req.url),
+		allow   = allows(req.url, host),
 		del     = allowed("DELETE", req.url),
 		post    = allowed("POST", req.url),
 		handled = true;
 		url     = parsed.protocol + "//" + req.headers.host.replace(/:.*/, "") + ":" + port + url;
 
-		self.log("[" + req.method + "] " + url, false, self.config.debug);
-
 		fs.exists(path, function (exists) {
 			switch (true) {
 				case !exists && method === "post":
-					allowed(req.method, req.url) ? self.write(path, res, req) : self.respond(res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {"Allow": allow});
+					if (allowed(req.method, req.url)) self.write(path, res, req);
+					else {
+						status = codes.NOT_ALLOWED;
+						self.respond(res, req, messages.NOT_ALLOWED, status, {"Allow": allow});
+					}
 					break;
 				case !exists:
 					self.respond(res, req, messages.NO_CONTENT, codes.NOT_FOUND, (post ? {"Allow": "POST"} : undefined));
@@ -66,30 +68,33 @@ factory.prototype.request = function (res, req) {
 						case "options":
 							mimetype = mime.lookup(path);
 							fs.stat(path, function (err, stat) {
-								var size, modified, etag, raw;
+								var ie = REGEX_IE.test(req.headers["user-agent"]),
+								    size, modified, etag, raw, headers;
 
 								if (err) error(err);
 								else {
 									size     = stat.size;
 									modified = stat.mtime.toUTCString();
 									etag     = "\"" + self.hash(stat.size + "-" + stat.mtime) + "\"";
+									headers  = {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified};
 
 									if (req.method === "GET") {
 										switch (true) {
 											case Date.parse(req.headers["if-modified-since"]) >= stat.mtime:
 											case req.headers["if-none-match"] === etag:
-												self.headers(res, req, codes.NOT_MODIFIED, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified});
+												self.headers(res, req, codes.NOT_MODIFIED, headers);
 												res.end();
 												break;
 											default:
-												self.headers(res, req, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified, "Transfer-Encoding": "chunked"});
+												headers["Transfer-Encoding"] = "chunked";
+												self.headers(res, req, codes.SUCCESS, headers);
 												raw = fs.createReadStream(path);
 												switch (true) {
-													case REGEX_DEF.test(req.headers["accept-encoding"]):
+													case !ie && REGEX_DEF.test(req.headers["accept-encoding"]):
 														res.setHeader("Content-Encoding", "deflate");
 														raw.pipe(zlib.createDeflate()).pipe(res);
 														break;
-													case REGEX_GZIP.test(req.headers["accept-encoding"]):
+													case !ie && REGEX_GZIP.test(req.headers["accept-encoding"]):
 														res.setHeader("Content-Encoding", "gzip");
 														raw.pipe(zlib.createGzip()).pipe(res);
 														break;
@@ -98,7 +103,7 @@ factory.prototype.request = function (res, req) {
 												}
 										}
 									}
-									else self.respond(res, req, messages.NO_CONTENT, codes.SUCCESS, {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified});
+									else self.respond(res, req, messages.NO_CONTENT, codes.SUCCESS, headers);
 								}
 							});
 							break;
