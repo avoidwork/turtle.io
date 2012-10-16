@@ -33,9 +33,9 @@ factory.prototype.request = function (res, req) {
 	handle = function (path, url) {
 		var allow, del, post, mimetype, status;
 
-		allow   = allows(req.url, host),
-		del     = allowed("DELETE", req.url),
-		post    = allowed("POST", req.url),
+		allow   = allows(req.url, host);
+		del     = allowed("DELETE", req.url);
+		post    = allowed("POST", req.url);
 		handled = true;
 		url     = parsed.protocol + "//" + req.headers.host.replace(/:.*/, "") + ":" + port + url;
 
