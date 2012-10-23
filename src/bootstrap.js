@@ -57,7 +57,7 @@ var bootstrap = function (args) {
 
 	// After start listener
 	this.on("afterStart", function () {
-		this.log("Started turtle.io on port " + this.config.port);
+		console.log("Started turtle.io on port " + this.config.port);
 	}, "logging");
 
 	// Restart listener
@@ -67,7 +67,7 @@ var bootstrap = function (args) {
 
 	// After restart listener
 	this.on("afterRestart", function () {
-		this.log("Restarted turtle.io on port " + this.config.port);
+		console.log("Restarted turtle.io on port " + this.config.port);
 	});
 
 	// Stop listener
@@ -83,7 +83,7 @@ var bootstrap = function (args) {
 
 	// After stop listener
 	this.on("afterStop", function () {
-		this.log("Stopped turtle.io on port " + this.config.port);
+		console.log("Stopped turtle.io on port " + this.config.port);
 	}, "logging");
 
 	return this;
