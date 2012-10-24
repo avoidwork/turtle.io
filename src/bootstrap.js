@@ -10,7 +10,7 @@ var bootstrap = function (args) {
 	var headers = {
 		"Accept"                       : "text/html, text/plain",
 		"Allow"                        : "",
-		"Content-Type"                 : "text/html; charset=UTF-8",
+		"Content-Type"                 : "text/html; charset=utf-8",
 		"Date"                         : "",
 		"Last-Modified"                : "",
 		"Server"                       : "turtle.io/{{VERSION}}",
