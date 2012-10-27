@@ -18,5 +18,11 @@
 		"localhost" : "test",
 		"test"      : "test",
 		"test2"     : "test2"
+	},
+	"auth"    : {
+		"test2" : {
+			"authRealm" : "Private",
+			"authList"  : ["admin:admin"]
+		}
 	}
 }
