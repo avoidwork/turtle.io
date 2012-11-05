@@ -22,7 +22,7 @@
   ],
   "main": "lib/turtle.io",
   "engines": {
-    "node": ">= 0.6.0"
+    "node": ">= 0.8.0"
   },
   "scripts": {
     "test": "grunt test"
