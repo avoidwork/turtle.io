@@ -88,17 +88,38 @@ factory.prototype.request = function (res, req) {
 											default:
 												headers["Transfer-Encoding"] = "chunked";
 												self.headers(res, req, codes.SUCCESS, headers);
-												raw = fs.createReadStream(path);
+												etag = etag.replace(/\"/g, "");
 												switch (true) {
 													case !ie && REGEX_DEF.test(req.headers["accept-encoding"]):
 														res.setHeader("Content-Encoding", "deflate");
-														raw.pipe(zlib.createDeflate()).pipe(res);
+														self.cached(etag, "deflate", function (ready, npath) {
+															if (ready) {
+																raw = fs.createReadStream(npath);
+																raw.pipe(res);
+															}
+															else {
+																self.cache(etag, path, "deflate");
+																raw = fs.createReadStream(path);
+																raw.pipe(zlib.createDeflate()).pipe(res);
+															}
+														});
 														break;
 													case !ie && REGEX_GZIP.test(req.headers["accept-encoding"]):
 														res.setHeader("Content-Encoding", "gzip");
-														raw.pipe(zlib.createGzip()).pipe(res);
+														self.cached(etag, "gzip", function (ready, npath) {
+															if (ready) {
+																raw = fs.createReadStream(npath);
+																raw.pipe(res);
+															}
+															else {
+																self.cache(etag, path, "gzip");
+																raw = fs.createReadStream(path);
+																raw.pipe(zlib.createGzip()).pipe(res);
+															}
+														});
 														break;
 													default:
+														raw = fs.createReadStream(path);
 														util.pump(raw, res);
 												}
 										}

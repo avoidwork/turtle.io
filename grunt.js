@@ -8,7 +8,7 @@ module.exports = function (grunt) {
 				         " * <%= pkg.description %>\n" +
 				         " *\n" +
 				         " * @author <%= pkg.author.name %> <<%= pkg.author.email %>>\n" +
-				         " * @copyright <%= pkg.author.name %> <%= grunt.template.today('yyyy') %>\n" +
+				         " * @copyright <%= grunt.template.today('yyyy') %> <%= pkg.author.name %>\n" +
 				         " * @license <%= pkg.licenses[0].type %> <<%= pkg.licenses[0].url %>>\n" +
 				         " * @link <%= pkg.homepage %>\n" +
 				         " * @version <%= pkg.version %>\n" +
@@ -25,6 +25,8 @@ module.exports = function (grunt) {
 					"src/codes.js",
 					"src/config.js",
 					"src/factory.js",
+					"src/cache.js",
+					"src/cached.js",
 					"src/echo.js",
 					"src/error.js",
 					"src/hash.js",

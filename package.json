@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Easy to use web server with virtual hosts & RESTful proxies",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "homepage": "https://github.com/avoidwork/turtle.io",
   "author": {
     "name": "Jason Mulligan",
