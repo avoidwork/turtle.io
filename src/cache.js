@@ -1,19 +1,21 @@
 /**
- * Gets or sets a compressed file
+ * Creates a compressed version of a file
  * 
- * @param  {String}   hash MD5 hash to identify temp file
- * @param  {String}   op   "get" or "set"
- * @param  {Function} fn   Callback function
- * @param  {Mixed}    body Buffer or UTF-8 String
- * @return {Undefined}     undefined
+ * @param  {String}   filename Filename of the new file (Etag without quotes)
+ * @param  {String}   path     Path to file to compress
+ * @param  {Function} format   Compression format (deflate or gzip)
+ * @return {Undefined}         undefined
  */
-var cache = function (hash, op, fn, body) {
-	if (!/^(get|set)$/.test(op)) throw Error($.label.error.invalidArguments);
+factory.prototype.cache = function (filename, path, encoding) {
+	var tmp = this.config.tmp;
 
-	switch (op) {
-		case "get":
-			break;
-		case "set":
-			break;
-	}
+	fs.exists(path, function (exists) {
+		var raw    = fs.createReadStream(path),
+		    regex  = /deflate/,
+		    ext    = regex.test(encoding) ? ".df" : ".gz",
+		    dest   = tmp + "/" + filename + ext,
+		    stream = fs.createWriteStream(dest);
+
+		raw.pipe(zlib[regex.test(encoding) ? "createDeflate" : "createGzip"]()).pipe(stream);
+	});
 };
