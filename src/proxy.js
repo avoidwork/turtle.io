@@ -21,8 +21,55 @@ factory.prototype.proxy = function (origin, route, host) {
 	 * @return {Undefined}  undefined
 	 */
 	handle = function (arg, xhr, res, req) {
+		var resHeaders = {},
+		    etag       = "",
+		    date       = "",
+		    ie         = REGEX_IE.test(req.headers["user-agent"]);
+
 		try {
-			self.respond(res, req, arg, xhr.status, headers(xhr.getAllResponseHeaders()));
+			// Getting or creating an Etag
+			resHeaders = headers(xhr.getAllResponseHeaders());
+			date       = (resHeaders["Last-Modified"] || resHeaders["Date"]) || undefined;
+			etag       = resHeaders.Etag || "\"" + self.hash(resHeaders["Content-Length"] + "-" + new Date(date).getTime()) + "\"";
+
+			// Setting headers
+			resHeaders["Transfer-Encoding"] = "chunked";
+			if (resHeaders.Etag !== etag) resHeaders.Etag = etag;
+
+			// Looking for a cached version
+			etag = etag.replace(/\"/g, "");
+			switch (true) {
+				case !ie && REGEX_DEF.test(req.headers["accept-encoding"]):
+					res.setHeader("Content-Encoding", "deflate");
+					self.cached(etag, "deflate", function (ready, npath) {
+						if (ready) {
+							self.headers(res, req, codes.SUCCESS, resHeaders);
+							raw = fs.createReadStream(npath);
+							raw.pipe(res);
+						}
+						else {
+							self.cache(etag, arg, "deflate", true);
+							self.respond(res, req, arg, xhr.status, resHeaders);
+						}
+					});
+					break;
+				case !ie && REGEX_GZIP.test(req.headers["accept-encoding"]):
+					res.setHeader("Content-Encoding", "gzip");
+					self.cached(etag, "gzip", function (ready, npath) {
+						if (ready) {
+							self.headers(res, req, codes.SUCCESS, resHeaders);
+							raw = fs.createReadStream(npath);
+							raw.pipe(res);
+						}
+						else {
+							self.cache(etag, arg, "gzip", true);
+							self.respond(res, req, arg, xhr.status, resHeaders);
+						}
+					});
+					break;
+				default:
+					self.respond(res, req, arg, xhr.status, resHeaders);
+			}
 		}
 		catch (e) {
 			self.log(e);
