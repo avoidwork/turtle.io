@@ -21,8 +21,57 @@ factory.prototype.proxy = function (origin, route, host) {
 	 * @return {Undefined}  undefined
 	 */
 	handle = function (arg, xhr, res, req) {
+		var resHeaders = {},
+		    etag       = "",
+		    date       = "",
+		    ie         = REGEX_IE.test(req.headers["user-agent"]),
+		    raw;
+
 		try {
-			self.respond(res, req, arg, xhr.status, headers(xhr.getAllResponseHeaders()));
+			// Getting or creating an Etag
+			resHeaders = headers(xhr.getAllResponseHeaders());
+			date       = (resHeaders["Last-Modified"] || resHeaders["Date"]) || undefined;
+			if (isNaN(new Date(date).getFullYear())) date = undefined;
+			etag       = resHeaders.Etag || "\"" + self.hash(resHeaders["Content-Length"] + "-" + new Date(date).getTime()) + "\"";
+
+			// Setting headers
+			resHeaders["Transfer-Encoding"] = "chunked";
+			if (resHeaders.Etag !== etag) resHeaders.Etag = etag;
+
+			// Looking for a cached version
+			etag = etag.replace(/\"/g, "");
+			switch (true) {
+				case !ie && REGEX_DEF.test(req.headers["accept-encoding"]):
+					res.setHeader("Content-Encoding", "deflate");
+					self.cached(etag, "deflate", function (ready, npath) {
+						if (ready) {
+							self.headers(res, req, codes.SUCCESS, resHeaders);
+							raw = fs.createReadStream(npath);
+							raw.pipe(res);
+						}
+						else {
+							self.cache(etag, arg, "deflate", true);
+							self.respond(res, req, arg, xhr.status, resHeaders);
+						}
+					});
+					break;
+				case !ie && REGEX_GZIP.test(req.headers["accept-encoding"]):
+					res.setHeader("Content-Encoding", "gzip");
+					self.cached(etag, "gzip", function (ready, npath) {
+						if (ready) {
+							self.headers(res, req, codes.SUCCESS, resHeaders);
+							raw = fs.createReadStream(npath);
+							raw.pipe(res);
+						}
+						else {
+							self.cache(etag, arg, "gzip", true);
+							self.respond(res, req, arg, xhr.status, resHeaders);
+						}
+					});
+					break;
+				default:
+					self.respond(res, req, arg, xhr.status, resHeaders);
+			}
 		}
 		catch (e) {
 			self.log(e);
@@ -56,9 +105,12 @@ factory.prototype.proxy = function (origin, route, host) {
 	// Setting route
 	verbs.each(function (i) {
 		self[REGEX_DEL.test(i) ? "delete" : i](route, function (res, req) {
-			var url = origin + req.url;
+			var url = origin + req.url,
+			    fn  = function (arg, xhr) {
+			    	handle(arg, xhr, res, req);
+			    };
 
-			url[req.method.toLowerCase()](function (arg, xhr) { handle (arg, xhr, res, req); }, function (arg, xhr) { handle (arg, xhr, res, req); });
+			url[req.method.toLowerCase()](fn, fn);
 		}, host);
 	});
 
