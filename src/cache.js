@@ -9,7 +9,8 @@
  */
 factory.prototype.cache = function (filename, obj, encoding, body) {
 	body      = (body === true);
-	var tmp   = this.config.tmp,
+	var self  = this,
+	    tmp   = this.config.tmp,
 	    regex = /deflate/,
 	    ext   = regex.test(encoding) ? ".df" : ".gz",
 	    dest  = tmp + "/" + filename + ext;
@@ -22,7 +23,20 @@ factory.prototype.cache = function (filename, obj, encoding, body) {
 			raw.pipe(zlib[regex.test(encoding) ? "createDeflate" : "createGzip"]()).pipe(stream);
 		});
 	}
-	else zlib[encoding](obj, function (err, compressed) {
-		if (!err) fs.writeFile(dest, compressed);
-	});
+	else {
+		// Converting JSON or XML to a String
+		switch (true) {
+			case obj instanceof Array:
+			case obj instanceof Object:
+				obj = $.encode(obj);
+				break;
+			case obj instanceof Document:
+				obj = $.xml.decode(obj);
+				break;
+		}
+		zlib[encoding](obj, function (err, compressed) {
+			if (!err) fs.writeFile(dest, compressed);
+			else self.log(err, true, false);
+		});
+	}
 };

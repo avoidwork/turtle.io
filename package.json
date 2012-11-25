@@ -28,14 +28,14 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "abaaso": ">= 3.0.0",
+    "abaaso": ">= 3.2.7",
     "mime": ">= 1.2.7",
     "moment": ">= 1.7.0",
     "http-auth" : ">= 1.2.2"
   },
   "devDependencies": {
     "grunt": "~0.3.14",
-    "abaaso": ">= 3.0.0",
+    "abaaso": ">= 3.2.7",
     "mime": ">= 1.2.7",
     "moment": ">= 1.7.0",
     "http-auth" : ">= 1.2.2"
