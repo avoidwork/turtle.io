@@ -8,9 +8,8 @@
  * @return {Objet}                   Instance
  */
 factory.prototype.headers = function (res, req, status, responseHeaders) {
-	var get      = REGEX_GET.test(req.method),
-	    headers  = $.clone(this.config.headers),
-	    compression;
+	var get     = REGEX_GET.test(req.method),
+	    headers = $.clone(this.config.headers);
 
 	// Setting optional params
 	if (typeof status === "undefined") status = codes.SUCCESS;
@@ -26,6 +25,9 @@ factory.prototype.headers = function (res, req, status, responseHeaders) {
 	// Setting the response status code
 	res.statusCode = status;
 
+	// Decorating "Last-Modified" header
+	if (headers["Last-Modified"].isEmpty()) headers["Last-Modified"] = headers["Date"];
+
 	// Removing headers not wanted in the response
 	if (!get || status >= codes.INVALID_ARGUMENTS) delete headers["Cache-Control"];
 	switch (true) {
@@ -38,7 +40,9 @@ factory.prototype.headers = function (res, req, status, responseHeaders) {
 	}
 
 	// Decorating response with headers
-	$.iterate(headers, function (v, k) { res.setHeader(k, v); });
+	$.iterate(headers, function (v, k) {
+		res.setHeader(k, v);
+	});
 
 	return this;
 };

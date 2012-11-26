@@ -6,25 +6,37 @@
  * @param  {Mixed}   output          [Optional] Response
  * @param  {Number}  status          [Optional] HTTP status code, default is 200
  * @param  {Object}  responseHeaders [Optional] HTTP headers to decorate the response with
+ * @param  {Boolean} compress        [Optional] Enable compression of the response (if supported)
  * @return {Objet}                   Instance
  */
-factory.prototype.respond = function (res, req, output, status, responseHeaders) {
+factory.prototype.respond = function (res, req, output, status, responseHeaders, compress) {
 	if (typeof status === "undefined")        status          = codes.SUCCESS;
 	if (!(responseHeaders instanceof Object)) responseHeaders = {};
 
-	var body     = !REGEX_BODY.test(req.method),
-	    encoding = req.headers["accept-encoding"],
-	    compress = body && !REGEX_IE.test(req.headers["user-agent"]) && (REGEX_DEF.test(encoding) || REGEX_GZIP.test(encoding)),
-	    self     = this;
+	var body      = !REGEX_BODY.test(req.method),
+	    encoding  = this.compression(req.headers["user-agent"], req.headers["accept-encoding"]),
+	    self      = this,
+	    nth;
 
-	// Encoding as JSON if not prepared
-	if (body && ((output instanceof Array) || String(output) === "[object Object]")) {
-		responseHeaders["Content-Type"] = "application/json";
-		output = $.encode(output);
+	// Determining wether compression is supported
+	compress = compress || (body && encoding !== null);
+
+	// Converting JSON or XML to a String
+	if (body) {
+		switch (true) {
+			case output instanceof Array:
+			case output instanceof Object:
+				responseHeaders["Content-Type"] = "application/json";
+				output = $.encode(output);
+				break;
+			/*case output instanceof Document:
+				responseHeaders["Content-Type"] = "application/xml";
+				output = $.xml.decode(output);
+				break;*/
+		}
 	}
 
 	if (compress) {
-		encoding = REGEX_DEF.test(encoding) ? "deflate" : "gzip";
 		responseHeaders["Content-Encoding"] = encoding;
 		zlib[encoding](output, function (err, compressed) {
 			if (err) self.error(res, req);

@@ -24,8 +24,7 @@ factory.prototype.proxy = function (origin, route, host) {
 		var resHeaders = {},
 		    etag       = "",
 		    date       = "",
-		    ie         = REGEX_IE.test(req.headers["user-agent"]),
-		    raw;
+		    nth, raw;
 
 		try {
 			// Getting or creating an Etag
@@ -34,43 +33,19 @@ factory.prototype.proxy = function (origin, route, host) {
 			if (isNaN(new Date(date).getFullYear())) date = undefined;
 			etag       = resHeaders.Etag || "\"" + self.hash(resHeaders["Content-Length"] + "-" + new Date(date).getTime()) + "\"";
 
-			// Setting headers
-			resHeaders["Transfer-Encoding"] = "chunked";
+			// Setting header
 			if (resHeaders.Etag !== etag) resHeaders.Etag = etag;
 
-			// Looking for a cached version
-			etag = etag.replace(/\"/g, "");
+			// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
 			switch (true) {
-				case !ie && REGEX_DEF.test(req.headers["accept-encoding"]):
-					res.setHeader("Content-Encoding", "deflate");
-					self.cached(etag, "deflate", function (ready, npath) {
-						if (ready) {
-							self.headers(res, req, codes.SUCCESS, resHeaders);
-							raw = fs.createReadStream(npath);
-							raw.pipe(res);
-						}
-						else {
-							self.cache(etag, arg, "deflate", true);
-							self.respond(res, req, arg, xhr.status, resHeaders);
-						}
-					});
-					break;
-				case !ie && REGEX_GZIP.test(req.headers["accept-encoding"]):
-					res.setHeader("Content-Encoding", "gzip");
-					self.cached(etag, "gzip", function (ready, npath) {
-						if (ready) {
-							self.headers(res, req, codes.SUCCESS, resHeaders);
-							raw = fs.createReadStream(npath);
-							raw.pipe(res);
-						}
-						else {
-							self.cache(etag, arg, "gzip", true);
-							self.respond(res, req, arg, xhr.status, resHeaders);
-						}
-					});
+				case req.headers["if-none-match"] === etag:
+					self.headers(res, req, codes.NOT_MODIFIED, headers);
+					res.end();
 					break;
 				default:
-					self.respond(res, req, arg, xhr.status, resHeaders);
+					resHeaders["Transfer-Encoding"] = "chunked";
+					etag = etag.replace(/\"/g, "");
+					self.compressed(res, req, etag, arg, xhr.status, resHeaders);
 			}
 		}
 		catch (e) {
