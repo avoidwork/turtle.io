@@ -9,7 +9,7 @@
 factory.prototype.proxy = function (origin, route, host) {
 	var self  = this,
 	    verbs = ["delete", "get", "post", "put"],
-	    handle, headers;
+	    handle, headers, wrapper;
 
 	/**
 	 * Response handler
@@ -77,16 +77,26 @@ factory.prototype.proxy = function (origin, route, host) {
 		return result;
 	};
 
+	/**
+	 * Wraps the proxy request
+	 * 
+	 * @param  {Object} res HTTP response Object
+	 * @param  {Object} req HTTP request Object
+	 * @return {Undefined}  undefined
+	 */
+	wrapper = function (res, req) {
+		var url = origin + req.url.replace(new RegExp("^" + route), ""),
+		    fn  = function (arg, xhr) {
+		    	handle(arg, xhr, res, req);
+		    };
+
+		url[req.method.toLowerCase()](fn, fn);
+	};
+
 	// Setting route
 	verbs.each(function (i) {
-		self[REGEX_DEL.test(i) ? "delete" : i](route, function (res, req) {
-			var url = origin + req.url,
-			    fn  = function (arg, xhr) {
-			    	handle(arg, xhr, res, req);
-			    };
-
-			url[req.method.toLowerCase()](fn, fn);
-		}, host);
+		self[REGEX_DEL.test(i) ? "delete" : i](route, wrapper, host);
+		self[REGEX_DEL.test(i) ? "delete" : i](route + "/.*", wrapper, host);
 	});
 
 	return this;
