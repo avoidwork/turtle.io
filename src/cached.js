@@ -4,7 +4,7 @@
  * @param  {String}   filename Filename (etag)
  * @param  {String}   format   Type of compression (gzip or deflate)
  * @param  {Function} fn       Callback function
- * @return {Undefiend}         undefined
+ * @return {Objet}             Instance
  */
 factory.prototype.cached = function (filename, format, fn) {
 	var ext  = /deflate/.test(format) ? ".df" : ".gz",
@@ -13,4 +13,6 @@ factory.prototype.cached = function (filename, format, fn) {
 	fs.exists(path, function (exists) {
 		fn(exists, path);
 	});
+
+	return this;
 };

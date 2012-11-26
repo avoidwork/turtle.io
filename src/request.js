@@ -68,8 +68,7 @@ factory.prototype.request = function (res, req) {
 						case "options":
 							mimetype = mime.lookup(path);
 							fs.stat(path, function (err, stat) {
-								var ie = REGEX_IE.test(req.headers["user-agent"]),
-								    size, modified, etag, raw, headers;
+								var size, modified, etag, raw, headers;
 
 								if (err) error(err);
 								else {
@@ -89,39 +88,7 @@ factory.prototype.request = function (res, req) {
 												headers["Transfer-Encoding"] = "chunked";
 												self.headers(res, req, codes.SUCCESS, headers);
 												etag = etag.replace(/\"/g, "");
-												switch (true) {
-													case !ie && REGEX_DEF.test(req.headers["accept-encoding"]):
-														res.setHeader("Content-Encoding", "deflate");
-														self.cached(etag, "deflate", function (ready, npath) {
-															if (ready) {
-																raw = fs.createReadStream(npath);
-																raw.pipe(res);
-															}
-															else {
-																self.cache(etag, path, "deflate");
-																raw = fs.createReadStream(path);
-																raw.pipe(zlib.createDeflate()).pipe(res);
-															}
-														});
-														break;
-													case !ie && REGEX_GZIP.test(req.headers["accept-encoding"]):
-														res.setHeader("Content-Encoding", "gzip");
-														self.cached(etag, "gzip", function (ready, npath) {
-															if (ready) {
-																raw = fs.createReadStream(npath);
-																raw.pipe(res);
-															}
-															else {
-																self.cache(etag, path, "gzip");
-																raw = fs.createReadStream(path);
-																raw.pipe(zlib.createGzip()).pipe(res);
-															}
-														});
-														break;
-													default:
-														raw = fs.createReadStream(path);
-														util.pump(raw, res);
-												}
+												self.compressed(res, req, etag, path, codes.SUCCESS, headers, true);
 										}
 									}
 									else self.respond(res, req, messages.NO_CONTENT, codes.SUCCESS, headers);

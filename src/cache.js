@@ -5,14 +5,13 @@
  * @param  {String}   obj      Body or Path to file to compress
  * @param  {Function} format   Compression format (deflate or gzip)
  * @param  {Boolean}  body     [Optional] Indicates obj is the Body of a Response (default is false)
- * @return {Undefined}         undefined
+ * @return {Objet}             Instance
  */
 factory.prototype.cache = function (filename, obj, encoding, body) {
 	body      = (body === true);
 	var self  = this,
 	    tmp   = this.config.tmp,
-	    regex = /deflate/,
-	    ext   = regex.test(encoding) ? ".df" : ".gz",
+	    ext   = REGEX_DEF.test(encoding) ? ".df" : ".gz",
 	    dest  = tmp + "/" + filename + ext;
 
 	if (!body) {
@@ -20,7 +19,7 @@ factory.prototype.cache = function (filename, obj, encoding, body) {
 			var raw    = fs.createReadStream(obj),
 			    stream = fs.createWriteStream(dest);
 
-			raw.pipe(zlib[regex.test(encoding) ? "createDeflate" : "createGzip"]()).pipe(stream);
+			raw.pipe(zlib[REGEX_DEF.test(encoding) ? "createDeflate" : "createGzip"]()).pipe(stream);
 		});
 	}
 	else {
@@ -30,13 +29,15 @@ factory.prototype.cache = function (filename, obj, encoding, body) {
 			case obj instanceof Object:
 				obj = $.encode(obj);
 				break;
-			case obj instanceof Document:
+			/*case obj instanceof Document:
 				obj = $.xml.decode(obj);
-				break;
+				break;*/
 		}
 		zlib[encoding](obj, function (err, compressed) {
 			if (!err) fs.writeFile(dest, compressed);
 			else self.log(err, true, false);
 		});
 	}
+
+	return this;
 };
