@@ -1,5 +1,5 @@
 /**
- * Proxies a request to a Server
+ * Proxies a (root) URL to a route
  * 
  * @param  {String} origin Host to proxy (e.g. http://hostname)
  * @param  {String} route  Route to proxy
@@ -9,7 +9,7 @@
 factory.prototype.proxy = function (origin, route, host) {
 	var self  = this,
 	    verbs = ["delete", "get", "post", "put"],
-	    handle, headers;
+	    handle, headers, wrapper;
 
 	/**
 	 * Response handler
@@ -24,6 +24,8 @@ factory.prototype.proxy = function (origin, route, host) {
 		var resHeaders = {},
 		    etag       = "",
 		    date       = "",
+		    regex      = /("|')\//g,
+		    replace    = "$1" + route + "/",
 		    nth, raw;
 
 		try {
@@ -45,6 +47,19 @@ factory.prototype.proxy = function (origin, route, host) {
 				default:
 					resHeaders["Transfer-Encoding"] = "chunked";
 					etag = etag.replace(/\"/g, "");
+
+					// Fixing root path of response
+					switch (true) {
+						case arg instanceof Array:
+						case arg instanceof Object:
+							arg = $.decode($.encode(arg).replace(regex, replace));
+							break;
+						case typeof arg === "string":
+							arg = arg.replace(regex, replace);
+							break;
+					}
+
+					// Ready to compress response
 					self.compressed(res, req, etag, arg, xhr.status, resHeaders);
 			}
 		}
@@ -77,16 +92,26 @@ factory.prototype.proxy = function (origin, route, host) {
 		return result;
 	};
 
+	/**
+	 * Wraps the proxy request
+	 * 
+	 * @param  {Object} res HTTP response Object
+	 * @param  {Object} req HTTP request Object
+	 * @return {Undefined}  undefined
+	 */
+	wrapper = function (res, req) {
+		var url = origin + req.url.replace(new RegExp("^" + route), ""),
+		    fn  = function (arg, xhr) {
+		    	handle(arg, xhr, res, req);
+		    };
+
+		url[req.method.toLowerCase()](fn, fn);
+	};
+
 	// Setting route
 	verbs.each(function (i) {
-		self[REGEX_DEL.test(i) ? "delete" : i](route, function (res, req) {
-			var url = origin + req.url,
-			    fn  = function (arg, xhr) {
-			    	handle(arg, xhr, res, req);
-			    };
-
-			url[req.method.toLowerCase()](fn, fn);
-		}, host);
+		self[REGEX_DEL.test(i) ? "delete" : i](route, wrapper, host);
+		self[REGEX_DEL.test(i) ? "delete" : i](route + "/.*", wrapper, host);
 	});
 
 	return this;
