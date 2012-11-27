@@ -18,5 +18,6 @@ var codes = {
 	CONFLICT          : 409,
 	FAILED            : 412,
 	ERROR_APPLICATION : 500,
+	ERROR_GATEWAY     : 502,
 	ERROR_SERVICE     : 503
 };
