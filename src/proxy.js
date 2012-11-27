@@ -64,8 +64,8 @@ factory.prototype.proxy = function (origin, route, host) {
 			}
 		}
 		catch (e) {
-			self.log(e);
-			self.respond(res, req, arg, 502, {});
+			self.log(e, true);
+			self.respond(res, req, messages.NO_CONTENT, codes.ERROR_GATEWAY, {});
 		}
 	};
 

@@ -15,5 +15,6 @@ var messages = {
 	NOT_ALLOWED       : "Method not allowed",
 	CONFLICT          : "Conflict",
 	ERROR_APPLICATION : "Application error",
+	ERROR_GATEWAY     : "Bad gateway",
 	ERROR_SERVICE     : "Service is unavailable"
 };
