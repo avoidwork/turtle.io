@@ -7,12 +7,11 @@
  * @return {Mixed}           Supported compression or null
  */
 factory.prototype.compression = function (agent, encoding) {
-	var result    = "",
+	var result    = null,
 	    encodings = typeof encoding === "string" ? encoding.explode(",") : [],
 	    nth       = encodings.length - 1;
 
-	
-	if (!REGEX_IE.test(agent)) {
+	if (this.config.compress === true && !REGEX_IE.test(agent)) {
 		// Iterating supported encodings
 		encodings.each(function (i, idx) {
 			switch (true) {
@@ -25,12 +24,9 @@ factory.prototype.compression = function (agent, encoding) {
 			}
 
 			// Found a supported encoding
-			if (!result.isEmpty()) return false;
+			if (result !== null) return false;
 		});
 	}
-
-	// Setting null to imply no compression is supported
-	if (result.isEmpty()) result = null;
 
 	return result;
 };
