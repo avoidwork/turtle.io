@@ -13,7 +13,7 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 	if (typeof status === "undefined")        status          = codes.SUCCESS;
 	if (!(responseHeaders instanceof Object)) responseHeaders = {};
 
-	var body      = !REGEX_BODY.test(req.method),
+	var body      = !REGEX_HEAD.test(req.method),
 	    encoding  = this.compression(req.headers["user-agent"], req.headers["accept-encoding"]),
 	    self      = this,
 	    nth;
