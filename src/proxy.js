@@ -103,9 +103,22 @@ factory.prototype.proxy = function (origin, route, host) {
 		var url = origin + req.url.replace(new RegExp("^" + route), ""),
 		    fn  = function (arg, xhr) {
 		    	handle(arg, xhr, res, req);
-		    };
+		    },
+		    payload;
 
-		url[req.method.toLowerCase()](fn, fn);
+		// Setting listeners if expecting a body
+		if (REGEX_BODY.test(req.method)) {
+			req.setEncoding("utf-8");
+
+			req.on("data", function (data) {
+				payload += data;
+			});
+
+			req.on("end", function () {
+				url[req.method.toLowerCase()](fn, fn, payload);
+			});
+		}
+		else url[req.method.toLowerCase()](fn, fn);
 	};
 
 	// Setting route
