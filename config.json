@@ -8,10 +8,7 @@
 	},
 	"index"   : ["index.htm", "index.html"],
 	"logs"    : {
-		"dir"    : "./logs",
-		"date"   : "YYYYMMDD",
-		"daemon" : "turtle_{{date}}.log",
-		"error"  : "error_{{date}}.log",
+		"file"   : "./turtle_io.log",
 		"format" : "{{host}} [{{time}}] \"{{method}} {{path}} HTTP/1.1\" {{status}} \"{{user-agent}}\""
 	},
 	"root"    : "./sites",
