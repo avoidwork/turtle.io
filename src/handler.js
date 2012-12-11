@@ -18,11 +18,11 @@ var handler = function (res, req, fn) {
 
 	// Setting listener for unexpected close
 	res.on("close", function () {
-		self.log(prep.call(self, res, req), false, self.config.debug);
+		self.log(prep.call(self, res, req));
 	});
 
 	// Logging request
-	this.log(prep.call(this, res, req), false, this.config.debug);
+	this.log(prep.call(this, res, req));
 
 	// Handling request or wrapping it with HTTP Authentication
 	switch (true) {

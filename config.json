@@ -1,10 +1,9 @@
 {
-	"debug"   : false,
 	"port"    : 8000,
 	"compress": true,
 	"headers" : {
-		"Cache-Control"                : "max-age=3600 must-revalidate",
-		"Access-Control-Allow-Origin"  : "*"
+		"Cache-Control"               : "max-age=3600 must-revalidate",
+		"Access-Control-Allow-Origin" : "*"
 	},
 	"index"   : ["index.htm", "index.html"],
 	"logs"    : {

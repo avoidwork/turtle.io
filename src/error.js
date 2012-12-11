@@ -29,5 +29,5 @@ factory.prototype.error = function (res, req) {
 	         .replace("{{user-agent}}", req.headers["user-agent"] || "-");
 	
 	// Writing log
-	this.log(msg, true, this.config.debug);
+	this.log(msg);
 };
