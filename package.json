@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Easy to use web server with virtual hosts & RESTful proxies",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "homepage": "https://github.com/avoidwork/turtle.io",
   "author": {
     "name": "Jason Mulligan",
@@ -31,14 +31,11 @@
     "abaaso": ">= 3.2.11",
     "mime": ">= 1.2.7",
     "moment": ">= 1.7.0",
-    "http-auth" : ">= 1.2.2"
+    "http-auth" : ">= 1.2.2",
+    "node-syslog" : ">= 1.1.6"
   },
   "devDependencies": {
-    "grunt": "~0.3.14",
-    "abaaso": ">= 3.2.11",
-    "mime": ">= 1.2.7",
-    "moment": ">= 1.7.0",
-    "http-auth" : ">= 1.2.2"
+    "grunt": "~0.3.14"
   },
   "keywords": ["web server", "http", "https", "web", "server", "virtual hosts"]
 }

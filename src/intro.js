@@ -7,6 +7,7 @@ var $          = require("abaaso"),
     http_auth  = require("http-auth"),
     mime       = require("mime"),
     moment     = require("moment"),
+    syslog     = require("node-syslog"),
     url        = require("url"),
     util       = require("util"),
     zlib       = require("zlib"),
@@ -18,3 +19,5 @@ var $          = require("abaaso"),
     REGEX_DEF  = /deflate/,
     REGEX_GZIP = /gzip/,
     REGEX_IE   = /msie/i;
+
+syslog.init("turtle_io", syslog.LOG_PID | syslog.LOG_ODELAY, syslog.LOG_LOCAL0);
