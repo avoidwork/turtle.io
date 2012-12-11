@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Easy to use web server with virtual hosts & RESTful proxies",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "homepage": "https://github.com/avoidwork/turtle.io",
   "author": {
     "name": "Jason Mulligan",
@@ -17,7 +17,7 @@
   "licenses": [
     {
       "type": "BSD-3",
-      "url": "http://opensource.org/licenses/BSD-3-Clause"
+      "url": "https://raw.github.com/avoidwork/turtle.io/master/LICENSE"
     }
   ],
   "main": "lib/turtle.io",

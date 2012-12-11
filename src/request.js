@@ -13,7 +13,7 @@ factory.prototype.request = function (res, req) {
 	    parsed  = url.parse(req.url, true),
 	    method  = REGEX_GET.test(req.method) ? "get" : req.method.toLowerCase(),
 	    error   = function (err) {
-	    	if (typeof err !== "undefined") self.log(err, true, self.config.debug);
+	    	if (typeof err !== "undefined") self.log(err);
 	    	self.respond(res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION);
 	    },
 	    path    = [],
