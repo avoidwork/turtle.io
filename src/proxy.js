@@ -111,11 +111,11 @@ factory.prototype.proxy = function (origin, route, host) {
 			req.setEncoding("utf-8");
 
 			req.on("data", function (data) {
-				payload += data;
+				payload = typeof payload === "undefined" ? data : payload + data;
 			});
 
 			req.on("end", function () {
-				url[req.method.toLowerCase()](fn, fn, payload);
+				url[req.method.toLowerCase()](fn, fn, payload, req.headers);
 			});
 		}
 		else url[req.method.toLowerCase()](fn, fn);
