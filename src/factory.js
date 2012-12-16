@@ -13,7 +13,8 @@ var factory = function (args) {
 	this.server  = null;
 	this.version = "{{VERSION}}";
 
-	bootstrap.call(self, args);
+	// Loading config
+	config.call(this, args);
 
 	return this;
 };
