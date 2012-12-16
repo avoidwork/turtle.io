@@ -21,7 +21,6 @@ module.exports = function (grunt) {
 					"src/intro.js",
 					"src/allowed.js",
 					"src/allows.js",
-					"src/bootstrap.js",
 					"src/codes.js",
 					"src/config.js",
 					"src/factory.js",
