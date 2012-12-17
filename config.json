@@ -7,7 +7,7 @@
 	},
 	"index"   : ["index.htm", "index.html"],
 	"logs"    : {
-		"file"   : "./turtle_io.log",
+		"file"   : "turtle_io.log",
 		"format" : "{{host}} [{{time}}] \"{{method}} {{path}} HTTP/1.1\" {{status}} \"{{user-agent}}\""
 	},
 	"root"    : "./sites",
