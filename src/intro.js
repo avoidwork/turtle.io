@@ -24,4 +24,4 @@ var $          = require("abaaso"),
 syslog.init("turtle_io", syslog.LOG_PID | syslog.LOG_ODELAY, syslog.LOG_LOCAL0);
 
 // Disabling abaaso observer
-$.observer.discard(true);
+$.discard(true);

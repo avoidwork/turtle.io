@@ -30,7 +30,7 @@ factory.prototype.log = function (msg) {
 	// Writing to log file
 	fs.appendFile("/var/log/" + file, msg + "\n", function (e) {
 		if (e) {
-			fs.appendFile(__dirname + "/" + file, msg + "\n", function (e) {
+			fs.appendFile(__dirname + "/../" + file, msg + "\n", function (e) {
 				if (e) console.log(e);
 				if (REGEX_HALT.test(msg)) exit();
 			});
