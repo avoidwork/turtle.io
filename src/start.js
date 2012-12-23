@@ -11,17 +11,14 @@ factory.prototype.start = function (args) {
 
 	// Default headers
 	headers = {
-		"Accept"                       : "text/html, text/plain",
-		"Allow"                        : "",
-		"Content-Type"                 : "text/html; charset=utf-8",
-		"Date"                         : "",
-		"Last-Modified"                : "",
-		"Server"                       : "turtle.io/{{VERSION}}",
-		"X-Powered-By"                 : (function () { return ("abaaso/" + $.version + " node.js/" + process.versions.node.replace(/^v/, "") + " (" + process.platform.capitalize() + " V8/" + process.versions.v8 + ")"); })(),
-		"Access-Control-Allow-Headers" : "Accept, Allow, Cache-Control, Content-Type, Date, Etag, Transfer-Encoding, Server",
-		"Access-Control-Allow-Methods" : "",
-		"Access-Control-Allow-Origin"  : ""
+		"Server"       : "turtle.io/{{VERSION}}",
+		"X-Powered-By" : (function () { return ("abaaso/" + $.version + " node.js/" + process.versions.node.replace(/^v/, "") + " (" + process.platform.capitalize() + " V8/" + process.versions.v8 + ")"); })()
 	};
+
+	// Capturing exceptions
+	process.on("uncaughtException", function (err) {
+		self.log(err);
+	});
 
 	// Loading config
 	config.call(this, args);
@@ -37,7 +34,9 @@ factory.prototype.start = function (args) {
 	if (typeof this.config.key !== "undefined") params.csr = this.config.key;
 
 	// Setting error route
-	$.route.set("error", function (res, req) { self.error(res, req); });
+	$.route.set("error", function (res, req) {
+		self.error(res, req);
+	});
 
 	// Setting default response route
 	this.get("/.*", this.request);

@@ -2,8 +2,15 @@
 	"port"    : 8000,
 	"compress": true,
 	"headers" : {
+		"Accept"                      : "text/html, text/plain",
+		"Access-Control-Allow-Origin" : "*",
+		"Access-Control-Allow-Headers": "Accept, Allow, Cache-Control, Content-Length, Content-Type, Date, Etag, Transfer-Encoding, Server",
+		"Access-Control-Allow-Methods": "",
+		"Allow"                       : "",
 		"Cache-Control"               : "max-age=3600 must-revalidate",
-		"Access-Control-Allow-Origin" : "*"
+		"Content-Type"                : "text/html; charset=utf-8",
+		"Date"                        : "",
+		"Last-Modified"               : ""
 	},
 	"index"   : ["index.htm", "index.html"],
 	"logs"    : {
