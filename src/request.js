@@ -74,7 +74,7 @@ factory.prototype.request = function (res, req) {
 								else {
 									size     = stat.size;
 									modified = stat.mtime.toUTCString();
-									etag     = "\"" + self.hash(stat.size + "-" + stat.mtime) + "\"";
+									etag     = "\"" + self.hash(req.url + "-" + stat.size + "-" + stat.mtime) + "\"";
 									headers  = {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified};
 
 									if (req.method === "GET") {

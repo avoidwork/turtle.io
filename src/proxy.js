@@ -33,7 +33,7 @@ factory.prototype.proxy = function (origin, route, host) {
 			resHeaders = headers(xhr.getAllResponseHeaders());
 			date       = (resHeaders["Last-Modified"] || resHeaders["Date"]) || undefined;
 			if (isNaN(new Date(date).getFullYear())) date = undefined;
-			etag       = resHeaders.Etag || "\"" + self.hash(resHeaders["Content-Length"] + "-" + new Date(date).getTime()) + "\"";
+			etag       = resHeaders.Etag || "\"" + self.hash(req.url + "-" + resHeaders["Content-Length"] + "-" + new Date(date).getTime()) + "\"";
 
 			// Setting header
 			if (resHeaders.Etag !== etag) resHeaders.Etag = etag;
