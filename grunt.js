@@ -34,6 +34,7 @@ module.exports = function (grunt) {
 					"src/headers.js",
 					"src/log.js",
 					"src/proxy.js",
+					"src/redirect.js",
 					"src/request.js",
 					"src/respond.js",
 					"src/restart.js",

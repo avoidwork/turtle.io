@@ -9,6 +9,7 @@ var codes = {
 	ACCEPTED          : 202,
 	NO_CONTENT        : 204,
 	MOVED             : 301,
+	REDIRECT          : 302,
 	NOT_MODIFIED      : 304,
 	INVALID_ARGUMENTS : 400,
 	INVALID_AUTH      : 401,
