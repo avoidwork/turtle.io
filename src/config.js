@@ -11,7 +11,14 @@ var config = function (args) {
 	    id     = this.id || (args.id || (config.id || $.genId()));
 
 	// Merging args into config
-	$.merge(config, args);
+	$.iterate(args, function (value, key) {
+		if (value instanceof Object) {
+			if (config[key] === undefined) config[key] = {};
+			$.merge(config[key], value);
+		}
+		else config[key] = value;
+	});
+
 	delete config.id;
 
 	// Loading if first execution or config has changed
