@@ -9,8 +9,8 @@
  */
 factory.prototype.redirect = function (route, url, host, permanent) {
 	var self   = this,
-	    code   = this.codes[permanent === true ? "MOVED" : "REDIRECT"],
-	    output = this.messages.NO_CONTENT;
+	    code   = codes[permanent === true ? "MOVED" : "REDIRECT"],
+	    output = messages.NO_CONTENT;
 
 	this.get(route, function (res, req) {
 		self.respond(res, req, output, code, {"Location": url});
