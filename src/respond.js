@@ -10,7 +10,7 @@
  * @return {Objet}                   Instance
  */
 factory.prototype.respond = function (res, req, output, status, responseHeaders, compress) {
-	if (typeof status === "undefined")        status          = codes.SUCCESS;
+	status = status || codes.SUCCESS;
 	if (!(responseHeaders instanceof Object)) responseHeaders = {};
 
 	var body      = !REGEX_HEAD.test(req.method),
@@ -35,6 +35,12 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 				break;*/
 		}
 	}
+
+	// Setting the response status code
+	res.statusCode = status;
+
+	// Logging request now because the Objects have mutated to their final state
+	self.log(prep.call(self, res, req));
 
 	if (compress) {
 		responseHeaders["Content-Encoding"] = encoding;

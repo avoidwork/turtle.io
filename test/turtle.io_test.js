@@ -3,15 +3,60 @@ var turtle = require("../lib/turtle.io"),
 
 exports["methods"] = {
 	setUp: function (done) {
-		this.methods = ["restart", "start", "stop", "status"];
 		done();
 	},
 	tests: function (test) {
 		test.expect(4);
-		test.equal(typeof server[this.methods[0]], "function", "Should be 'function");
-		test.equal(typeof server[this.methods[1]], "function", "Should be 'function");
-		test.equal(typeof server[this.methods[2]], "function", "Should be 'function");
-		test.equal(typeof server[this.methods[3]], "function", "Should be 'function");
+		test.equal(typeof server.restart, "function", "Should be 'function'");
+		test.equal(typeof server.start,   "function", "Should be 'function'");
+		test.equal(typeof server.stop,    "function", "Should be 'function'");
+		test.equal(typeof server.status,  "function", "Should be 'function'");
+		test.done();
+	}
+};
+
+exports["start"] = {
+	setUp: function (done) {
+		done();
+	},
+	tests: function (test) {
+		test.expect(1);
+		test.equal(server.start(), server, "Should be instance of turtle.io");
+		test.done();
+	}
+};
+
+exports["status"] = {
+	setUp: function (done) {
+		done();
+	},
+	tests: function (test) {
+		test.expect(1);
+		test.equal(server.status() instanceof Object, true, "Should be instance of Object");
+		test.done();
+	}
+};
+
+exports["stop"] = {
+	setUp: function (done) {
+		done();
+	},
+	tests: function (test) {
+		test.expect(1);
+		test.equal(server.stop(), server, "Should be instance of turtle.io");
+		test.done();
+	}
+};
+
+exports["restart"] = {
+	setUp: function (done) {
+		done();
+	},
+	tests: function (test) {
+		test.expect(3);
+		test.equal(server.start(),   server, "Should be instance of turtle.io");
+		test.equal(server.restart(), server, "Should be instance of turtle.io");
+		test.equal(server.stop(),    server, "Should be instance of turtle.io");
 		test.done();
 	}
 };

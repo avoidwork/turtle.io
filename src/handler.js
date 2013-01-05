@@ -21,9 +21,6 @@ var handler = function (res, req, fn) {
 		self.log(prep.call(self, res, req));
 	});
 
-	// Logging request
-	this.log(prep.call(this, res, req));
-
 	// Handling request or wrapping it with HTTP Authentication
 	switch (true) {
 		case this.config.auth === "undefined":
