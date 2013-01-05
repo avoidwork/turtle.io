@@ -18,7 +18,8 @@ var $          = require("abaaso"),
     REGEX_DEL  = /^(del)$/i,
     REGEX_DEF  = /deflate/,
     REGEX_GZIP = /gzip/,
-    REGEX_IE   = /msie/i;
+    REGEX_IE   = /msie/i,
+    REGEX_DIR  = /\/$/;
 
 // Hooking syslog output
 syslog.init("turtle_io", syslog.LOG_PID | syslog.LOG_ODELAY, syslog.LOG_LOCAL0);
