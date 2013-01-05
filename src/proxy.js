@@ -35,8 +35,9 @@ factory.prototype.proxy = function (origin, route, host) {
 			if (isNaN(new Date(date).getFullYear())) date = undefined;
 			etag       = resHeaders.Etag || "\"" + self.hash(req.url + "-" + resHeaders["Content-Length"] + "-" + new Date(date).getTime()) + "\"";
 
-			// Setting header
+			// Setting headers
 			if (resHeaders.Etag !== etag) resHeaders.Etag = etag;
+			if (resHeaders.Allow === undefined || resHeaders.Allow.isEmpty()) resHeaders.Allow = resHeaders["Access-Control-Allow-Methods"] || "GET";
 
 			// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
 			switch (true) {
