@@ -81,8 +81,7 @@ factory.prototype.request = function (res, req) {
 										switch (true) {
 											case Date.parse(req.headers["if-modified-since"]) >= stat.mtime:
 											case req.headers["if-none-match"] === etag:
-												self.headers(res, req, codes.NOT_MODIFIED, headers);
-												res.end();
+												self.respond(res, req, messages.NO_CONTENT, codes.NOT_MODIFIED, headers);
 												break;
 											default:
 												headers["Transfer-Encoding"] = "chunked";
