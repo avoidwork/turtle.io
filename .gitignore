@@ -1,4 +1,3 @@
 node_modules/*
 .travis.yml
-logs/*
 turtle_io.log
