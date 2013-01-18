@@ -1,6 +1,7 @@
 {
-	"port"    : 8000,
+	"auth"    : {},
 	"compress": true,
+	"default" : null,
 	"headers" : {
 		"Accept"                      : "text/html, text/plain",
 		"Access-Control-Allow-Origin" : "*",
@@ -17,17 +18,8 @@
 		"file"   : "turtle_io.log",
 		"format" : "{{host}} [{{time}}] \"{{method}} {{path}} HTTP/1.1\" {{status}} \"{{user-agent}}\""
 	},
-	"root"    : "./sites",
-	"vhosts"  : {
-		"localhost" : "test",
-		"test"      : "test",
-		"test2"     : "test2"
-	},
+	"port"    : 8000,
+	"root"    : "",
 	"tmp"     : "/tmp",
-	"auth"    : {
-		"test2" : {
-			"authRealm" : "Private",
-			"authList"  : ["admin:admin"]
-		}
-	}
+	"vhosts"  : {}
 }

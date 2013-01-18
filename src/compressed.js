@@ -8,7 +8,7 @@
  * @param  {Number}  code    Response status code
  * @param  {Object}  headers HTTP headers
  * @param  {Boolean} local   [Optional] Indicates arg is a file path, default is false
- * @return {Objet}          Instance
+ * @return {Objet}           Instance
  */
 factory.prototype.compressed = function (res, req, etag, arg, code, headers, local) {
 	local           = (local === true);
@@ -16,7 +16,6 @@ factory.prototype.compressed = function (res, req, etag, arg, code, headers, loc
 	    compression = this.compression(req.headers["user-agent"], req.headers["accept-encoding"]),
 	    raw;
 
-	
 	// Local asset, piping result directly to Client
 	if (local) {
 		if (compression !== null) {

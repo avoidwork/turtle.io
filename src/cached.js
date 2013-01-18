@@ -7,7 +7,7 @@
  * @return {Objet}             Instance
  */
 factory.prototype.cached = function (filename, format, fn) {
-	var ext  = /deflate/.test(format) ? ".df" : ".gz",
+	var ext  = REGEX_DEF.test(format) ? ".df" : ".gz",
 	    path = this.config.tmp + "/" + filename + ext;
 
 	fs.exists(path, function (exists) {

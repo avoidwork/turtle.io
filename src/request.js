@@ -12,17 +12,16 @@ factory.prototype.request = function (res, req) {
 	    host    = req.headers.host.replace(/:.*/, ""),
 	    parsed  = url.parse(req.url, true),
 	    method  = REGEX_GET.test(req.method) ? "get" : req.method.toLowerCase(),
-	    error   = function (err) {
-	    	if (typeof err !== "undefined") self.log(err);
-	    	self.respond(res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION);
-	    },
 	    path    = [],
 	    handled = false,
 	    port    = this.config.port,
 	    path    = "",
 	    count, handle, nth, root;
 
-	if (!this.config.vhosts.hasOwnProperty(host)) return error();
+	if (!this.config.vhosts.hasOwnProperty(host)) {
+		if (this.config.default !== null) host = this.config.default;
+		else return self.respond(res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION);
+	}
 
 	root = this.config.root + "/" + this.config.vhosts[host];
 
@@ -59,7 +58,7 @@ factory.prototype.request = function (res, req) {
 					switch (method) {
 						case "delete":
 							fs.unlink(path, function (err) {
-								if (err) error(err);
+								if (err) self.error(res, req);
 								else self.respond(res, req, messages.NO_CONTENT, codes.NO_CONTENT);
 							});
 							break;
@@ -70,7 +69,7 @@ factory.prototype.request = function (res, req) {
 							fs.stat(path, function (err, stat) {
 								var size, modified, etag, raw, headers;
 
-								if (err) error(err);
+								if (err) self.error(res, req);
 								else {
 									size     = stat.size;
 									modified = stat.mtime.toUTCString();
@@ -106,7 +105,7 @@ factory.prototype.request = function (res, req) {
 
 	// Determining if the request is valid
 	fs.stat(root + parsed.pathname, function (err, stats) {
-		if (err) self.respond(res, req, messages.NO_CONTENT, codes.NOT_FOUND, (allowed("POST", req.url) ? {"Allow": "POST"} : undefined));
+		if (err) self.error(res, req);
 		else {
 			if (!stats.isDirectory()) handle(root + parsed.pathname, parsed.pathname);
 			else {
@@ -122,7 +121,7 @@ factory.prototype.request = function (res, req) {
 					self.config.index.each(function (i) {
 						fs.exists(root + parsed.pathname + i, function (exists) {
 							if (exists && !handled) handle(root + parsed.pathname + i, parsed.pathname + i);
-							else if (!exists && ++count === nth) self.respond(res, req, messages.NO_CONTENT, codes.NOT_FOUND, (allowed("POST", req.url) ? {"Allow": "POST"} : undefined));
+							else if (!exists && ++count === nth) self.error(res, req);
 						});
 					});
 				}
