@@ -20,7 +20,7 @@ factory.prototype.request = function (res, req) {
 
 	if (!this.config.vhosts.hasOwnProperty(host)) {
 		if (this.config.default !== null) host = this.config.default;
-		else return this.error(res, req);
+		else return self.respond(res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION);
 	}
 
 	root = this.config.root + "/" + this.config.vhosts[host];
