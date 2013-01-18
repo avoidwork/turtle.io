@@ -1,6 +1,7 @@
 {
 	"auth"    : {},
 	"compress": true,
+	"default" : null,
 	"headers" : {
 		"Accept"                      : "text/html, text/plain",
 		"Access-Control-Allow-Origin" : "*",

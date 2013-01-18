@@ -18,7 +18,10 @@ factory.prototype.request = function (res, req) {
 	    path    = "",
 	    count, handle, nth, root;
 
-	if (!this.config.vhosts.hasOwnProperty(host)) return this.error(res, req);
+	if (!this.config.vhosts.hasOwnProperty(host)) {
+		if (this.config.default !== null) host = this.config.default;
+		else return this.error(res, req);
+	}
 
 	root = this.config.root + "/" + this.config.vhosts[host];
 

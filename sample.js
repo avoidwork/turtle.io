@@ -9,12 +9,11 @@ config = {
 			authList  : ["admin:admin"]
 		}
 	},
-	root   : "./sites",
-	vhosts : {
-		"localhost" : "test",
-		"test"      : "test",
-		"test2"     : "test2",
-		"all"       : "test"
+	default : "test",
+	root    : "./sites",
+	vhosts  : {
+		"test"  : "test",
+		"test2" : "test2"
 	}
 }
 
