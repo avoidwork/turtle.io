@@ -7,7 +7,7 @@
 var config = function (args) {
 	if (!(args instanceof Object)) args = {};
 
-	var config = require("../config.json"),
+	var config = require(__dirname + "/../config.json"),
 	    id     = this.id || (args.id || (config.id || $.genId()));
 
 	// Merging args into config
