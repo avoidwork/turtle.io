@@ -3,9 +3,8 @@
 	"compress": true,
 	"default" : null,
 	"headers" : {
-		"Accept"                      : "text/html, text/plain",
 		"Access-Control-Allow-Origin" : "*",
-		"Access-Control-Allow-Headers": "Accept, Allow, Cache-Control, Content-Length, Content-Type, Date, Etag, Transfer-Encoding, Server",
+		"Access-Control-Allow-Headers": "Cache-Control, Content-Length, Content-Type, Date, Etag, Server",
 		"Access-Control-Allow-Methods": "",
 		"Allow"                       : "",
 		"Cache-Control"               : "max-age=3600 must-revalidate",
