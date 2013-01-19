@@ -45,6 +45,9 @@ factory.prototype.start = function (args) {
 	this.server = $.route.server(params, function (e) { self.log(e, true); });
 	this.active = true;
 
+	// Setting acceptable lag
+	toobusy.maxLag(this.config.lag);
+
 	// Announcing state
 	this.log("Started turtle.io on port " + this.config.port);
 

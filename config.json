@@ -13,6 +13,7 @@
 		"Last-Modified"               : ""
 	},
 	"index"   : ["index.htm", "index.html"],
+	"lag"     : 70,
 	"logs"    : {
 		"file"   : "turtle_io.log",
 		"format" : "{{host}} [{{time}}] \"{{method}} {{path}} HTTP/1.1\" {{status}} \"{{user-agent}}\""

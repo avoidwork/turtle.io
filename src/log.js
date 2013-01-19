@@ -15,6 +15,7 @@ factory.prototype.log = function (msg) {
 	 */
 	exit = function () {
 		syslog.close();
+		toobusy.shutdown();
 		process.exit(0);
 	};
 

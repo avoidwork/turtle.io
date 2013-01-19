@@ -26,10 +26,10 @@ var turtle_io = require("turtle.io"),
     server    = new turtle_io(),
     params    = {};
 
-params.debug  = true; // verbose console output
-params.port   = 80;
-params.root   = "/var/www";
-params.vhosts = {
+params.default = "mysite.com";
+params.port    = 80;
+params.root    = "/var/www";
+params.vhosts  = {
 	"mysite.com"         : "mysite.com",
 	"another-domain.com" : "another-domain.com"
 }
