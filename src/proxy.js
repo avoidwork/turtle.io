@@ -42,7 +42,7 @@ factory.prototype.proxy = function (origin, route, host) {
 			// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
 			switch (true) {
 				case req.headers["if-none-match"] === etag:
-					self.headers(res, req, codes.NOT_MODIFIED, headers);
+					self.headers(res, req, codes.NOT_MODIFIED, resHeaders);
 					res.end();
 					break;
 				default:
