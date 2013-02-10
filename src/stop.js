@@ -1,6 +1,7 @@
 /**
  * Stops instance
  * 
+ * @method stop
  * @return {Object} Instance
  */
 factory.prototype.stop = function () {

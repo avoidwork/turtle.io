@@ -2,6 +2,7 @@
 /**
  * Determines what/if compression is supported for a request
  * 
+ * @method compression
  * @param  {String} agent    User-Agent header value
  * @param  {String} encoding Accept-Encoding header value
  * @return {Mixed}           Supported compression or null

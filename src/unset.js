@@ -1,6 +1,7 @@
 /**
  * Unsets a route
  * 
+ * @method unset
  * @param  {String} route URI Route
  * @param  {String} verb  HTTP method
  * @return {Object}       Instance

@@ -1,6 +1,7 @@
 /**
  * Instance Factory
  * 
+ * @method factory
  * @param  {Object} args [Optional] Properties to set
  * @return {Object}      Instance of turtle.io
  */

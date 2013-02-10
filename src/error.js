@@ -1,6 +1,7 @@
 /**
  * Error handler for requests
  * 
+ * @method error
  * @param  {Object} res Response Object
  * @param  {Object} req Request Object
  * @return {Object}     Instance

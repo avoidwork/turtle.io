@@ -1,6 +1,7 @@
 /**
  * Returns an Object describing the instance's status
  * 
+ * @method status
  * @return {Object} Status
  */
 factory.prototype.status = function () {

@@ -1,6 +1,7 @@
 /**
  * Loads & applies the configuration file
  * 
+ * @method config
  * @param  {Object} args [Optional] Overrides or optional properties to set
  * @return {Object}      Instance
  */
