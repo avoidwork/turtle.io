@@ -1,2 +1,5 @@
 /node_modules/
+.travis.yml
+.git
+.gitignore
 turtle_io.log

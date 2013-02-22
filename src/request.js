@@ -113,9 +113,8 @@ factory.prototype.request = function (res, req) {
 		else {
 			if (!stats.isDirectory()) handle(root + parsed.pathname, parsed.pathname);
 			else {
-				// Adding a trailing slash for relative paths; redirect is cached until server is restarted
+				// Adding a trailing slash for relative paths; redirect is not cached
 				if (stats.isDirectory() && !REGEX_DIR.test(parsed.pathname)) {
-					self.redirect(parsed.pathname, parsed.pathname + "/", host, true);
 					self.respond(res, req, messages.NO_CONTENT, codes.MOVED, {"Location": parsed.pathname + "/"});
 				}
 				else {

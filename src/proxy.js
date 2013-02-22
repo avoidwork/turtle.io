@@ -66,7 +66,7 @@ factory.prototype.proxy = function (origin, route, host) {
 		}
 		catch (e) {
 			self.log(e, true);
-			self.respond(res, req, messages.NO_CONTENT, codes.ERROR_GATEWAY, {});
+			self.respond(res, req, messages.NO_CONTENT, codes.ERROR_GATEWAY, {"Allow": "GET"});
 		}
 	};
 
@@ -86,7 +86,7 @@ factory.prototype.proxy = function (origin, route, host) {
 
 			value          = i.replace(rvalue, "");
 			header         = i.replace(rheader, "");
-			header         = header.indexOf("-") === -1 ? header.capitalize() : (function () { var x = []; header.explode("-").each(function (i) { x.push(i.capitalize()) }); return x.join("-"); })();
+			header         = header.unhyphenate(true).replace(/\s+/g, "-");
 			result[header] = value;
 		});
 
@@ -112,7 +112,7 @@ factory.prototype.proxy = function (origin, route, host) {
 			req.setEncoding("utf-8");
 
 			req.on("data", function (data) {
-				payload = typeof payload === "undefined" ? data : payload + data;
+				payload = payload === undefined ? data : payload + data;
 			});
 
 			req.on("end", function () {

@@ -1,6 +1,7 @@
 /**
  * Constructs a response
  * 
+ * @method respond
  * @param  {Object}  res             Response object
  * @param  {Object}  req             Request object
  * @param  {Mixed}   output          [Optional] Response

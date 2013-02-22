@@ -1,6 +1,7 @@
 /**
  * Starts instance
  * 
+ * @method start
  * @param  {Object} args Parameters to set
  * @return {Object}      Instance
  */

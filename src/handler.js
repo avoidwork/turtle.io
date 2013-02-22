@@ -1,6 +1,7 @@
 /**
  * Route handler
  * 
+ * @method handler
  * @param  {Object}   res HTTP response Object
  * @param  {Object}   req HTTP request Object
  * @param  {Function} fn  Request handler

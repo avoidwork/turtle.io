@@ -1,6 +1,7 @@
 /**
  * Writes files to disk
  * 
+ * @method write
  * @param  {String} path  File path
  * @param  {Object} res   HTTP response Object
  * @param  {Object} req   HTTP request Object
