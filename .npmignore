@@ -2,4 +2,4 @@
 .travis.yml
 .git
 .gitignore
-turtle_io.log
+turtleio*.log

@@ -7,7 +7,7 @@
 factory.prototype.log = function (msg) {
 	var self = this,
 	    err  = typeof msg.callstack !== "undefined",
-	    file = self.config.logs.file,
+	    file = self.config.logs.file.replace("{{ext}}", new moment().format(this.config.logs.ext)),
 	    exit;
 
 	/**
