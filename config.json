@@ -15,8 +15,10 @@
 	"index"   : ["index.htm", "index.html"],
 	"lag"     : 70,
 	"logs"    : {
-		"file"   : "turtle_io.log",
-		"format" : "{{host}} [{{time}}] \"{{method}} {{path}} HTTP/1.1\" {{status}} \"{{user-agent}}\""
+		"ext"    : "MMDDYY",
+		"file"   : "turtleio_{{ext}}.log",
+		"time"   : "D/MMM/YYYY:HH:MM:SS ZZ",
+		"format" : "{{ip}} - {{user}} [{{time}}] \"{{method}} {{path}} HTTP/1.1\" {{status}} {{length}} {{referer}} \"{{user-agent}}\""
 	},
 	"port"    : 8000,
 	"root"    : "",

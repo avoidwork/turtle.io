@@ -40,9 +40,6 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 	// Setting the response status code
 	res.statusCode = status;
 
-	// Logging request now because the Objects have mutated to their final state
-	self.log(prep.call(self, res, req));
-
 	if (compress) {
 		responseHeaders["Content-Encoding"] = encoding;
 		zlib[encoding](output, function (err, compressed) {
@@ -51,6 +48,7 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 				self.headers(res, req, status, responseHeaders);
 				res.write(compressed);
 				res.end();
+				self.log(prep.call(self, res, req));
 			}
 		});
 	}
@@ -58,6 +56,7 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 		this.headers(res, req, status, responseHeaders);
 		if (body) res.write(output);
 		res.end();
+		self.log(prep.call(self, res, req));
 	}
 
 	return this;

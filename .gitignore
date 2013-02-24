@@ -1,4 +1,4 @@
 node_modules/*
 .travis.yml
 .npmignore
-turtle_io.log
+turtleio*.log
