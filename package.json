@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Easy to use web server with virtual hosts & RESTful proxies",
-  "version": "0.5.20",
+  "version": "0.5.21",
   "homepage": "http://turtle.io",
   "author": {
     "name": "Jason Mulligan",
@@ -33,7 +33,8 @@
     "moment": ">= 1.7.0",
     "http-auth" : ">= 1.2.2",
     "node-syslog" : ">= 1.1.6",
-    "toobusy" : ">= 0.2.1"
+    "toobusy" : ">= 0.2.1",
+    "dtrace-provider" : ">= 0.2.8"
   },
   "devDependencies": {
     "grunt": "~0.3.14"

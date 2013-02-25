@@ -12,6 +12,9 @@ var $          = require("abaaso"),
     url        = require("url"),
     util       = require("util"),
     zlib       = require("zlib"),
+    d          = require("dtrace-provider"),
+    dtp        = d.createDTraceProvider("turtle-io"),
+    probes     = {},
     REGEX_BODY = /^(put|post)$/i,
     REGEX_HALT = new RegExp("^(ReferenceError|" + $.label.error.invalidArguments + ")$"),
     REGEX_HEAD = /^(head|options)$/i,
@@ -27,3 +30,7 @@ syslog.init("turtle_io", syslog.LOG_PID | syslog.LOG_ODELAY, syslog.LOG_LOCAL0);
 
 // Disabling abaaso observer
 $.discard(true);
+
+// Setting DTrace probes
+probes.connection = dtp.addProbe("connection", "int", "int", "int");
+dtp.enable();
