@@ -49,6 +49,15 @@ factory.prototype.start = function (args) {
 	// Setting acceptable lag
 	toobusy.maxLag(this.config.lag);
 
+	// Socket probe
+	this.server.on("connection", function () {
+		probes.connection.fire(function (p) {
+			var ram = process.memoryUsage();
+
+			return [self.server.connections, ram.heapUsed, ram.heapTotal];
+		});
+	});
+
 	// Announcing state
 	this.log("Started turtle.io on port " + this.config.port);
 
