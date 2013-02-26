@@ -16,8 +16,18 @@ factory.prototype.compressed = function (res, req, etag, arg, code, headers, loc
 	    compression = this.compression(req.headers["user-agent"], req.headers["accept-encoding"]),
 	    raw;
 
+	// Firing probe
+	dtp.fire("compressed", function (p) {
+		return [etag, local ? "local" : "proxy", req.headers.host, req.url];
+	});
+
 	// Local asset, piping result directly to Client
 	if (local) {
+		// Firing probe
+		dtp.fire("respond", function (p) {
+			return [req.headers.host, req.method, req.url, code];
+		});
+
 		if (compression !== null) {
 			res.setHeader("Content-Encoding", compression);
 			self.cached(etag, compression, function (ready, npath) {
@@ -44,6 +54,11 @@ factory.prototype.compressed = function (res, req, etag, arg, code, headers, loc
 			res.setHeader("Content-Encoding", compression);
 			self.cached(etag, compression, function (ready, npath) {
 				if (ready) {
+					// Firing probe
+					dtp.fire("respond", function (p) {
+						return [req.headers.host, req.method, req.url, code];
+					});
+
 					self.headers(res, req, code, headers);
 					raw = fs.createReadStream(npath);
 					raw.pipe(res);

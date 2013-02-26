@@ -15,6 +15,11 @@ factory.prototype.cache = function (filename, obj, encoding, body) {
 	    ext   = REGEX_DEF.test(encoding) ? ".df" : ".gz",
 	    dest  = tmp + "/" + filename + ext;
 
+	// Firing probe
+	dtp.fire("compress", function (p) {
+		return [obj, dest, REGEX_DEF.test(encoding) ? "deflate" : "gzip"];
+	});
+
 	if (!body) {
 		fs.exists(obj, function (exists) {
 			var raw    = fs.createReadStream(obj),

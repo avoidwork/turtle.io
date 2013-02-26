@@ -22,6 +22,11 @@ var handler = function (res, req, fn) {
 		self.log(prep.call(self, res, req));
 	});
 
+	// Firing probe
+	dtp.fire("handler", function (p) {
+		return [req.headers.host, req.url];
+	});
+
 	// Handling request or wrapping it with HTTP Authentication
 	switch (true) {
 		case this.config.auth === "undefined":

@@ -51,15 +51,18 @@ factory.prototype.start = function (args) {
 
 	// Socket probe
 	this.server.on("connection", function () {
-		probes.connection.fire(function (p) {
-			var ram = process.memoryUsage();
-
-			return [self.server.connections, ram.heapUsed, ram.heapTotal];
+		dtp.fire("connection", function (p) {
+			return [self.server.connections];
 		});
 	});
 
 	// Announcing state
 	this.log("Started turtle.io on port " + this.config.port);
+
+	// Setting a repeating dtrace probe hit (5mins)
+	$.repeat(function () {
+		self.status();
+	}, (5 * 60 * 1000), "status");
 
 	return this;
 };

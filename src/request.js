@@ -20,7 +20,14 @@ factory.prototype.request = function (res, req) {
 	    count, handle, nth, root;
 
 	// Most likely this request will fail due to latency, so handle it as a 503 and 'retry after a minute'
-	if (toobusy()) return this.respond(res, req, messages.ERROR_SERVICE, codes.ERROR_SERVICE, {"Retry-After": 60});
+	if (toobusy()) {
+		// Firing probe
+		dtp.fire("busy", function (p) {
+			return [req.headers.host, req.method, req.url];
+		});
+
+		return this.respond(res, req, messages.ERROR_SERVICE, codes.ERROR_SERVICE, {"Retry-After": 60});
+	}
 
 	// Can't find the hostname in vhosts, try the default (if set) or send a 500
 	if (!this.config.vhosts.hasOwnProperty(host)) {
@@ -54,6 +61,10 @@ factory.prototype.request = function (res, req) {
 		post    = allowed("POST", req.url);
 		handled = true;
 		url     = parsed.protocol + "//" + req.headers.host.replace(/:.*/, "") + ":" + port + url;
+
+		dtp.fire("request", function (p) {
+			return [url, allow];
+		});
 
 		fs.exists(path, function (exists) {
 			switch (true) {

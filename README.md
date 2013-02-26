@@ -54,12 +54,10 @@ server.start(config);
 
 ## DTrace
 
-DTrace is supported, but only one probe is active for now. To utilize this probe, which is named "connection", you need to look for "turtle-io".
-
-This probe will return the number of open socket connections, the ram used, and the ram allocated.
+DTrace is supported! 'sudo' is required to run _trace.sh_
 
 ```console
-sudo dtrace -Z -n 'turtle-io*:::connection{ trace(arg0); trace(arg1); trace(arg2); }'
+./trace.sh
 ```
 
 ## License

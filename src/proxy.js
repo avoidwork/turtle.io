@@ -28,6 +28,11 @@ factory.prototype.proxy = function (origin, route, host) {
 		    replace    = "$1" + route + "/",
 		    nth, raw;
 
+		// Firing probe
+		dtp.fire("proxy", function (p) {
+			return [req.headers.host, reg.method, route, origin];
+		});
+
 		try {
 			// Getting or creating an Etag
 			resHeaders = headers(xhr.getAllResponseHeaders());
@@ -124,6 +129,11 @@ factory.prototype.proxy = function (origin, route, host) {
 
 	// Setting route
 	verbs.each(function (i) {
+		// Firing probe
+		dtp.fire("register-proxy", function (p) {
+			return [host, REGEX_DEL.test(i) ? "delete" : i, origin, route];
+		});
+
 		self[REGEX_DEL.test(i) ? "delete" : i](route, wrapper, host);
 		self[REGEX_DEL.test(i) ? "delete" : i](route + "/.*", wrapper, host);
 	});
