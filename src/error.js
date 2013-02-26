@@ -2,20 +2,20 @@
  * Error handler for requests
  * 
  * @method error
- * @param  {Object} res Response Object
- * @param  {Object} req Request Object
- * @return {Object}     Instance
+ * @param  {Object} res   Response Object
+ * @param  {Object} req   Request Object
+ * @param  {Object} timer Date instance
+ * @return {Object}       Instance
  */
-factory.prototype.error = function (res, req) {
+factory.prototype.error = function (res, req, timer) {
 	var host = req.headers.host.replace(/:.*/, ""),
 	    get  = REGEX_GET.test(req.method),
-	    msg  = get ? messages.NOT_FOUND : messages.NOT_ALLOWED,
-	    code = get ? codes.NOT_FOUND    : codes.NOT_ALLOWED;
+	    msg  = messages[get ? "NOT_FOUND" : "NOT_ALLOWED"],
+	    code = codes[get ? "NOT_FOUND" : "NOT_ALLOWED"];
 
-	// Firing probe
 	dtp.fire("error", function (p) {
-		return [req.headers.host, req.url, code, msg];
+		return [req.headers.host, req.url, code, msg, diff(timer)];
 	});
 
-	this.respond(res, req, msg, code, {"Allow": allows(req.url, host)});
+	this.respond(res, req, msg, code, {"Allow": allows(req.url, host)}, timer);
 };

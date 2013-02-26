@@ -3,11 +3,12 @@
  * 
  * Default route is for GET only
  * 
- * @param  {Object} req HTTP(S) request Object
- * @param  {Object} res HTTP(S) response Object
- * @return {Object}     Instance
+ * @param  {Object} req   HTTP(S) request Object
+ * @param  {Object} res   HTTP(S) response Object
+ * @param  {Object} timer Date instance
+ * @return {Object}       Instance
  */
-factory.prototype.request = function (res, req) {
+factory.prototype.request = function (res, req, timer) {
 	var self    = this,
 	    host    = req.headers.host.replace(/:.*/, ""),
 	    parsed  = url.parse(req.url, true),
@@ -17,7 +18,6 @@ factory.prototype.request = function (res, req) {
 	    port    = this.config.port,
 	    path    = "",
 	    found   = false,
-	    timer   = new Date(),
 	    count, handle, nth, root;
 
 	// Most likely this request will fail due to latency, so handle it as a 503 and 'retry after a minute'
@@ -63,7 +63,7 @@ factory.prototype.request = function (res, req) {
 		url     = parsed.protocol + "//" + req.headers.host.replace(/:.*/, "") + ":" + port + url;
 
 		dtp.fire("request", function (p) {
-			return [url, allow];
+			return [url, allow, diff(timer)];
 		});
 
 		fs.exists(path, function (exists) {
@@ -114,7 +114,7 @@ factory.prototype.request = function (res, req) {
 												headers["Transfer-Encoding"] = "chunked";
 												self.headers(res, req, codes.SUCCESS, headers, timer);
 												etag = etag.replace(/\"/g, "");
-												self.compressed(res, req, etag, path, codes.SUCCESS, headers, timer, true);
+												self.compressed(res, req, etag, path, codes.SUCCESS, headers, true, timer);
 										}
 									}
 									else self.respond(res, req, messages.NO_CONTENT, codes.SUCCESS, headers, timer);

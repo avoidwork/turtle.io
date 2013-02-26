@@ -59,10 +59,5 @@ factory.prototype.start = function (args) {
 	// Announcing state
 	this.log("Started turtle.io on port " + this.config.port);
 
-	// Setting a repeating dtrace probe hit (5mins)
-	$.repeat(function () {
-		self.status();
-	}, (5 * 60 * 1000), "status");
-
 	return this;
 };

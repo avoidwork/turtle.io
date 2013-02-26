@@ -5,5 +5,5 @@
  * @return {Number}       Milliseconds
  */
 var diff = function (timer) {
-	return moment().diff(moment(timer));
+	return new Date() - timer;
 };

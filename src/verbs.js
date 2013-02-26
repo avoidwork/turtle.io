@@ -8,16 +8,16 @@
  * @return {Object}         Instance
  */
 factory.prototype.all = function (route, fn, host) {
-	var self = this;
-
-	// Firing probe
-	dtp.fire("route-set", function (p) {
-		return [host || "*", route, "ALL"];
-	});
+	var self  = this,
+	    timer = new Date();
 
 	$.route.set(route, function (res, req) {
 		handler.call(self, res, req, fn);
 	}, "all", host);
+
+	dtp.fire("route-set", function (p) {
+		return [host || "*", route, "ALL", diff(timer)];
+	});
 
 	return this;
 };
@@ -32,16 +32,16 @@ factory.prototype.all = function (route, fn, host) {
  * @return {Object}         Instance
  */
 factory.prototype.delete = function (route, fn, host) {
-	var self = this;
-
-	// Firing probe
-	dtp.fire("route-set", function (p) {
-		return [host || "*", route, "DELETE"];
-	});
+	var self  = this,
+	    timer = new Date();
 
 	$.route.set(route, function (res, req) {
 		handler.call(self, res, req, fn);
 	}, "delete", host);
+
+	dtp.fire("route-set", function (p) {
+		return [host || "*", route, "DELETE", diff(timer)];
+	});
 
 	return this;
 };
@@ -56,16 +56,16 @@ factory.prototype.delete = function (route, fn, host) {
  * @return {Object}         Instance
  */
 factory.prototype.get = function (route, fn, host) {
-	var self = this;
-
-	// Firing probe
-	dtp.fire("route-set", function (p) {
-		return [host || "*", route, "GET"];
-	});
+	var self  = this,
+	    timer = new Date();
 
 	$.route.set(route, function (res, req) {
 		handler.call(self, res, req, fn);
 	}, "get", host);
+
+	dtp.fire("route-set", function (p) {
+		return [host || "*", route, "GET", diff(timer)];
+	});
 
 	return this;
 };
@@ -80,16 +80,16 @@ factory.prototype.get = function (route, fn, host) {
  * @return {Object}         Instance
  */
 factory.prototype.post = function (route, fn, host) {
-	var self = this;
-
-	// Firing probe
-	dtp.fire("route-set", function (p) {
-		return [host || "*", route, "POST"];
-	});
+	var self  = this,
+	    timer = new Date();
 
 	$.route.set(route, function (res, req) {
 		handler.call(self, res, req, fn);
 	}, "post", host);
+
+	dtp.fire("route-set", function (p) {
+		return [host || "*", route, "POST", diff(timer)];
+	});
 
 	return this;
 };
@@ -104,16 +104,16 @@ factory.prototype.post = function (route, fn, host) {
  * @return {Object}         Instance
  */
 factory.prototype.put = function (route, fn, host) {
-	var self = this;
-
-	// Firing probe
-	dtp.fire("route-set", function (p) {
-		return [host || "*", route, "PUT"];
-	});
+	var self  = this,
+	    timer = new Date();
 
 	$.route.set(route, function (res, req) {
 		handler.call(self, res, req, fn);
 	}, "put", host);
+
+	dtp.fire("route-set", function (p) {
+		return [host || "*", route, "PUT", diff(timer)];
+	});
 
 	return this;
 };

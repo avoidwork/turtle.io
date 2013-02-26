@@ -9,7 +9,8 @@
  */
 var allowed = function (method, uri, host) {
 	host       = host || "all";
-	var result = false;
+	var result = false,
+	    timer  = new Date();
 
 	$.route.list(method, host).each(function (route) {
 		if (RegExp("^" + route + "$").test(uri)) return !(result = true);
@@ -28,6 +29,10 @@ var allowed = function (method, uri, host) {
 			if (RegExp("^" + route + "$").test(uri)) return !(result = true);
 		});		
 	}
+
+	dtp.fire("allowed", function (p) {
+		return [host, uri, method.toUpperCase(), diff(timer)];
+	});
 
 	return result;
 };
