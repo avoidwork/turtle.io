@@ -8,9 +8,10 @@
  * @param  {Number}  status          [Optional] HTTP status code, default is 200
  * @param  {Object}  responseHeaders [Optional] HTTP headers to decorate the response with
  * @param  {Boolean} compress        [Optional] Enable compression of the response (if supported)
+ * @param  {Object}  timer           [Optional] Timer to provide a 'diff' for DTrace probes
  * @return {Objet}                   Instance
  */
-factory.prototype.respond = function (res, req, output, status, responseHeaders, compress) {
+factory.prototype.respond = function (res, req, output, status, responseHeaders, timer, compress) {
 	status = status || codes.SUCCESS;
 	if (!(responseHeaders instanceof Object)) responseHeaders = {};
 
@@ -38,12 +39,7 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 	}
 
 	// Setting the response status code
-	res.statusCode = status;
-
-	// Firing probe
-	dtp.fire("respond", function (p) {
-		return [req.headers.host, req.method, req.url, status];
-	});
+	res.statusCode = status;	
 
 	if (compress) {
 		responseHeaders["Content-Encoding"] = encoding;
@@ -53,6 +49,9 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 				self.headers(res, req, status, responseHeaders);
 				res.write(compressed);
 				res.end();
+				dtp.fire("respond", function (p) {
+					return [req.headers.host, req.method, req.url, status, diff(timer)];
+				});
 				self.log(prep.call(self, res, req));
 			}
 		});
@@ -61,6 +60,9 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 		this.headers(res, req, status, responseHeaders);
 		if (body) res.write(output);
 		res.end();
+		dtp.fire("respond", function (p) {
+			return [req.headers.host, req.method, req.url, status, diff(timer)];
+		});
 		self.log(prep.call(self, res, req));
 	}
 
