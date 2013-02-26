@@ -13,6 +13,11 @@ factory.prototype.redirect = function (route, url, host, permanent) {
 	    output = messages.NO_CONTENT;
 
 	this.get(route, function (res, req) {
+		// Firing probe
+		dtp.fire("redirect", function (p) {
+			return [req.headers.host, route, url, permanent];
+		});
+
 		self.respond(res, req, output, code, {"Location": url});
 	}, host);
 

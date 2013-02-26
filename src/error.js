@@ -7,8 +7,15 @@
  * @return {Object}     Instance
  */
 factory.prototype.error = function (res, req) {
-	var host = req.headers.host.replace(/:.*/, "");
+	var host = req.headers.host.replace(/:.*/, ""),
+	    get  = REGEX_GET.test(req.method),
+	    msg  = get ? messages.NOT_FOUND : messages.NOT_ALLOWED,
+	    code = get ? codes.NOT_FOUND    : codes.NOT_ALLOWED;
 
-	REGEX_GET.test(req.method) ? this.respond(res, req, messages.NOT_FOUND,   codes.NOT_FOUND,   {"Allow": allows(req.url, host)})
-	                           : this.respond(res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {"Allow": allows(req.url, host)});
+	// Firing probe
+	dtp.fire("error", function (p) {
+		return [req.headers.host, req.url, code, msg];
+	});
+
+	this.respond(res, req, msg, code, {"Allow": allows(req.url, host)});
 };

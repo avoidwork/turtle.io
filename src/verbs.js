@@ -10,9 +10,15 @@
 factory.prototype.all = function (route, fn, host) {
 	var self = this;
 
+	// Firing probe
+	dtp.fire("route-set", function (p) {
+		return [host || "*", route, "ALL"];
+	});
+
 	$.route.set(route, function (res, req) {
 		handler.call(self, res, req, fn);
 	}, "all", host);
+
 	return this;
 };
 
@@ -28,9 +34,15 @@ factory.prototype.all = function (route, fn, host) {
 factory.prototype.delete = function (route, fn, host) {
 	var self = this;
 
+	// Firing probe
+	dtp.fire("route-set", function (p) {
+		return [host || "*", route, "DELETE"];
+	});
+
 	$.route.set(route, function (res, req) {
 		handler.call(self, res, req, fn);
 	}, "delete", host);
+
 	return this;
 };
 
@@ -46,9 +58,15 @@ factory.prototype.delete = function (route, fn, host) {
 factory.prototype.get = function (route, fn, host) {
 	var self = this;
 
+	// Firing probe
+	dtp.fire("route-set", function (p) {
+		return [host || "*", route, "GET"];
+	});
+
 	$.route.set(route, function (res, req) {
 		handler.call(self, res, req, fn);
 	}, "get", host);
+
 	return this;
 };
 
@@ -64,9 +82,15 @@ factory.prototype.get = function (route, fn, host) {
 factory.prototype.post = function (route, fn, host) {
 	var self = this;
 
+	// Firing probe
+	dtp.fire("route-set", function (p) {
+		return [host || "*", route, "POST"];
+	});
+
 	$.route.set(route, function (res, req) {
 		handler.call(self, res, req, fn);
 	}, "post", host);
+
 	return this;
 };
 
@@ -82,8 +106,14 @@ factory.prototype.post = function (route, fn, host) {
 factory.prototype.put = function (route, fn, host) {
 	var self = this;
 
+	// Firing probe
+	dtp.fire("route-set", function (p) {
+		return [host || "*", route, "PUT"];
+	});
+
 	$.route.set(route, function (res, req) {
 		handler.call(self, res, req, fn);
 	}, "put", host);
+
 	return this;
 };

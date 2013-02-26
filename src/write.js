@@ -14,6 +14,11 @@ factory.prototype.write = function (path, res, req) {
 	    allow = allows(req.url),
 	    del   = allowed("DELETE", req.url);
 
+	// Firing probe
+	dtp.fire("write", function (p) {
+		return [req.headers.host, req.url, req.method, path];
+	});
+
 	if (!put && /\/$/.test(req.url)) self.respond(res, req, (del ? messages.CONFLICT : messages.ERROR_APPLICATION), (del ? codes.CONFLICT : codes.ERROR_APPLICATION), {"Allow" : allow});
 	else {
 		allow = allow.explode().remove("POST").join(", ");

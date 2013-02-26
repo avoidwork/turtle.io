@@ -40,6 +40,11 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 	// Setting the response status code
 	res.statusCode = status;
 
+	// Firing probe
+	dtp.fire("respond", function (p) {
+		return [req.headers.host, req.method, req.url, status];
+	});
+
 	if (compress) {
 		responseHeaders["Content-Encoding"] = encoding;
 		zlib[encoding](output, function (err, compressed) {
