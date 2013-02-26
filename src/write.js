@@ -5,21 +5,17 @@
  * @param  {String} path  File path
  * @param  {Object} res   HTTP response Object
  * @param  {Object} req   HTTP request Object
+ * @param  {Object} timer Date instance
  * @return {Object}       Instance
  */
-factory.prototype.write = function (path, res, req) {
+factory.prototype.write = function (path, res, req, timer) {
 	var self  = this,
 	    put   = (req.method === "PUT"),
 	    body  = "",
 	    allow = allows(req.url),
 	    del   = allowed("DELETE", req.url);
 
-	// Firing probe
-	dtp.fire("write", function (p) {
-		return [req.headers.host, req.url, req.method, path];
-	});
-
-	if (!put && /\/$/.test(req.url)) self.respond(res, req, (del ? messages.CONFLICT : messages.ERROR_APPLICATION), (del ? codes.CONFLICT : codes.ERROR_APPLICATION), {"Allow" : allow});
+	if (!put && /\/$/.test(req.url)) self.respond(res, req, (del ? messages.CONFLICT : messages.ERROR_APPLICATION), (del ? codes.CONFLICT : codes.ERROR_APPLICATION), {"Allow" : allow}, timer);
 	else {
 		allow = allow.explode().remove("POST").join(", ");
 
@@ -31,13 +27,19 @@ factory.prototype.write = function (path, res, req) {
 			fs.readFile(path, function (e, data) {
 				var hash = "\"" + self.hash(data) + "\"";
 
-				if (e) self.respond(res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION);
+				if (e) self.respond(res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION, undefined, timer);
 				switch (true) {
 					case !req.headers.hasOwnProperty(etag):
 					case req.headers.etag === hash:
 						fs.writeFile(path, body, function (e) {
-							if (e) self.respond(res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION);
-							else self.respond(res, req, (put ? messages.NO_CONTENT : messages.CREATED), (put ? codes.NO_CONTENT : codes.CREATED), {"Allow" : allow, Etag: hash});
+							if (e) self.error(res, req, timer);
+							else {
+								dtp.fire("write", function (p) {
+									return [req.headers.host, req.url, req.method, path, diff(timer)];
+								});
+
+								self.respond(res, req, (put ? messages.NO_CONTENT : messages.CREATED), (put ? codes.NO_CONTENT : codes.CREATED), {"Allow" : allow, Etag: hash}, timer);
+							}
 						});
 						break;
 					case req.headers.etag !== hash:

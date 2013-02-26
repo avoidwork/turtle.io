@@ -13,9 +13,6 @@ factory.prototype.stop = function () {
 		this.unset("*");
 	}
 
-	// DTrace probe
-	$.clearTimer("status");
-
 	this.log("Stopped turtle.io on port " + this.config.port);
 	return this;
 };

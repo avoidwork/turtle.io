@@ -5,8 +5,9 @@
  * @return {Object} Status
  */
 factory.prototype.status = function () {
-	var ram   = process.memoryUsage(),
-	    state = {
+	var ram    = process.memoryUsage(),
+	    uptime = process.uptime(),
+	    state  = {
 	    	config  : {},
 	    	process : {},
 	    	server  : {}
@@ -25,11 +26,10 @@ factory.prototype.status = function () {
 	state.server.address        = this.server.address();
 	state.server.connections    = this.server.connections;
 	state.server.maxConnections = this.server.macConnections;
-	state.server.uptime         = process.uptime();
+	state.server.uptime         = uptime;
 
-	// Firing probe
 	dtp.fire("status", function (p) {
-		return [state.server.connections, process.uptime(), ram.heapUsed, ram.heapTotal];
+		return [state.server.connections, uptime, ram.heapUsed, ram.heapTotal];
 	});
 
 	return state;

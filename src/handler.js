@@ -8,23 +8,23 @@
  * @return {Object}       Instance
  */
 var handler = function (res, req, fn) {
-	var self = this,
-	    host = req.headers.host.replace(/:.*/, ""),
+	var self  = this,
+	    host  = req.headers.host.replace(/:.*/, ""),
+	    timer = new Date(),
 	    op;
 
 	// Setting up request handler
 	op = function () {
-		fn.call(self, res, req);
+		fn.call(self, res, req, timer);
+
+		dtp.fire("handler", function (p) {
+			return [req.headers.host, req.url, diff(timer)];
+		});
 	};
 
 	// Setting listener for unexpected close
 	res.on("close", function () {
 		self.log(prep.call(self, res, req));
-	});
-
-	// Firing probe
-	dtp.fire("handler", function (p) {
-		return [req.headers.host, req.url];
 	});
 
 	// Handling request or wrapping it with HTTP Authentication

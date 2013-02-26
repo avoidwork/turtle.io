@@ -7,11 +7,12 @@
  * @return {Object}       Instance
  */
 factory.prototype.unset = function (route, verb, host) {
+	var timer = new Date();
+
 	route === "*" ? $.route.reset() : $.route.del(route, verb, host);
 
-	// Firing probe
 	dtp.fire("route-unset", function (p) {
-		return [host || "*", route, verb || "ALL"];
+		return [host || "*", route, verb || "ALL", diff(timer)];
 	});
 
  	return this;

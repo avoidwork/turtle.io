@@ -13,12 +13,8 @@ factory.prototype.cache = function (filename, obj, encoding, body) {
 	var self  = this,
 	    tmp   = this.config.tmp,
 	    ext   = REGEX_DEF.test(encoding) ? ".df" : ".gz",
-	    dest  = tmp + "/" + filename + ext;
-
-	// Firing probe
-	dtp.fire("compress", function (p) {
-		return [obj, dest, REGEX_DEF.test(encoding) ? "deflate" : "gzip"];
-	});
+	    dest  = tmp + "/" + filename + ext,
+	    timer = new Date();
 
 	if (!body) {
 		fs.exists(obj, function (exists) {
@@ -26,6 +22,10 @@ factory.prototype.cache = function (filename, obj, encoding, body) {
 			    stream = fs.createWriteStream(dest);
 
 			raw.pipe(zlib[REGEX_DEF.test(encoding) ? "createDeflate" : "createGzip"]()).pipe(stream);
+
+			dtp.fire("compress", function (p) {
+				return [obj, dest, REGEX_DEF.test(encoding) ? "deflate" : "gzip", diff(timer)];
+			});
 		});
 	}
 	else {
@@ -40,8 +40,17 @@ factory.prototype.cache = function (filename, obj, encoding, body) {
 				break;*/
 		}
 		zlib[encoding](obj, function (err, compressed) {
-			if (!err) fs.writeFile(dest, compressed);
-			else self.log(err, true, false);
+			if (err) self.log(err, true, false);
+			else {
+				fs.writeFile(dest, compressed, "utf8", function (err) {
+					if (err) self.log(err, true, false);
+					else {
+						dtp.fire("compress", function (p) {
+							return [obj, dest, REGEX_DEF.test(encoding) ? "deflate" : "gzip", diff(timer)];
+						});
+					}
+				});
+			}
 		});
 	}
 

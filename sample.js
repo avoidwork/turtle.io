@@ -17,8 +17,8 @@ config = {
 	}
 }
 
-server.get("/status", function (res, req) {
-	server.respond(res, req, server.status());
+server.get("/status", function (res, req, timer) {
+	server.respond(res, req, server.status(), 200, undefined, timer);
 }, "localhost");
 
 server.start(config);

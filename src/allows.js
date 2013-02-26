@@ -6,13 +6,20 @@
  * @param  {String} host Hostname
  * @return {String}      Allowed methods
  */
-var allows = function (url, host) {
+var allows = function (uri, host) {
 	var result = "",
-	    verbs  = ["DELETE", "GET", "POST", "PUT"];
+	    verbs  = ["DELETE", "GET", "POST", "PUT"],
+	    timer  = new Date();
 
 	verbs.each(function (i) {
-		if (allowed(i, url, host)) result += (result.length > 0 ? ", " : "") + i;
+		if (allowed(i, uri, host)) result += (result.length > 0 ? ", " : "") + i;
 	});
 
-	return result.replace("GET", "GET, HEAD, OPTIONS");
+	result = result.replace("GET", "GET, HEAD, OPTIONS");
+
+	dtp.fire("allows", function (p) {
+		return [host, uri, diff(timer)];
+	});
+
+	return result;
 };
