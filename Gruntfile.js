@@ -1,7 +1,8 @@
 module.exports = function (grunt) {
 	grunt.initConfig({
-		pkg : "<json:package.json>",
-		meta : {
+		pkg : grunt.file.readJSON("package.json"),
+		concat: {
+			options : {
 				banner : "/**\n" + 
 				         " * <%= pkg.name %>\n" +
 				         " *\n" +
@@ -12,9 +13,8 @@ module.exports = function (grunt) {
 				         " * @license <%= pkg.licenses[0].type %> <<%= pkg.licenses[0].url %>>\n" +
 				         " * @link <%= pkg.homepage %>\n" +
 				         " * @version <%= pkg.version %>\n" +
-				         " */"
-		},
-		concat: {
+				         " */\n"
+			},
 			dist: {
 				src : [
 					"<banner>",
@@ -51,18 +51,23 @@ module.exports = function (grunt) {
 					"src/prep.js",
 					"src/outro.js"
 				],
-				dest : "lib/turtle.io.js"
+				dest : "lib/<%= pkg.name %>.js"
 			}
 		},
-		test : {
-			files : ["test/**/*.js"]
+		nodeunit : {
+			all : ["test/**/*.js"]
 		}
 	});
 
-  	// Replaces occurrances of {{VERSION}} with the value from package.json
-  	grunt.registerTask("version", function () {
-		var ver = grunt.config("pkg").version,
-		    fn  = grunt.config("concat").dist.dest,
+	grunt.loadNpmTasks("grunt-contrib-concat");
+	grunt.loadNpmTasks("grunt-contrib-nodeunit");
+
+	grunt.registerTask("test", ["nodeunit"]);
+
+	grunt.registerTask("version", function () {
+		var cfg = grunt.config("pkg"),
+		    ver = cfg.version,
+		    fn  = "lib/" + cfg.name + ".js",
 		    fp  = grunt.file.read(fn);
 
 		console.log("Setting version to: " + ver);
@@ -70,5 +75,5 @@ module.exports = function (grunt) {
 	});
 
 	// Concatting, setting version & testing
-	grunt.registerTask("default", "concat version test");
+	grunt.registerTask("default", ["concat", "version", "test"]);
 };
