@@ -5,7 +5,7 @@
  * @param  {Object} args [Optional] Properties to set
  * @return {Object}      Instance of turtle.io
  */
-var factory = function (args) {
+var factory = function ( args ) {
 	var self = this;
 
 	this.active  = false;
@@ -15,7 +15,7 @@ var factory = function (args) {
 	this.version = "{{VERSION}}";
 
 	// Loading config
-	config.call(this, args);
+	config.call( this, args );
 
 	return this;
 };

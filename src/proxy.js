@@ -6,7 +6,7 @@
  * @param  {String} host   [Optional] Hostname this route is for (default is all)
  * @return {Object}        Instance
  */
-factory.prototype.proxy = function (origin, route, host) {
+factory.prototype.proxy = function ( origin, route, host ) {
 	var self  = this,
 	    verbs = ["delete", "get", "post", "put"],
 	    timer = new Date(),
@@ -22,7 +22,7 @@ factory.prototype.proxy = function (origin, route, host) {
 	 * @param  {Object} timer Date instance
 	 * @return {Undefined}    undefined
 	 */
-	handle = function (arg, xhr, res, req, timer) {
+	handle = function ( arg, xhr, res, req, timer ) {
 		var resHeaders = {},
 		    etag       = "",
 		    date       = "",
@@ -32,19 +32,28 @@ factory.prototype.proxy = function (origin, route, host) {
 
 		try {
 			// Getting or creating an Etag
-			resHeaders = headers(xhr.getAllResponseHeaders());
-			date       = (resHeaders["Last-Modified"] || resHeaders["Date"]) || undefined;
-			if (isNaN(new Date(date).getFullYear())) date = undefined;
-			etag       = resHeaders.Etag || "\"" + self.hash(req.url + "-" + resHeaders["Content-Length"] + "-" + new Date(date).getTime()) + "\"";
+			resHeaders = headers( xhr.getAllResponseHeaders() );
+			date       = ( resHeaders["Last-Modified"] || resHeaders["Date"] ) || undefined;
+
+			if ( isNaN( new Date( date ).getFullYear() ) ) {
+				date = undefined;
+			}
+
+			etag = resHeaders.Etag || "\"" + self.hash( req.url + "-" + resHeaders["Content-Length"] + "-" + new Date( date ).getTime() ) + "\"";
 
 			// Setting headers
-			if (resHeaders.Etag !== etag) resHeaders.Etag = etag;
-			if (resHeaders.Allow === undefined || resHeaders.Allow.isEmpty()) resHeaders.Allow = resHeaders["Access-Control-Allow-Methods"] || "GET";
+			if ( resHeaders.Etag !== etag ) {
+				resHeaders.Etag = etag;
+			}
+
+			if ( resHeaders.Allow === undefined || resHeaders.Allow.isEmpty() ) {
+				resHeaders.Allow = resHeaders["Access-Control-Allow-Methods"] || "GET";
+			}
 
 			// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
-			switch (true) {
+			switch ( true ) {
 				case req.headers["if-none-match"] === etag:
-					self.respond(res, req, messages.NO_CONTENT, codes.NOT_MODIFIED, resHeaders, timer);
+					self.respond( res, req, messages.NO_CONTENT, codes.NOT_MODIFIED, resHeaders, timer );
 					/*self.headers(res, req, codes.NOT_MODIFIED, resHeaders);
 					res.end();*/
 					break;
@@ -56,24 +65,24 @@ factory.prototype.proxy = function (origin, route, host) {
 					switch (true) {
 						case arg instanceof Array:
 						case arg instanceof Object:
-							arg = $.decode($.encode(arg).replace(regex, replace));
+							arg = $.decode( $.encode( arg ).replace( regex, replace ) );
 							break;
 						case typeof arg === "string":
-							arg = arg.replace(regex, replace);
+							arg = arg.replace( regex, replace );
 							break;
 					}
 
 					// Ready to compress response
-					self.compressed(res, req, etag, arg, xhr.status, resHeaders, false, timer);
+					self.compressed( res, req, etag, arg, xhr.status, resHeaders, false, timer );
 			}
 		}
 		catch (e) {
-			self.log(e, true);
-			self.respond(res, req, messages.NO_CONTENT, codes.ERROR_GATEWAY, {"Allow": "GET"}, timer);
+			self.log( e, true );
+			self.respond( res, req, messages.NO_CONTENT, codes.ERROR_GATEWAY, {"Allow": "GET"}, timer );
 		}
 
-		dtp.fire("proxy", function (p) {
-			return [req.headers.host, req.method, route, origin, diff(timer)];
+		dtp.fire( "proxy", function ( p ) {
+			return [req.headers.host, req.method, route, origin, diff( timer )];
 		});
 	};
 
@@ -83,17 +92,17 @@ factory.prototype.proxy = function (origin, route, host) {
 	 * @param  {Object} args Response headers
 	 * @return {Object}      Reshaped response headers
 	 */
-	headers = function (args) {
+	headers = function ( args ) {
 		var result = {},
 			rvalue  = /.*:\s+/,
 			rheader = /:.*/;
 
-		args.trim().split("\n").each(function (i) {
+		args.trim().split( "\n" ).each( function ( i ) {
 			var header, value;
 
-			value          = i.replace(rvalue, "");
-			header         = i.replace(rheader, "");
-			header         = header.unhyphenate(true).replace(/\s+/g, "-");
+			value          = i.replace( rvalue, "" );
+			header         = i.replace( rheader, "" );
+			header         = header.unhyphenate( true ).replace( /\s+/g, "-" );
 			result[header] = value;
 		});
 
@@ -107,38 +116,38 @@ factory.prototype.proxy = function (origin, route, host) {
 	 * @param  {Object} req HTTP request Object
 	 * @return {Undefined}  undefined
 	 */
-	wrapper = function (res, req) {
-		var url   = origin + req.url.replace(new RegExp("^" + route), ""),
+	wrapper = function ( res, req ) {
+		var url   = origin + req.url.replace( new RegExp( "^" + route ), "" ),
 		    timer = new Date(),
 		    fn, payload;
 
 		// Facade to handle()
-		fn = function (arg, xhr) {
-			handle(arg, xhr, res, req, timer);
+		fn = function ( arg, xhr ) {
+			handle( arg, xhr, res, req, timer );
 		};
 
 		// Setting listeners if expecting a body
-		if (REGEX_BODY.test(req.method)) {
-			req.setEncoding("utf-8");
+		if ( REGEX_BODY.test( req.method ) ) {
+			req.setEncoding( "utf-8" );
 
-			req.on("data", function (data) {
+			req.on( "data", function ( data ) {
 				payload = payload === undefined ? data : payload + data;
 			});
 
-			req.on("end", function () {
-				url[req.method.toLowerCase()](fn, fn, payload, req.headers);
+			req.on( "end", function () {
+				url[req.method.toLowerCase()]( fn, fn, payload, req.headers );
 			});
 		}
-		else url[req.method.toLowerCase()](fn, fn);
+		else url[req.method.toLowerCase()]( fn, fn );
 	};
 
 	// Setting route
-	verbs.each(function (i) {
-		self[REGEX_DEL.test(i) ? "delete" : i](route, wrapper, host);
-		self[REGEX_DEL.test(i) ? "delete" : i](route + "/.*", wrapper, host);
+	verbs.each( function ( i ) {
+		self[REGEX_DEL.test( i ) ? "delete" : i]( route, wrapper, host );
+		self[REGEX_DEL.test( i ) ? "delete" : i]( route + "/.*", wrapper, host );
 
-		dtp.fire("proxy-set", function (p) {
-			return [host, REGEX_DEL.test(i) ? "delete" : i, origin, route, diff(timer)];
+		dtp.fire( "proxy-set", function ( p ) {
+			return [host, REGEX_DEL.test( i ) ? "delete" : i, origin, route, diff( timer )];
 		});
 	});
 

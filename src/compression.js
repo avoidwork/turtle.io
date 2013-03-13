@@ -7,25 +7,25 @@
  * @param  {String} encoding Accept-Encoding header value
  * @return {Mixed}           Supported compression or null
  */
-factory.prototype.compression = function (agent, encoding) {
+factory.prototype.compression = function ( agent, encoding ) {
 	var result    = null,
-	    encodings = typeof encoding === "string" ? encoding.explode(",") : [],
+	    encodings = typeof encoding === "string" ? encoding.explode( "," ) : [],
 	    nth       = encodings.length - 1;
 
-	if (this.config.compress === true && !REGEX_IE.test(agent)) {
+	if ( this.config.compress === true && !REGEX_IE.test( agent ) ) {
 		// Iterating supported encodings
-		encodings.each(function (i, idx) {
+		encodings.each( function ( i, idx ) {
 			switch (true) {
-				case REGEX_GZIP.test(i):
+				case REGEX_GZIP.test( i ):
 					result = "gzip";
 					break;
-				case REGEX_DEF.test(i):
+				case REGEX_DEF.test( i ):
 					result = "deflate";
 					break;
 			}
 
 			// Found a supported encoding
-			if (result !== null) return false;
+			if ( result !== null ) return false;
 		});
 	}
 

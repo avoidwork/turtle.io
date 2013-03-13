@@ -11,25 +11,29 @@
  * @param  {Boolean} compress        [Optional] Enable compression of the response (if supported)
  * @return {Objet}                   Instance
  */
-factory.prototype.respond = function (res, req, output, status, responseHeaders, timer, compress) {
+factory.prototype.respond = function ( res, req, output, status, responseHeaders, timer, compress ) {
 	status = status || codes.SUCCESS;
 	timer  = timer  || new Date(); // Not ideal! This gives a false sense of speed for custom routes
-	if (!(responseHeaders instanceof Object)) responseHeaders = {};
+
 	var body      = !REGEX_HEAD.test(req.method),
 	    encoding  = this.compression(req.headers["user-agent"], req.headers["accept-encoding"]),
 	    self      = this,
 	    nth;
 
+	if ( !( responseHeaders instanceof Object ) ) {
+		responseHeaders = {};
+	}
+
 	// Determining wether compression is supported
-	compress = compress || (body && encoding !== null);
+	compress = compress || ( body && encoding !== null );
 
 	// Converting JSON or XML to a String
-	if (body) {
-		switch (true) {
+	if ( body ) {
+		switch ( true ) {
 			case output instanceof Array:
 			case output instanceof Object:
 				responseHeaders["Content-Type"] = "application/json";
-				output = $.encode(output);
+				output = $.encode( output );
 				break;
 			/*case output instanceof Document:
 				responseHeaders["Content-Type"] = "application/xml";
@@ -41,33 +45,39 @@ factory.prototype.respond = function (res, req, output, status, responseHeaders,
 	// Setting the response status code
 	res.statusCode = status;	
 
-	if (compress) {
+	if ( compress ) {
 		responseHeaders["Content-Encoding"] = encoding;
-		zlib[encoding](output, function (err, compressed) {
-			if (err) self.error(res, req);
+		zlib[encoding](output, function ( err, compressed ) {
+			if ( err ) {
+				self.error( res, req );
+			}
 			else {
-				self.headers(res, req, status, responseHeaders);
-				res.write(compressed);
+				self.headers( res, req, status, responseHeaders );
+				res.write( compressed );
 				res.end();
 
-				dtp.fire("respond", function (p) {
-					return [req.headers.host, req.method, req.url, status, diff(timer)];
+				dtp.fire( "respond", function ( p ) {
+					return [req.headers.host, req.method, req.url, status, diff( timer )];
 				});
 
-				self.log(prep.call(self, res, req));
+				self.log( prep.call( self, res, req ) );
 			}
 		});
 	}
 	else {
-		this.headers(res, req, status, responseHeaders);
-		if (body) res.write(output);
+		this.headers( res, req, status, responseHeaders );
+
+		if ( body ) {
+			res.write( output );
+		}
+
 		res.end();
 
-		dtp.fire("respond", function (p) {
-			return [req.headers.host, req.method, req.url, status, diff(timer)];
+		dtp.fire( "respond", function ( p ) {
+			return [req.headers.host, req.method, req.url, status, diff( timer )];
 		});
 
-		self.log(prep.call(self, res, req));
+		self.log( prep.call( self, res, req ) );
 	}
 
 	return this;

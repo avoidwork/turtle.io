@@ -7,16 +7,21 @@
  * @param  {Object}  responseHeaders [Optional] HTTP headers to decorate the response with
  * @return {Objet}                   Instance
  */
-factory.prototype.headers = function (res, req, status, responseHeaders) {
-	var get     = REGEX_GET.test(req.method),
-	    headers = $.clone(this.config.headers);
+factory.prototype.headers = function ( res, req, status, responseHeaders ) {
+	var get     = REGEX_GET.test( req.method ),
+	    headers = $.clone( this.config.headers );
 
 	// Setting optional params
-	if (typeof status === "undefined") status = codes.SUCCESS;
-	if (!(responseHeaders instanceof Object)) responseHeaders = {};
+	if ( status === undefined) {
+		status = codes.SUCCESS;
+	}
+
+	if ( !( responseHeaders instanceof Object ) ) {
+		responseHeaders = {};
+	}
 
 	// Decorating response headers
-	$.merge(headers, responseHeaders);
+	$.merge( headers, responseHeaders );
 
 	// Setting headers
 	headers["Date"]                         = new Date().toUTCString();
@@ -26,11 +31,11 @@ factory.prototype.headers = function (res, req, status, responseHeaders) {
 	res.statusCode = status;
 
 	// Decorating "Last-Modified" header
-	if (headers["Last-Modified"].isEmpty()) headers["Last-Modified"] = headers["Date"];
+	if ( headers["Last-Modified"].isEmpty() ) headers["Last-Modified"] = headers["Date"];
 
 	// Removing headers not wanted in the response
-	if (!get || status >= codes.INVALID_ARGUMENTS) delete headers["Cache-Control"];
-	switch (true) {
+	if ( !get || status >= codes.INVALID_ARGUMENTS ) delete headers["Cache-Control"];
+	switch ( true ) {
 		case status >= codes.FORBIDDEN && status < codes.NOT_FOUND:
 		case status >= codes.ERROR_APPLICATION:
 			delete headers.Allow;
@@ -40,8 +45,8 @@ factory.prototype.headers = function (res, req, status, responseHeaders) {
 	}
 
 	// Decorating response with headers
-	$.iterate(headers, function (v, k) {
-		res.setHeader(k, v);
+	$.iterate( headers, function ( v, k ) {
+		res.setHeader( k, v );
 	});
 
 	return this;

@@ -7,34 +7,34 @@
  * @param  {Function} fn  Request handler
  * @return {Object}       Instance
  */
-var handler = function (res, req, fn) {
+var handler = function ( res, req, fn ) {
 	var self  = this,
-	    host  = req.headers.host.replace(/:.*/, ""),
+	    host  = req.headers.host.replace( /:.*/, "" ),
 	    timer = new Date(),
 	    op;
 
 	// Setting up request handler
 	op = function () {
-		fn.call(self, res, req, timer);
+		fn.call( self, res, req, timer );
 
-		dtp.fire("handler", function (p) {
-			return [req.headers.host, req.url, diff(timer)];
+		dtp.fire( "handler", function ( p ) {
+			return [req.headers.host, req.url, diff( timer )];
 		});
 	};
 
 	// Setting listener for unexpected close
-	res.on("close", function () {
-		self.log(prep.call(self, res, req));
+	res.on( "close", function () {
+		self.log( prep.call( self, res, req ) );
 	});
 
 	// Handling request or wrapping it with HTTP Authentication
-	switch (true) {
+	switch ( true ) {
 		case this.config.auth === "undefined":
-		case !this.config.auth.hasOwnProperty(host):
+		case !this.config.auth.hasOwnProperty( host ):
 			op();
 			break;
 		default:
-			if (typeof this.config.auth[host].auth === "undefined") this.config.auth[host].auth = http_auth(this.config.auth[host]);
-			this.config.auth[host].auth.apply(req, res, op);
+			if (typeof this.config.auth[host].auth === "undefined") this.config.auth[host].auth = http_auth( this.config.auth[host] );
+			this.config.auth[host].auth.apply( req, res, op );
 	}
 };
