@@ -117,9 +117,12 @@ factory.prototype.proxy = function ( origin, route, host ) {
 	 * @return {Undefined}  undefined
 	 */
 	wrapper = function ( res, req ) {
-		var url   = origin + req.url.replace( new RegExp( "^" + route ), "" ),
-		    timer = new Date(),
+		var url    = origin + req.url.replace( new RegExp( "^" + route ), "" ),
+		    timer  = new Date(),
+		    method = req.method.toLowerCase(),
 		    fn, payload;
+
+		if ( method === "delete" ) method = "del";
 
 		// Facade to handle()
 		fn = function ( arg, xhr ) {
@@ -135,10 +138,10 @@ factory.prototype.proxy = function ( origin, route, host ) {
 			});
 
 			req.on( "end", function () {
-				url[req.method.toLowerCase()]( fn, fn, payload, req.headers );
+				url[method]( fn, fn, payload, req.headers );
 			});
 		}
-		else url[req.method.toLowerCase()]( fn, fn );
+		else url[method]( fn, fn );
 	};
 
 	// Setting route
