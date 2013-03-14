@@ -1,2 +1,2 @@
 module.exports = factory;
-})(this);
+})( this );

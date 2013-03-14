@@ -7,18 +7,18 @@
  * @param  {Boolean} permanent [Optional] `true` will indicate the redirection is permanent
  * @return {Object}            instance
  */
-factory.prototype.redirect = function (route, url, host, permanent) {
+factory.prototype.redirect = function ( route, url, host, permanent ) {
 	var self   = this,
 	    code   = codes[permanent === true ? "MOVED" : "REDIRECT"],
 	    output = messages.NO_CONTENT,
 	    timer  = new Date();
 
-	this.get(route, function (res, req) {
-		self.respond(res, req, output, code, {"Location": url}, new Date());
+	this.get( route, function ( res, req ) {
+		self.respond( res, req, output, code, {"Location": url}, new Date() );
 	}, host);
 
-	dtp.fire("redirect-set", function (p) {
-		return [req.headers.host, route, url, permanent, diff(timer)];
+	dtp.fire( "redirect-set", function ( p ) {
+		return [req.headers.host, route, url, permanent, diff( timer )];
 	});
 
 	return this;

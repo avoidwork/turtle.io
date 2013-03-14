@@ -14,7 +14,7 @@ factory.prototype.status = function () {
 	    };
 
 	// Startup parameters
-	$.iterate(this.config, function (v, k) {
+	$.iterate( this.config, function ( v, k ) {
 		state.config[k] = v;
 	});
 
@@ -28,7 +28,7 @@ factory.prototype.status = function () {
 	state.server.maxConnections = this.server.macConnections;
 	state.server.uptime         = uptime;
 
-	dtp.fire("status", function (p) {
+	dtp.fire( "status", function ( p ) {
 		return [state.server.connections, uptime, ram.heapUsed, ram.heapTotal];
 	});
 

@@ -7,12 +7,12 @@
  * @param  {Function} fn       Callback function
  * @return {Objet}             Instance
  */
-factory.prototype.cached = function (filename, format, fn) {
-	var ext  = REGEX_DEF.test(format) ? ".df" : ".gz",
+factory.prototype.cached = function ( filename, format, fn ) {
+	var ext  = REGEX_DEF.test( format ) ? ".df" : ".gz",
 	    path = this.config.tmp + "/" + filename + ext;
 
-	fs.exists(path, function (exists) {
-		fn(exists, path);
+	fs.exists( path, function ( exists ) {
+		fn( exists, path );
 	});
 
 	return this;

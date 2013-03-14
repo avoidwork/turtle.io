@@ -15,7 +15,7 @@
 	"index"   : ["index.htm", "index.html"],
 	"lag"     : 70,
 	"logs"    : {
-		"ext"    : "MMDDYY",
+		"ext"    : "YYYYMMDD",
 		"file"   : "turtleio_{{ext}}.log",
 		"time"   : "D/MMM/YYYY:HH:MM:SS ZZ",
 		"format" : "{{ip}} - {{user}} [{{time}}] \"{{method}} {{path}} HTTP/1.1\" {{status}} {{length}} {{referer}} \"{{user-agent}}\""

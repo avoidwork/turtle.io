@@ -7,16 +7,16 @@
  * @param  {String}   host  [Optional] Hostname this route is for (default is all)
  * @return {Object}         Instance
  */
-factory.prototype.all = function (route, fn, host) {
+factory.prototype.all = function ( route, fn, host ) {
 	var self  = this,
 	    timer = new Date();
 
-	$.route.set(route, function (res, req) {
-		handler.call(self, res, req, fn);
-	}, "all", host);
+	$.route.set( route, function ( res, req ) {
+		handler.call( self, res, req, fn );
+	}, "all", host );
 
-	dtp.fire("route-set", function (p) {
-		return [host || "*", route, "ALL", diff(timer)];
+	dtp.fire( "route-set", function ( p ) {
+		return [host || "*", route, "ALL", diff( timer )];
 	});
 
 	return this;
@@ -31,16 +31,16 @@ factory.prototype.all = function (route, fn, host) {
  * @param  {String}   host  [Optional] Hostname this route is for (default is all)
  * @return {Object}         Instance
  */
-factory.prototype.delete = function (route, fn, host) {
+factory.prototype.delete = function ( route, fn, host ) {
 	var self  = this,
 	    timer = new Date();
 
-	$.route.set(route, function (res, req) {
-		handler.call(self, res, req, fn);
-	}, "delete", host);
+	$.route.set( route, function ( res, req ) {
+		handler.call( self, res, req, fn );
+	}, "delete", host );
 
-	dtp.fire("route-set", function (p) {
-		return [host || "*", route, "DELETE", diff(timer)];
+	dtp.fire( "route-set", function ( p ) {
+		return [host || "*", route, "DELETE", diff( timer )];
 	});
 
 	return this;
@@ -55,16 +55,16 @@ factory.prototype.delete = function (route, fn, host) {
  * @param  {String}   host  [Optional] Hostname this route is for (default is all)
  * @return {Object}         Instance
  */
-factory.prototype.get = function (route, fn, host) {
+factory.prototype.get = function ( route, fn, host ) {
 	var self  = this,
 	    timer = new Date();
 
-	$.route.set(route, function (res, req) {
-		handler.call(self, res, req, fn);
-	}, "get", host);
+	$.route.set(route, function ( res, req ) {
+		handler.call( self, res, req, fn );
+	}, "get", host );
 
-	dtp.fire("route-set", function (p) {
-		return [host || "*", route, "GET", diff(timer)];
+	dtp.fire( "route-set", function ( p ) {
+		return [host || "*", route, "GET", diff( timer )];
 	});
 
 	return this;
@@ -79,16 +79,16 @@ factory.prototype.get = function (route, fn, host) {
  * @param  {String}   host  [Optional] Hostname this route is for (default is all)
  * @return {Object}         Instance
  */
-factory.prototype.post = function (route, fn, host) {
+factory.prototype.post = function ( route, fn, host ) {
 	var self  = this,
 	    timer = new Date();
 
-	$.route.set(route, function (res, req) {
-		handler.call(self, res, req, fn);
-	}, "post", host);
+	$.route.set(route, function ( res, req ) {
+		handler.call( self, res, req, fn );
+	}, "post", host );
 
-	dtp.fire("route-set", function (p) {
-		return [host || "*", route, "POST", diff(timer)];
+	dtp.fire("route-set", function ( p ) {
+		return [host || "*", route, "POST", diff( timer )];
 	});
 
 	return this;
@@ -103,16 +103,16 @@ factory.prototype.post = function (route, fn, host) {
  * @param  {String}   host  [Optional] Hostname this route is for (default is all)
  * @return {Object}         Instance
  */
-factory.prototype.put = function (route, fn, host) {
+factory.prototype.put = function ( route, fn, host ) {
 	var self  = this,
 	    timer = new Date();
 
-	$.route.set(route, function (res, req) {
-		handler.call(self, res, req, fn);
-	}, "put", host);
+	$.route.set( route, function ( res, req ) {
+		handler.call( self, res, req, fn );
+	}, "put", host );
 
-	dtp.fire("route-set", function (p) {
-		return [host || "*", route, "PUT", diff(timer)];
+	dtp.fire( "route-set", function ( p ) {
+		return [host || "*", route, "PUT", diff( timer )];
 	});
 
 	return this;
