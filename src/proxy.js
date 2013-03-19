@@ -150,7 +150,7 @@ factory.prototype.proxy = function ( origin, route, host ) {
 		self[REGEX_DEL.test( i ) ? "delete" : i]( route + "/.*", wrapper, host );
 
 		dtp.fire( "proxy-set", function ( p ) {
-			return [host, REGEX_DEL.test( i ) ? "delete" : i, origin, route, diff( timer )];
+			return [host || "*", REGEX_DEL.test( i ) ? "delete" : i, origin, route, diff( timer )];
 		});
 	});
 
