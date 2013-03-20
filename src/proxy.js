@@ -63,6 +63,9 @@ factory.prototype.proxy = function ( origin, route, host ) {
 
 					// Fixing root path of response
 					switch (true) {
+						case REGEX_HEAD.test( req.method.toLowerCase() ):
+							arg = messages.NO_CONTENT;
+							break;
 						case arg instanceof Array:
 						case arg instanceof Object:
 							arg = $.decode( $.encode( arg ).replace( regex, replace ) );
@@ -93,9 +96,9 @@ factory.prototype.proxy = function ( origin, route, host ) {
 	 * @return {Object}      Reshaped response headers
 	 */
 	headers = function ( args ) {
-		var result = {},
-			rvalue  = /.*:\s+/,
-			rheader = /:.*/;
+		var result  = {},
+		    rvalue  = /.*:\s+/,
+		    rheader = /:.*/;
 
 		args.trim().split( "\n" ).each( function ( i ) {
 			var header, value;
@@ -122,7 +125,12 @@ factory.prototype.proxy = function ( origin, route, host ) {
 		    method = req.method.toLowerCase(),
 		    fn, payload;
 
-		if ( method === "delete" ) method = "del";
+		if ( REGEX_DEL.test( method ) ) {
+			method = "del";
+		}
+		else if ( REGEX_HEAD.test( method ) ) {
+			method = "get";
+		}
 
 		// Facade to handle()
 		fn = function ( arg, xhr ) {
