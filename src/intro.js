@@ -14,7 +14,7 @@ var $          = require( "abaaso" ),
     zlib       = require( "zlib" ),
     d          = require( "dtrace-provider" ),
     dtp        = d.createDTraceProvider( "turtle-io" ),
-    REGEX_BODY = /^(put|post)$/i,
+    REGEX_BODY = /^(put|post|patch)$/i,
     REGEX_HALT = new RegExp( "^(ReferenceError|" + $.label.error.invalidArguments + ")$" ),
     REGEX_HEAD = /^(head|options)$/i,
     REGEX_GET  = /^(get|head|options)$/i,
@@ -22,7 +22,8 @@ var $          = require( "abaaso" ),
     REGEX_DEF  = /deflate/,
     REGEX_GZIP = /gzip/,
     REGEX_IE   = /msie/i,
-    REGEX_DIR  = /\/$/;
+    REGEX_DIR  = /\/$/,
+    REGEX_NU   = /null|undefined/;
 
 // Hooking syslog output
 syslog.init( "turtle_io", syslog.LOG_PID | syslog.LOG_ODELAY, syslog.LOG_LOCAL0 );

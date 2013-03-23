@@ -34,7 +34,9 @@ var handler = function ( res, req, fn ) {
 			op();
 			break;
 		default:
-			if (typeof this.config.auth[host].auth === "undefined") this.config.auth[host].auth = http_auth( this.config.auth[host] );
+			if ( typeof this.config.auth[host].auth === "undefined" ) {
+				this.config.auth[host].auth = http_auth( this.config.auth[host] );
+			}
 			this.config.auth[host].auth.apply( req, res, op );
 	}
 };
