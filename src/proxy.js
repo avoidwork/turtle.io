@@ -8,7 +8,7 @@
  */
 factory.prototype.proxy = function ( origin, route, host ) {
 	var self  = this,
-	    verbs = ["delete", "get", "post", "put"],
+	    verbs = ["delete", "get", "post", "put", "patch"],
 	    timer = new Date(),
 	    handle, headers, wrapper;
 

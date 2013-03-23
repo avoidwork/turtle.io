@@ -7,7 +7,7 @@
  * @return {String}         Hash of arg
  */
 factory.prototype.hash = function ( arg, encrypt, digest ) {
-	if ( /null|undefined/.test( arg ) ) {
+	if ( REGEX_NU.test( arg ) ) {
 		arg = "";
 	}
 

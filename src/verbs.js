@@ -71,6 +71,30 @@ factory.prototype.get = function ( route, fn, host ) {
 };
 
 /**
+ * Sets a PATCH route
+ * 
+ * @method patch
+ * @param  {RegExp}   route Route
+ * @param  {Function} fn    Handler
+ * @param  {String}   host  [Optional] Hostname this route is for (default is all)
+ * @return {Object}         Instance
+ */
+factory.prototype.patch = function ( route, fn, host ) {
+	var self  = this,
+	    timer = new Date();
+
+	$.route.set(route, function ( res, req ) {
+		handler.call( self, res, req, fn );
+	}, "patch", host );
+
+	dtp.fire("route-set", function ( p ) {
+		return [host || "*", route, "PATCH", diff( timer )];
+	});
+
+	return this;
+};
+
+/**
  * Sets a POST route
  * 
  * @method post

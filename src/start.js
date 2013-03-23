@@ -13,13 +13,8 @@ factory.prototype.start = function ( args ) {
 	// Default headers
 	headers = {
 		"Server"       : "turtle.io/{{VERSION}}",
-		"X-Powered-By" : (function () { return ("abaaso/" + $.version + " node.js/" + process.versions.node.replace( /^v/, "" ) + " (" + process.platform.capitalize() + " V8/" + process.versions.v8 + ")"); })()
+		"X-Powered-By" : ( function () { return ( "abaaso/" + $.version + " node.js/" + process.versions.node.replace( /^v/, "" ) + " (" + process.platform.capitalize() + " V8/" + process.versions.v8 + ")" ); } )()
 	};
-
-	// Capturing exceptions
-	process.on( "uncaughtException", function ( err ) {
-		self.log( err );
-	});
 
 	// Loading config
 	config.call( this, args );
@@ -51,8 +46,10 @@ factory.prototype.start = function ( args ) {
 	this.get( "/.*", this.request );
 
 	// Creating a server
-	this.server = $.route.server( params, function ( e ) { self.log( e, true ); } );
 	this.active = true;
+	this.server = $.route.server( params, function ( e ) {
+		self.log( e, true );
+	});
 
 	// Setting acceptable lag
 	toobusy.maxLag( this.config.lag );

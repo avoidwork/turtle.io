@@ -15,7 +15,13 @@ var handler = function ( res, req, fn ) {
 
 	// Setting up request handler
 	op = function () {
-		fn.call( self, res, req, timer );
+		try {
+			fn.call( self, res, req, timer );
+		}
+		catch ( e ) {
+			self.log( e );
+			self.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION );
+		}
 
 		dtp.fire( "handler", function ( p ) {
 			return [req.headers.host, req.url, diff( timer )];
@@ -34,7 +40,9 @@ var handler = function ( res, req, fn ) {
 			op();
 			break;
 		default:
-			if (typeof this.config.auth[host].auth === "undefined") this.config.auth[host].auth = http_auth( this.config.auth[host] );
+			if ( typeof this.config.auth[host].auth === "undefined" ) {
+				this.config.auth[host].auth = http_auth( this.config.auth[host] );
+			}
 			this.config.auth[host].auth.apply( req, res, op );
 	}
 };

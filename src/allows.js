@@ -8,7 +8,7 @@
  */
 var allows = function ( uri, host ) {
 	var result = "",
-	    verbs  = ["DELETE", "GET", "POST", "PUT"],
+	    verbs  = ["DELETE", "GET", "POST", "PUT", "PATCH"],
 	    timer  = new Date();
 
 	verbs.each( function ( i ) {
