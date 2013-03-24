@@ -18,7 +18,7 @@ factory.prototype.respond = function ( res, req, output, status, responseHeaders
 	var body      = !REGEX_HEAD.test(req.method),
 	    encoding  = this.compression(req.headers["user-agent"], req.headers["accept-encoding"]),
 	    self      = this,
-	    nth;
+	    nth, salt;
 
 	if ( !( responseHeaders instanceof Object ) ) {
 		responseHeaders = {};
@@ -44,7 +44,8 @@ factory.prototype.respond = function ( res, req, output, status, responseHeaders
 
 	// Setting Etag if not present
 	if (responseHeaders.Etag === undefined) {
-		responseHeaders.Etag = "\"" + self.hash( req.url + "-" + output.length + "-" + output ) + "\"";
+		salt = req.url + "-" + req.method + "-" + ( output.length || null ) + "-" + output;
+		responseHeaders.Etag = "\"" + self.hash( salt ) + "\"";
 	}
 
 	// Comparing against request headers incase this is a custom route response
