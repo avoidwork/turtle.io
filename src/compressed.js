@@ -5,12 +5,12 @@
  * @param  {Object}  req     HTTP request Object
  * @param  {String}  etag    Etag header
  * @param  {String}  arg     Response body
- * @param  {Number}  code    Response status code
+ * @param  {Number}  status  Response status code
  * @param  {Object}  headers HTTP headers
  * @param  {Boolean} local   [Optional] Indicates arg is a file path, default is false
  * @return {Objet}           Instance
  */
-factory.prototype.compressed = function ( res, req, etag, arg, code, headers, local, timer ) {
+factory.prototype.compressed = function ( res, req, etag, arg, status, headers, local, timer ) {
 	local           = ( local === true );
 	timer           = timer || new Date();
 	var self        = this,
@@ -27,7 +27,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, code, headers, lo
 				});
 
 				if ( ready ) {
-					self.headers( res, req, code, headers );
+					self.headers( res, req, status, headers );
 					raw = fs.createReadStream( npath );
 					raw.pipe( res );
 				}
@@ -38,7 +38,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, code, headers, lo
 				}
 
 				dtp.fire( "respond", function ( p ) {
-					return [req.headers.host, req.method, req.url, code, diff( timer )];
+					return [req.headers.host, req.method, req.url, status, diff( timer )];
 				});
 			});
 		}
@@ -51,35 +51,70 @@ factory.prototype.compressed = function ( res, req, etag, arg, code, headers, lo
 			util.pump( raw, res );
 
 			dtp.fire( "respond", function ( p ) {
-				return [req.headers.host, req.method, req.url, code, diff( timer )];
+				return [req.headers.host, req.method, req.url, status, diff( timer )];
 			});
 		}
 	}
-	// Proxy response
+	// Custom or proxy route result
 	else {
-		if (compression !== null) {
-			res.setHeader( "Content-Encoding" , compression );
+		if ( compression !== null ) {
 			self.cached( etag, compression, function ( ready, npath ) {
-				dtp.fire( "compressed", function ( p ) {
-					return [etag, local ? "local" : "proxy", req.headers.host, req.url, diff( timer )];
-				});
+				res.setHeader( "Content-Encoding" , compression );
 
+				// Responding with cached asset
 				if ( ready ) {
-					self.headers( res, req, code, headers );
+					dtp.fire( "compressed", function ( p ) {
+						return [etag, local ? "local" : "proxy", req.headers.host, req.url, diff( timer )];
+					});
+
+					self.headers( res, req, status, headers );
+
 					raw = fs.createReadStream( npath );
 					raw.pipe( res );
 
-					dtp.fire(" respond", function ( p ) {
-						return [req.headers.host, req.method, req.url, code, diff( timer )];
+					dtp.fire( "respond", function ( p ) {
+						return [req.headers.host, req.method, req.url, status, diff( timer )];
 					});
 				}
+				// Compressing asset & writing to disk after responding
 				else {
-					self.cache( etag, arg, compression, true );
-					self.respond( res, req, arg, code, headers, timer );
+					zlib[compression]( arg, function ( err, compressed ) {
+						dtp.fire( "compressed", function ( p ) {
+							return [etag, local ? "local" : "proxy", req.headers.host, req.url, diff( timer )];
+						});
+
+						if ( err ) {
+							self.error( res, req, timer );
+						}
+						else {
+							self.headers( res, req, status, headers );
+							res.write( compressed );
+							res.end();
+
+							dtp.fire( "respond", function ( p ) {
+								return [req.headers.host, req.method, req.url, status, diff( timer )];
+							});
+
+							fs.writeFile( npath, compressed, function ( e ) {
+								if ( err ) {
+									self.log( err, true, false );
+								}
+								else {
+									dtp.fire( "compress", function ( p ) {
+										return [etag, npath, compression, diff( timer )];
+									});
+								}
+							});
+
+							self.log( prep.call( self, res, req ) );
+						}
+					});
 				}
 			});
 		}
-		else this.respond( res, req, arg, code, headers, timer, false );
+		else {
+			this.respond( res, req, arg, code, headers, timer, false );
+		}
 	}
 
 	return this;

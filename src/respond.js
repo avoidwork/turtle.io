@@ -42,28 +42,25 @@ factory.prototype.respond = function ( res, req, output, status, responseHeaders
 		}
 	}
 
-	// Setting the response status code
-	res.statusCode = status;	
-
-	if ( compress ) {
-		responseHeaders["Content-Encoding"] = encoding;
-		zlib[encoding](output, function ( err, compressed ) {
-			if ( err ) {
-				self.error( res, req );
-			}
-			else {
-				self.headers( res, req, status, responseHeaders );
-				res.write( compressed );
-				res.end();
-
-				dtp.fire( "respond", function ( p ) {
-					return [req.headers.host, req.method, req.url, status, diff( timer )];
-				});
-
-				self.log( prep.call( self, res, req ) );
-			}
-		});
+	// Setting Etag if not present
+	if (responseHeaders.Etag === undefined) {
+		responseHeaders.Etag = "\"" + self.hash( req.url + "-" + output.length + "-" + output ) + "\"";
 	}
+
+	// Comparing against request headers incase this is a custom route response
+	if (req.headers["if-none-match"] === responseHeaders.Etag) {
+		status = 304;
+		output = messages.NO_CONTENT;
+	}
+
+	// Setting the response status code
+	res.statusCode = status;
+
+	// Compressing response to disk
+	if ( status !== 304 && compress ) {
+		self.compressed( res, req, responseHeaders.Etag.replace(/"/g, ""), output, status, responseHeaders, false, timer );
+	}
+	// Serving content
 	else {
 		this.headers( res, req, status, responseHeaders );
 

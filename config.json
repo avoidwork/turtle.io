@@ -13,7 +13,7 @@
 		"Last-Modified"               : ""
 	},
 	"index"   : ["index.htm", "index.html"],
-	"lag"     : 70,
+	"lag"     : 100,
 	"logs"    : {
 		"ext"    : "YYYYMMDD",
 		"file"   : "turtleio_{{ext}}.log",
