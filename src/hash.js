@@ -7,16 +7,11 @@
  * @return {String}         Hash of arg
  */
 factory.prototype.hash = function ( arg, encrypt, digest ) {
-	if ( REGEX_NU.test( arg ) ) {
+	encrypt = encrypt || "md5";
+	digest  = digest  || "hex";
+
+	if ( arg === null || arg === undefined) {
 		arg = "";
-	}
-
-	if ( encrypt === undefined ) {
-		encrypt = "md5";
-	}
-
-	if ( digest === undefined ) {
-		digest  = "hex";
 	}
 
 	return crypto.createHash( encrypt ).update( arg ).digest( digest );
