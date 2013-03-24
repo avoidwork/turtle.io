@@ -13,7 +13,7 @@ factory.prototype.start = function ( args ) {
 	// Default headers
 	headers = {
 		"Server"       : "turtle.io/{{VERSION}}",
-		"X-Powered-By" : ( function () { return ( "abaaso/" + $.version + " node.js/" + process.versions.node.replace( /^v/, "" ) + " (" + process.platform.capitalize() + " V8/" + process.versions.v8 + ")" ); } )()
+		"X-Powered-By" : ( function () { return ( "abaaso/" + $.version + " node.js/" + process.versions.node.replace( /^v/, "" ) + " (" + process.platform.capitalize() + " V8/" + process.versions.v8.toString().trim() + ")" ); } )()
 	};
 
 	// Loading config
