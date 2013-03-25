@@ -113,7 +113,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 			});
 		}
 		else {
-			this.respond( res, req, arg, code, headers, timer, false );
+			this.respond( res, req, arg, status, headers, timer, false );
 		}
 	}
 
