@@ -15,7 +15,7 @@ factory.prototype.respond = function ( res, req, output, status, responseHeaders
 	status = status || codes.SUCCESS;
 	timer  = timer  || new Date(); // Not ideal! This gives a false sense of speed for custom routes
 
-	var body      = !REGEX_HEAD.test(req.method),
+	var body      = !REGEX_HEAD.test(req.method) && output !== null,
 	    encoding  = this.compression(req.headers["user-agent"], req.headers["accept-encoding"]),
 	    self      = this,
 	    nth, salt;
@@ -44,7 +44,7 @@ factory.prototype.respond = function ( res, req, output, status, responseHeaders
 
 	// Setting Etag if not present
 	if (responseHeaders.Etag === undefined) {
-		salt = req.url + "-" + req.method + "-" + ( output.length || null ) + "-" + output;
+		salt = req.url + "-" + req.method + "-" + ( output !== null && typeof output.length !== "undefined" ? output.length : null ) + "-" + output;
 		responseHeaders.Etag = "\"" + self.hash( salt ) + "\"";
 	}
 

@@ -23,7 +23,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 			res.setHeader( "Content-Encoding", compression );
 			self.cached( etag, compression, function ( ready, npath ) {
 				dtp.fire( "compressed", function ( p ) {
-					return [etag, local ? "local" : "proxy", req.headers.host, req.url, diff( timer )];
+					return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 				});
 
 				if ( ready ) {
@@ -44,7 +44,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 		}
 		else {
 			dtp.fire( "compressed", function ( p ) {
-				return [etag, local ? "local" : "proxy", req.headers.host, req.url, diff( timer )];
+				return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 			});
 
 			raw = fs.createReadStream( arg );
@@ -64,7 +64,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 				// Responding with cached asset
 				if ( ready ) {
 					dtp.fire( "compressed", function ( p ) {
-						return [etag, local ? "local" : "proxy", req.headers.host, req.url, diff( timer )];
+						return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 					});
 
 					self.headers( res, req, status, headers );
@@ -80,7 +80,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 				else {
 					zlib[compression]( arg, function ( err, compressed ) {
 						dtp.fire( "compressed", function ( p ) {
-							return [etag, local ? "local" : "proxy", req.headers.host, req.url, diff( timer )];
+							return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 						});
 
 						if ( err ) {
