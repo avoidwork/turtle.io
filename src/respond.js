@@ -4,7 +4,7 @@
  * @method respond
  * @param  {Object}  res             Response object
  * @param  {Object}  req             Request object
- * @param  {Mixed}   output          [Optional] Response
+ * @param  {Mixed}   output          [Optional] Response body
  * @param  {Number}  status          [Optional] HTTP status code, default is 200
  * @param  {Object}  responseHeaders [Optional] HTTP headers to decorate the response with
  * @param  {Object}  timer           [Optional] Date instance
@@ -12,8 +12,9 @@
  * @return {Objet}                   Instance
  */
 factory.prototype.respond = function ( res, req, output, status, responseHeaders, timer, compress ) {
-	status = status || codes.SUCCESS;
-	timer  = timer  || new Date(); // Not ideal! This gives a false sense of speed for custom routes
+	status   = status || codes.SUCCESS;
+	timer    = timer  || new Date(); // Not ideal! This gives a false sense of speed for custom routes
+	compress = ( compress === true );
 
 	var body      = !REGEX_HEAD.test(req.method) && output !== null,
 	    encoding  = this.compression(req.headers["user-agent"], req.headers["accept-encoding"]),
@@ -25,11 +26,14 @@ factory.prototype.respond = function ( res, req, output, status, responseHeaders
 	}
 
 	// Determining wether compression is supported
-	compress = compress || ( body && encoding !== null );
+	compress = compress && body && encoding !== null;
 
 	// Converting JSON or XML to a String
 	if ( body ) {
 		switch ( true ) {
+			case output instanceof Buffer:
+				// Do not want to coerce this Object to a String!
+				break;
 			case output instanceof Array:
 			case output instanceof Object:
 				responseHeaders["Content-Type"] = "application/json";

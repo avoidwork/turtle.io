@@ -26,7 +26,7 @@ factory.prototype.request = function ( res, req, timer ) {
 			return [req.headers.host, req.method, req.url, self.server.connections, diff( timer )];
 		});
 
-		return this.respond( res, req, messages.ERROR_SERVICE, codes.ERROR_SERVICE, {"Retry-After": 60}, timer );
+		return this.respond( res, req, messages.ERROR_SERVICE, codes.ERROR_SERVICE, {"Retry-After": 60}, timer, false );
 	}
 
 	// Can't find the hostname in vhosts, try the default (if set) or send a 500
@@ -46,7 +46,7 @@ factory.prototype.request = function ( res, req, timer ) {
 				host = this.config.default;
 			}
 			else {
-				return this.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION, timer );
+				return this.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION, timer, false );
 			}
 		}
 	}
@@ -83,14 +83,14 @@ factory.prototype.request = function ( res, req, timer ) {
 					}
 					else {
 						status = codes.NOT_ALLOWED;
-						self.respond( res, req, messages.NOT_ALLOWED, status, {"Allow": allow}, timer );
+						self.respond( res, req, messages.NOT_ALLOWED, status, {"Allow": allow}, timer, false );
 					}
 					break;
 				case !exists:
-					self.respond( res, req, messages.NO_CONTENT, codes.NOT_FOUND, ( post ? {"Allow": "POST"} : undefined ), timer );
+					self.respond( res, req, messages.NOT_FOUND, codes.NOT_FOUND, ( post ? {"Allow": "POST"} : {} ), timer, false );
 					break;
 				case !allowed( method, req.url ):
-					self.respond( res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {"Allow": allow}, timer );
+					self.respond( res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {"Allow": allow}, timer, false );
 					break;
 				default:
 					if ( !/\/$/.test( req.url ) ) {
@@ -99,12 +99,12 @@ factory.prototype.request = function ( res, req, timer ) {
 
 					switch ( method ) {
 						case "delete":
-							fs.unlink( path, function ( err ) {
-								if ( err ) {
-									self.error( res, req, timer );
+							fs.unlink( path, function ( e ) {
+								if ( e ) {
+									self.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION, {}, timer, false );
 								}
 								else {
-									self.respond( res, req, messages.NO_CONTENT, codes.NO_CONTENT, undefined, timer );
+									self.respond( res, req, messages.NO_CONTENT, codes.NO_CONTENT, {}, timer, false );
 								}
 							});
 							break;
@@ -112,10 +112,10 @@ factory.prototype.request = function ( res, req, timer ) {
 						case "head":
 						case "options":
 							mimetype = mime.lookup( path );
-							fs.stat( path, function ( err, stat ) {
+							fs.stat( path, function ( e, stat ) {
 								var size, modified, etag, raw, headers;
 
-								if ( err ) {
+								if ( e ) {
 									self.error( res, req, timer );
 								}
 								else {
@@ -128,17 +128,16 @@ factory.prototype.request = function ( res, req, timer ) {
 										switch ( true ) {
 											case Date.parse( req.headers["if-modified-since"] ) >= stat.mtime:
 											case req.headers["if-none-match"] === etag:
-												self.respond( res, req, messages.NO_CONTENT, codes.NOT_MODIFIED, headers, timer );
+												self.respond( res, req, messages.NO_CONTENT, codes.NOT_MODIFIED, headers, timer, false );
 												break;
 											default:
 												headers["Transfer-Encoding"] = "chunked";
-												self.headers( res, req, codes.SUCCESS, headers, timer );
 												etag = etag.replace( /\"/g, "" );
 												self.compressed( res, req, etag, path, codes.SUCCESS, headers, true, timer );
 										}
 									}
 									else {
-										self.respond( res, req, messages.NO_CONTENT, codes.SUCCESS, headers, timer );
+										self.respond( res, req, messages.NO_CONTENT, codes.SUCCESS, headers, timer, false );
 									}
 								}
 							});
@@ -147,15 +146,15 @@ factory.prototype.request = function ( res, req, timer ) {
 							self.write( path, res, req, timer );
 							break;
 						default:
-							self.respond( res, req, ( del ? messages.CONFLICT : messages.ERROR_APPLICATION ), ( del ? codes.CONFLICT : codes.ERROR_APPLICATION ), {"Allow": allow}, timer );
+							self.respond( res, req, ( del ? messages.CONFLICT : messages.ERROR_APPLICATION ), ( del ? codes.CONFLICT : codes.ERROR_APPLICATION ), {"Allow": allow}, timer, false );
 					}
 			}
 		});
 	};
 
 	// Determining if the request is valid
-	fs.stat( root + parsed.pathname, function ( err, stats ) {
-		if ( err ) {
+	fs.stat( root + parsed.pathname, function ( e, stats ) {
+		if ( e ) {
 			self.error( res, req );
 		}
 		else {
@@ -165,7 +164,7 @@ factory.prototype.request = function ( res, req, timer ) {
 			else {
 				// Adding a trailing slash for relative paths; redirect is not cached
 				if ( stats.isDirectory() && !REGEX_DIR.test( parsed.pathname ) ) {
-					self.respond( res, req, messages.NO_CONTENT, codes.MOVED, {"Location": parsed.pathname + "/"}, timer );
+					self.respond( res, req, messages.NO_CONTENT, codes.MOVED, {"Location": parsed.pathname + "/"}, timer, false );
 				}
 				else {
 					nth   = self.config.index.length;
