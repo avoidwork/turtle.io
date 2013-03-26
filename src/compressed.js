@@ -55,11 +55,12 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 			});
 		}
 		else {
+			raw = fs.createReadStream( arg );
+			util.pump( raw, res );
+
 			dtp.fire( "compressed", function ( p ) {
 				return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 			});
-
-			self.respond( res, req, arg, status, headers, timer, false );
 		}
 	}
 	// Custom or proxy route result
