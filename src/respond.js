@@ -2,16 +2,16 @@
  * Constructs a response
  * 
  * @method respond
- * @param  {Object}  res             Response object
- * @param  {Object}  req             Request object
- * @param  {Mixed}   output          [Optional] Response body
- * @param  {Number}  status          [Optional] HTTP status code, default is 200
- * @param  {Object}  responseHeaders [Optional] HTTP headers to decorate the response with
- * @param  {Object}  timer           [Optional] Date instance
- * @param  {Boolean} compress        [Optional] Enable compression of the response (if supported)
- * @return {Objet}                   Instance
+ * @param  {Object}  res      HTTP(S) response Object
+ * @param  {Object}  req      HTTP(S) request Object
+ * @param  {Mixed}   output   [Optional] Response body
+ * @param  {Number}  status   [Optional] HTTP status code, default is 200
+ * @param  {Object}  headers  [Optional] HTTP headers to decorate the response with
+ * @param  {Object}  timer    [Optional] Date instance
+ * @param  {Boolean} compress [Optional] Enable compression of the response (if supported)
+ * @return {Objet}            Instance
  */
-factory.prototype.respond = function ( res, req, output, status, responseHeaders, timer, compress ) {
+factory.prototype.respond = function ( res, req, output, status, headers, timer, compress ) {
 	status   = status || codes.SUCCESS;
 	timer    = timer  || new Date(); // Not ideal! This gives a false sense of speed for custom routes
 	compress = ( compress === true );
@@ -21,8 +21,8 @@ factory.prototype.respond = function ( res, req, output, status, responseHeaders
 	    self      = this,
 	    nth, salt;
 
-	if ( !( responseHeaders instanceof Object ) ) {
-		responseHeaders = {};
+	if ( !( headers instanceof Object ) ) {
+		headers = {};
 	}
 
 	// Determining wether compression is supported
@@ -36,26 +36,26 @@ factory.prototype.respond = function ( res, req, output, status, responseHeaders
 				break;
 			case output instanceof Array:
 			case output instanceof Object:
-				responseHeaders["Content-Type"] = "application/json";
+				headers["Content-Type"] = "application/json";
 				output = $.encode( output );
 				break;
 			/*case output instanceof Document:
-				responseHeaders["Content-Type"] = "application/xml";
+				headers["Content-Type"] = "application/xml";
 				output = $.xml.decode(output);
 				break;*/
 		}
 	}
 
 	// Setting Etag if not present
-	if (responseHeaders.Etag === undefined) {
+	if (headers.Etag === undefined) {
 		salt = req.url + "-" + req.method + "-" + ( output !== null && typeof output.length !== "undefined" ? output.length : null ) + "-" + output;
-		responseHeaders.Etag = "\"" + self.hash( salt ) + "\"";
+		headers.Etag = "\"" + self.hash( salt ) + "\"";
 	}
 
 	// Comparing against request headers incase this is a custom route response
-	if (req.headers["if-none-match"] === responseHeaders.Etag) {
+	if (req.headers["if-none-match"] === headers.Etag) {
 		status = 304;
-		output = messages.NO_CONTENT;
+		body   = false;
 	}
 
 	// Setting the response status code
@@ -63,11 +63,11 @@ factory.prototype.respond = function ( res, req, output, status, responseHeaders
 
 	// Compressing response to disk
 	if ( status !== 304 && compress ) {
-		self.compressed( res, req, responseHeaders.Etag.replace(/"/g, ""), output, status, responseHeaders, false, timer );
+		self.compressed( res, req, headers.Etag.replace(/"/g, ""), output, status, headers, false, timer );
 	}
 	// Serving content
 	else {
-		this.headers( res, req, status, responseHeaders );
+		this.headers( res, req, status, headers );
 
 		if ( body ) {
 			res.write( output );

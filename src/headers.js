@@ -1,20 +1,16 @@
 /**
  * Sets response headers
  * 
- * @param  {Object}  res             Response object
- * @param  {Object}  req             Request object
- * @param  {Number}  status          [Optional] HTTP status code, default is 200
+ * @param  {Object}  res             HTTP(S) response Object
+ * @param  {Object}  req             HTTP(S) request Object
+ * @param  {Number}  status          [Optional] Response status code
  * @param  {Object}  responseHeaders [Optional] HTTP headers to decorate the response with
  * @return {Objet}                   Instance
  */
 factory.prototype.headers = function ( res, req, status, responseHeaders ) {
+	status      = status || codes.SUCCESS;
 	var get     = REGEX_GET.test( req.method ),
 	    headers = $.clone( this.config.headers );
-
-	// Setting optional params
-	if ( status === undefined) {
-		status = codes.SUCCESS;
-	}
 
 	if ( !( responseHeaders instanceof Object ) ) {
 		responseHeaders = {};
@@ -31,10 +27,15 @@ factory.prototype.headers = function ( res, req, status, responseHeaders ) {
 	res.statusCode = status;
 
 	// Decorating "Last-Modified" header
-	if ( headers["Last-Modified"].isEmpty() ) headers["Last-Modified"] = headers["Date"];
+	if ( headers["Last-Modified"].isEmpty() ) {
+		headers["Last-Modified"] = headers["Date"];
+	}
 
 	// Removing headers not wanted in the response
-	if ( !get || status >= codes.INVALID_ARGUMENTS ) delete headers["Cache-Control"];
+	if ( !get || status >= codes.INVALID_ARGUMENTS ) {
+		delete headers["Cache-Control"];
+	}
+
 	switch ( true ) {
 		case status >= codes.FORBIDDEN && status < codes.NOT_FOUND:
 		case status >= codes.ERROR_APPLICATION:

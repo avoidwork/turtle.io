@@ -12,7 +12,7 @@ factory.prototype.unset = function ( route, verb, host ) {
 	route === "*" ? $.route.reset() : $.route.del( route, verb, host );
 
 	dtp.fire( "route-unset", function ( p ) {
-		return [host || "*", route, verb || "ALL", diff( timer )];
+		return [host || "*", route, verb.toUpperCase() || "ALL", diff( timer )];
 	});
 
  	return this;

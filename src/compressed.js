@@ -1,8 +1,8 @@
 /**
  * Pipes compressed asset to Client, or schedules the creation of the asset
  * 
- * @param  {Object}  res     HTTP response Object
- * @param  {Object}  req     HTTP request Object
+ * @param  {Object}  res     HTTP(S) response Object
+ * @param  {Object}  req     HTTP(S) request Object
  * @param  {String}  etag    Etag header
  * @param  {String}  arg     Response body
  * @param  {Number}  status  Response status code
@@ -18,10 +18,16 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 	    compression = this.compression( req.headers["user-agent"], req.headers["accept-encoding"] ),
 	    raw, body;
 
+	// Setting the response status code if not already set from `respond`
+	if ( isNaN ( res.statusCode ) ) {
+		res.statusCode = status;
+	}
+
 	// Local asset, piping result directly to Client
 	if ( local ) {
 		if (compression !== null) {
 			res.setHeader( "Content-Encoding", compression );
+
 			self.cached( etag, compression, function ( ready, npath ) {
 				dtp.fire( "compressed", function ( p ) {
 					return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
@@ -85,7 +91,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 				}
 				// Compressing asset & writing to disk after responding
 				else {
-					body = arg instanceof Array || arg instanceof Object ? $.encode ( arg ) : arg;
+					body = arg instanceof Array || ( !arg instanceof Buffer && arg instanceof Object ) ? $.encode ( arg ) : arg;
 
 					zlib[compression]( body, function ( e, compressed ) {
 						dtp.fire( "compressed", function ( p ) {
@@ -96,7 +102,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 							self.respond( res, req, e, codes.ERROR_APPLICATION, headers, timer, false );
 						}
 						else {
-							self.respond( res, req, compressed, status, headers, timer, false, true );
+							self.respond( res, req, compressed, status, headers, timer, false );
 
 							fs.writeFile( npath, compressed, function ( e ) {
 								if ( e ) {

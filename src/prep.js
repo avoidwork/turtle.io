@@ -1,8 +1,8 @@
 /**
  * Preparing log message
  * 
- * @param  {Object} res HTTP response Object
- * @param  {Object} req HTTP request Object
+ * @param  {Object} res HTTP(S) response Object
+ * @param  {Object} req HTTP(S) request Object
  * @return {String}     Log message
  */
 var prep = function ( res, req ) {

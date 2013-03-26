@@ -17,18 +17,17 @@ factory.prototype.proxy = function ( origin, route, host ) {
 	 * 
 	 * @param  {Mixed}  arg   Proxy response
 	 * @param  {Object} xhr   XmlHttpRequest
-	 * @param  {Object} res   HTTP response Object
-	 * @param  {Object} req   HTTP request Object
+	 * @param  {Object} res   HTTP(S) response Object
+	 * @param  {Object} req   HTTP(S) request Object
 	 * @param  {Object} timer [Optional] Date instance
 	 * @return {Undefined}    undefined
 	 */
 	handle = function ( arg, xhr, res, req, timer ) {
 		var resHeaders = {},
 		    etag       = "",
-		    date       = "",
 		    regex      = /("|')\//g,
 		    replace    = "$1" + route + "/",
-		    nth, raw;
+		    date, nth, raw;
 
 		try {
 			// Getting or creating an Etag
@@ -36,10 +35,13 @@ factory.prototype.proxy = function ( origin, route, host ) {
 			date       = ( resHeaders["Last-Modified"] || resHeaders["Date"] ) || undefined;
 
 			if ( isNaN( new Date( date ).getFullYear() ) ) {
-				date = undefined;
+				date = new Date();
+			}
+			else {
+				date = new Date( date );
 			}
 
-			etag = resHeaders.Etag || "\"" + self.hash( req.url + "-" + resHeaders["Content-Length"] + "-" + new Date( date ).getTime() ) + "\"";
+			etag = resHeaders.Etag || "\"" + self.hash( req.url + "-" + req.method + "-" + resHeaders["Content-Length"] + "-" + date.getTime() ) + "\"";
 
 			// Setting headers
 			if ( resHeaders.Etag !== etag ) {
@@ -57,7 +59,7 @@ factory.prototype.proxy = function ( origin, route, host ) {
 					break;
 				default:
 					resHeaders["Transfer-Encoding"] = "chunked";
-					etag = etag.replace(/\"/g, "");
+					etag = etag.replace( /\"/g, "" );
 
 					// Fixing root path of response
 					switch (true) {
@@ -73,7 +75,8 @@ factory.prototype.proxy = function ( origin, route, host ) {
 							break;
 					}
 
-					if (req.headers["accept-encoding"] !== undefined) {
+					// Sending compressed version to Client if supported
+					if ( req.headers["accept-encoding"] !== undefined ) {
 						self.compressed( res, req, etag, arg, xhr.status, resHeaders, false, timer );
 					}
 					else {
@@ -117,8 +120,8 @@ factory.prototype.proxy = function ( origin, route, host ) {
 	/**
 	 * Wraps the proxy request
 	 * 
-	 * @param  {Object} res   HTTP response Object
-	 * @param  {Object} req   HTTP request Object
+	 * @param  {Object} res   HTTP(S) response Object
+	 * @param  {Object} req   HTTP(S) request Object
 	 * @param  {Object} timer [Optional] Date instance
 	 * @return {Undefined}    undefined
 	 */
@@ -136,7 +139,6 @@ factory.prototype.proxy = function ( origin, route, host ) {
 			handle( arg, xhr, res, req, timer );
 		};
 
-		// Setting listeners if expecting a body
 		if ( REGEX_BODY.test( req.method ) ) {
 			url[method]( fn, fn, req.body, headerz );
 		}
@@ -161,7 +163,7 @@ factory.prototype.proxy = function ( origin, route, host ) {
 		self[i]( route + "/.*", wrapper, host );
 
 		dtp.fire( "proxy-set", function ( p ) {
-			return [host || "*", i, origin, route, diff( timer )];
+			return [host || "*", i.toUpperCase(), origin, route, diff( timer )];
 		});
 	});
 
