@@ -35,24 +35,21 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 					return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 				});
 
+				// File is ready!
 				if ( ready ) {
 					raw = fs.createReadStream( npath );
 					raw.pipe( res );
-
-					dtp.fire( "respond", function ( p ) {
-						return [req.headers.host, req.method, req.url, status, diff( timer )];
-					});
 				}
+				// File is not ready, cache it locally & pipe to the client while compressing (2x)
 				else {
-					self.cache( etag, arg, compression, true, function () {
-						raw = fs.createReadStream( arg );
-						raw.pipe( zlib[REGEX_DEF.test( compression ) ? "createDeflate" : "createGzip"]() ).pipe( res );
-
-						dtp.fire( "respond", function ( p ) {
-							return [req.headers.host, req.method, req.url, status, diff( timer )];
-						});
-					});
+					self.cache( etag, arg, compression );
+					raw = fs.createReadStream( arg );
+					raw.pipe( zlib[REGEX_DEF.test( compression ) ? "createDeflate" : "createGzip"]() ).pipe( res );
 				}
+
+				dtp.fire( "respond", function ( p ) {
+					return [req.headers.host, req.method, req.url, status, diff( timer )];
+				});
 
 				self.log( prep.call( self, res, req ) );
 			});
@@ -62,14 +59,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 				return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 			});
 
-			raw = fs.createReadStream( arg );
-			util.pump( raw, res );
-
-			self.log( prep.call( self, res, req ) );
-
-			dtp.fire( "respond", function ( p ) {
-				return [req.headers.host, req.method, req.url, status, diff( timer )];
-			});
+			self.respond( res, req, arg, status, headers, timer, false );
 		}
 	}
 	// Custom or proxy route result
@@ -126,6 +116,10 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 			});
 		}
 		else {
+			dtp.fire( "compressed", function ( p ) {
+				return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
+			});
+
 			this.respond( res, req, arg, status, headers, timer, false );
 		}
 	}
