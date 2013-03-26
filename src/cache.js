@@ -4,7 +4,7 @@
  * @method cache
  * @param  {String}   filename Filename of the new file (Etag without quotes)
  * @param  {String}   obj      Body or Path to file to compress
- * @param  {Function} format   Compression format (deflate or gzip)
+ * @param  {Function} encoding Compression encoding (deflate or gzip)
  * @param  {Boolean}  body     [Optional] Indicates obj is the Body of a Response (default is false)
  * @return {Objet}             Instance
  */
@@ -39,11 +39,15 @@ factory.prototype.cache = function ( filename, obj, encoding, body ) {
 				obj = $.xml.decode(obj);
 				break;*/
 		}
-		zlib[encoding]( obj, function ( err, compressed ) {
-			if ( err ) self.log( err, true, false );
+		zlib[encoding]( obj, function ( e, compressed ) {
+			if ( e ) {
+				self.log( e, true, false );
+			}
 			else {
-				fs.writeFile( dest, compressed, "utf8", function ( err ) {
-					if ( err ) self.log( err, true, false );
+				fs.writeFile( dest, compressed, "utf8", function ( e ) {
+					if ( e ) {
+						self.log( e, true, false );
+					}
 					else {
 						dtp.fire( "compress", function ( p ) {
 							return [filename, dest, REGEX_DEF.test( encoding ) ? "deflate" : "gzip", diff( timer )];

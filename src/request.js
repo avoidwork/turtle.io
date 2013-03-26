@@ -99,8 +99,8 @@ factory.prototype.request = function ( res, req, timer ) {
 
 					switch ( method ) {
 						case "delete":
-							fs.unlink( path, function ( err ) {
-								if ( err ) {
+							fs.unlink( path, function ( e ) {
+								if ( e ) {
 									self.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION, {}, timer, false );
 								}
 								else {
@@ -112,10 +112,10 @@ factory.prototype.request = function ( res, req, timer ) {
 						case "head":
 						case "options":
 							mimetype = mime.lookup( path );
-							fs.stat( path, function ( err, stat ) {
+							fs.stat( path, function ( e, stat ) {
 								var size, modified, etag, raw, headers;
 
-								if ( err ) {
+								if ( e ) {
 									self.error( res, req, timer );
 								}
 								else {
@@ -132,7 +132,6 @@ factory.prototype.request = function ( res, req, timer ) {
 												break;
 											default:
 												headers["Transfer-Encoding"] = "chunked";
-												self.headers( res, req, codes.SUCCESS, headers, timer );
 												etag = etag.replace( /\"/g, "" );
 												self.compressed( res, req, etag, path, codes.SUCCESS, headers, true, timer );
 										}
@@ -154,8 +153,8 @@ factory.prototype.request = function ( res, req, timer ) {
 	};
 
 	// Determining if the request is valid
-	fs.stat( root + parsed.pathname, function ( err, stats ) {
-		if ( err ) {
+	fs.stat( root + parsed.pathname, function ( e, stats ) {
+		if ( e ) {
 			self.error( res, req );
 		}
 		else {

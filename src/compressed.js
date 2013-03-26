@@ -16,7 +16,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 	timer           = timer || new Date();
 	var self        = this,
 	    compression = this.compression( req.headers["user-agent"], req.headers["accept-encoding"] ),
-	    raw;
+	    raw, body;
 
 	// Local asset, piping result directly to Client
 	if ( local ) {
@@ -38,6 +38,8 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 					raw.pipe( zlib[REGEX_DEF.test( compression ) ? "createDeflate" : "createGzip"]() ).pipe( res );
 				}
 
+				self.log( prep.call( self, res, req ) );
+
 				dtp.fire( "respond", function ( p ) {
 					return [req.headers.host, req.method, req.url, status, diff( timer )];
 				});
@@ -50,6 +52,8 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 
 			raw = fs.createReadStream( arg );
 			util.pump( raw, res );
+
+			self.log( prep.call( self, res, req ) );
 
 			dtp.fire( "respond", function ( p ) {
 				return [req.headers.host, req.method, req.url, status, diff( timer )];
@@ -73,30 +77,30 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 					raw = fs.createReadStream( npath );
 					raw.pipe( res );
 
+					self.log( prep.call( self, res, req ) );
+
 					dtp.fire( "respond", function ( p ) {
 						return [req.headers.host, req.method, req.url, status, diff( timer )];
 					});
 				}
 				// Compressing asset & writing to disk after responding
 				else {
-					zlib[compression]( arg, function ( err, compressed ) {
+					body = arg instanceof Array || arg instanceof Object ? $.encode ( arg ) : arg;
+
+					zlib[compression]( body, function ( e, compressed ) {
 						dtp.fire( "compressed", function ( p ) {
 							return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 						});
 
-						if ( err ) {
-							self.respond( res, req, err, codes.ERROR_APPLICATION, headers, timer, false );
+						if ( e ) {
+							self.respond( res, req, e, codes.ERROR_APPLICATION, headers, timer, false );
 						}
 						else {
-							self.respond( res, req, compressed, status, headers, timer, false );
-
-							dtp.fire( "respond", function ( p ) {
-								return [req.headers.host, req.method, req.url, status, diff( timer )];
-							});
+							self.respond( res, req, compressed, status, headers, timer, false, true );
 
 							fs.writeFile( npath, compressed, function ( e ) {
-								if ( err ) {
-									self.log( err, true, false );
+								if ( e ) {
+									self.log( e, true, false );
 								}
 								else {
 									dtp.fire( "compress", function ( p ) {
@@ -104,8 +108,6 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 									});
 								}
 							});
-
-							self.log( prep.call( self, res, req ) );
 						}
 					});
 				}
