@@ -2,8 +2,8 @@
  * Route handler
  * 
  * @method handler
- * @param  {Object}   res HTTP response Object
- * @param  {Object}   req HTTP request Object
+ * @param  {Object}   res HTTP(S) response Object
+ * @param  {Object}   req HTTP(S) request Object
  * @param  {Function} fn  Request handler
  * @return {Object}       Instance
  */

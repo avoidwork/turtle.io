@@ -83,14 +83,14 @@ factory.prototype.request = function ( res, req, timer ) {
 					}
 					else {
 						status = codes.NOT_ALLOWED;
-						self.respond( res, req, messages.NOT_ALLOWED, status, {"Allow": allow}, timer, false );
+						self.respond( res, req, messages.NOT_ALLOWED, status, {Allow: allow}, timer, false );
 					}
 					break;
 				case !exists:
-					self.respond( res, req, messages.NOT_FOUND, codes.NOT_FOUND, ( post ? {"Allow": "POST"} : {} ), timer, false );
+					self.respond( res, req, messages.NOT_FOUND, codes.NOT_FOUND, ( post ? {Allow: "POST"} : {} ), timer, false );
 					break;
 				case !allowed( method, req.url ):
-					self.respond( res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {"Allow": allow}, timer, false );
+					self.respond( res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {Allow: allow}, timer, false );
 					break;
 				default:
 					if ( !/\/$/.test( req.url ) ) {
@@ -122,7 +122,7 @@ factory.prototype.request = function ( res, req, timer ) {
 									size     = stat.size;
 									modified = stat.mtime.toUTCString();
 									etag     = "\"" + self.hash( req.url + "-" + stat.size + "-" + stat.mtime ) + "\"";
-									headers  = {"Allow" : allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified};
+									headers  = {Allow: allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified};
 
 									if ( req.method === "GET" ) {
 										switch ( true ) {
@@ -146,7 +146,7 @@ factory.prototype.request = function ( res, req, timer ) {
 							self.write( path, res, req, timer );
 							break;
 						default:
-							self.respond( res, req, ( del ? messages.CONFLICT : messages.ERROR_APPLICATION ), ( del ? codes.CONFLICT : codes.ERROR_APPLICATION ), {"Allow": allow}, timer, false );
+							self.respond( res, req, ( del ? messages.CONFLICT : messages.ERROR_APPLICATION ), ( del ? codes.CONFLICT : codes.ERROR_APPLICATION ), {Allow: allow}, timer, false );
 					}
 			}
 		});

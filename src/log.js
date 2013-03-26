@@ -10,9 +10,7 @@ factory.prototype.log = function ( msg ) {
 	    file = self.config.logs.file.replace("{{ext}}", new moment().format( this.config.logs.ext ) ),
 	    exit;
 
-	/**
-	 * Exist application when unrecoverable error occurs
-	 */
+	// Exist application when unrecoverable error occurs
 	exit = function () {
 		syslog.close();
 		toobusy.shutdown();
@@ -32,11 +30,18 @@ factory.prototype.log = function ( msg ) {
 	fs.appendFile( "/var/log/" + file, msg + "\n", function ( e ) {
 		if ( e ) {
 			fs.appendFile( __dirname + "/../" + file, msg + "\n", function ( e ) {
-				if ( e ) console.log( e );
-				if ( REGEX_HALT.test( msg ) ) exit();
+				if ( e ) {
+					console.log( e );
+				}
+
+				if ( REGEX_HALT.test( msg ) ) {
+					exit();
+				}
 			});
 		}
-		else if ( REGEX_HALT.test( msg ) ) exit();
+		else if ( REGEX_HALT.test( msg ) ) {
+			exit();
+		}
 	});
 
 	return this;

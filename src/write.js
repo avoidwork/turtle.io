@@ -16,7 +16,7 @@ factory.prototype.write = function ( path, res, req, timer ) {
 	    del   = allowed( "DELETE", req.url );
 
 	if ( !put && /\/$/.test( req.url ) ) {
-		self.respond( res, req, ( del ? messages.CONFLICT : messages.ERROR_APPLICATION ), ( del ? codes.CONFLICT : codes.ERROR_APPLICATION ), {"Allow" : allow}, timer );
+		self.respond( res, req, ( del ? messages.CONFLICT : messages.ERROR_APPLICATION ), ( del ? codes.CONFLICT : codes.ERROR_APPLICATION ), {Allow: allow}, timer, false );
 	}
 	else {
 		allow = allow.explode().remove( "POST" ).join(", ");
@@ -41,7 +41,7 @@ factory.prototype.write = function ( path, res, req, timer ) {
 									return [req.headers.host, req.url, req.method, path, diff( timer )];
 								});
 
-								self.respond( res, req, ( put ? messages.NO_CONTENT : messages.CREATED ), ( put ? codes.NO_CONTENT : codes.CREATED ), {"Allow" : allow, Etag: hash}, timer );
+								self.respond( res, req, ( put ? messages.NO_CONTENT : messages.CREATED ), ( put ? codes.NO_CONTENT : codes.CREATED ), {Allow: allow, Etag: hash}, timer );
 							}
 						});
 						break;

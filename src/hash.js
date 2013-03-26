@@ -10,7 +10,7 @@ factory.prototype.hash = function ( arg, encrypt, digest ) {
 	encrypt = encrypt || "md5";
 	digest  = digest  || "hex";
 
-	if ( arg === null || arg === undefined) {
+	if ( typeof arg !== "string" && !arg instanceof Buffer ) {
 		arg = "";
 	}
 
