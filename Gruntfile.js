@@ -25,6 +25,7 @@ module.exports = function (grunt) {
 					"src/codes.js",
 					"src/config.js",
 					"src/diff.js",
+					"src/encode.js",
 					"src/factory.js",
 					"src/cache.js",
 					"src/cached.js",

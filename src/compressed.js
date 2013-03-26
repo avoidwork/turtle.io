@@ -38,18 +38,23 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 				if ( ready ) {
 					raw = fs.createReadStream( npath );
 					raw.pipe( res );
+
+					dtp.fire( "respond", function ( p ) {
+						return [req.headers.host, req.method, req.url, status, diff( timer )];
+					});
 				}
 				else {
-					self.cache( etag, arg, compression );
-					raw = fs.createReadStream( arg );
-					raw.pipe( zlib[REGEX_DEF.test( compression ) ? "createDeflate" : "createGzip"]() ).pipe( res );
+					self.cache( etag, arg, compression, true, function () {
+						raw = fs.createReadStream( arg );
+						raw.pipe( zlib[REGEX_DEF.test( compression ) ? "createDeflate" : "createGzip"]() ).pipe( res );
+
+						dtp.fire( "respond", function ( p ) {
+							return [req.headers.host, req.method, req.url, status, diff( timer )];
+						});
+					});
 				}
 
 				self.log( prep.call( self, res, req ) );
-
-				dtp.fire( "respond", function ( p ) {
-					return [req.headers.host, req.method, req.url, status, diff( timer )];
-				});
 			});
 		}
 		else {
@@ -92,7 +97,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 				}
 				// Compressing asset & writing to disk after responding
 				else {
-					body = arg instanceof Array || ( !arg instanceof Buffer && arg instanceof Object ) ? $.encode ( arg ) : arg;
+					body = encode( arg );
 
 					zlib[compression]( body, function ( e, compressed ) {
 						dtp.fire( "compressed", function ( p ) {

@@ -14,10 +14,15 @@ var config = function ( args ) {
 	// Merging args into config
 	$.iterate( args, function ( value, key ) {
 		if ( value instanceof Object ) {
-			if ( config[key] === undefined ) config[key] = {};
+			if ( config[key] === undefined ) {
+				config[key] = {};
+			}
+
 			$.merge( config[key], value );
 		}
-		else config[key] = value;
+		else {
+			config[key] = value;
+		}
 	});
 
 	delete config.id;

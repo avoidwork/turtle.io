@@ -28,22 +28,12 @@ factory.prototype.respond = function ( res, req, output, status, headers, timer,
 	// Determining wether compression is supported
 	compress = compress && body && encoding !== null;
 
-	// Converting JSON or XML to a String
-	if ( body ) {
-		switch ( true ) {
-			case output instanceof Buffer:
-				// Do not want to coerce this Object to a String!
-				break;
-			case output instanceof Array:
-			case output instanceof Object:
-				headers["Content-Type"] = "application/json";
-				output = $.encode( output );
-				break;
-			/*case output instanceof Document:
-				headers["Content-Type"] = "application/xml";
-				output = $.xml.decode(output);
-				break;*/
-		}
+	// Stringifying Array or Object
+	output = encode( output );
+
+	// Decorating the proper header for a JSON response
+	if ( typeof output === "string" && $.regex.json_wrap.test( output ) ) {
+		headers["Content-Type"] = "application/json";
 	}
 
 	// Setting Etag if not present
