@@ -15,12 +15,29 @@ var handler = function ( res, req, fn ) {
 
 	// Setting up request handler
 	op = function () {
+		var payload;
+
 		try {
-			fn.call( self, res, req, timer );
+			// Setting listeners if expecting a body
+			if ( REGEX_BODY.test( req.method ) ) {
+				req.setEncoding( "utf-8" );
+
+				req.on( "data", function ( data ) {
+					payload = payload === undefined ? data : payload + data;
+				});
+
+				req.on( "end", function () {
+					req.body = payload;
+					fn.call( self, res, req, timer );
+				});
+			}
+			else {
+				fn.call( self, res, req, timer );
+			}
 		}
 		catch ( e ) {
+			self.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION, false );
 			self.log( e );
-			self.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION );
 		}
 
 		dtp.fire( "handler", function ( p ) {
@@ -35,7 +52,7 @@ var handler = function ( res, req, fn ) {
 
 	// Handling request or wrapping it with HTTP Authentication
 	switch ( true ) {
-		case this.config.auth === "undefined":
+		case this.config.auth === undefined:
 		case !this.config.auth.hasOwnProperty( host ):
 			op();
 			break;

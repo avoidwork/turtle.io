@@ -9,13 +9,12 @@
  */
 factory.prototype.compression = function ( agent, encoding ) {
 	var result    = null,
-	    encodings = typeof encoding === "string" ? encoding.explode( "," ) : [],
-	    nth       = encodings.length - 1;
+	    encodings = typeof encoding === "string" ? encoding.explode() : [];
 
 	if ( this.config.compress === true && !REGEX_IE.test( agent ) ) {
 		// Iterating supported encodings
-		encodings.each( function ( i, idx ) {
-			switch (true) {
+		encodings.each( function ( i ) {
+			switch ( true ) {
 				case REGEX_GZIP.test( i ):
 					result = "gzip";
 					break;
@@ -25,7 +24,9 @@ factory.prototype.compression = function ( agent, encoding ) {
 			}
 
 			// Found a supported encoding
-			if ( result !== null ) return false;
+			if ( result !== null ) {
+				return false;
+			}
 		});
 	}
 

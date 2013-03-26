@@ -8,6 +8,7 @@
  * @param  {Number}  status  Response status code
  * @param  {Object}  headers HTTP headers
  * @param  {Boolean} local   [Optional] Indicates arg is a file path, default is false
+ * @param  {Object}  timer   [Optional] Date instance
  * @return {Objet}           Instance
  */
 factory.prototype.compressed = function ( res, req, etag, arg, status, headers, local, timer ) {
@@ -84,12 +85,10 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 						});
 
 						if ( err ) {
-							self.error( res, req, timer );
+							self.respond( res, req, err, codes.ERROR_APPLICATION, headers, timer, false );
 						}
 						else {
-							self.headers( res, req, status, headers );
-							res.write( compressed );
-							res.end();
+							self.respond( res, req, compressed, status, headers, timer, false );
 
 							dtp.fire( "respond", function ( p ) {
 								return [req.headers.host, req.method, req.url, status, diff( timer )];

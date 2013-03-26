@@ -19,7 +19,7 @@ factory.prototype.proxy = function ( origin, route, host ) {
 	 * @param  {Object} xhr   XmlHttpRequest
 	 * @param  {Object} res   HTTP response Object
 	 * @param  {Object} req   HTTP request Object
-	 * @param  {Object} timer Date instance
+	 * @param  {Object} timer [Optional] Date instance
 	 * @return {Undefined}    undefined
 	 */
 	handle = function ( arg, xhr, res, req, timer ) {
@@ -53,9 +53,7 @@ factory.prototype.proxy = function ( origin, route, host ) {
 			// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
 			switch ( true ) {
 				case req.headers["if-none-match"] === etag:
-					self.respond( res, req, messages.NO_CONTENT, codes.NOT_MODIFIED, resHeaders, timer );
-					/*self.headers(res, req, codes.NOT_MODIFIED, resHeaders);
-					res.end();*/
+					self.respond( res, req, messages.NO_CONTENT, codes.NOT_MODIFIED, resHeaders, timer, false );
 					break;
 				default:
 					resHeaders["Transfer-Encoding"] = "chunked";
@@ -75,13 +73,17 @@ factory.prototype.proxy = function ( origin, route, host ) {
 							break;
 					}
 
-					// Ready to compress response
-					self.compressed( res, req, etag, arg, xhr.status, resHeaders, false, timer );
+					if (req.headers["accept-encoding"] !== undefined) {
+						self.compressed( res, req, etag, arg, xhr.status, resHeaders, false, timer );
+					}
+					else {
+						self.respond( res, req, arg, xhr.status, resHeaders, timer, false );
+					}
 			}
 		}
 		catch (e) {
+			self.respond( res, req, messages.NO_CONTENT, codes.ERROR_GATEWAY, {Allow: "GET"}, timer, false );
 			self.log( e, true );
-			self.respond( res, req, messages.NO_CONTENT, codes.ERROR_GATEWAY, {"Allow": "GET"}, timer );
 		}
 
 		dtp.fire( "proxy", function ( p ) {
@@ -115,22 +117,19 @@ factory.prototype.proxy = function ( origin, route, host ) {
 	/**
 	 * Wraps the proxy request
 	 * 
-	 * @param  {Object} res HTTP response Object
-	 * @param  {Object} req HTTP request Object
-	 * @return {Undefined}  undefined
+	 * @param  {Object} res   HTTP response Object
+	 * @param  {Object} req   HTTP request Object
+	 * @param  {Object} timer [Optional] Date instance
+	 * @return {Undefined}    undefined
 	 */
-	wrapper = function ( res, req ) {
-		var url    = origin + req.url.replace( new RegExp( "^" + route ), "" ),
-		    timer  = new Date(),
-		    method = req.method.toLowerCase(),
-		    fn, payload;
+	wrapper = function ( res, req, timer ) {
+		var url     = origin + req.url.replace( new RegExp( "^" + route ), "" ),
+		    method  = req.method.toLowerCase(),
+		    headerz = $.clone( req.headers ),
+		    fn;
 
-		if ( REGEX_DEL.test( method ) ) {
-			method = "del";
-		}
-		else if ( REGEX_HEAD.test( method ) ) {
-			method = "get";
-		}
+		// Removing support for compression so the response can be rewritten (if textual)
+		delete headerz["accept-encoding"];
 
 		// Facade to handle()
 		fn = function ( arg, xhr ) {
@@ -139,26 +138,30 @@ factory.prototype.proxy = function ( origin, route, host ) {
 
 		// Setting listeners if expecting a body
 		if ( REGEX_BODY.test( req.method ) ) {
-			req.setEncoding( "utf-8" );
-
-			req.on( "data", function ( data ) {
-				payload = payload === undefined ? data : payload + data;
-			});
-
-			req.on( "end", function () {
-				url[method]( fn, fn, payload, req.headers );
-			});
+			url[method]( fn, fn, req.body, headerz );
 		}
-		else url[method]( fn, fn );
+		else if ( REGEX_DEL.test( method ) ) {
+			url.del( fn, fn, headerz );
+		}
+		else if ( REGEX_HEAD.test( method ) ) {
+			if ( method === "head" ) {
+				method = "headers";
+			}
+
+			url[method]( fn, fn );
+		}
+		else {
+			url.get( fn, fn, headerz );
+		}
 	};
 
 	// Setting route
 	verbs.each( function ( i ) {
-		self[REGEX_DEL.test( i ) ? "delete" : i]( route, wrapper, host );
-		self[REGEX_DEL.test( i ) ? "delete" : i]( route + "/.*", wrapper, host );
+		self[i]( route, wrapper, host );
+		self[i]( route + "/.*", wrapper, host );
 
 		dtp.fire( "proxy-set", function ( p ) {
-			return [host || "*", REGEX_DEL.test( i ) ? "delete" : i, origin, route, diff( timer )];
+			return [host || "*", i, origin, route, diff( timer )];
 		});
 	});
 
