@@ -12,9 +12,8 @@
 factory.prototype.cache = function ( filename, obj, encoding, body, callback ) {
 	body      = ( body === true );
 	var self  = this,
-	    tmp   = this.config.tmp,
 	    ext   = REGEX_DEF.test(encoding) ? ".df" : ".gz",
-	    dest  = tmp + "/" + filename + ext,
+	    dest  = this.config.tmp + "/" + filename + ext,
 	    timer = new Date();
 
 	fs.exists(dest, function ( exists ) {
