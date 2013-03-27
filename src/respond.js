@@ -48,9 +48,6 @@ factory.prototype.respond = function ( res, req, output, status, headers, timer,
 		body   = false;
 	}
 
-	// Setting the response status code
-	res.statusCode = status;
-
 	// Compressing response to disk
 	if ( status !== 304 && compress ) {
 		self.compressed( res, req, headers.Etag.replace(/"/g, ""), output, status, headers, false, timer );
