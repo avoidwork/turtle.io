@@ -2,13 +2,25 @@
  * Starts instance
  * 
  * @method start
- * @param  {Object} args Parameters to set
- * @return {Object}      Instance
+ * @param  {Object}   args Parameters to set
+ * @param  {Function} fn   [Optional] Error handler
+ * @return {Object}        Instance
  */
-factory.prototype.start = function ( args ) {
+factory.prototype.start = function ( args, fn ) {
 	var self    = this,
 	    params  = {},
-	    headers = {};
+	    headers = {},
+	    error;
+
+	// Setting error handler
+	if (typeof fn === "function") {
+		error = fn;
+	}
+	else {
+		error = function ( res, req ) {
+			self.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION, {}, new Date(), false );
+		}
+	}
 
 	// Default headers
 	headers = {
@@ -39,7 +51,7 @@ factory.prototype.start = function ( args ) {
 
 	// Setting error route
 	$.route.set( "error", function ( res, req ) {
-		self.error( res, req );
+		error( res, req );
 	});
 
 	// Setting default response route
