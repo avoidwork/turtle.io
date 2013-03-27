@@ -18,11 +18,6 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 	    compression = this.compression( req.headers["user-agent"], req.headers["accept-encoding"] ),
 	    raw, body;
 
-	// Setting the response status code if not already set from `respond`
-	if ( isNaN ( res.statusCode ) ) {
-		res.statusCode = status;
-	}
-
 	// Local asset, piping result directly to Client
 	if ( local ) {
 		this.headers( res, req, status, headers );
@@ -66,8 +61,6 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 	// Custom or proxy route result
 	else {
 		if ( compression !== null ) {
-			this.headers( res, req, status, headers );
-
 			self.cached( etag, compression, function ( ready, npath ) {
 				res.setHeader( "Content-Encoding" , compression );
 
@@ -76,6 +69,8 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 					dtp.fire( "compressed", function ( p ) {
 						return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 					});
+
+					this.headers( res, req, status, headers );
 
 					raw = fs.createReadStream( npath );
 					raw.pipe( res );
