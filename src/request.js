@@ -46,7 +46,7 @@ factory.prototype.request = function ( res, req, timer ) {
 				host = this.config.default;
 			}
 			else {
-				return this.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION, timer, false );
+				throw Error( messages.ERROR_APPLICATION );
 			}
 		}
 	}
@@ -116,7 +116,7 @@ factory.prototype.request = function ( res, req, timer ) {
 								var size, modified, etag, raw, headers;
 
 								if ( e ) {
-									self.error( res, req, timer );
+									self.error( res, req, e );
 								}
 								else {
 									size     = stat.size;
@@ -155,7 +155,7 @@ factory.prototype.request = function ( res, req, timer ) {
 	// Determining if the request is valid
 	fs.stat( root + parsed.pathname, function ( e, stats ) {
 		if ( e ) {
-			self.error( res, req );
+			self.error( res, req, e );
 		}
 		else {
 			if ( !stats.isDirectory() ) {
@@ -176,7 +176,7 @@ factory.prototype.request = function ( res, req, timer ) {
 								handle( root + parsed.pathname + i, parsed.pathname + i, timer );
 							}
 							else if ( !exists && ++count === nth ) {
-								self.error( res, req, timer );
+								self.error( res, req, messages.NOT_FOUND );
 							}
 						});
 					});

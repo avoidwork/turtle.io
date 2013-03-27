@@ -7,15 +7,13 @@
  * @param  {Object} timer Date instance
  * @return {Object}       Instance
  */
-factory.prototype.error = function ( res, req, timer ) {
-	var host = req.headers.host.replace( /:.*/, "" ),
-	    get  = REGEX_GET.test( req.method ),
-	    msg  = messages[get ? "NOT_FOUND" : "NOT_ALLOWED"],
-	    code = codes[get ? "NOT_FOUND" : "NOT_ALLOWED"];
+factory.prototype.error = function ( res, req, e, timer ) {
+	e     = e.message || e;
+	timer = timer     || new Date();
 
-	this.respond( res, req, msg, code, {Allow: allows( req.url, host )}, timer );
+	$.route.load( "error", res, req );
 
 	dtp.fire( "error", function ( p ) {
-		return [req.headers.host, req.url, code, msg, diff( timer )];
+		return [req.headers.host, req.url, codes.ERROR_APPLICATION, e || messages.ERROR_APPLICATION, diff( timer )];
 	});
 };

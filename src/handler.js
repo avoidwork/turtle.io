@@ -36,8 +36,7 @@ var handler = function ( res, req, fn ) {
 			}
 		}
 		catch ( e ) {
-			self.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION, false );
-			self.log( e );
+			self.error( res, req, e, timer );
 		}
 
 		dtp.fire( "handler", function ( p ) {
