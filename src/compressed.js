@@ -91,7 +91,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 						});
 
 						if ( e ) {
-							self.respond( res, req, e, codes.ERROR_APPLICATION, headers, timer, false );
+							self.error( res, req, e, timer );
 						}
 						else {
 							self.respond( res, req, compressed, status, headers, timer, false );

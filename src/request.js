@@ -101,7 +101,7 @@ factory.prototype.request = function ( res, req, timer ) {
 						case "delete":
 							fs.unlink( path, function ( e ) {
 								if ( e ) {
-									self.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION, {}, timer, false );
+									self.error( req, req, e, timer );
 								}
 								else {
 									self.respond( res, req, messages.NO_CONTENT, codes.NO_CONTENT, {}, timer, false );
@@ -146,7 +146,7 @@ factory.prototype.request = function ( res, req, timer ) {
 							self.write( path, res, req, timer );
 							break;
 						default:
-							self.respond( res, req, ( del ? messages.CONFLICT : messages.ERROR_APPLICATION ), ( del ? codes.CONFLICT : codes.ERROR_APPLICATION ), {Allow: allow}, timer, false );
+							self.error( req, req, e, timer );
 					}
 			}
 		});
