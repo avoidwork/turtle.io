@@ -25,7 +25,7 @@ factory.prototype.write = function ( path, res, req, timer ) {
 			var hash = "\"" + self.hash( data ) + "\"";
 
 			if ( e ) {
-				self.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION, {}, timer );
+				self.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION, {}, timer, false );
 				self.log( e );
 			}
 			else {
@@ -34,22 +34,22 @@ factory.prototype.write = function ( path, res, req, timer ) {
 					case req.headers.etag === hash:
 						fs.writeFile( path, body, function ( e ) {
 							if ( e ) {
-								self.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION, {}, timer );
+								self.error( req, req, e, timer );
 							}
 							else {
 								dtp.fire( "write", function ( p ) {
 									return [req.headers.host, req.url, req.method, path, diff( timer )];
 								});
 
-								self.respond( res, req, ( put ? messages.NO_CONTENT : messages.CREATED ), ( put ? codes.NO_CONTENT : codes.CREATED ), {Allow: allow, Etag: hash}, timer );
+								self.respond( res, req, ( put ? messages.NO_CONTENT : messages.CREATED ), ( put ? codes.NO_CONTENT : codes.CREATED ), {Allow: allow, Etag: hash}, timer, false );
 							}
 						});
 						break;
 					case req.headers.etag !== hash:
-						self.respond( res, req, messages.NO_CONTENT, codes.FAILED );
+						self.respond( res, req, messages.NO_CONTENT, codes.FAILED, {}, timer, false );
 						break;
 					default:
-						self.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION );
+						self.error( req, req, e, timer );
 				}
 			}
 		});

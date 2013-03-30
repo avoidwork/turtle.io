@@ -23,9 +23,6 @@ factory.prototype.log = function ( msg ) {
 	// Dispatching to syslog server
 	syslog.log( syslog[!err ? "LOG_INFO" : "LOG_ERR"], msg );
 
-	// Dispatching to STDOUT
-	console.log( msg );
-
 	// Writing to log file
 	fs.appendFile( "/var/log/" + file, msg + "\n", function ( e ) {
 		if ( e ) {
@@ -43,6 +40,9 @@ factory.prototype.log = function ( msg ) {
 			exit();
 		}
 	});
+
+	// Dispatching to STDOUT
+	console.log( msg );
 
 	return this;
 };
