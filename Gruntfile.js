@@ -19,7 +19,6 @@ module.exports = function (grunt) {
 				src : [
 					"<banner>",
 					"src/intro.js",
-					"src/probes.js",
 					"src/allowed.js",
 					"src/allows.js",
 					"src/codes.js",
@@ -50,6 +49,7 @@ module.exports = function (grunt) {
 					"src/handler.js",
 					"src/messages.js",
 					"src/prep.js",
+					"src/probes.js",
 					"src/outro.js"
 				],
 				dest : "lib/<%= pkg.name %>.js"

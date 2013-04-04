@@ -2,6 +2,8 @@
 	"auth"    : {},
 	"compress": true,
 	"default" : null,
+	"probes"  : true,
+	"maxConnections" : 25,
 	"headers" : {
 		"Access-Control-Allow-Origin" : "*",
 		"Access-Control-Allow-Headers": "*",
@@ -13,7 +15,7 @@
 		"Last-Modified"               : ""
 	},
 	"index"   : ["index.htm", "index.html"],
-	"lag"     : 100,
+	"lag"     : 50,
 	"logs"    : {
 		"ext"    : "YYYYMMDD",
 		"file"   : "turtleio_{{ext}}.log",
