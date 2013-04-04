@@ -25,6 +25,4 @@ var probes = function () {
 
 	// Enabling probes
 	dtp.enable();
-
-	dtp.disable();
 };
