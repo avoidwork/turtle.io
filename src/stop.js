@@ -8,6 +8,7 @@ factory.prototype.stop = function () {
 	if ( this.server !== null ) {
 		try {
 			this.server.close();
+			dtp.disable();
 		}
 		catch (e) {
 			void 0;

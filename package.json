@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Easy to use web server with virtual hosts & RESTful proxies",
-  "version": "0.6.17",
+  "version": "0.6.18",
   "homepage": "http://turtle.io",
   "author": {
     "name": "Jason Mulligan",
@@ -22,25 +22,25 @@
   ],
   "main": "lib/turtle.io",
   "engines": {
-    "node": ">= 0.8.0"
+    "node": ">=0.8.0"
   },
   "scripts": {
     "test": "grunt test"
   },
   "dependencies": {
-    "abaaso": ">= 3.5.30",
-    "mime": ">= 1.2.7",
-    "moment": ">= 1.7.0",
-    "http-auth" : ">= 1.2.2",
-    "node-syslog" : ">= 1.1.6",
-    "toobusy" : ">= 0.2.1",
-    "dtrace-provider" : ">= 0.2.8"
+    "abaaso": "~3.6.3",
+    "mime": ">=1.2.7",
+    "moment": ">=1.7.0",
+    "http-auth" : ">=1.2.2",
+    "node-syslog" : ">=1.1.6",
+    "toobusy" : ">=0.2.1",
+    "dtrace-provider" : ">=0.2.8"
   },
   "devDependencies": {
     "grunt" : "~0.4.0",
-    "grunt-cli" : "~ 0.1.6",
-    "grunt-contrib-concat"   : "~ 0.1.3",
-    "grunt-contrib-nodeunit" : "~ 0.1.2"
+    "grunt-cli" : "~0.1.6",
+    "grunt-contrib-concat"   : "~0.1.3",
+    "grunt-contrib-nodeunit" : "~0.1.2"
   },
   "keywords": ["web server", "http", "https", "web", "server", "virtual", "virtual hosts", "proxy", "api", "cache", "application"]
 }

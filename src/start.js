@@ -39,7 +39,8 @@ factory.prototype.start = function ( args, fn ) {
 	});
 
 	// Preparing parameters
-	params.port = this.config.port;
+	params.port           = this.config.port;
+	params.maxConnections = this.config.maxConnections;
 
 	if ( this.config.csr !== undefined ) {
 		params.csr = this.config.csr;
@@ -47,6 +48,11 @@ factory.prototype.start = function ( args, fn ) {
 
 	if ( this.config.key !== undefined ) {
 		params.csr = this.config.key;
+	}
+
+	// Registering dtrace probes
+	if (this.config.probes) {
+		probes();
 	}
 
 	// Setting error route
