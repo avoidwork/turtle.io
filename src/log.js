@@ -5,9 +5,8 @@
  * @return {Object}    Instance
  */
 factory.prototype.log = function ( msg ) {
-	var self = this,
-	    err  = msg.callstack !== undefined,
-	    file = self.config.logs.file.replace("{{ext}}", new moment().format( this.config.logs.ext ) ),
+	var err  = msg.callstack !== undefined,
+	    file = this.config.logs.file.replace("{{ext}}", new moment().format( this.config.logs.ext ) ),
 	    exit;
 
 	// Exist application when unrecoverable error occurs
@@ -43,7 +42,7 @@ factory.prototype.log = function ( msg ) {
 	});
 
 	// Dispatching to STDOUT
-	if ( self.config.logs.stdout ) {
+	if ( this.config.logs.stdout ) {
 		console.log( msg );
 	}
 
