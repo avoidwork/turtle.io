@@ -25,7 +25,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 		if (compression !== null) {
 			res.setHeader( "Content-Encoding", compression );
 
-			self.cached( etag, compression, function ( ready, npath ) {
+			this.cached( etag, compression, function ( ready, npath ) {
 				dtp.fire( "compressed", function ( p ) {
 					return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 				});
@@ -61,7 +61,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 	// Custom or proxy route result
 	else {
 		if ( compression !== null ) {
-			self.cached( etag, compression, function ( ready, npath ) {
+			this.cached( etag, compression, function ( ready, npath ) {
 				res.setHeader( "Content-Encoding" , compression );
 
 				// Responding with cached asset
@@ -70,7 +70,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 						return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 					});
 
-					this.headers( res, req, status, headers );
+					self.headers( res, req, status, headers );
 
 					raw = fs.createReadStream( npath );
 					raw.pipe( res );
