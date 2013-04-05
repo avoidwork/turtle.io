@@ -28,7 +28,8 @@ factory.prototype.log = function ( msg ) {
 		if ( e ) {
 			fs.appendFile( __dirname + "/../" + file, msg + "\n", function ( e ) {
 				if ( e ) {
-					console.log( e );
+					// Couldn't write to the log, no need to spam the terminal
+					void 0;
 				}
 
 				if ( REGEX_HALT.test( msg ) ) {
@@ -42,7 +43,9 @@ factory.prototype.log = function ( msg ) {
 	});
 
 	// Dispatching to STDOUT
-	console.log( msg );
+	if ( self.config.logs.stdout ) {
+		console.log( msg );
+	}
 
 	return this;
 };
