@@ -8,7 +8,7 @@
 var prep = function ( res, req ) {
 	var msg    = this.config.logs.format,
 	    time   = this.config.logs.time,
-	    parsed = url.parse( req.url ),
+	    parsed = $.parse( this.url( req ) ),
 	    header = req.headers["authorization"] || "",
 	    token  = header.split( /\s+/ ).pop()  || "",
 	    auth   = new Buffer( token, "base64" ).toString(),
@@ -19,7 +19,7 @@ var prep = function ( res, req ) {
 	         .replace( "{{time}}",       new moment().format( time ) )
 	         .replace( "{{ip}}",         req.connection.remoteAddress )
 	         .replace( "{{method}}",     req.method )
-	         .replace( "{{path}}",       parsed.pathname )
+	         .replace( "{{path}}",       parsed.path )
 	         .replace( "{{status}}",     res.statusCode )
 	         .replace( "{{length}}",     res.getHeader( "Content-Length" ) || "-")
 	         .replace( "{{referer}}",    refer )

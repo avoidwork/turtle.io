@@ -11,7 +11,7 @@
 factory.prototype.request = function ( res, req, timer ) {
 	var self    = this,
 	    host    = req.headers.host.replace( /:.*/, "" ),
-	    parsed  = url.parse( req.url, true ),
+	    parsed  = $.parse( this.url( req ) ),
 	    method  = REGEX_GET.test( req.method ) ? "get" : req.method.toLowerCase(),
 	    path    = [],
 	    handled = false,
