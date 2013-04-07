@@ -17,8 +17,24 @@ factory.prototype.start = function ( args, fn ) {
 		error = fn;
 	}
 	else {
-		error = function ( res, req ) {
-			self.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION, {}, new Date(), false );
+		error = function ( res, req, timer ) {
+			var body   = messages.NOT_FOUND,
+			    status = codes.NOT_FOUND,
+			    method = req.method.toLowerCase(),
+			    host   = req.headers.host.replace( /:.*/, "" );
+
+			if ( !REGEX_GET.test( method ) ) {
+				if ( allowed( req.method, req.url, host ) ) {
+					body   = messages.ERROR_APPLICATION;
+					status = codes.ERROR_APPLICATION;
+				}
+				else {
+					body   = messages.NOT_ALLOWED;
+					status = codes.NOT_ALLOWED;
+				}
+			}
+
+			self.respond( res, req, body, status, {"Cache-Control": "no-cache"}, timer, false );
 		}
 	}
 
@@ -56,9 +72,27 @@ factory.prototype.start = function ( args, fn ) {
 	}
 
 	// Setting error route
-	$.route.set( "error", function ( res, req ) {
-		error( res, req );
+	$.route.set( "error", function ( res, req, timer ) {
+		error( res, req, timer );
 	});
+
+	// Setting optional queue status route
+	if ( this.config.queue.status ) {
+		this.get( "/queue", function ( res, req, timer ) {
+			this.respond( res, req, {next: "/queue/:item", items: $.array.cast( this.requestQueue.registry, true )}, 200, {"Cache-Control": "no-cache"}, timer, false );
+		});
+
+		this.get( "/queue/.*", function ( res, req, timer ) {
+			var uuid = req.url.replace(/.*\/queue\/?/, "");
+
+			if ( uuid.indexOf( "/" ) > -1 ) {
+				self.error( res, req, timer );
+			}
+			else {
+				self.queueStatus( res, req, uuid, timer );
+			}
+		});
+	}
 
 	// Setting default response route
 	this.get( "/.*", this.request );
@@ -78,6 +112,9 @@ factory.prototype.start = function ( args, fn ) {
 			return [self.server.connections];
 		});
 	});
+
+	// Starting queue processor
+	this.mode( true );
 
 	// Announcing state
 	this.log( "Started turtle.io on port " + this.config.port );

@@ -35,7 +35,10 @@ module.exports = function (grunt) {
 					"src/hash.js",
 					"src/headers.js",
 					"src/log.js",
+					"src/mode.js",
 					"src/proxy.js",
+					"src/queue.js",
+					"src/queueStatus.js",
 					"src/redirect.js",
 					"src/request.js",
 					"src/respond.js",
@@ -50,6 +53,7 @@ module.exports = function (grunt) {
 					"src/messages.js",
 					"src/prep.js",
 					"src/probes.js",
+					"src/url.js",
 					"src/outro.js"
 				],
 				dest : "lib/<%= pkg.name %>.js"

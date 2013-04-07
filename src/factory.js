@@ -8,11 +8,18 @@
 var factory = function ( args ) {
 	var self = this;
 
-	this.active  = false;
-	this.id      = "";
-	this.config  = {};
-	this.server  = null;
-	this.version = "{{VERSION}}";
+	this.active       = false;
+	this.id           = "";
+	this.config       = {};
+	this.requestQueue = {
+		flushing : false,
+		items    : [],
+		last     : null,
+		times    : [],
+		registry : {}
+	};
+	this.server       = null;
+	this.version      = "{{VERSION}}";
 
 	// Loading config
 	config.call( this, args );

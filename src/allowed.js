@@ -16,9 +16,11 @@ var allowed = function ( method, uri, host ) {
 		if ( RegExp( "^" + route + "$" ).test( uri ) ) return !( result = true );
 	});
 
-	if ( !result ) $.route.list( "all", host ).each( function ( route ) {
-		if ( RegExp( "^" + route + "$" ).test( uri ) ) return !( result = true );
-	});
+	if ( !result ) {
+		$.route.list( "all", host ).each( function ( route ) {
+			if ( RegExp( "^" + route + "$" ).test( uri ) ) return !( result = true );
+		});
+	}
 
 	if ( !result && host !== "all" ) {
 		$.route.list( method, "all" ).each( function ( route ) {
