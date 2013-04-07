@@ -23,6 +23,11 @@
 		"format" : "{{ip}} - {{user}} [{{time}}] \"{{method}} {{path}} HTTP/1.1\" {{status}} {{length}} {{referer}} \"{{user-agent}}\"",
 		"stdout" : true
 	},
+	"queue"   : {
+		"status" : true,
+		"size"   : 200,
+		"time"   : 1000
+	},
 	"port"    : 8000,
 	"root"    : "",
 	"tmp"     : "/tmp",

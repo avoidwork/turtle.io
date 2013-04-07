@@ -15,6 +15,8 @@ factory.prototype.stop = function () {
 
 		this.active = false;
 		this.server = null;
+
+		this.mode( false );
 		this.unset( "*" );
 	}
 

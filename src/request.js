@@ -3,8 +3,8 @@
  * 
  * Default route is for GET only
  * 
- * @param  {Object} req   HTTP(S) request Object
  * @param  {Object} res   HTTP(S) response Object
+ * @param  {Object} req   HTTP(S) request Object
  * @param  {Object} timer Date instance
  * @return {Object}       Instance
  */
@@ -66,10 +66,10 @@ factory.prototype.request = function ( res, req, timer ) {
 		var allow, del, post, mimetype, status;
 
 		allow   = allows( req.url, host );
-		del     = allowed( "DELETE", req.url );
-		post    = allowed( "POST", req.url );
+		del     = allowed( "DELETE", req.url, host );
+		post    = allowed( "POST", req.url, host );
 		handled = true;
-		url     = parsed.protocol + "//" + req.headers.host.replace( /:.*/, "" ) + ":" + port + url;
+		url     = parsed.href;
 
 		dtp.fire( "request", function ( p ) {
 			return [url, allow, diff( timer )];
@@ -78,7 +78,7 @@ factory.prototype.request = function ( res, req, timer ) {
 		fs.exists( path, function ( exists ) {
 			switch ( true ) {
 				case !exists && method === "post":
-					if ( allowed( req.method, req.url ) ) {
+					if ( allowed( req.method, req.url, host ) ) {
 						self.write( path, res, req, timer );
 					}
 					else {
@@ -89,7 +89,7 @@ factory.prototype.request = function ( res, req, timer ) {
 				case !exists:
 					self.respond( res, req, messages.NOT_FOUND, codes.NOT_FOUND, ( post ? {Allow: "POST"} : {} ), timer, false );
 					break;
-				case !allowed( method, req.url ):
+				case !allowed( method, req.url, host ):
 					self.respond( res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {Allow: allow}, timer, false );
 					break;
 				default:

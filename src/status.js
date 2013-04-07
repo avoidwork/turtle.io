@@ -10,6 +10,7 @@ factory.prototype.status = function () {
 	    state  = {
 	    	config  : {},
 	    	process : {},
+	    	queue   : {},
 	    	server  : {}
 	    };
 
@@ -19,13 +20,24 @@ factory.prototype.status = function () {
 	});
 
 	// Process information
-	state.process.memory = ram;
-	state.process.pid    = process.pid;
+	state.process = {
+		memory : ram,
+		pid    : process.pid
+	};
+
+	// Queue
+	state.queue = {
+		average : Math.ceil( this.requestQueue.times.mean() || 0 ),
+		last    : this.requestQueue.last,
+		total   : this.requestQueue.items.length
+	};
 
 	// Server information
-	state.server.address     = this.server.address();
-	state.server.connections = typeof this.server.getConnections === "function" ? this.server.getConnections() : this.server.connections;
-	state.server.uptime      = uptime;
+	state.server = {
+		address     : this.server.address(),
+		connections : typeof this.server.getConnections === "function" ? this.server.getConnections() : this.server.connections,
+		uptime      : uptime
+	};
 
 	dtp.fire( "status", function ( p ) {
 		return [state.server.connections, uptime, ram.heapUsed, ram.heapTotal];

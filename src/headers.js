@@ -37,7 +37,7 @@ factory.prototype.headers = function ( res, req, status, responseHeaders ) {
 	}
 
 	switch ( true ) {
-		case status >= codes.FORBIDDEN && status < codes.NOT_FOUND:
+		case status >= codes.FORBIDDEN && status <= codes.NOT_FOUND:
 		case status >= codes.ERROR_APPLICATION:
 			delete headers.Allow;
 			delete headers["Access-Control-Allow-Methods"];
