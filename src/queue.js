@@ -11,7 +11,7 @@
  * @return {Object}            Instance
  */
 factory.prototype.queue = function ( res, req, callback, id, headers, timer ) {
-	var uuid   = id   || $.uuid( true ),
+	var uuid   = id || $.uuid( true ),
 	    parsed = $.parse( this.url( req ) ),
 	    body;
 
