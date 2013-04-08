@@ -5,6 +5,7 @@
  * @return {Object} Instance
  */
 factory.prototype.stop = function () {
+	// Shutting down the server
 	if ( this.server !== null ) {
 		try {
 			this.server.close();
@@ -19,6 +20,9 @@ factory.prototype.stop = function () {
 		this.mode( false );
 		this.unset( "*" );
 	}
+
+	// Removing hooks to process
+	process.removeAllListeners("on");
 
 	this.log( "Stopped turtle.io on port " + this.config.port );
 

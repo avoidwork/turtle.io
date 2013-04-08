@@ -116,6 +116,12 @@ factory.prototype.start = function ( args, fn ) {
 	// Starting queue processor
 	this.mode( true );
 
+	// This is only meant to capture Errors emitted from node.js,
+	// such as a Stream Error in stream.js, which allows toobusy to do it's job
+	process.on("uncaughtException", function ( e ) {
+		self.log( e );
+	});
+
 	// Announcing state
 	this.log( "Started turtle.io on port " + this.config.port );
 
