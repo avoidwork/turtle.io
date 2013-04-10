@@ -21,7 +21,7 @@ config = {
 	}
 }
 
-if (cluster.isMaster) {
+if (cpus > 1 && cluster.isMaster) {
 	while (++i <= cpus) {
 		cluster.fork();
 	}
