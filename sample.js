@@ -1,6 +1,10 @@
-var turtle = require("./lib/turtle.io"),
-    server = new turtle(),
-    config;
+"use strict";
+
+var cluster = require("cluster"),
+    turtle  = require("./lib/turtle.io"),
+    cpus    = require("os").cpus().length,
+    i       = 0,
+    config, server;
 
 config = {
 	auth : {
@@ -17,8 +21,17 @@ config = {
 	}
 }
 
-server.get("/status", function (res, req, timer) {
-	server.respond(res, req, server.status(), 200, undefined, timer);
-}, "localhost");
+if (cpus > 1 && cluster.isMaster) {
+	while (++i <= cpus) {
+		cluster.fork();
+	}
+}
+else {
+	server = new turtle();
 
-server.start(config);
+	server.get("/status", function (res, req, timer) {
+		server.respond(res, req, server.status(), 200, undefined, timer);
+	}, "localhost");
+
+	server.start(config);
+}

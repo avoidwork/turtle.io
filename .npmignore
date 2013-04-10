@@ -1,5 +1,8 @@
 /node_modules/
+/src/
+/test/
 .travis.yml
 .git
 .gitignore
 turtleio*.log
+Gruntfile.js

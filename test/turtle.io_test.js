@@ -1,5 +1,5 @@
 var turtle = require("../lib/turtle.io"),
-    server = new turtle();
+    server = new turtle({logs:{stdout: false}});
 
 exports["methods"] = {
 	setUp: function (done) {
@@ -22,17 +22,6 @@ exports["start"] = {
 	tests: function (test) {
 		test.expect(1);
 		test.equal(server.start(), server, "Should be instance of turtle.io");
-		test.done();
-	}
-};
-
-exports["status"] = {
-	setUp: function (done) {
-		done();
-	},
-	tests: function (test) {
-		test.expect(1);
-		test.equal(server.status() instanceof Object, true, "Should be instance of Object");
 		test.done();
 	}
 };
