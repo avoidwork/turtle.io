@@ -19,17 +19,30 @@ factory.prototype.headers = function ( res, req, status, responseHeaders ) {
 	// Decorating response headers
 	$.merge( headers, responseHeaders );
 
-	// Setting headers
-	headers["Date"]                         = new Date().toUTCString();
-	headers["Access-Control-Allow-Methods"] = headers.Allow;
+	// Fixing `Allow` header
+	if ( !REGEX_HEAD2.test( headers.Allow ) ) {
+		headers.Allow = headers.Allow.toUpperCase()
+		                             .split( /,|\s+/ )
+		                             .filter( function ( i ) {
+		                             	return ( !i.isEmpty() && i !== "HEAD" && i !== "OPTIONS" );
+		                              })
+		                             .join( ", " )
+		                             .replace( "GET", "GET, HEAD, OPTIONS" );
+	}
 
-	// Setting the response status code
-	res.statusCode = status;
+	headers["Date"] = new Date().toUTCString();
+
+	if ( headers["Access-Control-Allow-Methods"].isEmpty() ) {
+		headers["Access-Control-Allow-Methods"] = headers.Allow;
+	}
 
 	// Decorating "Last-Modified" header
 	if ( headers["Last-Modified"].isEmpty() ) {
 		headers["Last-Modified"] = headers["Date"];
 	}
+
+	// Setting the response status code
+	res.statusCode = status;
 
 	// Removing headers not wanted in the response
 	if ( !get || status >= codes.INVALID_ARGUMENTS ) {
