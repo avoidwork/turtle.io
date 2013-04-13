@@ -18,7 +18,7 @@
 	"lag"     : 50,
 	"logs"    : {
 		"ext"    : "YYYYMMDD",
-		"file"   : "turtleio_{{ext}}.log",
+		"file"   : "turtleio.log",
 		"time"   : "D/MMM/YYYY:HH:mm:ss ZZ",
 		"format" : "{{host}} - {{user}} [{{time}}] \"{{method}} {{path}} HTTP/1.1\" {{status}} {{length}} {{referer}} \"{{user-agent}}\"",
 		"stdout" : true
