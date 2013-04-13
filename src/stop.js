@@ -24,7 +24,7 @@ factory.prototype.stop = function () {
 	// Removing hooks to process
 	process.removeAllListeners("on");
 
-	this.log( "Stopped turtle.io on port " + this.config.port );
+	console.log( "Stopped turtle.io on port " + this.config.port );
 
 	return this;
 };

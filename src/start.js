@@ -123,7 +123,7 @@ factory.prototype.start = function ( args, fn ) {
 	});
 
 	// Announcing state
-	this.log( "Started turtle.io on port " + this.config.port );
+	console.log( "Started turtle.io on port " + this.config.port );
 
 	return this;
 };
