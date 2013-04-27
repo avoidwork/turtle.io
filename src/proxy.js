@@ -127,11 +127,8 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 		var url     = origin + req.url.replace( new RegExp( "^" + route ), "" ),
 		    method  = req.method.toLowerCase(),
 		    headerz = $.clone( req.headers ),
-		    parsed  = $.parse( origin + req.url ),
+		    parsed  = $.parse( url ),
 		    fn, options, proxyReq;
-
-		// Removing support for compression so the response can be rewritten (if textual)
-		delete headerz["accept-encoding"];
 
 		// Facade to handle()
 		fn = function ( arg, xhr ) {
@@ -140,21 +137,24 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 
 		// Streaming response to Client
 		if ( stream ) {
-			headerz.host = parsed.hostname;
+			headerz.host = req.headers.host;
 
 			options = {
 				headers  : headerz,
 				hostname : parsed.hostname,
 				method   : req.method,
 				path     : parsed.path,
-				port     : parsed.port
+				port     : parsed.port || 80
 			};
 
 			if ( !parsed.auth.isEmpty() ) {
 				options.auth = parsed.auth;
 			}
 
-			proxyReq = http.request( options ).pipe( res );
+			proxyReq = http.request( options, function ( proxyRes ) {
+				res.writeHeader(proxyRes.statusCode, proxyRes.headers);
+				proxyRes.pipe( res );
+			});
 
 			if ( REGEX_BODY.test( req.method ) ) {
 				proxyReq.write( req.body );
@@ -168,6 +168,9 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 		}
 		// Acting as a RESTful proxy
 		else {
+			// Removing support for compression so the response can be rewritten (if textual)
+			delete headerz["accept-encoding"];
+
 			if ( REGEX_BODY.test( req.method ) ) {
 				url[method]( fn, fn, req.body, headerz );
 			}
