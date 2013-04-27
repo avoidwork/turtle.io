@@ -33,6 +33,7 @@
     "moment": "~2.0.0",
     "http-auth" : "~1.2.7",
     "node-syslog" : "~1.1.7",
+    "request" : "~2.20.0",
     "toobusy" : "~0.2.3",
     "dtrace-provider" : ">=0.2.8"
   },
