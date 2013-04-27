@@ -1,18 +1,18 @@
 {
   "name": "turtle.io",
   "description": "turtle.io website",
-  "version": "0.1.1",
-  "homepage": "https://github.com/avoidwork/turtle.io.website",
+  "version": "0.1.2",
+  "homepage": "https://github.com/avoidwork/turtle.io",
   "author": {
     "name": "Jason Mulligan",
     "email": "jason.mulligan@avoidwork.com"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/avoidwork/turtle.io.website.git"
+    "url": "git://github.com/avoidwork/turtle.io.git"
   },
   "bugs": {
-    "url": "https://github.com/avoidwork/turtle.io.website/issues"
+    "url": "https://github.com/avoidwork/turtle.io/issues"
   },
   "licenses": [
     {
