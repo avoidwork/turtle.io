@@ -1,0 +1,172 @@
+$zeros: 0 0 0 0;
+$ten: 10px;
+$lightestgrey: #f2f2f2;
+$lightgrey: #7e7e7e;
+$darkgrey: #282828;
+$white: #fff;
+
+html,
+body {
+	padding: $zeros;
+	margin: $zeros;
+	min-height: 100%;
+}
+
+body {
+	background-color: #fff;
+	font-size: 12pt;
+	font-family: "Oxygen", arial, helvetica, sans-serif;
+	color: #000;	
+}
+
+h2,
+h3,
+h4 {
+	margin: $zeros;
+	padding: $zeros;
+}
+
+header {
+	height: $ten * 10;
+	overflow: hidden;
+
+	h1 {
+		font-weight: normal;
+		font-size: 36pt;
+		margin: $zeros;
+		padding: $zeros;
+		padding-top: $ten * 4;
+	}
+}
+
+h2 {
+	font-size: 20pt;
+}
+
+h3 {
+	font-size: 14pt;
+}
+
+h2,
+h3 {
+	margin-bottom: $ten * 2;
+}
+
+ol {
+	li {
+		margin: 5px;
+	}
+}
+
+article,
+footer,
+.gist {
+	margin-bottom: 50pt;
+}
+
+section:last-child {
+	margin: $zeros;
+}
+
+a {
+	color: #6d6d6d;
+}
+
+a img {
+	border: none;
+}
+
+p,
+ol {
+	margin: $zeros;
+	padding: 0 0 $ten 0;
+}
+
+ol {
+	margin-left: $ten * 2;
+}
+
+#rate,
+#tip {
+	text-align: center;
+}
+
+#intro {
+	min-height: $ten * 35;
+	background-color: $lightgrey;
+	color: $darkgrey;
+	text-align: right;
+
+	h2 {
+		padding-top: $ten * 23;
+		font-size: 24pt;
+	}
+}
+
+#rate,
+#tip {
+	height: $ten * 20;
+
+	> * {
+		padding-top: $ten * 8.3;
+	}
+}
+
+#rate {
+	background-color: $darkgrey;
+	color: $white;
+}
+
+#start,
+#documentation,
+#examples {
+	background-color: $lightestgrey;
+	overflow: hidden;
+	padding-bottom: $ten * 5;
+
+	h2 {
+		padding-top: $ten;
+	}
+}
+
+.code {
+	border: 1px solid #dedede;
+	padding: 2px;
+	font-size: 10pt;
+	background: #f8f8ff;
+}
+
+.container {
+	width: $ten * 96;
+	margin: 0 auto 0 auto;
+	transition: width .2s ease-in-out;
+}
+
+.gist {
+	font-size: 10pt;
+}
+
+.github {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 100;
+}
+
+@media screen and (min-width: 900px) and (max-width: 960px) {
+	.container {
+		width: $ten * 89 !important;
+	}
+}
+
+@media screen and (min-width: 600px) and (max-width: 900px) {
+	.container {
+		width: $ten * 59 !important;
+	}
+}
+
+@media screen and (min-width: 1px) and (max-width: 600px) {
+	.container {
+		width: $ten * 40 !important;
+	}
+}

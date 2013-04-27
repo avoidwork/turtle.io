@@ -1,66 +1,100 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Turtle.io by avoidwork</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>turtle.io</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="keywords" content="node.js web server,node web server,node webserver,web,server,webserver,node.js,node,nodejs,abaaso,turtle,turtle.io,turtleio,rest,api,proxy" />
+<meta name="description" content="asynchronous application / web server for node.js with virtual hosts" />
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="assets/style.css" media="print,screen" />
+<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Oxygen" media="print,screen" />
+<script type="text/javascript" src="http://cdn.abaaso.com/abaaso.min.js"></script>
+<script type="text/javascript" src="assets/app.min.js"></script>
+<script type="text/javascript">
+  var _gauges = _gauges || [];
+  (function() {
+    var t   = document.createElement('script');
+    t.type  = 'text/javascript';
+    t.async = true;
+    t.id    = 'gauges-tracker';
+    t.setAttribute('data-site-id', '5079e2cff5a1f51e4d00013f');
+    t.src = '//secure.gaug.es/track.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(t, s);
+  })();
+</script>
+<!--[if lt IE 9]>
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
+<![endif]-->
+</head>
+<body>
+<header>
+	<div class="container">
+		<h1>turtle <strong>i/o</strong></h1>
+	</div>
+</header>
+<article>
+	<section id="intro">
+		<div class="container">
+			<h2>elastic node.js application / web server</h2>
+			<p>turtle.io can be used to create complex applications with custom routes per HTTP verb, act as a RESTful proxy to other services, and serve your static content with virtual hosts</p>
+		</div>
+	</section>
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1>Turtle.io</h1>
-        <p>Web server with virtual hosts for node.js</p>
+	<section id="rate">
+		<div class="container">
+			<h2>Faster than your hardware!</h2>
+		</div>
+	</section>
 
-        <p class="view"><a href="https://github.com/avoidwork/turtle.io">View the Project on GitHub <small>avoidwork/turtle.io</small></a></p>
+	<section id="tip">
+		<div class="container">
+			<h2>Keep latency low, use an SSD</h2>
+		</div>
+	</section>
 
+	<section id="start">
+		<div class="container">
+			<h2>Getting Started</h2>
+			<ol>
+				<li>Install turtle.io from npm: "> npm install turtle.io"</li>
+				<li>Create a script to load &amp; start a server. You could use sample.js in the turtle.io directory (./node_modules/turtle.io) as a template, or see the examples below</li>
+				<li>[Optional] Edit config.json in the turtle.io directory to configure server defaults; you can override defaults by passing server.start() an Object</li>
+			</ol>
+		</div>
+	</section>
 
-        <ul>
-          <li><a href="https://github.com/avoidwork/turtle.io/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/avoidwork/turtle.io/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/avoidwork/turtle.io">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h3>Welcome to GitHub Pages.</h3>
+	<section id="documentation">
+		<div class="container">
+			<h2>Documentation</h2>
+			<p>Please visit the <a href="https://github.com/avoidwork/turtle.io/wiki" title="wiki">wiki</a> on GitHub</p>
+		</div>
+	</section>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+	<section id="examples">
+		<div class="container">
+			<h2>Examples</h2>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+			<h3>Common Setup</h3>
+			<p>Clustering with virtual hosts; keys are hostname, and value is the directory relative to "root"</p>
+			<script src="https://gist.github.com/avoidwork/5350198.js"></script>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+			<h3>Proxy routes</h3>
+			<p>The /api route acts as a proxy to another service; this example also utilizes a <strong>config.json</strong> file local to the server script, for easy DevOps management</p>
+			<script src="https://gist.github.com/3886592.js"> </script>
 
-<h3>Designer Templates</h3>
-
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
-
-<h3>Rather Drive Stick?</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
-<h3>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/avoidwork">avoidwork</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
-  </body>
+			<h3>Server status route</h3>
+			<p>This is useful for SysOps / DevOps</p>
+			<script src="https://gist.github.com/3902527.js"> </script>
+		</div>
+	</section>
+</article>
+<footer>
+	<div class="container">
+		Copyright &copy <span id="year"></span> <a href="http://avoidwork.com">Jason Mulligan</a> | <a href="https://raw.github.com/avoidwork/turtle.io/master/LICENSE">BSD 3 Licensed</a> | <span id="version"></span>
+	</div>
+</footer>
+<a href="https://github.com/avoidwork/turtle.io" class="github"><img src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub" /></a>
+</body>
 </html>
