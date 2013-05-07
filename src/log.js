@@ -5,16 +5,7 @@
  * @return {Object}    Instance
  */
 factory.prototype.log = function ( msg ) {
-	var err  = msg.callstack !== undefined,
-	    file = this.config.logs.file.replace("{{ext}}", new moment().format( this.config.logs.ext ) ),
-	    exit;
-
-	// Exist application when unrecoverable error occurs
-	exit = function () {
-		syslog.close();
-		toobusy.shutdown();
-		process.exit( 0 );
-	};
+	var err = msg.callstack !== undefined;
 
 	// Determining what to log
 	msg = msg.callstack || msg;
@@ -22,24 +13,14 @@ factory.prototype.log = function ( msg ) {
 	// Dispatching to syslog server
 	syslog.log( syslog[!err ? "LOG_INFO" : "LOG_ERR"], msg );
 
-	// Writing to log file
-	fs.appendFile( "/var/log/" + file, msg + "\n", function ( e ) {
-		if ( e ) {
-			fs.appendFile( __dirname + "/../" + file, msg + "\n", function ( e ) {
-				if ( e ) {
-					// Couldn't write to the log, no need to spam the terminal
-					void 0;
-				}
-
-				if ( REGEX_HALT.test( msg ) ) {
-					exit();
-				}
-			});
-		}
-		else if ( REGEX_HALT.test( msg ) ) {
-			exit();
-		}
-	});
+	// Unrecoverable error, restarting process
+	if ( REGEX_HALT.test( msg ) ) {
+		exit();
+	}
+	// Adding message to log queue
+	else {
+		this.logQueue.push(msg);
+	}
 
 	// Dispatching to STDOUT
 	if ( this.config.logs.stdout ) {

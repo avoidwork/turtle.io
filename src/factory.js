@@ -18,6 +18,7 @@ var factory = function ( args ) {
 		times    : [],
 		registry : {}
 	};
+	this.logQueue     = [];
 	this.server       = null;
 	this.version      = "{{VERSION}}";
 

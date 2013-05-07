@@ -24,6 +24,9 @@ factory.prototype.stop = function () {
 	// Removing hooks to process
 	process.removeAllListeners("on");
 
+	// Stopping log flush
+	$.clearTimer( "logs" );
+
 	console.log( "Stopped turtle.io on port " + this.config.port );
 
 	return this;
