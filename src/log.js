@@ -19,7 +19,7 @@ factory.prototype.log = function ( msg ) {
 	}
 	// Adding message to log queue
 	else {
-		this.logQueue.push(msg);
+		this.logQueue.push( msg );
 	}
 
 	// Dispatching to STDOUT
