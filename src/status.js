@@ -35,7 +35,7 @@ factory.prototype.status = function () {
 	// Server information
 	state.server = {
 		address     : this.server.address(),
-		connections : typeof this.server.getConnections === "function" ? this.server.getConnections() : this.server.connections,
+		connections : this.server.connections,
 		uptime      : uptime
 	};
 

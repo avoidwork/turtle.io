@@ -4,6 +4,7 @@
 var $          = require( "abaaso" ),
     crypto     = require( "crypto" ),
     fs         = require( "fs" ),
+    http       = require( "http" ),
     http_auth  = require( "http-auth" ),
     mime       = require( "mime" ),
     moment     = require( "moment" ),

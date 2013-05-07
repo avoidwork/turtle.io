@@ -1,12 +1,14 @@
 /**
  * Proxies a (root) URL to a route
  * 
- * @param  {String} origin Host to proxy (e.g. http://hostname)
- * @param  {String} route  Route to proxy
- * @param  {String} host   [Optional] Hostname this route is for (default is all)
- * @return {Object}        Instance
+ * @param  {String}  origin Host to proxy (e.g. http://hostname)
+ * @param  {String}  route  Route to proxy
+ * @param  {String}  host   [Optional] Hostname this route is for (default is all)
+ * @param  {Boolean} stream [Optional] Stream response to client (default is false)
+ * @return {Object}         Instance
  */
-factory.prototype.proxy = function ( origin, route, host ) {
+factory.prototype.proxy = function ( origin, route, host, stream ) {
+	stream    = ( stream === true );
 	var self  = this,
 	    verbs = ["delete", "get", "post", "put", "patch"],
 	    timer = new Date(),
@@ -88,10 +90,6 @@ factory.prototype.proxy = function ( origin, route, host ) {
 			self.respond( res, req, messages.NO_CONTENT, codes.ERROR_GATEWAY, {Allow: "GET"}, timer, false );
 			self.log( e, true );
 		}
-
-		dtp.fire( "proxy", function ( p ) {
-			return [req.headers.host, req.method, route, origin, diff( timer )];
-		});
 	};
 
 	/**
@@ -129,31 +127,66 @@ factory.prototype.proxy = function ( origin, route, host ) {
 		var url     = origin + req.url.replace( new RegExp( "^" + route ), "" ),
 		    method  = req.method.toLowerCase(),
 		    headerz = $.clone( req.headers ),
-		    fn;
-
-		// Removing support for compression so the response can be rewritten (if textual)
-		delete headerz["accept-encoding"];
+		    parsed  = $.parse( url ),
+		    fn, options, proxyReq;
 
 		// Facade to handle()
 		fn = function ( arg, xhr ) {
 			handle( arg, xhr, res, req, timer );
 		};
 
-		if ( REGEX_BODY.test( req.method ) ) {
-			url[method]( fn, fn, req.body, headerz );
-		}
-		else if ( REGEX_DEL.test( method ) ) {
-			url.del( fn, fn, headerz );
-		}
-		else if ( REGEX_HEAD.test( method ) ) {
-			if ( method === "head" ) {
-				method = "headers";
+		// Streaming response to Client
+		if ( stream ) {
+			headerz.host = req.headers.host;
+
+			options = {
+				headers  : headerz,
+				hostname : parsed.hostname,
+				method   : req.method,
+				path     : parsed.path,
+				port     : parsed.port || 80
+			};
+
+			if ( !parsed.auth.isEmpty() ) {
+				options.auth = parsed.auth;
 			}
 
-			url[method]( fn, fn );
+			proxyReq = http.request( options, function ( proxyRes ) {
+				res.writeHeader(proxyRes.statusCode, proxyRes.headers);
+				proxyRes.pipe( res );
+			});
+
+			if ( REGEX_BODY.test( req.method ) ) {
+				proxyReq.write( req.body );
+			}
+
+			proxyReq.end();
+
+			dtp.fire( "proxy", function ( p ) {
+				return [req.headers.host, req.method, route, origin, diff( timer )];
+			});
 		}
+		// Acting as a RESTful proxy
 		else {
-			url.get( fn, fn, headerz );
+			// Removing support for compression so the response can be rewritten (if textual)
+			delete headerz["accept-encoding"];
+
+			if ( REGEX_BODY.test( req.method ) ) {
+				url[method]( fn, fn, req.body, headerz );
+			}
+			else if ( REGEX_DEL.test( method ) ) {
+				url.del( fn, fn, headerz );
+			}
+			else if ( REGEX_HEAD.test( method ) ) {
+				if ( method === "head" ) {
+					method = "headers";
+				}
+
+				url[method]( fn, fn );
+			}
+			else {
+				url.get( fn, fn, headerz );
+			}
 		}
 	};
 

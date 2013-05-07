@@ -122,6 +122,28 @@ factory.prototype.start = function ( args, fn ) {
 		self.log( e );
 	});
 
+	// Flushing logs to disk on a timer
+	fs.exists( "/var/log/" + this.config.logs.file, function ( exists ) {
+		if ( !exists ) {
+			fs.exists( __dirname + "/../log/" + self.config.logs.file, function ( exists ) {
+				var file = __dirname + "/../log/" + self.config.logs.file;
+
+				if ( !exists ) {
+					fs.writeFileSync( file, "" );
+				}
+
+				$.repeat( function () {
+					self.flush( file );
+				}, self.config.logs.flush, "logs");
+			});
+		}
+		else {
+			$.repeat( function () {
+				self.flush( "/var/log/" + self.config.logs.file );
+			}, self.config.logs.flush, "logs");
+		}
+	});
+
 	// Announcing state
 	console.log( "Started turtle.io on port " + this.config.port );
 
