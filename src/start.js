@@ -123,8 +123,8 @@ factory.prototype.start = function ( args, fn ) {
 	});
 
 	// Flushing logs to disk on a timer
-	fs.exists( "/var/log/" + this.config.logs.file, function ( exists ) {
-		if ( !exists ) {
+	fs.appendFile( "/var/log/" + this.config.logs.file, "", function ( e ) {
+		if ( e ) {
 			fs.exists( __dirname + "/../log/" + self.config.logs.file, function ( exists ) {
 				var file = __dirname + "/../log/" + self.config.logs.file;
 
