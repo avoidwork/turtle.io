@@ -12,13 +12,12 @@
  * @return {Objet}            Instance
  */
 factory.prototype.respond = function ( res, req, output, status, headers, timer, compress ) {
-	status   = status || codes.SUCCESS;
-	timer    = timer  || new Date(); // Not ideal! This gives a false sense of speed for custom routes
-	compress = ( compress === true );
-
-	var body      = !REGEX_HEAD.test(req.method) && output !== null,
-	    encoding  = this.compression(req.headers["user-agent"], req.headers["accept-encoding"]),
-	    self      = this,
+	status       = status || codes.SUCCESS;
+	timer        = timer  || new Date(); // Not ideal! This gives a false sense of speed for custom routes
+	compress     = ( compress === true );
+	var body     = !REGEX_HEAD.test( req.method ) && output !== null,
+	    encoding = this.compression( req.headers["user-agent"], req.headers["accept-encoding"] ),
+	    self     = this,
 	    nth, salt;
 
 	if ( !( headers instanceof Object ) ) {
@@ -36,20 +35,33 @@ factory.prototype.respond = function ( res, req, output, status, headers, timer,
 		headers["Content-Type"] = "application/json";
 	}
 
-	// Setting Etag if not present
-	if (headers.Etag === undefined) {
-		salt = req.url + "-" + req.method + "-" + ( output !== null && typeof output.length !== "undefined" ? output.length : null ) + "-" + output;
-		headers.Etag = "\"" + self.hash( salt ) + "\"";
+	if ( status === 200 ) {
+		// CSV hook
+		if ( headers["Content-Type"] === "application/json" && REGEX_CSV.test( req.headers["accept"].explode()[0].replace( REGEX_NVAL, "" ) ) ) {
+			headers["Content-Type"] = "text/csv";
+
+			if ( headers["Content-Disposition"] === undefined ) {
+				headers["Content-Disposition"] = "attachment; filename=\"" + req.url.replace( REGEX_NURI, "" ) + ".csv\"";
+			}
+
+			output = $.json.csv( body );
+		}
+
+		// Setting Etag if not present
+		if ( headers.Etag === undefined ) {
+			salt = req.url + "-" + req.method + "-" + $.encode( req.headers ) + "-" + ( output !== null && typeof output.length !== "undefined" ? output.length : null ) + "-" + output;
+			headers.Etag = "\"" + self.hash( salt ) + "\"";
+		}
 	}
 
 	// Comparing against request headers incase this is a custom route response
-	if (req.headers["if-none-match"] === headers.Etag) {
+	if ( req.headers["if-none-match"] === headers.Etag ) {
 		status = 304;
 		body   = false;
 	}
 
 	// Compressing response to disk
-	if ( status !== 304 && compress ) {
+	if ( status === 200 && compress ) {
 		self.compressed( res, req, headers.Etag.replace(/"/g, ""), output, status, headers, false, timer );
 	}
 	// Serving content
