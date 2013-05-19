@@ -37,7 +37,7 @@ factory.prototype.respond = function ( res, req, output, status, headers, timer,
 
 	if ( status === 200 ) {
 		// CSV hook
-		if ( headers["Content-Type"] === "application/json" && REGEX_CSV.test( req.headers["accept"].explode()[0].replace( REGEX_NVAL, "" ) ) ) {
+		if ( headers["Content-Type"] === "application/json" && req.headers["accept"] !== undefined && REGEX_CSV.test( req.headers["accept"].explode()[0].replace( REGEX_NVAL, "" ) ) ) {
 			headers["Content-Type"] = "text/csv";
 
 			if ( headers["Content-Disposition"] === undefined ) {
