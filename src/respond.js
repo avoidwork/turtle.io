@@ -55,7 +55,7 @@ factory.prototype.respond = function ( res, req, output, status, headers, timer,
 	}
 
 	// Comparing against request headers incase this is a custom route response
-	if ( req.headers["if-none-match"] === headers.Etag ) {
+	if ( headers.Etag !== undefined && req.headers["if-none-match"] === headers.Etag ) {
 		status = 304;
 		body   = false;
 	}
