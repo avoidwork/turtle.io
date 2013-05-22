@@ -31,6 +31,7 @@ module.exports = function (grunt) {
 					"src/cached.js",
 					"src/compressed.js",
 					"src/compression.js",
+					"src/cookie.js",
 					"src/echo.js",
 					"src/error.js",
 					"src/flush.js",
