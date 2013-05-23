@@ -10,11 +10,12 @@ factory.prototype.session = {
 	 * @method create
 	 * @param  {Object} req HTTP(S) request Object
 	 * @return {Object}     Session
+	 * @todo set `secure` flag if SSL is enabled
 	 */
 	create : function ( req ) {
 		var id = $.uuid(true);
 
-		this.cookie.set( this.config.sessionid, id, req.headers.host, "/" );
+		this.cookie.set( this.config.sessionid, id, req.headers.host, false, "/" );
 		this.sessions.data.set(id, {});
 
 		return this.sessions.data.get(id);
