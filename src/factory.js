@@ -20,6 +20,7 @@ var factory = function ( args ) {
 	};
 	this.logQueue     = [];
 	this.server       = null;
+	this.sessions     = {};
 	this.version      = "{{VERSION}}";
 
 	// Loading config

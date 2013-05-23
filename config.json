@@ -30,6 +30,7 @@
 	},
 	"port"    : 8000,
 	"root"    : "",
+	"sessionid" : "sid",
 	"tmp"     : "/tmp",
 	"vhosts"  : {}
 }
