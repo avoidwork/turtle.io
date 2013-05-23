@@ -30,7 +30,10 @@
 	},
 	"port"    : 8000,
 	"root"    : "",
-	"sessionid" : "sid",
+	"session" : {
+		"id"     : "sid",
+		"salt"   : "turtleio"
+	},
 	"tmp"     : "/tmp",
 	"vhosts"  : {}
 }
