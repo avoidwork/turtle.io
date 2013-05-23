@@ -9,15 +9,15 @@ factory.prototype.session = {
 	 * 
 	 * @method create
 	 * @param  {Object} req HTTP(S) request Object
-	 * @return {String}     Session id
+	 * @return {Object}     Session
 	 */
 	create : function ( req ) {
 		var id = $.uuid(true);
 
-		this.cookie.set( this.config.session, id, req.headers.host );
-		this.sessions[id] = {};
+		this.cookie.set( this.config.sessionid, id, req.headers.host, "/" );
+		this.sessions.data.set(id, {});
 
-		return id;
+		return this.sessions.data.get(id);
 	},
 
 	/**
@@ -28,9 +28,9 @@ factory.prototype.session = {
 	 * @param  {String} id  Session id
 	 * @return {Object}     Instance
 	 */
-	destroy : function ( res, id ) {
-		this.cookie.expire( this.config.session, res );
-		delete this.sessions[id];
+	destroy : function ( res ) {
+		this.cookie.expire( this.config.sessionid, res );
+		this.sessions.data.del( id );
 
 		return this;
 	},
@@ -41,22 +41,9 @@ factory.prototype.session = {
 	 * @param  {String} id  Session id
 	 * @return {Object}     Session Object
 	 */
-	get : function ( id ) {
-		return this.sessions[id];
-	},
+	get : function ( req ) {
+		var id = req.headers[this.config.sessionid];
 
-	/**
-	 * Sets a session variable
-	 * 
-	 * @method set
-	 * @param  {String} id    Session id
-	 * @param  {String} key   Variable key
-	 * @param  {Mixed}  value Variable value
-	 * @return {Object}       Instance
-	 */
-	set : function ( id, key, value ) {
-		this.sessions[id][key] = value;
-
-		return this;
+		return this.sessions.data.get( id );
 	}
 };

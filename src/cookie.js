@@ -8,14 +8,15 @@ factory.prototype.cookie = {
 	 * Expires a cookie if it exists
 	 *
 	 * @method expire
-	 * @param  {Object} res    HTTP(S) response Object
-	 * @param  {String} name   Name of the cookie to expire
-	 * @param  {String} domain [Optional] Domain to set the cookie for
-	 * @param  {Boolea} secure [Optional] Make the cookie only accessible via SSL
+	 * @param  {Object}  res    HTTP(S) response Object
+	 * @param  {String}  name   Name of the cookie to expire
+	 * @param  {String}  domain [Optional] Domain to set the cookie for
+	 * @param  {Boolean} secure [Optional] Make the cookie only accessible via SSL
+	 * @param  {String}  path   [Optional] Path the cookie is for
 	 * @return {String}        Name of the expired cookie
 	 */
-	expire : function ( res, name, domain, secure ) {
-		return $.cookie.expire( name, domain, secure, res );
+	expire : function ( res, name, domain, secure, path ) {
+		return $.cookie.expire( name, domain, secure, path, res );
 	},
 
 	/**
@@ -46,15 +47,16 @@ factory.prototype.cookie = {
 	 * Sets a cookie in the response headers
 	 *
 	 * @method set
-	 * @param  {Object} res    HTTP(S) response Object
-	 * @param  {String} name   Name of the cookie to create
-	 * @param  {String} value  Value to set
-	 * @param  {String} offset A positive or negative integer followed by "d", "h", "m" or "s"
-	 * @param  {String} domain [Optional] Domain to set the cookie for
-	 * @param  {Boolea} secure [Optional] Make the cookie only accessible via SSL
+	 * @param  {Object}  res    HTTP(S) response Object
+	 * @param  {String}  name   Name of the cookie to create
+	 * @param  {String}  value  Value to set
+	 * @param  {String}  offset A positive or negative integer followed by "d", "h", "m" or "s"
+	 * @param  {String}  domain [Optional] Domain to set the cookie for
+	 * @param  {Boolean} secure [Optional] Make the cookie only accessible via SSL
+	 * @param  {String}  path   [Optional] Path the cookie is for
 	 * @return {Object}        The new cookie
 	 */
-	set : function ( res, name, value, offset, domain, secure ) {
-		return $.cookie.set( name, value, offset, domain, secure, res );
+	set : function ( res, name, value, offset, domain, secure, path ) {
+		return $.cookie.set( name, value, offset, domain, secure, path, res );
 	}
 };
