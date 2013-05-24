@@ -144,6 +144,9 @@ factory.prototype.start = function ( args, fn ) {
 		}
 	});
 
+	// Setting internal reference
+	this.session.server = this;
+
 	// Announcing state
 	console.log( "Started turtle.io on port " + this.config.port );
 

@@ -14,15 +14,29 @@ factory.prototype.stop = function () {
 			void 0;
 		}
 
+		// Resetting flags
 		this.active = false;
-		this.server = null;
+		this.server = this.session.server = null;
 
+		// Purging sessions
+		this.sessions.data.clear();
+
+		// Resetting queue
 		this.mode( false );
+		this.requestQueue = {
+			flushing : false,
+			items    : [],
+			last     : null,
+			times    : [],
+			registry : {}
+		};
+
+		// Unsetting routes
 		this.unset( "*" );
 	}
 
 	// Removing hooks to process
-	process.removeAllListeners("on");
+	process.removeAllListeners( "on" );
 
 	// Stopping log flush
 	$.clearTimer( "logs" );
