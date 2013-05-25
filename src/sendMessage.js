@@ -11,9 +11,9 @@ factory.prototype.sendMessage = function ( cmd, arg, all ) {
 	var id   = $.uuid( true ),
 	    body = {
 	    	cmd    : cmd,
-			id     : id,
-			arg    : arg,
-			worker : cluster.worker.id
+	    	id     : id,
+	    	arg    : arg,
+	    	worker : cluster.worker.id
 	    };
 
 	if ( all ) {
