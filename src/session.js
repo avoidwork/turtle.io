@@ -22,6 +22,7 @@ factory.prototype.session = {
 		    sid      = instance.cipher( id, true, salt );
 
 		instance.cookie.set( res, instance.config.session.id, sid, instance.config.session.valid, domain, secure, "/" );
+
 		return instance.sessions.data.set( id, {} );
 	},
 
@@ -39,30 +40,45 @@ factory.prototype.session = {
 		    domain   = parsed.host.isDomain() && !parsed.host.isIP() ? parsed.host : undefined,
 		    secure   = ( parsed.protocol === "https:" ),
 		    salt     = req.connection.remoteAddress + "-" + instance.config.session.salt,
-		    sid      = req.headers[instance.config.session.id],
+		    sid      = instance.cookie.get( req, instance.config.session.id ),
 		    id       = instance.cipher( sid, false, salt );
 
 		if ( id !== undefined ) {
-			instance.cookie.expire( res, instance.config.session.id, sid, domain, secure, "/" );
-			instance.sessions.data.del( id );
+			instance.cookie.expire( res, instance.config.session.id, domain, secure, "/" );
+
+			if ( instance.sessions.data.get( id ) !== undefined ) {
+				instance.sessions.data.del( id );
+			}
 		}
 
 		return instance;
 	},
 
 	/**
-	 * Gets a session Object
+	 * Gets a session
 	 * 
-	 * @param  {String} id Session id
-	 * @return {Mixed}    Session Object or undefined
+	 * @method get
+	 * @param  {Object} res HTTP(S) response Object
+	 * @param  {Object} req HTTP(S) request Object
+	 * @return {Mixed}      Session or undefined
 	 */
-	get : function ( req ) {
+	get : function ( res, req ) {
 		var instance = this.server,
-		    salt     = req.connection.remoteAddress + "-" + instance.config.session.salt,
-		    sid      = req.headers[instance.config.session.id],
-		    id       = instance.cipher( sid, false, salt );
+		    sid      = instance.cookie.get( req, instance.config.session.id),
+		    id, salt, sesh;
 
-		return instance.sessions.data.get( id );
+		if ( sid !== undefined ) {
+			salt = req.connection.remoteAddress + "-" + instance.config.session.salt,
+			id   = instance.cipher( sid, false, salt );
+			sesh = instance.sessions.data.get( id );
+
+			// Invalid session, expiring cookie
+			if ( sesh === undefined ) {
+				instance.session.destroy( res, req );
+			}
+		}
+
+		return sesh;
 	},
 
 	// Set & unset from `start()` & `stop()`

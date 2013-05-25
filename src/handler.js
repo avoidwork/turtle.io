@@ -18,6 +18,9 @@ var handler = function ( res, req, fn ) {
 		var payload;
 
 		try {
+			// Decorating session (by reference)
+			req.session = self.session.get( res, req );
+
 			// Setting listeners if expecting a body
 			if ( REGEX_BODY.test( req.method ) ) {
 				req.setEncoding( "utf-8" );

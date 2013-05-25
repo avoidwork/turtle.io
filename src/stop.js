@@ -19,7 +19,7 @@ factory.prototype.stop = function () {
 		this.server = this.session.server = null;
 
 		// Purging sessions
-		this.sessions.data.clear();
+		this.sessions.data.clear( true );
 
 		// Resetting queue
 		this.mode( false );
