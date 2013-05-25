@@ -23,7 +23,7 @@ factory.prototype.cookie = {
 	 * Gets a cookie from the request headers
 	 *
 	 * @method get
-	 * @param  {Object} req  HTTP(S) response Object
+	 * @param  {Object} req  HTTP(S) request Object
 	 * @param  {String} name Name of the cookie to get
 	 * @return {Mixed}       Cookie or undefined
 	 */
@@ -54,7 +54,7 @@ factory.prototype.cookie = {
 	 * @param  {String}  domain [Optional] Domain to set the cookie for
 	 * @param  {Boolean} secure [Optional] Make the cookie only accessible via SSL
 	 * @param  {String}  path   [Optional] Path the cookie is for
-	 * @return {Object}        The new cookie
+	 * @return {Undefined}      undefined
 	 */
 	set : function ( res, name, value, offset, domain, secure, path ) {
 		return $.cookie.set( name, value, offset, domain, secure, path, res );

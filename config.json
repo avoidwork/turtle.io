@@ -32,7 +32,8 @@
 	"root"    : "",
 	"session" : {
 		"id"     : "sid",
-		"salt"   : "turtleio"
+		"salt"   : "turtleio",
+		"valid"  : "15m"
 	},
 	"tmp"     : "/tmp",
 	"vhosts"  : {}

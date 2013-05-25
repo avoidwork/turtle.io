@@ -10,19 +10,19 @@ factory.prototype.session = {
 	 * @method create
 	 * @param  {Object} res HTTP(S) response Object
 	 * @param  {Object} req HTTP(S) request Object
-	 * @return {Object}     Session
+	 * @return {Object}     Promise
 	 */
 	create : function ( res, req ) {
 		var instance = this.server,
 		    parsed   = $.parse( instance.url( req ) ),
+		    domain   = parsed.host.isDomain() && !parsed.host.isIP() ? parsed.host : undefined,
 		    secure   = ( parsed.protocol === "https:" ),
 		    salt     = req.connection.remoteAddress + "-" + instance.config.session.salt,
-		    id       = instance.cipher( $.uuid( true ), true, salt );
+		    id       = $.uuid( true ),
+		    sid      = instance.cipher( id, true, salt );
 
-		instance.cookie.set( res, instance.config.session.id, id, parsed.host, secure, "/" );
-		instance.sessions.data.set( id, {} );
-
-		return instance.sessions.data.get( id );
+		instance.cookie.set( res, instance.config.session.id, sid, instance.config.session.valid, domain, secure, "/" );
+		return instance.sessions.data.set( id, {} );
 	},
 
 	/**
@@ -36,12 +36,14 @@ factory.prototype.session = {
 	destroy : function ( res, req ) {
 		var instance = this.server,
 		    parsed   = $.parse( instance.url( req ) ),
+		    domain   = parsed.host.isDomain() && !parsed.host.isIP() ? parsed.host : undefined,
 		    secure   = ( parsed.protocol === "https:" ),
 		    salt     = req.connection.remoteAddress + "-" + instance.config.session.salt,
-		    id       = instance.cipher( req.headers[instance.config.session.id], false, salt );
+		    sid      = req.headers[instance.config.session.id],
+		    id       = instance.cipher( sid, false, salt );
 
 		if ( id !== undefined ) {
-			instance.cookie.expire( res, instance.config.session.id, id, parsed.host, secure, "/" );
+			instance.cookie.expire( res, instance.config.session.id, sid, domain, secure, "/" );
 			instance.sessions.data.del( id );
 		}
 
@@ -52,12 +54,13 @@ factory.prototype.session = {
 	 * Gets a session Object
 	 * 
 	 * @param  {String} id Session id
-	 * @return {Object}    Session Object
+	 * @return {Mixed}    Session Object or undefined
 	 */
 	get : function ( req ) {
 		var instance = this.server,
 		    salt     = req.connection.remoteAddress + "-" + instance.config.session.salt,
-		    id       = instance.cipher( req.headers[instance.config.session.id], false, salt );
+		    sid      = req.headers[instance.config.session.id],
+		    id       = instance.cipher( sid, false, salt );
 
 		return instance.sessions.data.get( id );
 	},
