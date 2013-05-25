@@ -4,6 +4,8 @@
 	"default" : null,
 	"probes"  : true,
 	"maxConnections" : 25,
+	"ps"      : 5,
+	"uid"     : null,
 	"headers" : {
 		"Access-Control-Allow-Origin" : "*",
 		"Access-Control-Allow-Headers": "*",
@@ -33,7 +35,7 @@
 	"session" : {
 		"id"     : "sid",
 		"salt"   : "turtleio",
-		"valid"  : "15m"
+		"valid"  : "15 minutes"
 	},
 	"tmp"     : "/tmp",
 	"vhosts"  : {}

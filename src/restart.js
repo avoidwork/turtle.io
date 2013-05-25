@@ -5,5 +5,9 @@
  * @return {Object} instance
  */
 factory.prototype.restart = function () {
-	return this.stop().start();
+	if ( cluster.isMaster ) {
+		this.stop().start();
+	}
+
+	return this;
 };

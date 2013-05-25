@@ -18,7 +18,7 @@ var handler = function ( res, req, fn ) {
 		var payload;
 
 		try {
-			// Decorating session (by reference)
+			// Decorating session
 			req.session = self.session.get( res, req );
 
 			// Setting listeners if expecting a body
