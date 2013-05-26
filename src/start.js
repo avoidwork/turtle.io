@@ -50,12 +50,12 @@ factory.prototype.start = function ( args, fn ) {
 				var worker;
 
 				if ( signal !== "SIGHUP" ) {
-					worker = cluster.fork();
-
 					// Queue worker was killed, re-route!
 					if ( cluster.workers[self.config.queueWorker] === undefined ) {
-						self.config.queueWorker = worker.id.toString();
+						self.config.queueWorker = ( parseInt( $.array.keys( cluster.workers ).sort( $.array.sort ).last(), 10 ) + 1 ).toString();
 					}
+
+					worker = cluster.fork();
 				}
 			});
 		});
