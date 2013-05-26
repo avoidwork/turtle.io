@@ -36,7 +36,7 @@ factory.prototype.bootstrap = function ( fn ) {
 		});
 
 		// Setting optional queue status route
-		if ( this.config.queue.status ) {
+		if ( parseInt( cluster.worker.id, 10 ) > 1 && this.config.queue.status ) {
 			this.get( "/queue", function ( res, req, timer ) {
 				this.respond( res, req, {next: "/queue/:item", items: $.array.cast( this.requestQueue.registry, true )}, 200, {"Cache-Control": "no-cache"}, timer, false );
 			});

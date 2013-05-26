@@ -121,13 +121,12 @@ function Session ( id, server ) {
  * @return {Undefined} undefined
  */
 Session.prototype.save = function () {
-	var invalid = /^\_server/,
-	    body    = {};
+	var body = {};
 
 	this._timestamp = moment().utc().unix();
 
 	$.iterate( this, function ( v, k ) {
-		if ( !invalid.test( k ) ) {
+		if ( !REGEX_SERVER.test( k ) ) {
 			body[k] = v;
 		}
 	});
