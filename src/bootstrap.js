@@ -129,7 +129,7 @@ factory.prototype.bootstrap = function ( fn ) {
 		$.repeat(function () {
 			var now = moment().utc().unix();
 
-			$.array.keys( self.sessions ).each( function ( i ) {
+			$.array.cast( self.sessions ).each( function ( i ) {
 				if ( now.diff( i._timestamp ) >= self.session.maxDiff ) {
 					i.expire();
 				}

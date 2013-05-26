@@ -30,7 +30,7 @@ factory.prototype.receiveMessage = function ( msg ) {
 	}
 
 	// Acknowledging message
-	if ( msg.cmd !== MSG_ACK ) {
-		process.send( {cmd: MSG_ACK, id: msg.id, worker: msg.worker} );
+	if ( msg.ack ) {
+		process.send( {ack: false, cmd: MSG_ACK, id: msg.id, worker: msg.worker} );
 	}
 };

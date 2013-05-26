@@ -73,27 +73,20 @@ factory.prototype.session = {
 	 */
 	get : function ( res, req ) {
 		var instance = this.server,
+		    parsed   = $.parse( instance.url( req ) ),
+		    domain   = parsed.host.isDomain() && !parsed.host.isIP() ? parsed.host : undefined,
+		    secure   = ( parsed.protocol === "https:" ),
 		    sid      = instance.cookie.get( req, instance.config.session.id ),
-		    id, salt, sesh;
+		    id, salt, sesh, timestamp, now;
 
 		if ( sid !== undefined ) {
 			salt = req.connection.remoteAddress + "-" + instance.config.session.salt;
 			id   = instance.cipher( sid, false, salt );
 			sesh = instance.sessions[id];
 
-			// Invalid session, expiring cookie
-			if ( sesh === undefined ) {
-				instance.session.destroy( res, req );
-			}
-			else {
-				if ( moment().unix( sesh._timestamp ).diff( moment().utc().unix() ) >= this.maxDiff ) {
-					instance.session.destroy( res, req );
-					sesh = undefined;
-				}
-				else {
-					sesh.save();
-					return sesh;
-				}
+			if ( sesh !== undefined ) {
+				instance.cookie.set( res, instance.config.session.id, sid, this.expires, domain, secure, "/" );
+				sesh.save();
 			}
 		}
 
