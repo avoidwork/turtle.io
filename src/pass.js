@@ -18,7 +18,7 @@ var pass = function ( arg ) {
 		});
 	}
 	else {
-		id = arg.cmd === "queue" ? "1" : arg.worker.toString();
+		id = arg.cmd === "queue" ? this.config.queueWorker : arg.worker.toString();
 		cluster.workers[ id ].send( arg );
 	}
 };

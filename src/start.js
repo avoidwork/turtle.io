@@ -29,6 +29,9 @@ factory.prototype.start = function ( args, fn ) {
 			this.config.ps = 2;
 		}
 
+		// Setting queueWorker to worker 1
+		this.config.queueWorker = "1";
+
 		// Announcing state
 		console.log( "Starting turtle.io on port " + this.config.port );
 
@@ -37,13 +40,29 @@ factory.prototype.start = function ( args, fn ) {
 			cluster.fork();
 		}
 
-		// Setting up message passing
-		$.array.cast( cluster.workers ).each(function (i, idx) {
-			i.on( "message", pass );
+		// Setting up worker events
+		$.array.cast( cluster.workers ).each( function ( i, idx ) {
+			i.on( "message", function ( msg ) {
+				pass.call( self, msg );
+			});
+
+			i.on( "exit", function ( code, signal ) {
+				var worker;
+
+				if ( signal !== "SIGHUP" ) {
+					worker = cluster.fork();
+
+					// Queue worker was killed, re-route!
+					if ( cluster.workers[self.config.queueWorker] === undefined ) {
+						self.config.queueWorker = worker.id.toString();
+					}
+				}
+			});
 		});
 	}
 	else {
 		// Starting queue processor
+		// @todo exec mode() when re-routing
 		if ( cluster.worker.id === "1" ) {
 			this.mode( true );
 		}

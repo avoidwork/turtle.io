@@ -34,10 +34,11 @@ factory.prototype.mode = function ( start ) {
 					self.requestQueue.last = i.uuid;
 					self.requestQueue.times.push( now.getTime() - i.timestamp.getTime() );
 					delete self.requestQueue.registry[i.uuid];
+
+					//self.sendMessage()
 				});
 
 				self.requestQueue.items.remove(0, (nth - 1));
-
 				self.requestQueue.flushing = false;
 			}
 		}, this.config.queue.time, id );

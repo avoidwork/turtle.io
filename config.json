@@ -28,7 +28,8 @@
 	"queue"   : {
 		"status" : true,
 		"size"   : 200,
-		"time"   : 1000
+		"time"   : 1000,
+		"fn"     : null
 	},
 	"port"    : 8000,
 	"root"    : "",

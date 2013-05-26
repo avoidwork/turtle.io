@@ -12,9 +12,12 @@ factory.prototype.receiveMessage = function ( msg ) {
 			$.clearTimer( msg.id );
 			break;
 
-		case MSG_QUEUE:
+		case MSG_SET_QUE:
 			queue.items.push( msg.arg );
 			break;
+
+		case MSG_DEL_QUE:
+			queue.items.push( msg.arg );
 
 		case MSG_DEL_SES:
 			delete this.sessions[msg.arg];
