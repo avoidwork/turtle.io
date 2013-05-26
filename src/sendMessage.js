@@ -21,8 +21,8 @@ factory.prototype.sendMessage = function ( cmd, arg, all, ack ) {
 	    };
 
 	if ( all ) {
-		body.oldCmd = cmd;
-		body.cmd    = "announce";
+		body.altCmd = cmd;
+		body.cmd    = MSG_ALL;
 	}
 
 	if ( ack ) {

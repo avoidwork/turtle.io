@@ -25,7 +25,7 @@ factory.prototype.session = {
 		// Setting cookie
 		instance.cookie.set( res, instance.config.session.id, sid, this.expires, domain, secure, "/" );
 
-		// Creating session instance
+		// Creating session instance & announcing it
 		sesh = instance.sessions[id] = new Session( id, instance );
 		sesh.save();
 
@@ -57,7 +57,7 @@ factory.prototype.session = {
 			delete instance.sessions[id];
 
 			// Announcing deletion of session
-			instance.sendMessage( MSG_DEL_SES, id, true );
+			instance.sendMessage( MSG_SES_DEL, id, true );
 		}
 
 		return instance;
@@ -132,7 +132,7 @@ Session.prototype.save = function () {
 	});
 
 	// Announcing session shape
-	this._server.sendMessage( MSG_SET_SES, {id: this._id, session: $.encode( body )}, true );
+	this._server.sendMessage( MSG_SES_SET, {id: this._id, session: body}, true );
 };
 
 /**
@@ -142,5 +142,5 @@ Session.prototype.save = function () {
  */
 Session.prototype.expire = function () {
 	delete this._server.sessions[this._id];
-	this._server.sendMessage( MSG_DEL_SES, this._id, true );
+	this._server.sendMessage( MSG_SES_DEL, this._id, true );
 };

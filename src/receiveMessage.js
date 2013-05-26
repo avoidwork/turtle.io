@@ -6,44 +6,48 @@
  * @return {Object}     Instance
  */
 factory.prototype.receiveMessage = function ( msg ) {
+	var self = this;
+
 	// Processing message
 	switch ( msg.cmd ) {
 		case MSG_ACK:
 			$.clearTimer( msg.id );
 			break;
 
-		case MSG_SET_QUE:
+		case MSG_QUE_NEW:
+			this.config.queueWorker = msg.arg;
+			break;
+
+		case MSG_QUE_SET:
 			queue.items.push( msg.arg );
 			break;
 
-		case MSG_DEL_QUE:
+		case MSG_QUE_DEL:
 			queue.items.push( msg.arg );
+			break;
 
-		case MSG_DEL_SES:
+		case MSG_SES_DEL:
 			delete this.sessions[msg.arg];
 			break;
 
-		case MSG_SET_SES:
+		case MSG_SES_SET:
 			if ( this.sessions[msg.arg.id] === undefined ) {
 				this.sessions[msg.arg.id] = new Session( msg.arg.id, this );
 			}
 
-			$.merge( this.sessions[msg.arg.id], $.decode( msg.arg.session ) );
+			$.merge( this.sessions[msg.arg.id], msg.arg.session );
 			break;
 
 		case MSG_START:
-			// Starting queue processor
-			if ( cluster.worker.id === "1" ) {
+			// Starting queue worker
+			if ( cluster.worker.id === msg.arg.queue ) {
 				this.mode( true );
 			}
-			// Starting http workers
+			// Starting http worker
 			else {
 				// Setting error handler
-				if ( typeof fn === "function" ) {
-					error = fn;
-				}
-				else {
-					error = function ( res, req, timer ) {
+				if ( typeof msg.arg.error !== "function" ) {
+					msg.arg.error = function ( res, req, timer ) {
 						var body   = messages.NOT_FOUND,
 						    status = codes.NOT_FOUND,
 						    method = req.method.toLowerCase(),
@@ -65,18 +69,13 @@ factory.prototype.receiveMessage = function ( msg ) {
 				}
 
 				// Bootstrapping instance
-				self.bootstrap.call( self, error );
+				self.bootstrap.call( self, msg.arg.error );
 			}
-
-
-
 			break;
-
-
 	}
 
 	// Acknowledging message
 	if ( msg.ack ) {
-		process.send( {ack: false, cmd: MSG_ACK, id: msg.id, worker: msg.worker} );
+		process.send( {ack: false, cmd: MSG_ACK, arg: null, id: msg.id, worker: msg.worker} );
 	}
 };

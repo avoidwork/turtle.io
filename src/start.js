@@ -39,20 +39,26 @@ factory.prototype.start = function ( args, fn ) {
 					self.config.queueWorker = ( parseInt( $.array.keys( cluster.workers ).sort( $.array.sort ).last(), 10 ) + 1 ).toString();
 				}
 
+				// Forking new queue process
 				worker = cluster.fork();
+				worker.on( "message", msg );
+				worker.on( "exit",    sig );
 
-				worker.on( "message", msg);
-				worker.on( "exit",    sig);
+				// Announcing new queue worker
+				msg( {ack: false, cmd: MSG_ALL, altCmd: MSG_QUE_NEW, id: $.uuid( true ), arg: self.config.queueWorker, worker: MSG_MASTER} );
 			}
 		};
 
-		// Minimum thread count is 3 [master, queue, (www - n)]
+		// Minimum process count is 3 [master, queue, (www - n)]
 		if ( this.config.ps < 2 ) {
 			this.config.ps = 2;
 		}
 
 		// Setting queueWorker to worker 1
 		this.config.queueWorker = "1";
+
+		// Setting errorHandler for workers
+		this.config.errorHandler = fn;
 
 		// Announcing state
 		console.log( "Starting turtle.io on port " + this.config.port );
@@ -64,12 +70,24 @@ factory.prototype.start = function ( args, fn ) {
 
 		// Setting up worker events
 		$.array.cast( cluster.workers ).each( function ( i, idx ) {
-			i.on( "message", msg);
-			i.on( "exit",    sig);
+			i.on( "message", msg );
+			i.on( "exit",    sig );
 		});
 	}
 	else {
-		this.sendMessage( MSG_READY, cluster.worker.id );
+		// This is only meant to capture Errors emitted from node.js,
+		// such as a Stream Error in stream.js, which allows toobusy to do it's job
+		process.on("uncaughtException", function ( e ) {
+			self.log( e );
+		});
+
+		// Setting message listener
+		process.on( "message", function ( arg ) {
+			self.receiveMessage.call( self, arg );
+		});
+
+		// Notifying master
+		this.sendMessage( MSG_READY, null );
 	}
 
 	return this;

@@ -72,17 +72,6 @@ factory.prototype.bootstrap = function ( fn ) {
 			});
 		});
 
-		// This is only meant to capture Errors emitted from node.js,
-		// such as a Stream Error in stream.js, which allows toobusy to do it's job
-		process.on("uncaughtException", function ( e ) {
-			self.log( e );
-		});
-
-		// Setting message listener
-		process.on( "message", function ( arg ) {
-			self.receiveMessage.call( self, arg );
-		});
-
 		// Flushing logs to disk on a timer
 		fs.appendFile( "/var/log/" + this.config.logs.file, "", function ( e ) {
 			if ( e ) {
@@ -134,7 +123,7 @@ factory.prototype.bootstrap = function ( fn ) {
 					i.expire();
 				}
 			});
-		}, ( 1000 * 60 ), "expiredSessions" );
+		}, self.config.session.gc, "expiredSessions" );
 
 		// Dropping process
 		if ( this.config.uid !== null ) {
