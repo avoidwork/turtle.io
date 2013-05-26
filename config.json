@@ -26,17 +26,19 @@
 		"stdout" : true
 	},
 	"queue"   : {
+		"id"     : 1,
 		"status" : true,
 		"size"   : 200,
 		"time"   : 1000,
-		"fn"     : null
+		"handler": null
 	},
 	"port"    : 8000,
 	"root"    : "",
 	"session" : {
 		"id"     : "sid",
 		"salt"   : "turtleio",
-		"valid"  : "15 minutes"
+		"valid"  : "15 minutes",
+		"gc"     : 60000
 	},
 	"tmp"     : "/tmp",
 	"vhosts"  : {}

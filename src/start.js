@@ -2,11 +2,11 @@
  * Starts instance
  * 
  * @method start
- * @param  {Object}   args Parameters to set
- * @param  {Function} fn   [Optional] Error handler
- * @return {Object}        Instance
+ * @param  {Object}   args         Parameters to set
+ * @param  {Function} errorHandler [Optional] Error handler
+ * @return {Object}                Instance
  */
-factory.prototype.start = function ( args, fn ) {
+factory.prototype.start = function ( args, errorHandler ) {
 	var self    = this,
 	    params  = {},
 	    headers = {},
@@ -23,6 +23,9 @@ factory.prototype.start = function ( args, fn ) {
 		this.config.headers.Server = ( function () { return ( "turtle.io/{{VERSION}} (abaaso/" + $.version + " node.js/" + process.versions.node.replace( /^v/, "" ) + process.platform.capitalize() + " V8/" + process.versions.v8.toString().trim() + ")" ); } )();
 	}
 
+	// Setting errorHandler for workers
+	this.config.errorHandler = errorHandler;
+
 	if ( cluster.isMaster ) {
 		// Message passing
 		msg = function ( msg ) {
@@ -35,8 +38,8 @@ factory.prototype.start = function ( args, fn ) {
 
 			if ( signal !== "SIGHUP" ) {
 				// Queue worker was killed, re-route!
-				if ( cluster.workers[self.config.queueWorker] === undefined ) {
-					self.config.queueWorker = ( parseInt( $.array.keys( cluster.workers ).sort( $.array.sort ).last(), 10 ) + 1 ).toString();
+				if ( cluster.workers[self.config.queue.id.toString()] === undefined ) {
+					self.config.queue.id = parseInt( $.array.keys( cluster.workers ).sort( $.array.sort ).last(), 10 ) + 1;
 				}
 
 				// Forking new queue process
@@ -45,20 +48,14 @@ factory.prototype.start = function ( args, fn ) {
 				worker.on( "exit",    sig );
 
 				// Announcing new queue worker
-				msg( {ack: false, cmd: MSG_ALL, altCmd: MSG_QUE_NEW, id: $.uuid( true ), arg: self.config.queueWorker, worker: MSG_MASTER} );
+				msg( {ack: false, cmd: MSG_ALL, altCmd: MSG_QUE_ID, id: $.uuid( true ), arg: self.config.queue.id, worker: MSG_MASTER} );
 			}
 		};
 
-		// Minimum process count is 3 [master, queue, (www - n)]
+		// Minimum process count is 3 [master, queue, www(1+)]
 		if ( this.config.ps < 2 ) {
 			this.config.ps = 2;
 		}
-
-		// Setting queueWorker to worker 1
-		this.config.queueWorker = "1";
-
-		// Setting errorHandler for workers
-		this.config.errorHandler = fn;
 
 		// Announcing state
 		console.log( "Starting turtle.io on port " + this.config.port );

@@ -6,44 +6,45 @@
  * @return {Object}         Instance
  */
 factory.prototype.mode = function ( start ) {
-	var id = "queue",
-	    self, limit;
+	var id    = "queue",
+	    self  = this,
+	    limit = this.config.queue.size,
+	    fn    = ( self.config.queue.handler instanceof Function );
 
-	if ( start ) {
-		self  = this,
-		limit = this.config.queue.size;
+	$.repeat( function () {
+		var processed = [],
+		    now       = moment().utc().unix(),
+		    items, nth;
 
-		$.repeat( function () {
-			var items, nth, now;
+		if ( self.requestQueue.items.length > 0 ) {
+			self.requestQueue.flushing = true;
 
-			if ( self.requestQueue.items.length > 0 ) {
-				self.requestQueue.flushing = true;
+			items = self.requestQueue.items.limit( 0, limit );
+			nth   = items.length - 1;
 
-				items = self.requestQueue.items.limit(0, limit);
-				nth   = items.length;
-				now   = new Date();
-
-				items.each( function ( i ) {
+			items.each( function ( i ) {
+				if ( fn ) {
 					try {
-						i.callback();
+						self.config.queue.handler.call( self, i.data );
 					}
 					catch ( e ) {
 						self.log( e );
 					}
+				}
 
-					self.requestQueue.last = i.uuid;
-					self.requestQueue.times.push( now.getTime() - i.timestamp.getTime() );
-					delete self.requestQueue.registry[i.uuid];
+				self.requestQueue.last = i.uuid;
+				self.requestQueue.times.push( now - i.timestamp );
+				delete self.requestQueue.registry[i.uuid];
 
-					//self.sendMessage()
-				});
+				processed.push( i.uuid );
+			});
 
-				self.requestQueue.items.remove(0, (nth - 1));
-				self.requestQueue.flushing = false;
-			}
-		}, this.config.queue.time, id );
-	}
-	else {
-		$.clearTimer( id );
-	}
+			// Removing processed items
+			self.requestQueue.items.remove( 0, nth );
+			self.requestQueue.flushing = false;
+
+			// Announcing which items where processed
+			self.sendMessage( MSG_QUE_DEL, processed, true );
+		}
+	}, this.config.queue.time, id );
 };

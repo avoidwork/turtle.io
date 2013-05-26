@@ -14,16 +14,24 @@ factory.prototype.receiveMessage = function ( msg ) {
 			$.clearTimer( msg.id );
 			break;
 
+		case MSG_QUE_ID:
+			this.config.queue.id = msg.arg;
+			break;
+
 		case MSG_QUE_NEW:
-			this.config.queueWorker = msg.arg;
+			this.requestQueue.registry[msg.arg.uuid] = this.requestQueue.items.length;
+			this.requestQueue.items.push( {uuid: msg.arg.uuid, data: msg.arg.data, timestamp: msg.arg.timestamp} );
+			this.sendMessage( MSG_QUE_SET, {uuid: msg.arg.uuid, timestamp: msg.arg.timestamp}, true );
 			break;
 
 		case MSG_QUE_SET:
-			queue.items.push( msg.arg );
+			this.requestQueue.registry[msg.arg.uuid] = msg.arg.timestamp;
 			break;
 
 		case MSG_QUE_DEL:
-			queue.items.push( msg.arg );
+			msg.arg.each( function ( i ) {
+				delete self.requestQueue.registry[i];
+			});
 			break;
 
 		case MSG_SES_DEL:
@@ -39,15 +47,18 @@ factory.prototype.receiveMessage = function ( msg ) {
 			break;
 
 		case MSG_START:
+			// Setting reference to queue worker
+			this.config.queue.id = msg.arg;
+
 			// Starting queue worker
-			if ( cluster.worker.id === msg.arg.queue ) {
+			if ( cluster.worker.id === this.config.queue.id ) {
 				this.mode( true );
 			}
 			// Starting http worker
 			else {
 				// Setting error handler
-				if ( typeof msg.arg.error !== "function" ) {
-					msg.arg.error = function ( res, req, timer ) {
+				if ( typeof this.config.errorHandler !== "function" ) {
+					this.config.errorHandler = function ( res, req, timer ) {
 						var body   = messages.NOT_FOUND,
 						    status = codes.NOT_FOUND,
 						    method = req.method.toLowerCase(),
@@ -69,7 +80,7 @@ factory.prototype.receiveMessage = function ( msg ) {
 				}
 
 				// Bootstrapping instance
-				self.bootstrap.call( self, msg.arg.error );
+				self.bootstrap.call( self, self.config.errorHandler );
 			}
 			break;
 	}

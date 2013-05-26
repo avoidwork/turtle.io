@@ -2,29 +2,25 @@
  * Queues a request for processing
  * 
  * @method queue
- * @param  {Object}   res      HTTP(S) response Object
- * @param  {Object}   req      HTTP(S) request Object
- * @param  {Function} callback Callback function to execute when processed
- * @param  {String}   id       [Optional] Queue item ID
- * @param  {Object}   headers  [Optional] HTTP headers to decorate the response with
- * @param  {Object}   timer    [Optional] Date instance
- * @return {Object}            Instance
+ * @param  {Object} res     HTTP(S) response Object
+ * @param  {Object} req     HTTP(S) request Object
+ * @param  {Mixed}  arg     Argument to pass to queue
+ * @param  {String} id      [Optional] Queue item ID
+ * @param  {Object} headers [Optional] HTTP headers to decorate the response with
+ * @param  {Object} timer   [Optional] Date instance
+ * @return {Object}         Instance
  */
-factory.prototype.queue = function ( res, req, callback, id, headers, timer ) {
+factory.prototype.queue = function ( res, req, arg, id, headers, timer ) {
 	var uuid   = id || $.uuid( true ),
 	    parsed = $.parse( this.url( req ) ),
-	    body;
+	    epoch  = moment().utc().unix(),
+	    body, total;
 
-	if ( typeof callback !== "function" ) {
-		throw Error( $.label.error.invalidArguments );
-	}
+	this.requestQueue.registry[uuid] = epoch;
+	this.sendMessage( MSG_QUE_NEW, {uuid: uuid, data: arg, timestamp: epoch}, false );
 
-	this.requestQueue.items.push( {callback: callback, uuid: uuid, timestamp: new Date()} );
-	this.requestQueue.registry[uuid] = true;
-
-	body = {
-		processing: this.requestQueue.items.length < this.config.queue.size ? "now" : moment().fromNow( ( this.requestQueue.items.length / this.config.queue.size * this.config.queue.time ), " seconds" )
-	}
+	total = $.array.cast( this.requestQueue.registry ).length - 1;
+	body  = {processing: total < this.config.queue.size ? "now" : moment().fromNow( ( total / this.config.queue.size * this.config.queue.time ), " seconds" )};
 
 	if ( this.config.queue.status ) {
 		body.status = parsed.protocol + "//" + req.headers.host + "/queue/" + uuid;
