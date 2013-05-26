@@ -85,8 +85,13 @@ factory.prototype.session = {
 			sesh = instance.sessions[id];
 
 			if ( sesh !== undefined ) {
-				instance.cookie.set( res, instance.config.session.id, sid, this.expires, domain, secure, "/" );
-				sesh.save();
+				if ( sesh._timestamp.diff( moment().utc().unix() ) > 1 ) {
+					instance.cookie.set( res, instance.config.session.id, sid, this.expires, domain, secure, "/" );
+					sesh.save();
+				}
+			}
+			else {
+				this.destroy( res, req );
 			}
 		}
 
