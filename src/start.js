@@ -4,9 +4,10 @@
  * @method start
  * @param  {Object}   args         Parameters to set
  * @param  {Function} errorHandler [Optional] Error handler
+ * @param  {Function} queueHandler [Optional] Queue handler
  * @return {Object}                Instance
  */
-factory.prototype.start = function ( args, errorHandler ) {
+factory.prototype.start = function ( args, errorHandler, queueHandler ) {
 	var self    = this,
 	    params  = {},
 	    headers = {},
@@ -23,8 +24,9 @@ factory.prototype.start = function ( args, errorHandler ) {
 		this.config.headers.Server = ( function () { return ( "turtle.io/{{VERSION}} (abaaso/" + $.version + " node.js/" + process.versions.node.replace( /^v/, "" ) + process.platform.capitalize() + " V8/" + process.versions.v8.toString().trim() + ")" ); } )();
 	}
 
-	// Setting errorHandler for workers
-	this.config.errorHandler = errorHandler;
+	// Setting handlers
+	this.config.errorHandler  = errorHandler;
+	this.config.queue.handler = queueHandler;
 
 	if ( cluster.isMaster ) {
 		// Message passing
