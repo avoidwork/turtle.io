@@ -4,10 +4,9 @@
  * @method start
  * @param  {Object}   args         Parameters to set
  * @param  {Function} errorHandler [Optional] Error handler
- * @param  {Function} queueHandler [Optional] Queue handler
  * @return {Object}                Instance
  */
-factory.prototype.start = function ( args, errorHandler, queueHandler ) {
+factory.prototype.start = function ( args, errorHandler ) {
 	var self    = this,
 	    params  = {},
 	    headers = {},
@@ -24,9 +23,8 @@ factory.prototype.start = function ( args, errorHandler, queueHandler ) {
 		this.config.headers.Server = ( function () { return ( "turtle.io/{{VERSION}} (abaaso/" + $.version + " node.js/" + process.versions.node.replace( /^v/, "" ) + process.platform.capitalize() + " V8/" + process.versions.v8.toString().trim() + ")" ); } )();
 	}
 
-	// Setting handlers
+	// Setting error handler
 	this.config.errorHandler  = errorHandler;
-	this.config.queue.handler = queueHandler;
 
 	if ( cluster.isMaster ) {
 		// Message passing
@@ -38,7 +36,8 @@ factory.prototype.start = function ( args, errorHandler, queueHandler ) {
 		sig = function ( code, signal ) {
 			var worker;
 
-			if ( signal !== TERMINATE ) {
+			// Only restarting if a SIGTERM wasn't received, e.g. SIGKILL or SIGHUP
+			if ( signal !== TERM_SIG && code !== TERM_CODE ) {
 				// Queue worker was killed, re-route!
 				if ( cluster.workers[self.config.queue.id.toString()] === undefined ) {
 					self.config.queue.id = parseInt( $.array.keys( cluster.workers ).sort( $.array.sort ).last(), 10 ) + 1;
