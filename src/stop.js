@@ -9,7 +9,7 @@ factory.prototype.stop = function () {
 		console.log( "Stopping turtle.io on port " + this.config.port );
 	}
 	else {
-		process.kill( process.pid, "SIGHUP" );
+		process.kill( process.pid, TERMINATE );
 	}
 
 	return this;

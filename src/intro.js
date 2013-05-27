@@ -41,6 +41,7 @@ var $           = require( "abaaso" ),
     MSG_QUE_SET = "set_queue",
     MSG_SES_DEL = "delete_session",
     MSG_SES_SET = "set_session",
+    TERMINATE   = "SIGTERM",
     fn;
 
 // Hooking syslog output

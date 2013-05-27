@@ -38,7 +38,7 @@ factory.prototype.start = function ( args, errorHandler, queueHandler ) {
 		sig = function ( code, signal ) {
 			var worker;
 
-			if ( signal !== "SIGHUP" ) {
+			if ( signal !== TERMINATE ) {
 				// Queue worker was killed, re-route!
 				if ( cluster.workers[self.config.queue.id.toString()] === undefined ) {
 					self.config.queue.id = parseInt( $.array.keys( cluster.workers ).sort( $.array.sort ).last(), 10 ) + 1;
