@@ -7,7 +7,6 @@
 var factory = function () {
 	this.active       = false;
 	this.bootstrapped = false;
-	this.id           = "";
 	this.config       = require(__dirname + "/../config.json");
 	this.requestQueue = {
 		flushing : false,
