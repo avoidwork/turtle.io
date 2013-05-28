@@ -98,6 +98,22 @@ factory.prototype.session = {
 		return sesh;
 	},
 
+	/**
+	 * Sets a session (cluster normalization)
+	 * 
+	 * @param  {Object} arg Message argument from Master
+	 * @return {Object}     Instance
+	 */
+	set : function ( arg ) {
+		if ( this.sessions[arg.id] === undefined ) {
+			this.sessions[arg.id] = new Session( arg.id, this );
+		}
+
+		$.merge( this.sessions[arg.id], arg.session );
+
+		return this;
+	},
+
 	// Transformed `config.session.valid` for $.cookie{}
 	expires : "",
 

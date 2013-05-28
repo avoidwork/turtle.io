@@ -43,6 +43,7 @@ module.exports = function (grunt) {
 					"src/proxy.js",
 					"src/queue.js",
 					"src/queueStatus.js",
+					"src/ready.js",
 					"src/receiveMessage.js",
 					"src/redirect.js",
 					"src/request.js",
