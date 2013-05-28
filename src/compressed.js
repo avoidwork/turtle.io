@@ -51,7 +51,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 		}
 		else {
 			raw = fs.createReadStream( arg );
-			util.pump( raw, res );
+			raw.pipe( res );
 
 			dtp.fire( "compressed", function ( p ) {
 				return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
