@@ -29,6 +29,7 @@ factory.prototype.receiveMessage = function ( msg ) {
 			break;
 
 		case MSG_QUE_DEL:
+			self.requestQueue.last = msg.arg.last();
 			msg.arg.each( function ( i ) {
 				delete self.requestQueue.registry[i];
 			});

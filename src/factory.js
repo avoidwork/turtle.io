@@ -9,7 +9,6 @@ var factory = function () {
 	this.bootstrapped = false;
 	this.config       = require(__dirname + "/../config.json");
 	this.requestQueue = {
-		flushing : false,
 		items    : [],
 		last     : null,
 		times    : [],

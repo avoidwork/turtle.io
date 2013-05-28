@@ -23,8 +23,6 @@ factory.prototype.mode = function ( start ) {
 
 		// Batch processing the queue
 		if ( self.requestQueue.items.length > 0 ) {
-			self.requestQueue.flushing = true;
-
 			items = self.requestQueue.items.limit( 0, limit );
 			nth   = items.length - 1;
 
@@ -47,7 +45,6 @@ factory.prototype.mode = function ( start ) {
 
 			// Removing processed items
 			self.requestQueue.items.remove( 0, nth );
-			self.requestQueue.flushing = false;
 
 			// Announcing which items where processed
 			self.sendMessage( MSG_QUE_DEL, processed, true );
