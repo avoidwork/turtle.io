@@ -1,6 +1,7 @@
 /**
  * Creates a cipher from two input parameters
  * 
+ * @method cipher
  * @param  {String}  arg    String to encrypt
  * @param  {Boolean} encode [Optional] Encrypt or decrypt `arg` using `salt`, default is `true`
  * @param  {String}  salt   [Optional] Salt for encryption

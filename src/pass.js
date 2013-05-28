@@ -1,6 +1,7 @@
 /**
  * Sends a command to one or more processes
  * 
+ * @method pass
  * @param  {Object} arg Command
  * @return {Undefined}  undefined
  */
