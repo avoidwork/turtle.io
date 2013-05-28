@@ -20,24 +20,8 @@ factory.prototype.ready = function ( arg ) {
 		// Setting error handler
 		if ( typeof this.config.errorHandler !== "function" ) {
 			this.config.errorHandler = function ( res, req, timer ) {
-				var body   = messages.NOT_FOUND,
-				    status = codes.NOT_FOUND,
-				    method = req.method.toLowerCase(),
-				    host   = req.headers.host.replace( /:.*/, "" );
-
-				if ( !REGEX_GET.test( method ) ) {
-					if ( allowed( req.method, req.url, host ) ) {
-						body   = messages.ERROR_APPLICATION;
-						status = codes.ERROR_APPLICATION;
-					}
-					else {
-						body   = messages.NOT_ALLOWED;
-						status = codes.NOT_ALLOWED;
-					}
-				}
-
-				self.respond( res, req, body, status, {"Cache-Control": "no-cache"}, timer, false );
-			}
+				errorHandler.call( self, res, req, timer );
+			};
 		}
 
 		// Bootstrapping instance
