@@ -101,6 +101,7 @@ factory.prototype.session = {
 	/**
 	 * Sets a session (cluster normalization)
 	 * 
+	 * @method set
 	 * @param  {Object} arg Message argument from Master
 	 * @return {Object}     Instance
 	 */
@@ -127,6 +128,7 @@ factory.prototype.session = {
 /**
  * Session factory
  * 
+ * @method Session
  * @param {String} id     Session ID
  * @param {Object} server Server instance
  */
@@ -139,6 +141,7 @@ function Session ( id, server ) {
 /**
  * Saves session across cluster
  *
+ * @method save
  * @return {Undefined} undefined
  */
 Session.prototype.save = function () {
@@ -159,6 +162,7 @@ Session.prototype.save = function () {
 /**
  * Expires session across cluster
  * 
+ * @method expire
  * @return {Undefined} undefined
  */
 Session.prototype.expire = function () {

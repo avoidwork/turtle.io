@@ -2,6 +2,7 @@
  * Broadcasts a message to other workers every second,
  * until acknowledged
  * 
+ * @method sendMessage
  * @param  {String}  cmd Command
  * @param  {Object}  arg Parameter
  * @param  {Boolean} all [Optional] `true` will broadcast message to other workers

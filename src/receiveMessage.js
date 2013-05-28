@@ -1,7 +1,7 @@
 /**
  * Cluster command processing
  * 
- * @method cmd
+ * @method sendMessage
  * @param  {Object} arg Message passed
  * @return {Object}     Instance
  */
