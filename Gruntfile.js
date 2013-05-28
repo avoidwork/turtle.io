@@ -50,6 +50,7 @@ module.exports = function (grunt) {
 					"src/request.js",
 					"src/respond.js",
 					"src/restart.js",
+					"src/routes.js",
 					"src/sendMessage.js",
 					"src/session.js",
 					"src/start.js",
