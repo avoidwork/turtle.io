@@ -4,7 +4,7 @@
 	"default" : null,
 	"probes"  : true,
 	"maxConnections" : 25,
-	"ps"      : 3,
+	"ps"      : 2,
 	"uid"     : null,
 	"headers" : {
 		"Access-Control-Allow-Origin" : "*",
