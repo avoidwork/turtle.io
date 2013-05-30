@@ -17,7 +17,7 @@ factory.prototype.queueStatus = function ( res, req, uuid, timer ) {
 	else {
 		items     = $.array.keys( this.requestQueue.registry, true );
 		position  = items.index( uuid );
-		timestamp = this.requestQueue[uuid];
+		timestamp = this.requestQueue.registry[uuid];
 		body      = {
 			position  : position,
 			total     : items.length,
