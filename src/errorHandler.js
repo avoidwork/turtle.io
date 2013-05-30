@@ -9,14 +9,15 @@
  */
 var errorHandler = function ( res, req, timer ) {
 	timer      = timer || new Date();
-	var body   = messages.NOT_FOUND,
+	var self   = this,
+	    body   = messages.NOT_FOUND,
 	    status = codes.NOT_FOUND,
 	    method = req.method.toLowerCase(),
 	    host   = req.headers.host.replace( REGEX_PORT, "" );
 
 	// If valid, determine what kind of error to respond with
 	if ( !REGEX_GET.test( method ) && !REGEX_HEAD.test( method ) ) {
-		if ( allowed( req.method, req.url, host ) ) {
+		if ( self.allowed( req.method, req.url, host ) ) {
 			body   = messages.ERROR_APPLICATION;
 			status = codes.ERROR_APPLICATION;
 		}

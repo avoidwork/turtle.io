@@ -12,11 +12,11 @@ factory.prototype.write = function ( path, res, req, timer ) {
 	var self  = this,
 	    put   = ( req.method === "PUT" ),
 	    body  = req.body,
-	    allow = allows( req.url ),
-	    del   = allowed( "DELETE", req.url );
+	    allow = this.allows( req.url ),
+	    del   = this.allowed( "DELETE", req.url );
 
 	if ( !put && /\/$/.test( req.url ) ) {
-		self.respond( res, req, ( del ? messages.CONFLICT : messages.ERROR_APPLICATION ), ( del ? codes.CONFLICT : codes.ERROR_APPLICATION ), {Allow: allow}, timer, false );
+		this.respond( res, req, ( del ? messages.CONFLICT : messages.ERROR_APPLICATION ), ( del ? codes.CONFLICT : codes.ERROR_APPLICATION ), {Allow: allow}, timer, false );
 	}
 	else {
 		allow = allow.explode().remove( "POST" ).join(", ");

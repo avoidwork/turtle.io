@@ -65,9 +65,9 @@ factory.prototype.request = function ( res, req, timer ) {
 	handle = function ( path, url, timer ) {
 		var allow, del, post, mimetype, status;
 
-		allow   = allows( req.url, host );
-		del     = allowed( "DELETE", req.url, host );
-		post    = allowed( "POST", req.url, host );
+		allow   = self.allows( req.url, host );
+		del     = self.allowed( "DELETE", req.url, host );
+		post    = self.allowed( "POST", req.url, host );
 		handled = true;
 		url     = parsed.href;
 
@@ -78,7 +78,7 @@ factory.prototype.request = function ( res, req, timer ) {
 		fs.exists( path, function ( exists ) {
 			switch ( true ) {
 				case !exists && method === "post":
-					if ( allowed( req.method, req.url, host ) ) {
+					if ( self.allowed( req.method, req.url, host ) ) {
 						self.write( path, res, req, timer );
 					}
 					else {
@@ -89,7 +89,7 @@ factory.prototype.request = function ( res, req, timer ) {
 				case !exists:
 					self.respond( res, req, messages.NOT_FOUND, codes.NOT_FOUND, ( post ? {Allow: "POST"} : {} ), timer, false );
 					break;
-				case !allowed( method, req.url, host ):
+				case !self.allowed( method.toUpperCase(), req.url, host ):
 					self.respond( res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {Allow: allow}, timer, false );
 					break;
 				default:
