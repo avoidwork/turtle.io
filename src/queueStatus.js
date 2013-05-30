@@ -9,25 +9,20 @@
  * @return {Object}       Instance
  */
 factory.prototype.queueStatus = function ( res, req, uuid, timer ) {
-	var body, position, timestamp;
+	var body, items, position, timestamp;
 
 	if ( this.requestQueue.registry[uuid] === undefined ) {
 		this.respond( res, req, messages.NOT_FOUND, 404, {"Cache-Control": "no-cache"}, timer, false );	
 	}
 	else {
-		this.requestQueue.items.each( function ( i, idx ) {
-			if ( i.uuid === uuid ) {
-				position  = idx;
-				timestamp = i.timestamp;
-				return false;
-			}
-		});
-
-		body = {
+		items     = $.array.keys( this.requestQueue.registry, true );
+		position  = items.index( uuid );
+		timestamp = this.requestQueue[uuid];
+		body      = {
 			position  : position,
-			total     : this.requestQueue.items.length,
+			total     : items.length,
 			estimate  : Math.ceil( this.requestQueue.times.mean() ) + " seconds",
-			timestamp : moment.utc( timestamp ).format()
+			timestamp : timestamp
 		}
 
 		this.respond( res, req, body, 200, {"Cache-Control": "no-cache"}, timer, false );
