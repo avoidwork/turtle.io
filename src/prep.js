@@ -27,4 +27,4 @@ var prep = function ( res, req ) {
 	         .replace( "{{user-agent}}", req.headers["user-agent"] || "-" );
 
 	return msg;
-}
+};

@@ -1,18 +1,14 @@
 /**
- * Instance Factory
+ * turtle.io factory
  * 
  * @method factory
- * @param  {Object} args [Optional] Properties to set
- * @return {Object}      Instance of turtle.io
+ * @return {Object} Instance
  */
-var factory = function ( args ) {
-	var self = this;
-
+var factory = function () {
 	this.active       = false;
-	this.id           = "";
-	this.config       = {};
+	this.bootstrapped = false;
+	this.config       = require(__dirname + "/../config.json");
 	this.requestQueue = {
-		flushing : false,
 		items    : [],
 		last     : null,
 		times    : [],
@@ -20,10 +16,6 @@ var factory = function ( args ) {
 	};
 	this.logQueue     = [];
 	this.server       = null;
+	this.sessions     = {};
 	this.version      = "{{VERSION}}";
-
-	// Loading config
-	config.call( this, args );
-
-	return this;
 };

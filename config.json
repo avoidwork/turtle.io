@@ -4,6 +4,8 @@
 	"default" : null,
 	"probes"  : true,
 	"maxConnections" : 25,
+	"ps"      : 2,
+	"uid"     : null,
 	"headers" : {
 		"Access-Control-Allow-Origin" : "*",
 		"Access-Control-Allow-Headers": "*",
@@ -24,12 +26,20 @@
 		"stdout" : true
 	},
 	"queue"   : {
+		"id"     : 1,
 		"status" : true,
 		"size"   : 200,
-		"time"   : 1000
+		"time"   : 1000,
+		"handler": null
 	},
 	"port"    : 8000,
 	"root"    : "",
+	"session" : {
+		"id"     : "sid",
+		"salt"   : "turtleio",
+		"valid"  : "15 minutes",
+		"gc"     : 60000
+	},
 	"tmp"     : "/tmp",
 	"vhosts"  : {}
 }

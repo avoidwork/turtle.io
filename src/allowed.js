@@ -7,30 +7,21 @@
  * @param  {String} host   Hostname
  * @return {Boolean}       Boolean indicating if method is allowed
  */
-var allowed = function ( method, uri, host ) {
+factory.prototype.allowed = function ( method, uri, host ) {
 	host       = host || "all";
 	var result = false,
-	    timer  = new Date();
+	    timer  = new Date(),
+	    routes = this.routes( method, host ).merge( this.routes( "all", host ) );
 
-	$.route.list( method, host ).each(function ( route ) {
-		if ( RegExp( "^" + route + "$" ).test( uri ) ) return !( result = true );
+	if ( host !== undefined ) {
+		routes.merge( this.routes( method, "all" ) ).merge( this.routes( "all", "all" ) );
+	}
+
+	routes.each( function ( i ) {
+		if ( RegExp( "^" + i + "$" ).test( uri ) ) {
+			return !( result = true );
+		}
 	});
-
-	if ( !result ) {
-		$.route.list( "all", host ).each( function ( route ) {
-			if ( RegExp( "^" + route + "$" ).test( uri ) ) return !( result = true );
-		});
-	}
-
-	if ( !result && host !== "all" ) {
-		$.route.list( method, "all" ).each( function ( route ) {
-			if ( RegExp( "^" + route + "$" ).test( uri ) ) return !( result = true );
-		});
-
-		if ( !result ) $.route.list( "all", "all" ).each( function ( route ) {
-			if ( RegExp( "^" + route + "$" ).test( uri ) ) return !( result = true );
-		});		
-	}
 
 	dtp.fire( "allowed", function ( p ) {
 		return [host, uri, method.toUpperCase(), diff( timer )];

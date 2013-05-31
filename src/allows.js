@@ -6,16 +6,19 @@
  * @param  {String} host Hostname
  * @return {String}      Allowed methods
  */
-var allows = function ( uri, host ) {
-	var result = "",
+factory.prototype.allows = function ( uri, host ) {
+	var self   = this,
+	    result = [],
 	    verbs  = ["DELETE", "GET", "POST", "PUT", "PATCH"],
 	    timer  = new Date();
 
 	verbs.each( function ( i ) {
-		if ( allowed( i, uri, host ) ) result += ( result.length > 0 ? ", " : "" ) + i;
+		if ( self.allowed( i, uri, host ) ) {
+			result.push( i );
+		}
 	});
 
-	result = result.replace( "GET", "GET, HEAD, OPTIONS" );
+	result = result.join( ", " ).replace( "GET", "GET, HEAD, OPTIONS" );
 
 	dtp.fire( "allows", function ( p ) {
 		return [host, uri, diff( timer )];

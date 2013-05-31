@@ -5,5 +5,12 @@
  * @return {Object} instance
  */
 factory.prototype.restart = function () {
-	return this.stop().start();
+	var config;
+
+	if ( cluster.isMaster ) {
+		config = this.config;
+		this.stop().start( config );
+	}
+
+	return this;
 };

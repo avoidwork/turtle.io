@@ -5,29 +5,13 @@
  * @return {Object} Instance
  */
 factory.prototype.stop = function () {
-	// Shutting down the server
-	if ( this.server !== null ) {
-		try {
-			this.server.close();
-		}
-		catch (e) {
-			void 0;
-		}
+	if ( cluster.isMaster ) {
+		console.log( "Stopping turtle.io on port " + this.config.port );
 
-		this.active = false;
-		this.server = null;
-
-		this.mode( false );
-		this.unset( "*" );
+		$.array.cast( cluster.workers ).each(function ( i ) {
+			process.kill( i.process.pid, TERM_SIG );
+		});
 	}
-
-	// Removing hooks to process
-	process.removeAllListeners("on");
-
-	// Stopping log flush
-	$.clearTimer( "logs" );
-
-	console.log( "Stopped turtle.io on port " + this.config.port );
 
 	return this;
 };
