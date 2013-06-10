@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Easy to use web server with virtual hosts & RESTful proxies",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "homepage": "http://turtle.io",
   "author": {
     "name": "Jason Mulligan",
