@@ -55,7 +55,9 @@ factory.prototype.bootstrap = function ( fn ) {
 		}
 
 		// Setting default response route
-		this.get( "/.*", this.request );
+		if ( !this.routes().get.contains( "/.*" ) ) {
+			this.get( "/.*", this.request );
+		}
 
 		// Creating a server
 		this.active = true;
