@@ -18,15 +18,15 @@ module.exports = function (grunt) {
 				src : [
 					"src/app.js"
 				],
-				dest : "lib/app.js"
+				dest : "assets/app.js"
 			}
 		},
 		shell: {
 			closure: {
-				command: "cd lib\nclosure-compiler --js app.js --js_output_file app.min.js --create_source_map ./app.map"
+				command: "cd assets\nclosure-compiler --js app.js --js_output_file app.min.js --create_source_map ./app.map"
 			},
 			sourcemap: {
-				command: "echo //@ sourceMappingURL=app.map >> lib/app.min.js"
+				command: "echo //@ sourceMappingURL=app.map >> assets/app.min.js"
 			}
 		}
 	});
