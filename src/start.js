@@ -42,7 +42,9 @@ factory.prototype.start = function ( args, errorHandler ) {
 				// Queue worker was killed, re-route!
 				if ( cluster.workers[self.config.queue.id.toString()] === undefined ) {
 					newQueue = true;
-					self.config.queue.id = parseInt( $.array.keys( cluster.workers ).sort( $.array.sort ).last(), 10 ) + 1;
+					self.config.queue.id = $.array.keys( cluster.workers ).map( function ( i ) {
+						return parseInt( i, 10 );
+					}).sorted().last() + 1;
 				}
 
 				// Forking new queue process
