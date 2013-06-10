@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"app.min.js",
+"lineCount":8,
+"mappings":"A;;;;;;;AAUC,SAAS,CAACA,CAAD,CAAI,CACbA,CAAAC,GAAA,CAAK,OAAL,CAAc,QAAS,EAAG,CAEzBD,CAAA,CAAE,OAAF,CAAAE,KAAA,CAAgBC,CAAA,IAAIC,IAAJD,aAAA,EAAhB,CAEA,IAAAE,QAAA,CAAY,QAAS,CAACC,CAAD,CAAM,CAC1BN,CAAA,CAAE,UAAF,CAAAE,KAAA,CAAmBI,CAAAC,OAAAC,QAAA,CAAmB,2BAAnB,CAAgD,IAAhD,CAAnB,CAD0B,CAA3B,CAJyB,CAA1B,CADa,CAAb,CAAA,CASEC,MATF;",
+"sources":["app.js"],
+"names":["$","on","html","getFullYear","Date","headers","arg","Server","replace","abaaso"]
+}
