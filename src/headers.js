@@ -1,6 +1,6 @@
 /**
  * Sets response headers
- * 
+ *
  * @param  {Object}  res             HTTP(S) response Object
  * @param  {Object}  req             HTTP(S) request Object
  * @param  {Number}  status          [Optional] Response status code
@@ -21,16 +21,12 @@ factory.prototype.headers = function ( res, req, status, responseHeaders ) {
 
 	// Fixing `Allow` header
 	if ( !REGEX_HEAD2.test( headers.Allow ) ) {
-		headers.Allow = headers.Allow.toUpperCase()
-		                             .split( /,|\s+/ )
-		                             .filter( function ( i ) {
-		                             	return ( !i.isEmpty() && i !== "HEAD" && i !== "OPTIONS" );
-		                              })
-		                             .join( ", " )
-		                             .replace( "GET", "GET, HEAD, OPTIONS" );
+		headers.Allow = headers.Allow.toUpperCase().split( /,|\s+/ ).filter( function ( i ) {
+			return ( !i.isEmpty() && i !== "HEAD" && i !== "OPTIONS" );
+		}).join( ", " ).replace( "GET", "GET, HEAD, OPTIONS" );
 	}
 
-	headers["Date"] = new Date().toUTCString();
+	headers.Date = new Date().toUTCString();
 
 	if ( headers["Access-Control-Allow-Methods"].isEmpty() ) {
 		headers["Access-Control-Allow-Methods"] = headers.Allow;
@@ -38,7 +34,7 @@ factory.prototype.headers = function ( res, req, status, responseHeaders ) {
 
 	// Decorating "Last-Modified" header
 	if ( headers["Last-Modified"].isEmpty() ) {
-		headers["Last-Modified"] = headers["Date"];
+		headers["Last-Modified"] = headers.Date;
 	}
 
 	// Setting the response status code
@@ -49,13 +45,10 @@ factory.prototype.headers = function ( res, req, status, responseHeaders ) {
 		delete headers["Cache-Control"];
 	}
 
-	switch ( true ) {
-		case status >= codes.FORBIDDEN && status <= codes.NOT_FOUND:
-		case status >= codes.ERROR_APPLICATION:
-			delete headers.Allow;
-			delete headers["Access-Control-Allow-Methods"];
-			delete headers["Last-Modified"];
-			break;
+	if ( ( status >= codes.FORBIDDEN && status <= codes.NOT_FOUND ) || ( status >= codes.ERROR_APPLICATION ) ) {
+		delete headers.Allow;
+		delete headers["Access-Control-Allow-Methods"];
+		delete headers["Last-Modified"];
 	}
 
 	// Decorating response with headers

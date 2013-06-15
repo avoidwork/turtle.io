@@ -1,6 +1,6 @@
 /**
  * Stops instance
- * 
+ *
  * @method stop
  * @return {Object} Instance
  */

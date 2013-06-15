@@ -1,6 +1,6 @@
 /**
  * Logs a message
- * 
+ *
  * @param  {Mixed} msg Error Object or String
  * @return {Object}    Instance
  */

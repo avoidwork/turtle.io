@@ -1,6 +1,6 @@
 /**
  * Proxies a (root) URL to a route
- * 
+ *
  * @param  {String}  origin Host to proxy (e.g. http://hostname)
  * @param  {String}  route  Route to proxy
  * @param  {String}  host   [Optional] Hostname this route is for (default is all)
@@ -16,7 +16,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 
 	/**
 	 * Response handler
-	 * 
+	 *
 	 * @param  {Mixed}  arg   Proxy response
 	 * @param  {Object} xhr   XmlHttpRequest
 	 * @param  {Object} res   HTTP(S) response Object
@@ -29,12 +29,12 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 		    etag       = "",
 		    regex      = /("|')\//g,
 		    replace    = "$1" + route + "/",
-		    date, nth, raw;
+		    date;
 
 		try {
 			// Getting or creating an Etag
 			resHeaders = headers( xhr.getAllResponseHeaders() );
-			date       = ( resHeaders["Last-Modified"] || resHeaders["Date"] ) || undefined;
+			date       = ( resHeaders["Last-Modified"] || resHeaders.Date ) || undefined;
 
 			if ( isNaN( new Date( date ).getFullYear() ) ) {
 				date = new Date();
@@ -55,35 +55,31 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 			}
 
 			// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
-			switch ( true ) {
-				case req.headers["if-none-match"] === etag:
-					self.respond( res, req, messages.NO_CONTENT, codes.NOT_MODIFIED, resHeaders, timer, false );
-					break;
-				default:
-					resHeaders["Transfer-Encoding"] = "chunked";
-					etag = etag.replace( /\"/g, "" );
+			if ( req.headers["if-none-match"] === etag ) {
+				self.respond( res, req, messages.NO_CONTENT, codes.NOT_MODIFIED, resHeaders, timer, false );
+			}
+			else {
+				resHeaders["Transfer-Encoding"] = "chunked";
+				etag = etag.replace( /\"/g, "" );
 
-					// Fixing root path of response
-					switch (true) {
-						case REGEX_HEAD.test( req.method.toLowerCase() ):
-							arg = messages.NO_CONTENT;
-							break;
-						case arg instanceof Array:
-						case arg instanceof Object:
-							arg = $.decode( $.encode( arg ).replace( regex, replace ) );
-							break;
-						case typeof arg === "string":
-							arg = arg.replace( regex, replace );
-							break;
-					}
+				// Fixing root path of response
+				if ( REGEX_HEAD.test( req.method.toLowerCase() ) ) {
+					arg = messages.NO_CONTENT;
+				}
+				else if ( arg instanceof Array || arg instanceof Object ) {
+					arg = $.decode( $.encode( arg ).replace( regex, replace ) );
+				}
+				else if ( typeof arg === "string" ) {
+					arg = arg.replace( regex, replace );
+				}
 
-					// Sending compressed version to Client if supported
-					if ( req.headers["accept-encoding"] !== undefined ) {
-						self.compressed( res, req, etag, arg, xhr.status, resHeaders, false, timer );
-					}
-					else {
-						self.respond( res, req, arg, xhr.status, resHeaders, timer, false );
-					}
+				// Sending compressed version to Client if supported
+				if ( req.headers["accept-encoding"] !== undefined ) {
+					self.compressed( res, req, etag, arg, xhr.status, resHeaders, false, timer );
+				}
+				else {
+					self.respond( res, req, arg, xhr.status, resHeaders, timer, false );
+				}
 			}
 		}
 		catch (e) {
@@ -94,7 +90,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 
 	/**
 	 * Capitalizes HTTP headers
-	 * 
+	 *
 	 * @param  {Object} args Response headers
 	 * @return {Object}      Reshaped response headers
 	 */
@@ -117,7 +113,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 
 	/**
 	 * Wraps the proxy request
-	 * 
+	 *
 	 * @param  {Object} res   HTTP(S) response Object
 	 * @param  {Object} req   HTTP(S) request Object
 	 * @param  {Object} timer [Optional] Date instance
@@ -162,7 +158,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 
 			proxyReq.end();
 
-			dtp.fire( "proxy", function ( p ) {
+			dtp.fire( "proxy", function () {
 				return [req.headers.host, req.method, route, origin, diff( timer )];
 			});
 		}
@@ -195,7 +191,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 		self[i]( route, wrapper, host );
 		self[i]( route + "/.*", wrapper, host );
 
-		dtp.fire( "proxy-set", function ( p ) {
+		dtp.fire( "proxy-set", function () {
 			return [host || "*", i.toUpperCase(), origin, route, diff( timer )];
 		});
 	});

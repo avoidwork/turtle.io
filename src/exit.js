@@ -1,6 +1,6 @@
 /**
  * Exits application when unrecoverable error occurs
- * 
+ *
  * @return {Undefined} undefined
  */
 var exit = function () {

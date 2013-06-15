@@ -1,4 +1,4 @@
-( function ( global ) {
+( function () {
 "use strict";
 
 var $           = require( "abaaso" ),
@@ -11,7 +11,6 @@ var $           = require( "abaaso" ),
     moment      = require( "moment" ),
     syslog      = require( "node-syslog" ),
     toobusy     = require( "toobusy" ),
-    url         = require( "url" ),
     zlib        = require( "zlib" ),
     d           = require( "dtrace-provider" ),
     dtp         = d.createDTraceProvider( "turtle-io" ),
@@ -30,6 +29,8 @@ var $           = require( "abaaso" ),
     REGEX_NURI  = /.*\//,
     REGEX_PORT  = /:.*/,
     REGEX_SERVER= /^\_server/,
+    REGEX_SLASH = /\/$/,
+    REGEX_SPACE = /\s+/,
     MSG_ACK     = "acknowledge",
     MSG_ALL     = "announce",
     MSG_MASTER  = "master",
@@ -42,8 +43,7 @@ var $           = require( "abaaso" ),
     MSG_SES_DEL = "delete_session",
     MSG_SES_SET = "set_session",
     TERM_SIG    = "SIGTERM",
-    TERM_CODE   = 143,
-    fn;
+    TERM_CODE   = 143;
 
 // Hooking syslog output
 syslog.init( "turtle_io", syslog.LOG_PID | syslog.LOG_ODELAY, syslog.LOG_LOCAL0 );

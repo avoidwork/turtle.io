@@ -1,6 +1,6 @@
 /**
  * Concatinates the request URL
- * 
+ *
  * @param  {Object} req HTTP(S) request Object
  * @return {String}     Complete request URL
  */

@@ -1,6 +1,6 @@
 /**
  * HTTP (semantic) status messages
- * 
+ *
  * @type {Object}
  */
 var messages = {

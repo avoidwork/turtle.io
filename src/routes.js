@@ -1,6 +1,6 @@
 /**
  * Retrieves routes
- * 
+ *
  * @param  {String} method [Optional] HTTP method/verb
  * @param  {String} host   [Optional] Host to lookup, defaults to `all`
  * @return {Object}        Hash of routes

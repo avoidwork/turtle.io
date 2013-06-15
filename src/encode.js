@@ -1,6 +1,6 @@
 /**
  * Encodes `obj` as JSON if applicable
- * 
+ *
  * @param  {Mixed} obj Object to encode
  * @return {Mixed}     Original Object or JSON string
  */

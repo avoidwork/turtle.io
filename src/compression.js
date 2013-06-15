@@ -1,7 +1,7 @@
 
 /**
  * Determines what/if compression is supported for a request
- * 
+ *
  * @method compression
  * @param  {String} agent    User-Agent header value
  * @param  {String} encoding Accept-Encoding header value
@@ -14,13 +14,11 @@ factory.prototype.compression = function ( agent, encoding ) {
 	if ( this.config.compress === true && !REGEX_IE.test( agent ) ) {
 		// Iterating supported encodings
 		encodings.each( function ( i ) {
-			switch ( true ) {
-				case REGEX_GZIP.test( i ):
-					result = "gzip";
-					break;
-				case REGEX_DEF.test( i ):
-					result = "deflate";
-					break;
+			if ( REGEX_GZIP.test( i ) ) {
+				result = "gzip";
+			}
+			else if ( REGEX_DEF.test( i ) ) {
+				result = "deflate";
 			}
 
 			// Found a supported encoding

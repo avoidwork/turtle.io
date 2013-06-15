@@ -1,6 +1,6 @@
 /**
  * Sends a command to one or more processes
- * 
+ *
  * @method pass
  * @param  {Object} arg Command
  * @return {Undefined}  undefined
@@ -13,7 +13,7 @@ var pass = function ( arg ) {
 			arg.cmd = arg.altCmd;
 			delete arg.altCmd;
 
-			$.array.cast( cluster.workers ).each(function ( i, idx ) {
+			$.array.cast( cluster.workers ).each( function ( i ) {
 				if ( self.config.queue.id !== i.id && i.id !== arg.worker ) {
 					cluster.workers[i.id.toString()].send( arg );
 				}

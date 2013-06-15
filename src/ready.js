@@ -1,6 +1,6 @@
 /**
  * Starts worker
- * 
+ *
  * @method ready
  * @param  {Object} arg Message argument from Master
  * @return {Object}     Instance

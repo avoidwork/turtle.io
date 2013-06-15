@@ -1,6 +1,6 @@
 /**
  * Determines which verbs are allowed against a URL
- * 
+ *
  * @method allows
  * @param  {String} url  URL to query
  * @param  {String} host Hostname
@@ -20,7 +20,7 @@ factory.prototype.allows = function ( uri, host ) {
 
 	result = result.join( ", " ).replace( "GET", "GET, HEAD, OPTIONS" );
 
-	dtp.fire( "allows", function ( p ) {
+	dtp.fire( "allows", function () {
 		return [host, uri, diff( timer )];
 	});
 

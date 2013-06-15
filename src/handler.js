@@ -1,6 +1,6 @@
 /**
  * Route handler
- * 
+ *
  * @method handler
  * @param  {Object}   res HTTP(S) response Object
  * @param  {Object}   req HTTP(S) request Object
@@ -42,7 +42,7 @@ var handler = function ( res, req, fn ) {
 			self.error( res, req, e, timer );
 		}
 
-		dtp.fire( "handler", function ( p ) {
+		dtp.fire( "handler", function () {
 			return [req.headers.host, req.url, diff( timer )];
 		});
 	};
@@ -53,15 +53,13 @@ var handler = function ( res, req, fn ) {
 	});
 
 	// Handling request or wrapping it with HTTP Authentication
-	switch ( true ) {
-		case this.config.auth === undefined:
-		case !this.config.auth.hasOwnProperty( host ):
-			op();
-			break;
-		default:
-			if ( typeof this.config.auth[host].auth === "undefined" ) {
-				this.config.auth[host].auth = http_auth( this.config.auth[host] );
-			}
-			this.config.auth[host].auth.apply( req, res, op );
+	if ( this.config.auth === undefined || !this.config.auth.hasOwnProperty( host ) ) {
+		op();
+	}
+	else {
+		if ( typeof this.config.auth[host].auth === "undefined" ) {
+			this.config.auth[host].auth = http_auth( this.config.auth[host] );
+		}
+		this.config.auth[host].auth.apply( req, res, op );
 	}
 };

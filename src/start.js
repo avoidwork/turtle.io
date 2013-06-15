@@ -1,17 +1,15 @@
 /**
  * Starts instance
- * 
+ *
  * @method start
  * @param  {Object}   args         Parameters to set
  * @param  {Function} errorHandler [Optional] Error handler
  * @return {Object}                Instance
  */
 factory.prototype.start = function ( args, errorHandler ) {
-	var self    = this,
-	    params  = {},
-	    headers = {},
-	    i       = -1,
-	    bootstrap, error, msg, sig;
+	var self = this,
+	    i    = -1,
+	    msg, sig;
 
 	// Merging config
 	if ( args !== undefined ) {
@@ -24,7 +22,9 @@ factory.prototype.start = function ( args, errorHandler ) {
 	}
 
 	// Setting error handler
-	this.config.errorHandler  = errorHandler;
+	if ( errorHandler !== undefined ) {
+		this.config.errorHandler = errorHandler;
+	}
 
 	if ( cluster.isMaster ) {
 		// Message passing
@@ -73,7 +73,7 @@ factory.prototype.start = function ( args, errorHandler ) {
 		}
 
 		// Setting up worker events
-		$.array.cast( cluster.workers ).each( function ( i, idx ) {
+		$.array.cast( cluster.workers ).each( function ( i ) {
 			i.on( "message", msg );
 			i.on( "exit",    sig );
 		});

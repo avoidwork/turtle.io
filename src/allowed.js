@@ -1,6 +1,6 @@
 /**
  * Verifies a method is allowed on a URI
- * 
+ *
  * @method allowed
  * @param  {String} method HTTP verb
  * @param  {String} uri    URI to query
@@ -18,12 +18,12 @@ factory.prototype.allowed = function ( method, uri, host ) {
 	}
 
 	routes.each( function ( i ) {
-		if ( RegExp( "^" + i + "$" ).test( uri ) ) {
+		if ( new RegExp( "^" + i + "$" ).test( uri ) ) {
 			return !( result = true );
 		}
 	});
 
-	dtp.fire( "allowed", function ( p ) {
+	dtp.fire( "allowed", function () {
 		return [host, uri, method.toUpperCase(), diff( timer )];
 	});
 

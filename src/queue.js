@@ -1,6 +1,6 @@
 /**
  * Queues a request for processing
- * 
+ *
  * @method queue
  * @param  {Object} res     HTTP(S) response Object
  * @param  {Object} req     HTTP(S) request Object

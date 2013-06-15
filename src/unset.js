@@ -1,6 +1,6 @@
 /**
  * Unsets a route
- * 
+ *
  * @method unset
  * @param  {String} route URI Route
  * @param  {String} verb  HTTP method
@@ -11,9 +11,9 @@ factory.prototype.unset = function ( route, verb, host ) {
 
 	route === "*" ? $.route.reset() : $.route.del( route, verb, host );
 
-	dtp.fire( "route-unset", function ( p ) {
+	dtp.fire( "route-unset", function () {
 		return [host || "*", route, verb || "ALL", diff( timer )];
 	});
 
- 	return this;
+	return this;
 };
