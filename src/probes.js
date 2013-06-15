@@ -1,6 +1,6 @@
 /**
  * Registers dtrace probes
- * 
+ *
  * @return {Undefined} undefined
  */
 var probes = function () {

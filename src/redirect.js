@@ -1,6 +1,6 @@
 /**
  * Redirects GETs for a route to another URL
- * 
+ *
  * @param  {String}  route     Route to redirect
  * @param  {String}  url       URL to redirect the Client to
  * @param  {String}  host      [Optional] Hostname this route is for (default is all)
@@ -16,7 +16,7 @@ factory.prototype.redirect = function ( route, url, host, permanent ) {
 		self.respond( res, req, messages.NO_CONTENT, code, {"Location": url}, timer, false );
 	}, host);
 
-	dtp.fire( "redirect-set", function ( p ) {
+	dtp.fire( "redirect-set", function () {
 		return [host || "*", route, url, permanent, diff( timer )];
 	});
 

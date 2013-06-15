@@ -1,6 +1,6 @@
 /**
  * Creates a compressed version of the Body of a Response
- * 
+ *
  * @method cache
  * @param  {String}   filename Filename of the new file (Etag without quotes)
  * @param  {String}   obj      Body or Path to file to compress
@@ -27,7 +27,7 @@ factory.prototype.cache = function ( filename, obj, encoding, body, callback ) {
 
 				raw.pipe( zlib[REGEX_DEF.test( encoding ) ? "createDeflate" : "createGzip"]() ).pipe( stream );
 
-				dtp.fire( "compress", function ( p ) {
+				dtp.fire( "compress", function () {
 					return [filename, dest, encoding, diff( timer )];
 				});
 			}
@@ -51,7 +51,7 @@ factory.prototype.cache = function ( filename, obj, encoding, body, callback ) {
 								self.log( e, true, false );
 							}
 							else {
-								dtp.fire( "compress", function ( p ) {
+								dtp.fire( "compress", function () {
 									return [filename, dest, encoding, diff( timer )];
 								});
 

@@ -1,6 +1,6 @@
 /**
  * Pipes compressed asset to Client, or schedules the creation of the asset
- * 
+ *
  * @param  {Object}  res     HTTP(S) response Object
  * @param  {Object}  req     HTTP(S) request Object
  * @param  {String}  etag    Etag header
@@ -26,7 +26,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 			res.setHeader( "Content-Encoding", compression );
 
 			this.cached( etag, compression, function ( ready, npath ) {
-				dtp.fire( "compressed", function ( p ) {
+				dtp.fire( "compressed", function () {
 					return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 				});
 
@@ -42,7 +42,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 					raw.pipe( zlib[REGEX_DEF.test( compression ) ? "createDeflate" : "createGzip"]() ).pipe( res );
 				}
 
-				dtp.fire( "respond", function ( p ) {
+				dtp.fire( "respond", function () {
 					return [req.headers.host, req.method, req.url, status, diff( timer )];
 				});
 
@@ -53,7 +53,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 			raw = fs.createReadStream( arg );
 			raw.pipe( res );
 
-			dtp.fire( "compressed", function ( p ) {
+			dtp.fire( "compressed", function () {
 				return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 			});
 		}
@@ -66,7 +66,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 
 				// Responding with cached asset
 				if ( ready ) {
-					dtp.fire( "compressed", function ( p ) {
+					dtp.fire( "compressed", function () {
 						return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 					});
 
@@ -77,7 +77,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 
 					self.log( prep.call( self, res, req ) );
 
-					dtp.fire( "respond", function ( p ) {
+					dtp.fire( "respond", function () {
 						return [req.headers.host, req.method, req.url, status, diff( timer )];
 					});
 				}
@@ -86,7 +86,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 					body = encode( arg );
 
 					zlib[compression]( body, function ( e, compressed ) {
-						dtp.fire( "compressed", function ( p ) {
+						dtp.fire( "compressed", function () {
 							return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 						});
 
@@ -101,7 +101,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 									self.log( e, true, false );
 								}
 								else {
-									dtp.fire( "compress", function ( p ) {
+									dtp.fire( "compress", function () {
 										return [etag, npath, compression, diff( timer )];
 									});
 								}
@@ -112,7 +112,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 			});
 		}
 		else {
-			dtp.fire( "compressed", function ( p ) {
+			dtp.fire( "compressed", function () {
 				return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 			});
 

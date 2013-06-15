@@ -1,18 +1,13 @@
 /**
  * Returns an Object describing the instance's status
- * 
+ *
  * @method status
  * @return {Object} Status
  */
 factory.prototype.status = function () {
 	var ram    = process.memoryUsage(),
 	    uptime = process.uptime(),
-	    state  = {
-	    	config  : {},
-	    	process : {},
-	    	queue   : {},
-	    	server  : {}
-	    };
+	    state  = {config: {}, process: {}, queue: {}, server: {}};
 
 	// Startup parameters
 	$.iterate( this.config, function ( v, k ) {
@@ -39,7 +34,7 @@ factory.prototype.status = function () {
 		uptime      : uptime
 	};
 
-	dtp.fire( "status", function ( p ) {
+	dtp.fire( "status", function () {
 		return [state.server.connections, uptime, ram.heapUsed, ram.heapTotal];
 	});
 

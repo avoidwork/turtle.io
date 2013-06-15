@@ -1,12 +1,12 @@
 /**
  * Sessions
- * 
+ *
  * @type {Object}
  */
 factory.prototype.session = {
 	/**
 	 * Creates a session
-	 * 
+	 *
 	 * @method create
 	 * @param  {Object} res HTTP(S) response Object
 	 * @param  {Object} req HTTP(S) request Object
@@ -34,7 +34,7 @@ factory.prototype.session = {
 
 	/**
 	 * Destroys a session
-	 * 
+	 *
 	 * @method destroy
 	 * @param  {Object} res HTTP(S) response Object
 	 * @param  {Object} req HTTP(S) request Object
@@ -65,7 +65,7 @@ factory.prototype.session = {
 
 	/**
 	 * Gets a session
-	 * 
+	 *
 	 * @method get
 	 * @param  {Object} res HTTP(S) response Object
 	 * @param  {Object} req HTTP(S) request Object
@@ -77,7 +77,7 @@ factory.prototype.session = {
 		    domain   = parsed.host.isDomain() && !parsed.host.isIP() ? parsed.host : undefined,
 		    secure   = ( parsed.protocol === "https:" ),
 		    sid      = instance.cookie.get( req, instance.config.session.id ),
-		    id, salt, sesh, timestamp, now;
+		    id, salt, sesh;
 
 		if ( sid !== undefined ) {
 			salt = req.connection.remoteAddress + "-" + instance.config.session.salt;
@@ -100,7 +100,7 @@ factory.prototype.session = {
 
 	/**
 	 * Sets a session (cluster normalization)
-	 * 
+	 *
 	 * @method set
 	 * @param  {Object} arg Message argument from Master
 	 * @return {Object}     Instance
@@ -127,7 +127,7 @@ factory.prototype.session = {
 
 /**
  * Session factory
- * 
+ *
  * @method Session
  * @param {String} id     Session ID
  * @param {Object} server Server instance
@@ -136,7 +136,7 @@ function Session ( id, server ) {
 	this._id        = id;
 	this._server    = server;
 	this._timestamp = 0;
-};
+}
 
 /**
  * Saves session across cluster
@@ -161,7 +161,7 @@ Session.prototype.save = function () {
 
 /**
  * Expires session across cluster
- * 
+ *
  * @method expire
  * @return {Undefined} undefined
  */

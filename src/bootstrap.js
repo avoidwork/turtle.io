@@ -1,6 +1,6 @@
 /**
  * Bootstraps instance
- * 
+ *
  * @method bootstrap
  * @param  {Function} fn [Optional] Route error handler
  * @return {Object}      Instance
@@ -8,10 +8,7 @@
 factory.prototype.bootstrap = function ( fn ) {
 	var self    = this,
 	    params  = {},
-	    expires = {
-	    	interval : 0,
-	    	sampling : ""
-	    };
+	    expires = {interval: 0, sampling: ""};
 
 	if ( this.bootstrapped === false ) {
 		// Preparing parameters
@@ -70,7 +67,7 @@ factory.prototype.bootstrap = function ( fn ) {
 
 		// Socket probe
 		this.server.on( "connection", function () {
-			dtp.fire( "connection", function ( p ) {
+			dtp.fire( "connection", function () {
 				return [self.server.connections];
 			});
 		});

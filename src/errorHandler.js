@@ -1,6 +1,6 @@
 /**
  * Default error handler
- * 
+ *
  * @method errorHandler
  * @param  {Object} res   HTTP(S) response Object
  * @param  {Object} req   HTTP(S) request Object

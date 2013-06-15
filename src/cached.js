@@ -1,6 +1,6 @@
 /**
  * Verifies there's a cached version of the compressed file
- * 
+ *
  * @method cached
  * @param  {String}   filename Filename (etag)
  * @param  {String}   format   Type of compression (gzip or deflate)

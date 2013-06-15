@@ -1,6 +1,6 @@
 /**
  * HTTP (semantic) status codes
- * 
+ *
  * @type {Object}
  */
 var codes = {

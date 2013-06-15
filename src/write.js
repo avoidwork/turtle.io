@@ -1,6 +1,6 @@
 /**
  * Writes files to disk
- * 
+ *
  * @method write
  * @param  {String} path  File path
  * @param  {Object} res   HTTP response Object
@@ -25,31 +25,25 @@ factory.prototype.write = function ( path, res, req, timer ) {
 			var hash = "\"" + self.hash( data ) + "\"";
 
 			if ( e ) {
-				self.respond( res, req, messages.ERROR_APPLICATION, codes.ERROR_APPLICATION, {}, timer, false );
-				self.log( e );
+				self.error( res, req, e, timer );
 			}
 			else {
-				switch (true) {
-					case !req.headers.hasOwnProperty( etag ):
-					case req.headers.etag === hash:
-						fs.writeFile( path, body, function ( e ) {
-							if ( e ) {
-								self.error( req, req, e, timer );
-							}
-							else {
-								dtp.fire( "write", function ( p ) {
-									return [req.headers.host, req.url, req.method, path, diff( timer )];
-								});
+				if ( !req.headers.hasOwnProperty( "etag" ) || req.headers.etag === hash ) {
+					fs.writeFile( path, body, function ( e ) {
+						if ( e ) {
+							self.error( req, req, e, timer );
+						}
+						else {
+							dtp.fire( "write", function () {
+								return [req.headers.host, req.url, req.method, path, diff( timer )];
+							});
 
-								self.respond( res, req, ( put ? messages.NO_CONTENT : messages.CREATED ), ( put ? codes.NO_CONTENT : codes.CREATED ), {Allow: allow, Etag: hash}, timer, false );
-							}
-						});
-						break;
-					case req.headers.etag !== hash:
-						self.respond( res, req, messages.NO_CONTENT, codes.FAILED, {}, timer, false );
-						break;
-					default:
-						self.error( req, req, e, timer );
+							self.respond( res, req, ( put ? messages.NO_CONTENT : messages.CREATED ), ( put ? codes.NO_CONTENT : codes.CREATED ), {Allow: allow, Etag: hash}, timer, false );
+						}
+					});
+				}
+				else if ( req.headers.etag !== hash ) {
+					self.respond( res, req, messages.NO_CONTENT, codes.FAILED, {}, timer, false );
 				}
 			}
 		});

@@ -1,6 +1,6 @@
 /**
  * Constructs a response
- * 
+ *
  * @method respond
  * @param  {Object}  res      HTTP(S) response Object
  * @param  {Object}  req      HTTP(S) request Object
@@ -18,7 +18,7 @@ factory.prototype.respond = function ( res, req, output, status, headers, timer,
 	var body     = !REGEX_HEAD.test( req.method ) && output !== null,
 	    encoding = this.compression( req.headers["user-agent"], req.headers["accept-encoding"] ),
 	    self     = this,
-	    nth, salt;
+	    salt;
 
 	if ( !( headers instanceof Object ) ) {
 		headers = {};
@@ -37,7 +37,7 @@ factory.prototype.respond = function ( res, req, output, status, headers, timer,
 
 	if ( status === 200 ) {
 		// CSV hook
-		if ( body && headers["Content-Type"] === "application/json" && req.headers["accept"] !== undefined && REGEX_CSV.test( req.headers["accept"].explode()[0].replace( REGEX_NVAL, "" ) ) ) {
+		if ( body && headers["Content-Type"] === "application/json" && req.headers.accept !== undefined && REGEX_CSV.test( req.headers.accept.explode()[0].replace( REGEX_NVAL, "" ) ) ) {
 			headers["Content-Type"] = "text/csv";
 
 			if ( headers["Content-Disposition"] === undefined ) {
@@ -74,7 +74,7 @@ factory.prototype.respond = function ( res, req, output, status, headers, timer,
 
 		res.end();
 
-		dtp.fire( "respond", function ( p ) {
+		dtp.fire( "respond", function () {
 			return [req.headers.host, req.method, req.url, status, diff( timer )];
 		});
 

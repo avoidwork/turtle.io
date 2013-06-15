@@ -1,8 +1,8 @@
 /**
  * Request handler which provides RESTful CRUD operations
- * 
+ *
  * Default route is for GET only
- * 
+ *
  * @param  {Object} res   HTTP(S) response Object
  * @param  {Object} req   HTTP(S) request Object
  * @param  {Object} timer Date instance
@@ -13,16 +13,13 @@ factory.prototype.request = function ( res, req, timer ) {
 	    host    = req.headers.host.replace( /:.*/, "" ),
 	    parsed  = $.parse( this.url( req ) ),
 	    method  = REGEX_GET.test( req.method ) ? "get" : req.method.toLowerCase(),
-	    path    = [],
 	    handled = false,
-	    port    = this.config.port,
-	    path    = "",
 	    found   = false,
 	    count, handle, nth, root;
 
 	// Most likely this request will fail due to latency, so handle it as a 503 and 'retry after a minute'
 	if ( toobusy() ) {
-		dtp.fire( "busy", function ( p ) {
+		dtp.fire( "busy", function () {
 			return [req.headers.host, req.method, req.url, self.server.connections, diff( timer )];
 		});
 
@@ -42,11 +39,11 @@ factory.prototype.request = function ( res, req, timer ) {
 		});
 
 		if ( !found ) {
-			if ( this.config.default !== null ) {
-				host = this.config.default;
+			if ( this.config["default"] !== null ) {
+				host = this.config["default"];
 			}
 			else {
-				throw Error( messages.ERROR_APPLICATION );
+				throw new Error( messages.ERROR_APPLICATION );
 			}
 		}
 	}
@@ -71,83 +68,80 @@ factory.prototype.request = function ( res, req, timer ) {
 		handled = true;
 		url     = parsed.href;
 
-		dtp.fire( "request", function ( p ) {
+		dtp.fire( "request", function () {
 			return [url, allow, diff( timer )];
 		});
 
 		fs.exists( path, function ( exists ) {
-			switch ( true ) {
-				case !exists && method === "post":
-					if ( self.allowed( req.method, req.url, host ) ) {
-						self.write( path, res, req, timer );
-					}
-					else {
-						status = codes.NOT_ALLOWED;
-						self.respond( res, req, messages.NOT_ALLOWED, status, {Allow: allow}, timer, false );
-					}
-					break;
-				case !exists:
-					self.respond( res, req, messages.NOT_FOUND, codes.NOT_FOUND, ( post ? {Allow: "POST"} : {} ), timer, false );
-					break;
-				case !self.allowed( method.toUpperCase(), req.url, host ):
-					self.respond( res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {Allow: allow}, timer, false );
-					break;
-				default:
-					if ( !/\/$/.test( req.url ) ) {
-						allow = allow.explode().remove( "POST" ).join( ", " );
-					}
+			if ( !exists && method === "post" ) {
+				if ( self.allowed( req.method, req.url, host ) ) {
+					self.write( path, res, req, timer );
+				}
+				else {
+					status = codes.NOT_ALLOWED;
+					self.respond( res, req, messages.NOT_ALLOWED, status, {Allow: allow}, timer, false );
+				}
+			}
+			else if ( !exists ) {
+				self.respond( res, req, messages.NOT_FOUND, codes.NOT_FOUND, ( post ? {Allow: "POST"} : {} ), timer, false );
+			}
+			else if ( !self.allowed( method.toUpperCase(), req.url, host ) ) {
+				self.respond( res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {Allow: allow}, timer, false );
+			}
+			else {
+				if ( !REGEX_SLASH.test( req.url ) ) {
+					allow = allow.explode().remove( "POST" ).join( ", " );
+				}
 
-					switch ( method ) {
-						case "delete":
-							fs.unlink( path, function ( e ) {
-								if ( e ) {
-									self.error( req, req, e, timer );
-								}
-								else {
-									self.respond( res, req, messages.NO_CONTENT, codes.NO_CONTENT, {}, timer, false );
-								}
-							});
-							break;
-						case "get":
-						case "head":
-						case "options":
-							mimetype = mime.lookup( path );
-							fs.stat( path, function ( e, stat ) {
-								var size, modified, etag, raw, headers;
+				switch ( method ) {
+					case "delete":
+						fs.unlink( path, function ( e ) {
+							if ( e ) {
+								self.error( req, req, e, timer );
+							}
+							else {
+								self.respond( res, req, messages.NO_CONTENT, codes.NO_CONTENT, {}, timer, false );
+							}
+						});
+						break;
+					case "get":
+					case "head":
+					case "options":
+						mimetype = mime.lookup( path );
+						fs.stat( path, function ( e, stat ) {
+							var size, modified, etag, headers;
 
-								if ( e ) {
-									self.error( res, req, e );
-								}
-								else {
-									size     = stat.size;
-									modified = stat.mtime.toUTCString();
-									etag     = "\"" + self.hash( req.url + "-" + stat.size + "-" + stat.mtime ) + "\"";
-									headers  = {Allow: allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified};
+							if ( e ) {
+								self.error( res, req, e );
+							}
+							else {
+								size     = stat.size;
+								modified = stat.mtime.toUTCString();
+								etag     = "\"" + self.hash( req.url + "-" + stat.size + "-" + stat.mtime ) + "\"";
+								headers  = {Allow: allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified};
 
-									if ( req.method === "GET" ) {
-										switch ( true ) {
-											case Date.parse( req.headers["if-modified-since"] ) >= stat.mtime:
-											case req.headers["if-none-match"] === etag:
-												self.respond( res, req, messages.NO_CONTENT, codes.NOT_MODIFIED, headers, timer, false );
-												break;
-											default:
-												headers["Transfer-Encoding"] = "chunked";
-												etag = etag.replace( /\"/g, "" );
-												self.compressed( res, req, etag, path, codes.SUCCESS, headers, true, timer );
-										}
+								if ( req.method === "GET" ) {
+									if ( ( Date.parse( req.headers["if-modified-since"] ) >= stat.mtime ) || ( req.headers["if-none-match"] === etag ) ) {
+										self.respond( res, req, messages.NO_CONTENT, codes.NOT_MODIFIED, headers, timer, false );
 									}
 									else {
-										self.respond( res, req, messages.NO_CONTENT, codes.SUCCESS, headers, timer, false );
+										headers["Transfer-Encoding"] = "chunked";
+										etag = etag.replace( /\"/g, "" );
+										self.compressed( res, req, etag, path, codes.SUCCESS, headers, true, timer );
 									}
 								}
-							});
-							break;
-						case "put":
-							self.write( path, res, req, timer );
-							break;
-						default:
-							self.error( req, req, e, timer );
-					}
+								else {
+									self.respond( res, req, messages.NO_CONTENT, codes.SUCCESS, headers, timer, false );
+								}
+							}
+						});
+						break;
+					case "put":
+						self.write( path, res, req, timer );
+						break;
+					default:
+						self.error( req, req, undefined, timer );
+				}
 			}
 		});
 	};

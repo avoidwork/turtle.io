@@ -1,6 +1,6 @@
 /**
  * Error handler for requests
- * 
+ *
  * @method error
  * @param  {Object} res   HTTP(S) response Object
  * @param  {Object} req   HTTP(S) request Object
@@ -13,7 +13,7 @@ factory.prototype.error = function ( res, req, e, timer ) {
 
 	$.route.load( "error", res, req );
 
-	dtp.fire( "error", function ( p ) {
+	dtp.fire( "error", function () {
 		return [req.headers.host, req.url, codes.ERROR_APPLICATION, e || messages.ERROR_APPLICATION, diff( timer )];
 	});
 };

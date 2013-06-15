@@ -1,6 +1,6 @@
 /**
  * turtle.io factory
- * 
+ *
  * @method factory
  * @return {Object} Instance
  */

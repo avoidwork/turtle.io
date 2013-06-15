@@ -1,6 +1,6 @@
 /**
  * Cookies
- * 
+ *
  * @class cookie
  */
 factory.prototype.cookie = {
@@ -33,7 +33,7 @@ factory.prototype.cookie = {
 
 	/**
 	 * Gets a list cookies from the request headers
-	 * 
+	 *
 	 * @method list
 	 * @param  {Object} req  HTTP(S) request Object
 	 * @param  {String} name Cookie name

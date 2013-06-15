@@ -1,6 +1,6 @@
 /**
  * Sets a route for all verbs
- * 
+ *
  * @method all
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
@@ -15,7 +15,7 @@ factory.prototype.all = function ( route, fn, host ) {
 		handler.call( self, res, req, fn );
 	}, "all", host );
 
-	dtp.fire( "route-set", function ( p ) {
+	dtp.fire( "route-set", function () {
 		return [host || "*", route, "ALL", diff( timer )];
 	});
 
@@ -24,14 +24,14 @@ factory.prototype.all = function ( route, fn, host ) {
 
 /**
  * Sets a DELETE route
- * 
+ *
  * @method delete
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
  * @param  {String}   host  [Optional] Hostname this route is for (default is all)
  * @return {Object}         Instance
  */
-factory.prototype.delete = function ( route, fn, host ) {
+factory.prototype["delete"] = function ( route, fn, host ) {
 	var self  = this,
 	    timer = new Date();
 
@@ -39,7 +39,7 @@ factory.prototype.delete = function ( route, fn, host ) {
 		handler.call( self, res, req, fn );
 	}, "delete", host );
 
-	dtp.fire( "route-set", function ( p ) {
+	dtp.fire( "route-set", function () {
 		return [host || "*", route, "DELETE", diff( timer )];
 	});
 
@@ -48,7 +48,7 @@ factory.prototype.delete = function ( route, fn, host ) {
 
 /**
  * Sets a GET route
- * 
+ *
  * @method get
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
@@ -63,7 +63,7 @@ factory.prototype.get = function ( route, fn, host ) {
 		handler.call( self, res, req, fn );
 	}, "get", host );
 
-	dtp.fire( "route-set", function ( p ) {
+	dtp.fire( "route-set", function () {
 		return [host || "*", route, "GET", diff( timer )];
 	});
 
@@ -72,7 +72,7 @@ factory.prototype.get = function ( route, fn, host ) {
 
 /**
  * Sets a PATCH route
- * 
+ *
  * @method patch
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
@@ -87,7 +87,7 @@ factory.prototype.patch = function ( route, fn, host ) {
 		handler.call( self, res, req, fn );
 	}, "patch", host );
 
-	dtp.fire("route-set", function ( p ) {
+	dtp.fire("route-set", function () {
 		return [host || "*", route, "PATCH", diff( timer )];
 	});
 
@@ -96,7 +96,7 @@ factory.prototype.patch = function ( route, fn, host ) {
 
 /**
  * Sets a POST route
- * 
+ *
  * @method post
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
@@ -111,7 +111,7 @@ factory.prototype.post = function ( route, fn, host ) {
 		handler.call( self, res, req, fn );
 	}, "post", host );
 
-	dtp.fire("route-set", function ( p ) {
+	dtp.fire("route-set", function () {
 		return [host || "*", route, "POST", diff( timer )];
 	});
 
@@ -120,7 +120,7 @@ factory.prototype.post = function ( route, fn, host ) {
 
 /**
  * Sets a DELETE route
- * 
+ *
  * @method put
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
@@ -135,7 +135,7 @@ factory.prototype.put = function ( route, fn, host ) {
 		handler.call( self, res, req, fn );
 	}, "put", host );
 
-	dtp.fire( "route-set", function ( p ) {
+	dtp.fire( "route-set", function () {
 		return [host || "*", route, "PUT", diff( timer )];
 	});
 

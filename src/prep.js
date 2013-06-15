@@ -1,6 +1,6 @@
 /**
  * Preparing log message
- * 
+ *
  * @param  {Object} res HTTP(S) response Object
  * @param  {Object} req HTTP(S) request Object
  * @return {String}     Log message
@@ -9,14 +9,14 @@ var prep = function ( res, req ) {
 	var msg    = this.config.logs.format,
 	    time   = this.config.logs.time,
 	    parsed = $.parse( this.url( req ) ),
-	    header = req.headers["authorization"] || "",
-	    token  = header.split( /\s+/ ).pop()  || "",
+	    header = req.headers.authorization || "",
+	    token  = header.split( REGEX_SPACE ).pop()  || "",
 	    auth   = new Buffer( token, "base64" ).toString(),
-	    user   = auth.split( /:/ )[0] || "-",
+	    user   = auth.split( ":" )[0] || "-",
 	    refer  = req.headers.referer !== undefined ? ( "\"" + req.headers.referer + "\"" ) : "-";
 
 	msg = msg.replace( "{{host}}",       req.headers.host )
-	         .replace( "{{time}}",       new moment().format( time ) )
+	         .replace( "{{time}}",       moment().format( time ) )
 	         .replace( "{{ip}}",         req.connection.remoteAddress )
 	         .replace( "{{method}}",     req.method )
 	         .replace( "{{path}}",       parsed.path )
