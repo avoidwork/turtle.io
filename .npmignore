@@ -1,8 +1,9 @@
 /node_modules/
+/log/turtleio.log
 /src/
 /test/
 .travis.yml
 .git
 .gitignore
-turtleio*.log
+.jshintrc
 Gruntfile.js
