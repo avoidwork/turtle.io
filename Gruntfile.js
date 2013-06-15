@@ -70,26 +70,43 @@ module.exports = function (grunt) {
 				dest : "lib/<%= pkg.name %>.js"
 			}
 		},
+		jshint : {
+			options : {
+				jshintrc : ".jshintrc"
+			},
+			src : "lib/<%= pkg.name %>.js"
+		},
 		nodeunit : {
-			all : ["test/**/*.js"]
+			all : ["test/*.js"]
+		},
+		sed : {
+			"version" : {
+				pattern : "{{VERSION}}",
+				replacement : "<%= pkg.version %>",
+				path : ["<%= concat.dist.dest %>"]
+			}
+		},
+		watch : {
+			js : {
+				files : "<%= concat.dist.src %>",
+				tasks : "default"
+			},
+			pkg: {
+				files : "package.json",
+				tasks : "default"
+			}
 		}
 	});
 
+	// tasks
+	grunt.loadNpmTasks("grunt-sed");
 	grunt.loadNpmTasks("grunt-contrib-concat");
 	grunt.loadNpmTasks("grunt-contrib-nodeunit");
+	grunt.loadNpmTasks("grunt-contrib-jshint");
+	grunt.loadNpmTasks('grunt-contrib-watch');
 
-	grunt.registerTask("test", ["nodeunit"]);
-
-	grunt.registerTask("version", function () {
-		var cfg = grunt.config("pkg"),
-		    ver = cfg.version,
-		    fn  = "lib/" + cfg.name + ".js",
-		    fp  = grunt.file.read(fn);
-
-		console.log("Setting version to: " + ver);
-		grunt.file.write(fn, fp.replace(/\{\{VERSION\}\}/g, ver));
-	});
-
-	// Concatting, setting version & testing
-	grunt.registerTask("default", ["concat", "version", "test"]);
+	// aliases
+	grunt.registerTask("test", ["nodeunit", "jshint"]);
+	grunt.registerTask("build", ["concat", "sed"]);
+	grunt.registerTask("default", ["build", "test"]);
 };
