@@ -15,6 +15,12 @@ All you need to do is install it, and tell it what directory holds your web site
 
 Please visit the [wiki](https://github.com/avoidwork/turtle.io/wiki).
 
+## Support
+
+If you're having problems with using the project, use the support forum at CodersClan.
+
+<a href="http://codersclan.net/forum/index.php?repo_id=12"><img src="http://www.codersclan.net/graphics/getSupport_blue_big.png" width="160"></a>
+
 ## Examples
 
 ### Virtual hosts
@@ -23,16 +29,18 @@ Virtual host keys are the hostname, and the value is the directory relative to "
 
 ```javascript
 var turtle_io = require("turtle.io"),
-    server    = new turtle_io(),
-    params    = {};
+    server    = new turtle_io()
+    params;
 
-params.default = "mysite.com";
-params.port    = 80;
-params.root    = "/var/www";
-params.vhosts  = {
-	"mysite.com"         : "mysite.com",
-	"another-domain.com" : "another-domain.com"
-}
+params = {
+	default : "mysite.com";
+	port    : 80;
+	root    : "/var/www";
+	vhosts  : {
+		"mysite.com"         : "mysite.com",
+		"another-domain.com" : "another-domain.com"
+	}
+};
 
 server.start(params);
 ```
