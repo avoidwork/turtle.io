@@ -33,9 +33,9 @@ var turtle_io = require("turtle.io"),
     params;
 
 params = {
-	default : "mysite.com";
-	port    : 80;
-	root    : "/var/www";
+	default : "mysite.com",
+	port    : 80,
+	root    : "/var/www",
 	vhosts  : {
 		"mysite.com"         : "mysite.com",
 		"another-domain.com" : "another-domain.com"
