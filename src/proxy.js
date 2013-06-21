@@ -29,6 +29,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 		    etag       = "",
 		    regex      = /("|')\//g,
 		    replace    = "$1" + route + "/",
+		    rewrite    = !REGEX_JS.test( req.url ),
 		    date;
 
 		try {
@@ -66,10 +67,10 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 				if ( REGEX_HEAD.test( req.method.toLowerCase() ) ) {
 					arg = messages.NO_CONTENT;
 				}
-				else if ( arg instanceof Array || arg instanceof Object ) {
+				else if ( rewrite && ( arg instanceof Array || arg instanceof Object ) ) {
 					arg = $.decode( $.encode( arg ).replace( regex, replace ) );
 				}
-				else if ( typeof arg === "string" ) {
+				else if ( rewrite && typeof arg === "string" ) {
 					arg = arg.replace( regex, replace );
 				}
 
