@@ -29,6 +29,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 		    etag       = "",
 		    regex      = /("|')\//g,
 		    replace    = "$1" + route + "/",
+		    rewrite    = !REGEX_JS.test( req.url ),
 		    date, nth, raw;
 
 		try {
@@ -70,9 +71,9 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 							break;
 						case arg instanceof Array:
 						case arg instanceof Object:
-							arg = $.decode( $.encode( arg ).replace( regex, replace ) );
+							arg = rewrite ? $.decode( $.encode( arg ).replace( regex, replace ) ) : arg;
 							break;
-						case typeof arg === "string":
+						case rewrite && typeof arg === "string":
 							arg = arg.replace( regex, replace );
 							break;
 					}

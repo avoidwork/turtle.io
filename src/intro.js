@@ -27,7 +27,8 @@ var $          = require( "abaaso" ),
     REGEX_IE   = /msie/i,
     REGEX_DIR  = /\/$/,
     REGEX_NVAL = /;.*/,
-    REGEX_NURI = ".*\//";
+    REGEX_NURI = ".*\//",
+    REGEX_JS   = /\.js$/;
 
 // Hooking syslog output
 syslog.init( "turtle_io", syslog.LOG_PID | syslog.LOG_ODELAY, syslog.LOG_LOCAL0 );
