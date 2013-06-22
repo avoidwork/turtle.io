@@ -29,13 +29,13 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 		    etag       = "",
 		    regex      = /("|')\//g,
 		    replace    = "$1" + route + "/",
-		    rewrite    = !REGEX_JS.test( req.url ),
-		    date;
+		    date, rewrite;
 
 		try {
 			// Getting or creating an Etag
 			resHeaders = headers( xhr.getAllResponseHeaders() );
 			date       = ( resHeaders["Last-Modified"] || resHeaders.Date ) || undefined;
+			rewrite    = REGEX_REWRITE.test( resHeaders["Content-Type"] );
 
 			if ( isNaN( new Date( date ).getFullYear() ) ) {
 				date = new Date();
@@ -63,15 +63,17 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 				resHeaders["Transfer-Encoding"] = "chunked";
 				etag = etag.replace( /\"/g, "" );
 
-				// Fixing root path of response
 				if ( REGEX_HEAD.test( req.method.toLowerCase() ) ) {
 					arg = messages.NO_CONTENT;
 				}
-				else if ( rewrite && ( arg instanceof Array || arg instanceof Object ) ) {
-					arg = $.decode( $.encode( arg ).replace( regex, replace ) );
-				}
-				else if ( rewrite && typeof arg === "string" ) {
-					arg = arg.replace( regex, replace );
+				// Fixing root path of response
+				else if ( rewrite ) {
+					if ( arg instanceof Array || arg instanceof Object ) {
+						arg = $.decode( $.encode( arg ).replace( regex, replace ) );
+					}
+					else if ( typeof arg === "string" ) {
+						arg = arg.replace( regex, replace );
+					}
 				}
 
 				// Sending compressed version to Client if supported
