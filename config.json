@@ -40,6 +40,13 @@
 		"valid"  : "15 minutes",
 		"gc"     : 60000
 	},
+	"proxy"   : {
+		"rewrite" : [
+			"text/html",
+			"text/plain",
+			"application/json"
+		]
+	},
 	"tmp"     : "/tmp",
 	"vhosts"  : {}
 }
