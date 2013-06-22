@@ -28,6 +28,9 @@ factory.prototype.bootstrap = function ( fn ) {
 			probes();
 		}
 
+		// Creating REGEX_REWRITE
+		REGEX_REWRITE = new RegExp( "^(" + this.config.proxy.rewrite.join( "|" ) + ")$" );
+
 		// Setting error route
 		$.route.set( "error", function ( res, req, timer ) {
 			fn( res, req, timer );

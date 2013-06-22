@@ -35,7 +35,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 			// Getting or creating an Etag
 			resHeaders = headers( xhr.getAllResponseHeaders() );
 			date       = ( resHeaders["Last-Modified"] || resHeaders.Date ) || undefined;
-			rewrite    = REGEX_REWRITE.test( resHeaders["Content-Type"] );
+			rewrite    = REGEX_REWRITE.test( resHeaders["Content-Type"].replace( REGEX_NVAL, "" ) );
 
 			if ( isNaN( new Date( date ).getFullYear() ) ) {
 				date = new Date();
