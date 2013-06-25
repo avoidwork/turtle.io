@@ -41,6 +41,7 @@ module.exports = function (grunt) {
 					"src/headers.js",
 					"src/log.js",
 					"src/mode.js",
+					"src/pages.js",
 					"src/proxy.js",
 					"src/queue.js",
 					"src/queueStatus.js",
