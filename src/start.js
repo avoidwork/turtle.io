@@ -72,7 +72,7 @@ factory.prototype.start = function ( args, errorHandler ) {
 			}
 			else {
 				files.each(function ( i ) {
-					self.pages.all[i.replace( ".html", "" )] = fs.readFileSync( pages + "/" + i, {encoding: "utf8"} );
+					self.pages.all[i.replace( ".html", "" )] = fs.readFileSync( pages + "/" + i, "utf8"/*{encoding: "utf8"}*/ );
 				});
 
 				// Announcing state
