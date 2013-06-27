@@ -7,8 +7,9 @@
  * @return {Object}                Instance
  */
 factory.prototype.start = function ( args, errorHandler ) {
-	var self = this,
-	    i    = -1,
+	var self  = this,
+	    i     = -1,
+	    pages = __dirname + "/../pages",
 	    msg, sig;
 
 	// Merging config
@@ -64,18 +65,30 @@ factory.prototype.start = function ( args, errorHandler ) {
 			this.config.ps = 2;
 		}
 
-		// Announcing state
-		console.log( "Starting turtle.io on port " + this.config.port );
+		// Loading default error pages
+		fs.readdir( pages, function ( e, files ) {
+			if ( e ) {
+				console.log( e );
+			}
+			else {
+				files.each(function ( i ) {
+					self.pages.all[i.replace( ".html", "" )] = fs.readFileSync( pages + "/" + i, {encoding: "utf8"} );
+				});
 
-		// Spawning child processes
-		while ( ++i < this.config.ps ) {
-			cluster.fork();
-		}
+				// Announcing state
+				console.log( "Starting turtle.io on port " + self.config.port );
 
-		// Setting up worker events
-		$.array.cast( cluster.workers ).each( function ( i ) {
-			i.on( "message", msg );
-			i.on( "exit",    sig );
+				// Spawning child processes
+				while ( ++i < self.config.ps ) {
+					cluster.fork();
+				}
+
+				// Setting up worker events
+				$.array.cast( cluster.workers ).each( function ( i ) {
+					i.on( "message", msg );
+					i.on( "exit",    sig );
+				});
+			}
 		});
 	}
 	else {
