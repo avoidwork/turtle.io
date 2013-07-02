@@ -109,5 +109,5 @@ module.exports = function (grunt) {
 	// aliases
 	grunt.registerTask("test", ["nodeunit", "jshint"]);
 	grunt.registerTask("build", ["concat", "sed"]);
-	grunt.registerTask("default", ["build", "test"]);
+	grunt.registerTask("default", ["build"]);
 };
