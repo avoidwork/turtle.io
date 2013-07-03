@@ -9,8 +9,7 @@
 factory.prototype.start = function ( args, errorHandler ) {
 	var self  = this,
 	    i     = -1,
-	    pages = __dirname + "/../pages",
-	    msg, sig;
+	    pages, msg, sig;
 
 	// Merging config
 	if ( args !== undefined ) {
@@ -26,6 +25,9 @@ factory.prototype.start = function ( args, errorHandler ) {
 	if ( errorHandler !== undefined ) {
 		this.config.errorHandler = errorHandler;
 	}
+
+	// Setting error page path
+	pages = this.config.pages ? ( this.config.root + this.config.pages ) : ( __dirname + "/../pages" );
 
 	if ( cluster.isMaster ) {
 		// Message passing
@@ -72,7 +74,7 @@ factory.prototype.start = function ( args, errorHandler ) {
 			}
 			else {
 				files.each(function ( i ) {
-					self.pages.all[i.replace( ".html", "" )] = fs.readFileSync( pages + "/" + i, "utf8"/*{encoding: "utf8"}*/ );
+					self.pages.all[i.replace( REGEX_NEXT, "" )] = fs.readFileSync( pages + "/" + i, "utf8"/*{encoding: "utf8"}*/ );
 				});
 
 				// Announcing state
