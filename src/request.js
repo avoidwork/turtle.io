@@ -83,11 +83,11 @@ factory.prototype.request = function ( res, req, timer ) {
 				}
 			}
 			else if ( !exists ) {
-				stats = codes.NOT_FOUND;
+				status = codes.NOT_FOUND;
 				self.respond( res, req, self.page( status, host ), status, ( post ? {Allow: "POST"} : {} ), timer, false );
 			}
 			else if ( !self.allowed( method.toUpperCase(), req.url, host ) ) {
-				stats = codes.NOT_ALLOWED;
+				status = codes.NOT_ALLOWED;
 				self.respond( res, req, self.page( status, host ), status, {Allow: allow}, timer, false );
 			}
 			else {

@@ -108,7 +108,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	// aliases
-	grunt.registerTask("test", ["nodeunit", "jshint"]);
+	grunt.registerTask("test", ["jshint", "nodeunit"]);
 	grunt.registerTask("build", ["concat", "sed"]);
-	grunt.registerTask("default", ["build"]);
+	grunt.registerTask("default", ["build", "test"]);
 };
