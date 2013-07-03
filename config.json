@@ -40,6 +40,7 @@
 		"valid"  : "15 minutes",
 		"gc"     : 60000
 	},
+	"pages"   : null,
 	"proxy"   : {
 		"rewrite" : [
 			"text/html",

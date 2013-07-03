@@ -21,7 +21,7 @@ var pass = function ( arg ) {
 			break;
 
 		case MSG_READY:
-			cluster.workers[arg.worker.toString()].send( {ack: false, cmd: MSG_START, id: $.uuid( true ), arg: this.config.queue.id, worker: MSG_MASTER} );
+			cluster.workers[arg.worker.toString()].send( {ack: false, cmd: MSG_START, id: $.uuid( true ), arg: {queue: this.config.queue.id, pages: this.pages}, worker: MSG_MASTER} );
 			break;
 
 		default:

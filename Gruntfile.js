@@ -39,8 +39,10 @@ module.exports = function (grunt) {
 					"src/flush.js",
 					"src/hash.js",
 					"src/headers.js",
+					"src/hostname.js",
 					"src/log.js",
 					"src/mode.js",
+					"src/page.js",
 					"src/proxy.js",
 					"src/queue.js",
 					"src/queueStatus.js",
@@ -106,7 +108,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	// aliases
-	grunt.registerTask("test", ["nodeunit", "jshint"]);
+	grunt.registerTask("test", ["jshint", "nodeunit"]);
 	grunt.registerTask("build", ["concat", "sed"]);
 	grunt.registerTask("default", ["build", "test"]);
 };

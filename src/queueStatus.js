@@ -12,7 +12,7 @@ factory.prototype.queueStatus = function ( res, req, uuid, timer ) {
 	var body, items, position, timestamp;
 
 	if ( this.requestQueue.registry[uuid] === undefined ) {
-		this.respond( res, req, messages.NOT_FOUND, 404, {"Cache-Control": "no-cache"}, timer, false );
+		this.respond( res, req, this.page( codes.NOT_FOUND, this.hostname( req ) ), codes.NOT_FOUND, {"Cache-Control": "no-cache"}, timer, false );
 	}
 	else {
 		items     = $.array.keys( this.requestQueue.registry, true );
@@ -25,6 +25,6 @@ factory.prototype.queueStatus = function ( res, req, uuid, timer ) {
 			timestamp : timestamp
 		};
 
-		this.respond( res, req, body, 200, {"Cache-Control": "no-cache"}, timer, false );
+		this.respond( res, req, body, codes.SUCCESS, {"Cache-Control": "no-cache"}, timer, false );
 	}
 };

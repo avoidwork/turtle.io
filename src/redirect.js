@@ -8,12 +8,15 @@
  * @return {Object}            instance
  */
 factory.prototype.redirect = function ( route, url, host, permanent ) {
-	var self  = this,
-	    code  = codes[permanent === true ? "MOVED" : "REDIRECT"],
-	    timer = new Date();
+	var self    = this,
+	    code    = codes[permanent === true ? "MOVED" : "REDIRECT"],
+	    pattern = new RegExp( "^" + route + "$" ),
+	    timer   = new Date();
 
 	this.get( route, function ( res, req, timer ) {
-		self.respond( res, req, messages.NO_CONTENT, code, {"Location": url}, timer, false );
+		var rewrite = ( pattern.exec( req.url ) || [] ).length > 0;
+
+		self.respond( res, req, messages.NO_CONTENT, code, {"Location": ( rewrite ? req.url.replace( pattern, url ) : url )}, timer, false );
 	}, host);
 
 	dtp.fire( "redirect-set", function () {

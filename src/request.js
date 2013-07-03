@@ -10,7 +10,7 @@
  */
 factory.prototype.request = function ( res, req, timer ) {
 	var self    = this,
-	    host    = req.headers.host.replace( /:.*/, "" ),
+	    host    = this.hostname( req ),
 	    parsed  = $.parse( this.url( req ) ),
 	    method  = REGEX_GET.test( req.method ) ? "get" : req.method.toLowerCase(),
 	    handled = false,
@@ -23,7 +23,7 @@ factory.prototype.request = function ( res, req, timer ) {
 			return [req.headers.host, req.method, req.url, self.server.connections, diff( timer )];
 		});
 
-		return this.respond( res, req, messages.ERROR_SERVICE, codes.ERROR_SERVICE, {"Retry-After": 60}, timer, false );
+		return this.respond( res, req, this.page( codes.ERROR_SERVICE, host ), codes.ERROR_SERVICE, {"Retry-After": 60}, timer, false );
 	}
 
 	// Can't find the hostname in vhosts, try the default (if set) or send a 500
@@ -79,14 +79,16 @@ factory.prototype.request = function ( res, req, timer ) {
 				}
 				else {
 					status = codes.NOT_ALLOWED;
-					self.respond( res, req, messages.NOT_ALLOWED, status, {Allow: allow}, timer, false );
+					self.respond( res, req, self.page( status, host ), status, {Allow: allow}, timer, false );
 				}
 			}
 			else if ( !exists ) {
-				self.respond( res, req, messages.NOT_FOUND, codes.NOT_FOUND, ( post ? {Allow: "POST"} : {} ), timer, false );
+				status = codes.NOT_FOUND;
+				self.respond( res, req, self.page( status, host ), status, ( post ? {Allow: "POST"} : {} ), timer, false );
 			}
 			else if ( !self.allowed( method.toUpperCase(), req.url, host ) ) {
-				self.respond( res, req, messages.NOT_ALLOWED, codes.NOT_ALLOWED, {Allow: allow}, timer, false );
+				status = codes.NOT_ALLOWED;
+				self.respond( res, req, self.page( status, host ), status, {Allow: allow}, timer, false );
 			}
 			else {
 				if ( !REGEX_SLASH.test( req.url ) ) {
