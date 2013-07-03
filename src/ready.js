@@ -9,7 +9,10 @@ factory.prototype.ready = function ( arg ) {
 	var self = this;
 
 	// Setting reference to queue worker
-	this.config.queue.id = arg;
+	this.config.queue.id = arg.queue;
+
+	// Setting error pages
+	this.pages = arg.pages;
 
 	// Starting queue worker
 	if ( cluster.worker.id === this.config.queue.id ) {
