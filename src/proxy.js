@@ -88,7 +88,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 			}
 		}
 		catch (e) {
-			self.respond( res, req, messages.NO_CONTENT, codes.ERROR_GATEWAY, {Allow: "GET"}, timer, false );
+			self.respond( res, req, self.page( codes.ERROR_GATEWAY, self.hostname( req ) ), codes.ERROR_GATEWAY, {Allow: "GET"}, timer, false );
 			self.log( e, true );
 		}
 	};
