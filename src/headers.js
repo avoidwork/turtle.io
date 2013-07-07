@@ -19,10 +19,15 @@ factory.prototype.headers = function ( req, res, status, responseHeaders ) {
 	// Decorating response headers
 	$.merge( headers, responseHeaders );
 
+	// If passing an empty Object, make sure to set `Allow`
+	if ( headers.Allow.isEmpty() && status !== 404 && status !== 405 ) {
+		headers.Allow = "GET";
+	}
+
 	// Fixing `Allow` header
 	if ( !REGEX_HEAD2.test( headers.Allow ) ) {
 		headers.Allow = headers.Allow.toUpperCase().split( /,|\s+/ ).filter( function ( i ) {
-			return ( !i.isEmpty() && i !== "HEAD" && i !== "OPTIONS" );
+			return ( !i.isEmpty() && !REGEX_HEAD.test( i ) );
 		}).join( ", " ).replace( "GET", "GET, HEAD, OPTIONS" );
 	}
 
