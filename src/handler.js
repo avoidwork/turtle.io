@@ -2,12 +2,12 @@
  * Route handler
  *
  * @method handler
- * @param  {Object}   res HTTP(S) response Object
  * @param  {Object}   req HTTP(S) request Object
+ * @param  {Object}   res HTTP(S) response Object
  * @param  {Function} fn  Request handler
  * @return {Object}       Instance
  */
-var handler = function ( res, req, fn ) {
+var handler = function ( req, res, fn ) {
 	var self  = this,
 	    host  = req.headers.host.replace( /:.*/, "" ),
 	    timer = new Date(),
@@ -19,7 +19,7 @@ var handler = function ( res, req, fn ) {
 
 		try {
 			// Decorating session
-			req.session = self.session.get( res, req );
+			req.session = self.session.get( req, res );
 
 			// Setting listeners if expecting a body
 			if ( REGEX_BODY.test( req.method ) ) {
@@ -31,15 +31,15 @@ var handler = function ( res, req, fn ) {
 
 				req.on( "end", function () {
 					req.body = payload;
-					fn.call( self, res, req, timer );
+					fn.call( self, req, res, timer );
 				});
 			}
 			else {
-				fn.call( self, res, req, timer );
+				fn.call( self, req, res, timer );
 			}
 		}
 		catch ( e ) {
-			self.error( res, req, e, timer );
+			self.error( req, res, e, timer );
 		}
 
 		dtp.fire( "handler", function () {
@@ -49,7 +49,7 @@ var handler = function ( res, req, fn ) {
 
 	// Setting listener for unexpected close
 	res.on( "close", function () {
-		self.log( prep.call( self, res, req ) );
+		self.log( prep.call( self, req, res ) );
 	});
 
 	// Handling request or wrapping it with HTTP Authentication

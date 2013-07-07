@@ -2,8 +2,8 @@
  * Constructs a response
  *
  * @method respond
- * @param  {Object}  res      HTTP(S) response Object
  * @param  {Object}  req      HTTP(S) request Object
+ * @param  {Object}  res      HTTP(S) response Object
  * @param  {Mixed}   output   [Optional] Response body
  * @param  {Number}  status   [Optional] HTTP status code, default is 200
  * @param  {Object}  headers  [Optional] HTTP headers to decorate the response with
@@ -11,7 +11,7 @@
  * @param  {Boolean} compress [Optional] Enable compression of the response (if supported)
  * @return {Objet}            Instance
  */
-factory.prototype.respond = function ( res, req, output, status, headers, timer, compress ) {
+factory.prototype.respond = function ( req, res, output, status, headers, timer, compress ) {
 	status       = status || codes.SUCCESS;
 	timer        = timer  || new Date(); // Not ideal! This gives a false sense of speed for custom routes
 	compress     = ( compress === true );
@@ -62,11 +62,11 @@ factory.prototype.respond = function ( res, req, output, status, headers, timer,
 
 	// Compressing response to disk
 	if ( status === 200 && compress ) {
-		self.compressed( res, req, headers.Etag.replace(/"/g, ""), output, status, headers, false, timer );
+		self.compressed( req, res, headers.Etag.replace(/"/g, ""), output, status, headers, false, timer );
 	}
 	// Serving content
 	else {
-		this.headers( res, req, status, headers );
+		this.headers( req, res, status, headers );
 
 		if ( body ) {
 			res.write( output );
@@ -78,7 +78,7 @@ factory.prototype.respond = function ( res, req, output, status, headers, timer,
 			return [req.headers.host, req.method, req.url, status, diff( timer )];
 		});
 
-		self.log( prep.call( self, res, req ) );
+		self.log( prep.call( self, req, res ) );
 	}
 
 	return this;

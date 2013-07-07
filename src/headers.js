@@ -1,13 +1,13 @@
 /**
  * Sets response headers
  *
- * @param  {Object}  res             HTTP(S) response Object
  * @param  {Object}  req             HTTP(S) request Object
+ * @param  {Object}  res             HTTP(S) response Object
  * @param  {Number}  status          [Optional] Response status code
  * @param  {Object}  responseHeaders [Optional] HTTP headers to decorate the response with
  * @return {Objet}                   Instance
  */
-factory.prototype.headers = function ( res, req, status, responseHeaders ) {
+factory.prototype.headers = function ( req, res, status, responseHeaders ) {
 	status      = status || codes.SUCCESS;
 	var get     = REGEX_GET.test( req.method ),
 	    headers = $.clone( this.config.headers );
@@ -19,10 +19,15 @@ factory.prototype.headers = function ( res, req, status, responseHeaders ) {
 	// Decorating response headers
 	$.merge( headers, responseHeaders );
 
+	// If passing an empty Object, make sure to set `Allow`
+	if ( headers.Allow.isEmpty() && status !== 404 && status !== 405 ) {
+		headers.Allow = "GET";
+	}
+
 	// Fixing `Allow` header
 	if ( !REGEX_HEAD2.test( headers.Allow ) ) {
 		headers.Allow = headers.Allow.toUpperCase().split( /,|\s+/ ).filter( function ( i ) {
-			return ( !i.isEmpty() && i !== "HEAD" && i !== "OPTIONS" );
+			return ( !i.isEmpty() && !REGEX_HEAD.test( i ) );
 		}).join( ", " ).replace( "GET", "GET, HEAD, OPTIONS" );
 	}
 

@@ -22,8 +22,8 @@ factory.prototype.ready = function ( arg ) {
 	else {
 		// Setting error handler
 		if ( typeof this.config.errorHandler !== "function" ) {
-			this.config.errorHandler = function ( res, req, timer ) {
-				errorHandler.call( self, res, req, timer );
+			this.config.errorHandler = function ( req, res, timer ) {
+				errorHandler.call( self, req, res, timer );
 			};
 		}
 

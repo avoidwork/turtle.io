@@ -3,12 +3,12 @@
  *
  * @method write
  * @param  {String} path  File path
- * @param  {Object} res   HTTP response Object
  * @param  {Object} req   HTTP request Object
+ * @param  {Object} res   HTTP response Object
  * @param  {Object} timer Date instance
  * @return {Object}       Instance
  */
-factory.prototype.write = function ( path, res, req, timer ) {
+factory.prototype.write = function ( path, req, res, timer ) {
 	var self  = this,
 	    put   = ( req.method === "PUT" ),
 	    body  = req.body,
@@ -18,7 +18,7 @@ factory.prototype.write = function ( path, res, req, timer ) {
 
 	if ( !put && /\/$/.test( req.url ) ) {
 		status = del ? codes.CONFLICT : codes.ERROR_APPLICATION;
-		this.respond( res, req, self.page( status, self.hostname( req ) ), status, {Allow: allow}, timer, false );
+		this.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow}, timer, false );
 	}
 	else {
 		allow = allow.explode().remove( "POST" ).join(", ");
@@ -27,7 +27,7 @@ factory.prototype.write = function ( path, res, req, timer ) {
 			var hash = "\"" + self.hash( data ) + "\"";
 
 			if ( e ) {
-				self.error( res, req, e, timer );
+				self.error( req, res, e, timer );
 			}
 			else {
 				if ( !req.headers.hasOwnProperty( "etag" ) || req.headers.etag === hash ) {
@@ -41,12 +41,12 @@ factory.prototype.write = function ( path, res, req, timer ) {
 							});
 
 							status = put ? codes.NO_CONTENT : codes.CREATED;
-							self.respond( res, req, self.page( status, self.hostname( req ) ), status, {Allow: allow, Etag: hash}, timer, false );
+							self.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow, Etag: hash}, timer, false );
 						}
 					});
 				}
 				else if ( req.headers.etag !== hash ) {
-					self.respond( res, req, messages.NO_CONTENT, codes.FAILED, {}, timer, false );
+					self.respond( req, res, messages.NO_CONTENT, codes.FAILED, {}, timer, false );
 				}
 			}
 		});
