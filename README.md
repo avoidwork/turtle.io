@@ -29,15 +29,13 @@ Virtual host keys are the hostname, and the value is the directory relative to "
 
 ```javascript
 var turtle_io = require("turtle.io"),
-    server    = new turtle_io(),
+    server    = new turtle_io()
     params;
 
 params = {
-	default : "mysite.com",
-	port    : 80,
-	root    : "/var/www",
-	ps      : 5,
-	pages   : "errors",
+	default : "mysite.com";
+	port    : 80;
+	root    : "/var/www";
 	vhosts  : {
 		"mysite.com"         : "mysite.com",
 		"another-domain.com" : "another-domain.com"
