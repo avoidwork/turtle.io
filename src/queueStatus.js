@@ -2,17 +2,17 @@
  * Checks queued request status
  *
  * @method queueStatus
- * @param  {Object} res   HTTP(S) response Object
  * @param  {Object} req   HTTP(S) request Object
+ * @param  {Object} res   HTTP(S) response Object
  * @param  {String} uuid  Queue item UUID
  * @param  {Object} timer Date instance
  * @return {Object}       Instance
  */
-factory.prototype.queueStatus = function ( res, req, uuid, timer ) {
+factory.prototype.queueStatus = function ( req, res, uuid, timer ) {
 	var body, items, position, timestamp;
 
 	if ( this.requestQueue.registry[uuid] === undefined ) {
-		this.respond( res, req, this.page( codes.NOT_FOUND, this.hostname( req ) ), codes.NOT_FOUND, {"Cache-Control": "no-cache"}, timer, false );
+		this.respond( req, res, this.page( codes.NOT_FOUND, this.hostname( req ) ), codes.NOT_FOUND, {"Cache-Control": "no-cache"}, timer, false );
 	}
 	else {
 		items     = $.array.keys( this.requestQueue.registry, true );
@@ -25,6 +25,6 @@ factory.prototype.queueStatus = function ( res, req, uuid, timer ) {
 			timestamp : timestamp
 		};
 
-		this.respond( res, req, body, codes.SUCCESS, {"Cache-Control": "no-cache"}, timer, false );
+		this.respond( req, res, body, codes.SUCCESS, {"Cache-Control": "no-cache"}, timer, false );
 	}
 };

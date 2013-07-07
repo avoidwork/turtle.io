@@ -19,12 +19,12 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 	 *
 	 * @param  {Mixed}  arg   Proxy response
 	 * @param  {Object} xhr   XmlHttpRequest
-	 * @param  {Object} res   HTTP(S) response Object
 	 * @param  {Object} req   HTTP(S) request Object
+	 * @param  {Object} res   HTTP(S) response Object
 	 * @param  {Object} timer [Optional] Date instance
 	 * @return {Undefined}    undefined
 	 */
-	handle = function ( arg, xhr, res, req, timer ) {
+	handle = function ( arg, xhr, req, res, timer ) {
 		var resHeaders = {},
 		    etag       = "",
 		    regex      = /("|')\//g,
@@ -59,7 +59,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 
 			// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
 			if ( req.headers["if-none-match"] === etag ) {
-				self.respond( res, req, messages.NO_CONTENT, codes.NOT_MODIFIED, resHeaders, timer, false );
+				self.respond( req, res, messages.NO_CONTENT, codes.NOT_MODIFIED, resHeaders, timer, false );
 			}
 			else {
 				resHeaders["Transfer-Encoding"] = "chunked";
@@ -80,15 +80,15 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 
 				// Sending compressed version to Client if supported
 				if ( req.headers["accept-encoding"] !== undefined ) {
-					self.compressed( res, req, etag, arg, xhr.status, resHeaders, false, timer );
+					self.compressed( req, res, etag, arg, xhr.status, resHeaders, false, timer );
 				}
 				else {
-					self.respond( res, req, arg, xhr.status, resHeaders, timer, false );
+					self.respond( req, res, arg, xhr.status, resHeaders, timer, false );
 				}
 			}
 		}
 		catch (e) {
-			self.respond( res, req, self.page( codes.ERROR_GATEWAY, self.hostname( req ) ), codes.ERROR_GATEWAY, {Allow: "GET"}, timer, false );
+			self.respond( req, res, self.page( codes.ERROR_GATEWAY, self.hostname( req ) ), codes.ERROR_GATEWAY, {Allow: "GET"}, timer, false );
 			self.log( e, true );
 		}
 	};
@@ -119,12 +119,12 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 	/**
 	 * Wraps the proxy request
 	 *
-	 * @param  {Object} res   HTTP(S) response Object
 	 * @param  {Object} req   HTTP(S) request Object
+	 * @param  {Object} res   HTTP(S) response Object
 	 * @param  {Object} timer [Optional] Date instance
 	 * @return {Undefined}    undefined
 	 */
-	wrapper = function ( res, req, timer ) {
+	wrapper = function ( req, res, timer ) {
 		var url     = origin + req.url.replace( new RegExp( "^" + route ), "" ),
 		    method  = req.method.toLowerCase(),
 		    headerz = $.clone( req.headers ),
@@ -133,7 +133,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 
 		// Facade to handle()
 		fn = function ( arg, xhr ) {
-			handle( arg, xhr, res, req, timer );
+			handle( arg, xhr, req, res, timer );
 		};
 
 		// Streaming response to Client

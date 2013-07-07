@@ -13,10 +13,10 @@ factory.prototype.redirect = function ( route, url, host, permanent ) {
 	    pattern = new RegExp( "^" + route + "$" ),
 	    timer   = new Date();
 
-	this.get( route, function ( res, req, timer ) {
+	this.get( route, function ( req, res, timer ) {
 		var rewrite = ( pattern.exec( req.url ) || [] ).length > 0;
 
-		self.respond( res, req, messages.NO_CONTENT, code, {"Location": ( rewrite ? req.url.replace( pattern, url ) : url )}, timer, false );
+		self.respond( req, res, messages.NO_CONTENT, code, {"Location": ( rewrite ? req.url.replace( pattern, url ) : url )}, timer, false );
 	}, host);
 
 	dtp.fire( "redirect-set", function () {

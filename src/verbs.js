@@ -11,8 +11,8 @@ factory.prototype.all = function ( route, fn, host ) {
 	var self  = this,
 	    timer = new Date();
 
-	$.route.set( route, function ( res, req ) {
-		handler.call( self, res, req, fn );
+	$.route.set( route, function ( req, res ) {
+		handler.call( self, req, res, fn );
 	}, "all", host );
 
 	dtp.fire( "route-set", function () {
@@ -35,8 +35,8 @@ factory.prototype["delete"] = function ( route, fn, host ) {
 	var self  = this,
 	    timer = new Date();
 
-	$.route.set( route, function ( res, req ) {
-		handler.call( self, res, req, fn );
+	$.route.set( route, function ( req, res ) {
+		handler.call( self, req, res, fn );
 	}, "delete", host );
 
 	dtp.fire( "route-set", function () {
@@ -59,8 +59,8 @@ factory.prototype.get = function ( route, fn, host ) {
 	var self  = this,
 	    timer = new Date();
 
-	$.route.set(route, function ( res, req ) {
-		handler.call( self, res, req, fn );
+	$.route.set(route, function ( req, res ) {
+		handler.call( self, req, res, fn );
 	}, "get", host );
 
 	dtp.fire( "route-set", function () {
@@ -83,8 +83,8 @@ factory.prototype.patch = function ( route, fn, host ) {
 	var self  = this,
 	    timer = new Date();
 
-	$.route.set(route, function ( res, req ) {
-		handler.call( self, res, req, fn );
+	$.route.set(route, function ( req, res ) {
+		handler.call( self, req, res, fn );
 	}, "patch", host );
 
 	dtp.fire("route-set", function () {
@@ -107,8 +107,8 @@ factory.prototype.post = function ( route, fn, host ) {
 	var self  = this,
 	    timer = new Date();
 
-	$.route.set(route, function ( res, req ) {
-		handler.call( self, res, req, fn );
+	$.route.set(route, function ( req, res ) {
+		handler.call( self, req, res, fn );
 	}, "post", host );
 
 	dtp.fire("route-set", function () {
@@ -131,8 +131,8 @@ factory.prototype.put = function ( route, fn, host ) {
 	var self  = this,
 	    timer = new Date();
 
-	$.route.set( route, function ( res, req ) {
-		handler.call( self, res, req, fn );
+	$.route.set( route, function ( req, res ) {
+		handler.call( self, req, res, fn );
 	}, "put", host );
 
 	dtp.fire( "route-set", function () {

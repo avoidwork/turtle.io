@@ -1,13 +1,13 @@
 /**
  * Sets response headers
  *
- * @param  {Object}  res             HTTP(S) response Object
  * @param  {Object}  req             HTTP(S) request Object
+ * @param  {Object}  res             HTTP(S) response Object
  * @param  {Number}  status          [Optional] Response status code
  * @param  {Object}  responseHeaders [Optional] HTTP headers to decorate the response with
  * @return {Objet}                   Instance
  */
-factory.prototype.headers = function ( res, req, status, responseHeaders ) {
+factory.prototype.headers = function ( req, res, status, responseHeaders ) {
 	status      = status || codes.SUCCESS;
 	var get     = REGEX_GET.test( req.method ),
 	    headers = $.clone( this.config.headers );

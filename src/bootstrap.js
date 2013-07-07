@@ -32,24 +32,24 @@ factory.prototype.bootstrap = function ( fn ) {
 		REGEX_REWRITE = new RegExp( "^(" + this.config.proxy.rewrite.join( "|" ) + ")$" );
 
 		// Setting error route
-		$.route.set( "error", function ( res, req, timer ) {
-			fn( res, req, timer );
+		$.route.set( "error", function ( req, res, timer ) {
+			fn( req, res, timer );
 		});
 
 		// Setting optional queue status route
 		if ( this.config.queue.status ) {
-			this.get( "/queue", function ( res, req, timer ) {
-				this.respond( res, req, {next: "/queue/:item", items: $.array.cast( this.requestQueue.registry, true )}, 200, {"Cache-Control": "no-cache"}, timer, false );
+			this.get( "/queue", function ( req, res, timer ) {
+				this.respond( req, res, {next: "/queue/:item", items: $.array.cast( this.requestQueue.registry, true )}, 200, {"Cache-Control": "no-cache"}, timer, false );
 			});
 
-			this.get( "/queue/.*", function ( res, req, timer ) {
+			this.get( "/queue/.*", function ( req, res, timer ) {
 				var uuid = req.url.replace(/.*\/queue\/?/, "");
 
 				if ( uuid.indexOf( "/" ) > -1 ) {
-					self.error( res, req, timer );
+					self.error( req, res, timer );
 				}
 				else {
-					self.queueStatus( res, req, uuid, timer );
+					self.queueStatus( req, res, uuid, timer );
 				}
 			});
 		}

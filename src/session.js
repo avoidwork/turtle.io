@@ -8,11 +8,11 @@ factory.prototype.session = {
 	 * Creates a session
 	 *
 	 * @method create
-	 * @param  {Object} res HTTP(S) response Object
 	 * @param  {Object} req HTTP(S) request Object
+	 * @param  {Object} res HTTP(S) response Object
 	 * @return {Object}     Session
 	 */
-	create : function ( res, req ) {
+	create : function ( req, res ) {
 		var instance = this.server,
 		    parsed   = $.parse( instance.url( req ) ),
 		    domain   = parsed.host.isDomain() && !parsed.host.isIP() ? parsed.host : undefined,
@@ -36,11 +36,11 @@ factory.prototype.session = {
 	 * Destroys a session
 	 *
 	 * @method destroy
-	 * @param  {Object} res HTTP(S) response Object
 	 * @param  {Object} req HTTP(S) request Object
+	 * @param  {Object} res HTTP(S) response Object
 	 * @return {Object}     Instance
 	 */
-	destroy : function ( res, req ) {
+	destroy : function ( req, res ) {
 		var instance = this.server,
 		    parsed   = $.parse( instance.url( req ) ),
 		    domain   = parsed.host.isDomain() && !parsed.host.isIP() ? parsed.host : undefined,
@@ -67,11 +67,11 @@ factory.prototype.session = {
 	 * Gets a session
 	 *
 	 * @method get
-	 * @param  {Object} res HTTP(S) response Object
 	 * @param  {Object} req HTTP(S) request Object
+	 * @param  {Object} res HTTP(S) response Object
 	 * @return {Mixed}      Session or undefined
 	 */
-	get : function ( res, req ) {
+	get : function ( req, res ) {
 		var instance = this.server,
 		    parsed   = $.parse( instance.url( req ) ),
 		    domain   = parsed.host.isDomain() && !parsed.host.isIP() ? parsed.host : undefined,
@@ -91,7 +91,7 @@ factory.prototype.session = {
 				}
 			}
 			else {
-				this.destroy( res, req );
+				this.destroy( req, res );
 			}
 		}
 

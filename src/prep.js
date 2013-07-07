@@ -1,11 +1,11 @@
 /**
  * Preparing log message
  *
- * @param  {Object} res HTTP(S) response Object
  * @param  {Object} req HTTP(S) request Object
+ * @param  {Object} res HTTP(S) response Object
  * @return {String}     Log message
  */
-var prep = function ( res, req ) {
+var prep = function ( req, res ) {
 	var msg    = this.config.logs.format,
 	    time   = this.config.logs.time,
 	    parsed = $.parse( this.url( req ) ),

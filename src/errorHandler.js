@@ -2,12 +2,12 @@
  * Default error handler
  *
  * @method errorHandler
- * @param  {Object} res   HTTP(S) response Object
  * @param  {Object} req   HTTP(S) request Object
+ * @param  {Object} res   HTTP(S) response Object
  * @param  {Object} timer [Optional] Date instance
  * @return {undefined}    Undefined
  */
-var errorHandler = function ( res, req, timer ) {
+var errorHandler = function ( req, res, timer ) {
 	timer      = timer || new Date();
 	var body   = "",
 	    status = codes.NOT_FOUND,
@@ -26,5 +26,5 @@ var errorHandler = function ( res, req, timer ) {
 
 	body = this.page( status, host );
 
-	this.respond( res, req, body, status, {"Cache-Control": "no-cache"}, timer, false );
+	this.respond( req, res, body, status, {"Cache-Control": "no-cache"}, timer, false );
 };

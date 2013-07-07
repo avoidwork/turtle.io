@@ -1,8 +1,8 @@
 /**
  * Pipes compressed asset to Client, or schedules the creation of the asset
  *
- * @param  {Object}  res     HTTP(S) response Object
  * @param  {Object}  req     HTTP(S) request Object
+ * @param  {Object}  res     HTTP(S) response Object
  * @param  {String}  etag    Etag header
  * @param  {String}  arg     Response body
  * @param  {Number}  status  Response status code
@@ -11,7 +11,7 @@
  * @param  {Object}  timer   [Optional] Date instance
  * @return {Objet}           Instance
  */
-factory.prototype.compressed = function ( res, req, etag, arg, status, headers, local, timer ) {
+factory.prototype.compressed = function ( req, res, etag, arg, status, headers, local, timer ) {
 	local           = ( local === true );
 	timer           = timer || new Date();
 	var self        = this,
@@ -20,7 +20,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 
 	// Local asset, piping result directly to Client
 	if ( local ) {
-		this.headers( res, req, status, headers );
+		this.headers( req, res, status, headers );
 
 		if (compression !== null) {
 			res.setHeader( "Content-Encoding", compression );
@@ -46,7 +46,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 					return [req.headers.host, req.method, req.url, status, diff( timer )];
 				});
 
-				self.log( prep.call( self, res, req ) );
+				self.log( prep.call( self, req, res ) );
 			});
 		}
 		else {
@@ -70,12 +70,12 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 						return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 					});
 
-					self.headers( res, req, status, headers );
+					self.headers( req, res, status, headers );
 
 					raw = fs.createReadStream( npath );
 					raw.pipe( res );
 
-					self.log( prep.call( self, res, req ) );
+					self.log( prep.call( self, req, res ) );
 
 					dtp.fire( "respond", function () {
 						return [req.headers.host, req.method, req.url, status, diff( timer )];
@@ -91,10 +91,10 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 						});
 
 						if ( e ) {
-							self.error( res, req, e, timer );
+							self.error( req, res, e, timer );
 						}
 						else {
-							self.respond( res, req, compressed, status, headers, timer, false );
+							self.respond( req, res, compressed, status, headers, timer, false );
 
 							fs.writeFile( npath, compressed, function ( e ) {
 								if ( e ) {
@@ -116,7 +116,7 @@ factory.prototype.compressed = function ( res, req, etag, arg, status, headers, 
 				return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 			});
 
-			this.respond( res, req, arg, status, headers, timer, false );
+			this.respond( req, res, arg, status, headers, timer, false );
 		}
 	}
 
