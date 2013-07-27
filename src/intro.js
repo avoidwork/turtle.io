@@ -45,6 +45,7 @@ var $           = require( "abaaso" ),
     MSG_SES_DEL = "session_delete",
     MSG_SES_SET = "session_set",
     MSG_REG_SET = "cache_set",
+    MSG_REG_DEL = "cache_delete",
     TERM_SIG    = "SIGTERM",
     TERM_CODE   = 143;
 

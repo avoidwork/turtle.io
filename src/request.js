@@ -143,15 +143,16 @@ factory.prototype.request = function ( req, res, timer ) {
 
 									// Watching path for changes
 									watcher = fs.watch( path, function ( event ) {
-										self.stale( url );
-
 										if ( event === "rename" ) {
+											self.unregister( url );
 											watcher.close();
 										}
 										else {
 											fs.stat( path, function ( e, stat ) {
 												if ( e ) {
 													self.log( e );
+													self.unregister( url );
+													watcher.close();
 												}
 												else if ( self.registry.get( url ) ) {
 													self.register( url, {etag: self.etag( url, stat.size, stat.mtime ), mimetype: mimetype}, true );

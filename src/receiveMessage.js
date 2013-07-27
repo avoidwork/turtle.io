@@ -50,6 +50,10 @@ factory.prototype.receiveMessage = function ( msg ) {
 		case MSG_REG_SET:
 			this.registry.set( msg.arg.key, msg.arg.value );
 			break;
+
+		case MSG_REG_DEL:
+			this.registry.remove( msg.arg );
+			break;
 	}
 
 	// Acknowledging message

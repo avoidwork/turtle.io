@@ -30,6 +30,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 		    regex      = /("|')\//g,
 		    replace    = "$1" + route + "/",
 		    url        = self.url( req ),
+		    delay      = $.expires,
 		    date, rewrite;
 
 		try {
@@ -60,6 +61,18 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 
 			// Updating LRU
 			self.register( url, {etag: etag.replace( /\"/g, "" ), mimetype: resHeaders["Content-Type"]}, true );
+
+			// Removing from LRU when invalid
+			if ( resHeaders["Cache-Control"] && regex.number_present.test( resHeaders["Cache-Control"] ) ) {
+				delay = $.number.parse( $.regex.number_present.exec( resHeaders["Cache-Control"] )[0], 10 );
+			}
+			else if ( resHeaders.Expires !== undefined ) {
+				delay = new Date( resHeaders.Expires ).diff( new Date() );
+			}
+
+			$.delay( function () {
+				self.unregister( url );
+			}, delay );
 
 			// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
 			if ( req.headers["if-none-match"] === etag ) {
