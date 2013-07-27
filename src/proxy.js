@@ -29,6 +29,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 		    etag       = "",
 		    regex      = /("|')\//g,
 		    replace    = "$1" + route + "/",
+		    url        = self.url( req ),
 		    date, rewrite;
 
 		try {
@@ -44,7 +45,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 				date = new Date( date );
 			}
 
-			etag = resHeaders.Etag || "\"" + self.hash( req.url + "-" + req.method + "-" + resHeaders["Content-Length"] + "-" + date.getTime() ) + "\"";
+			etag = resHeaders.Etag || "\"" + self.etag( url, resHeaders["Content-Length"], date.getTime(), arg ) + "\"";
 
 			// Setting headers
 			if ( resHeaders.Etag !== etag ) {

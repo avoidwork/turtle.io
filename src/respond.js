@@ -18,7 +18,7 @@ factory.prototype.respond = function ( req, res, output, status, headers, timer,
 	var body     = !REGEX_HEAD.test( req.method ) && output !== null,
 	    encoding = this.compression( req.headers["user-agent"], req.headers["accept-encoding"] ),
 	    self     = this,
-	    salt;
+	    url      = this.url( req );
 
 	if ( !( headers instanceof Object ) ) {
 		headers = {};
@@ -49,8 +49,8 @@ factory.prototype.respond = function ( req, res, output, status, headers, timer,
 
 		// Setting Etag if not present
 		if ( headers.Etag === undefined ) {
-			salt = req.url + "-" + req.method + "-" + $.encode( req.headers ) + "-" + ( output !== null && typeof output.length !== "undefined" ? output.length : null ) + "-" + output;
-			headers.Etag = "\"" + self.hash( salt ) + "\"";
+			headers.Etag = "\"" + self.etag( url, output && output.length || 0, new Date().getTime(), output ) + "\"";
+			this.register( url, headers.Etag );
 		}
 	}
 
@@ -75,7 +75,7 @@ factory.prototype.respond = function ( req, res, output, status, headers, timer,
 		res.end();
 
 		dtp.fire( "respond", function () {
-			return [req.headers.host, req.method, req.url, status, diff( timer )];
+			return [req.headers.host, req.method, url, status, diff( timer )];
 		});
 
 		self.log( prep.call( self, req, res ) );

@@ -29,7 +29,7 @@ factory.prototype.receiveMessage = function ( msg ) {
 			break;
 
 		case MSG_QUE_DEL:
-			self.requestQueue.last = msg.arg.last();
+			this.requestQueue.last = msg.arg.last();
 			msg.arg.each( function ( i ) {
 				delete self.requestQueue.registry[i];
 			});
@@ -45,6 +45,10 @@ factory.prototype.receiveMessage = function ( msg ) {
 
 		case MSG_START:
 			this.ready( msg.arg );
+			break;
+
+		case MSG_REG_SET:
+			this.registry.set( msg.arg.key, msg.arg.value );
 			break;
 	}
 

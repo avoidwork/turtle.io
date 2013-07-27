@@ -29,7 +29,7 @@ factory.prototype.request = function ( req, res, timer ) {
 	// Can't find the hostname in vhosts, try the default (if set) or send a 500
 	if ( !this.config.vhosts.hasOwnProperty( host ) ) {
 		$.array.cast( this.config.vhosts, true ).each(function ( i ) {
-			var regex = new RegExp( i.replace(/^\*/, ".*" ) );
+			var regex = new RegExp( i.replace( /^\*/, ".*" ) );
 
 			if ( regex.test( host ) ) {
 				found = true;
@@ -106,12 +106,13 @@ factory.prototype.request = function ( req, res, timer ) {
 							}
 						});
 						break;
+
 					case "get":
 					case "head":
 					case "options":
 						mimetype = mime.lookup( path );
 						fs.stat( path, function ( e, stat ) {
-							var size, modified, etag, headers;
+							var size, modified, etag, headers, url;
 
 							if ( e ) {
 								self.error( req, res, e );
@@ -119,16 +120,22 @@ factory.prototype.request = function ( req, res, timer ) {
 							else {
 								size     = stat.size;
 								modified = stat.mtime.toUTCString();
-								etag     = "\"" + self.hash( req.url + "-" + stat.size + "-" + stat.mtime ) + "\"";
+								url      = self.url( req );
+								etag     = "\"" + self.etag( url, stat.size, stat.mtime ) + "\"";
 								headers  = {Allow: allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified};
 
 								if ( req.method === "GET" ) {
 									if ( ( Date.parse( req.headers["if-modified-since"] ) >= stat.mtime ) || ( req.headers["if-none-match"] === etag ) ) {
+										if ( req.headers["if-none-match"] === etag ) {
+											self.register( url, etag.replace( /\"/g, "" ) );
+										}
+
 										self.respond( req, res, messages.NO_CONTENT, codes.NOT_MODIFIED, headers, timer, false );
 									}
 									else {
 										headers["Transfer-Encoding"] = "chunked";
 										etag = etag.replace( /\"/g, "" );
+										self.register( url, etag );
 										self.compressed( req, res, etag, path, codes.SUCCESS, headers, true, timer );
 									}
 								}
@@ -138,9 +145,11 @@ factory.prototype.request = function ( req, res, timer ) {
 							}
 						});
 						break;
+
 					case "put":
 						self.write( path, req, res, timer );
 						break;
+
 					default:
 						self.error( req, req, undefined, timer );
 				}

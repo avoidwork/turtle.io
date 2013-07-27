@@ -15,7 +15,8 @@ var handler = function ( req, res, fn ) {
 
 	// Setting up request handler
 	op = function () {
-		var payload;
+		var url = self.url( req ),
+		    payload;
 
 		try {
 			// Decorating session
@@ -33,6 +34,11 @@ var handler = function ( req, res, fn ) {
 					req.body = payload;
 					fn.call( self, req, res, timer );
 				});
+			}
+			// Looking in LRU cache for Etag
+			else if ( REGEX_GET.test( req.method ) && !REGEX_HEAD.test( req.method ) && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === self.registry.get( url ) ) {
+				self.register( url, req.headers["if-none-match"].replace( /\"/g, "" ) );
+				self.respond( req, res, messages.NO_CONTENT, codes.NOT_MODIFIED, {Etag: req.headers["if-none-match"]}, timer, false );
 			}
 			else {
 				fn.call( self, req, res, timer );

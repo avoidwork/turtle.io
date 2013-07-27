@@ -14,6 +14,7 @@ factory.prototype.write = function ( path, req, res, timer ) {
 	    body  = req.body,
 	    allow = this.allows( req.url ),
 	    del   = this.allowed( "DELETE", req.url ),
+	    url   = this.url( req ),
 	    status;
 
 	if ( !put && /\/$/.test( req.url ) ) {
@@ -23,29 +24,40 @@ factory.prototype.write = function ( path, req, res, timer ) {
 	else {
 		allow = allow.explode().remove( "POST" ).join(", ");
 
-		fs.readFile( path, function ( e, data ) {
-			var hash = "\"" + self.hash( data ) + "\"";
-
+		fs.stat( path, function ( e, stat ) {
 			if ( e ) {
 				self.error( req, res, e, timer );
 			}
 			else {
-				if ( !req.headers.hasOwnProperty( "etag" ) || req.headers.etag === hash ) {
+				var etag = "\"" + self.etag( url, stat.size, stat.mtime ) + "\"";
+
+				if ( !req.headers.hasOwnProperty( "etag" ) || req.headers.etag === etag ) {
 					fs.writeFile( path, body, function ( e ) {
 						if ( e ) {
 							self.error( req, req, e, timer );
 						}
 						else {
-							dtp.fire( "write", function () {
-								return [req.headers.host, req.url, req.method, path, diff( timer )];
-							});
+							fs.stat( path, function ( e, stat ) {
+								var etag;
 
-							status = put ? codes.NO_CONTENT : codes.CREATED;
-							self.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow, Etag: hash}, timer, false );
+								if ( e ) {
+									self.error( req, res, e, timer );
+								}
+								else {
+									etag = "\"" + self.etag( url, stat.size, stat.mtime ) + "\"";
+
+									dtp.fire( "write", function () {
+										return [req.headers.host, req.url, req.method, path, diff( timer )];
+									});
+
+									status = put ? codes.NO_CONTENT : codes.CREATED;
+									self.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow, Etag: etag}, timer, false );
+								}
+							});
 						}
 					});
 				}
-				else if ( req.headers.etag !== hash ) {
+				else if ( req.headers.etag !== etag ) {
 					self.respond( req, res, messages.NO_CONTENT, codes.FAILED, {}, timer, false );
 				}
 			}
