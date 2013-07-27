@@ -58,6 +58,9 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 
 			resHeaders.Server = self.config.headers.Server;
 
+			// Updating LRU
+			self.register( url, etag.replace( /\"/g, "" ), true );
+
 			// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
 			if ( req.headers["if-none-match"] === etag ) {
 				self.respond( req, res, messages.NO_CONTENT, codes.NOT_MODIFIED, resHeaders, timer, false );

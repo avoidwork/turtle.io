@@ -97,6 +97,8 @@ factory.prototype.request = function ( req, res, timer ) {
 
 				switch ( method ) {
 					case "delete":
+						self.stale( self.url( req ) );
+
 						fs.unlink( path, function ( e ) {
 							if ( e ) {
 								self.error( req, req, e, timer );
@@ -112,7 +114,7 @@ factory.prototype.request = function ( req, res, timer ) {
 					case "options":
 						mimetype = mime.lookup( path );
 						fs.stat( path, function ( e, stat ) {
-							var size, modified, etag, headers, url;
+							var size, modified, etag, headers, url, watcher;
 
 							if ( e ) {
 								self.error( req, res, e );
@@ -135,9 +137,28 @@ factory.prototype.request = function ( req, res, timer ) {
 									else {
 										headers["Transfer-Encoding"] = "chunked";
 										etag = etag.replace( /\"/g, "" );
-										self.register( url, etag );
+										self.register( url, etag, true );
 										self.compressed( req, res, etag, path, codes.SUCCESS, headers, true, timer );
 									}
+
+									// Watching path for changes
+									watcher = fs.watch( path, function ( event ) {
+										self.stale( url );
+
+										if ( event === "rename" ) {
+											watcher.close();
+										}
+										else {
+											fs.stat( path, function ( e, stat ) {
+												if ( e ) {
+													self.log( e );
+												}
+												else {
+													self.register( url, self.etag( url, stat.size, stat.mtime, true ) );
+												}
+											});
+										}
+									});
 								}
 								else {
 									self.respond( req, res, messages.NO_CONTENT, codes.SUCCESS, headers, timer, false );

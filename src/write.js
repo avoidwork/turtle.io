@@ -17,6 +17,9 @@ factory.prototype.write = function ( path, req, res, timer ) {
 	    url   = this.url( req ),
 	    status;
 
+	// Updating LRU position
+	self.registry.get( url );
+
 	if ( !put && /\/$/.test( req.url ) ) {
 		status = del ? codes.CONFLICT : codes.ERROR_APPLICATION;
 		this.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow}, timer, false );
@@ -38,20 +41,18 @@ factory.prototype.write = function ( path, req, res, timer ) {
 						}
 						else {
 							fs.stat( path, function ( e, stat ) {
-								var etag;
-
 								if ( e ) {
 									self.error( req, res, e, timer );
 								}
 								else {
-									etag = "\"" + self.etag( url, stat.size, stat.mtime ) + "\"";
+									self.register( url, self.etag( url, stat.size, stat.mtime ), true );
 
 									dtp.fire( "write", function () {
 										return [req.headers.host, req.url, req.method, path, diff( timer )];
 									});
 
 									status = put ? codes.NO_CONTENT : codes.CREATED;
-									self.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow, Etag: etag}, timer, false );
+									self.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow}, timer, false );
 								}
 							});
 						}

@@ -57,6 +57,7 @@ module.exports = function (grunt) {
 					"src/routes.js",
 					"src/sendMessage.js",
 					"src/session.js",
+					"src/stale.js",
 					"src/start.js",
 					"src/status.js",
 					"src/stop.js",
