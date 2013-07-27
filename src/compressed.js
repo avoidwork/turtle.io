@@ -37,7 +37,7 @@ factory.prototype.compressed = function ( req, res, etag, arg, status, headers, 
 				}
 				// File is not ready, cache it locally & pipe to the client while compressing (2x)
 				else {
-					self.cache( etag, arg, compression, true, function () {
+					self.cache( etag, arg, compression, false, function () {
 						dtp.fire( "compressed", function () {
 							return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 						});
