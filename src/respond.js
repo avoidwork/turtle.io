@@ -50,7 +50,7 @@ factory.prototype.respond = function ( req, res, output, status, headers, timer,
 		// Setting Etag if not present
 		if ( headers.Etag === undefined ) {
 			headers.Etag = "\"" + self.etag( url, output && output.length || 0, new Date().getTime(), output ) + "\"";
-			this.register( url, headers.Etag.replace( /\"/g, "" ), true );
+			this.register( url, {etag: headers.Etag.replace( /\"/g, "" ), mimetype: headers["Content-Type"]}, true );
 		}
 	}
 

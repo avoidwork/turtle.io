@@ -6,13 +6,13 @@
  * @return {Object}      Instance
  */
 factory.prototype.stale = function ( key ) {
-	var self = this,
-	    etag = this.registry.get( key ),
+	var self   = this,
+	    cached = this.registry.get( key ),
 	    gz, df;
 
-	if ( etag ) {
-		gz = this.config.tmp + "/" + etag + ".gz";
-		df = this.config.tmp + "/" + etag + ".df";
+	if ( cached ) {
+		gz = this.config.tmp + "/" + cached.etag + ".gz";
+		df = this.config.tmp + "/" + cached.etag + ".df";
 
 		this.registry.remove( key );
 

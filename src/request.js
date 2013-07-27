@@ -129,7 +129,7 @@ factory.prototype.request = function ( req, res, timer ) {
 								if ( req.method === "GET" ) {
 									if ( ( Date.parse( req.headers["if-modified-since"] ) >= stat.mtime ) || ( req.headers["if-none-match"] === etag ) ) {
 										if ( req.headers["if-none-match"] === etag ) {
-											self.register( url, etag.replace( /\"/g, "" ) );
+											self.register( url, {etag: etag.replace( /\"/g, "" ), mimetype: mimetype} );
 										}
 
 										self.respond( req, res, messages.NO_CONTENT, codes.NOT_MODIFIED, headers, timer, false );
@@ -137,7 +137,7 @@ factory.prototype.request = function ( req, res, timer ) {
 									else {
 										headers["Transfer-Encoding"] = "chunked";
 										etag = etag.replace( /\"/g, "" );
-										self.register( url, etag, true );
+										self.register( url, {etag: etag, mimetype: mimetype}, true );
 										self.compressed( req, res, etag, path, codes.SUCCESS, headers, true, timer );
 									}
 
@@ -154,7 +154,7 @@ factory.prototype.request = function ( req, res, timer ) {
 													self.log( e );
 												}
 												else if ( self.registry.get( url ) ) {
-													self.register( url, self.etag( url, stat.size, stat.mtime, true ) );
+													self.register( url, {etag: self.etag( url, stat.size, stat.mtime ), mimetype: mimetype}, true );
 												}
 												else {
 													watcher.close();

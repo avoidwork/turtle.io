@@ -15,7 +15,8 @@ var handler = function ( req, res, fn ) {
 
 	// Setting up request handler
 	op = function () {
-		var url = self.url( req ),
+		var url    = self.url( req ),
+		    cached = self.registry.get( url ),
 		    payload;
 
 		try {
@@ -36,9 +37,9 @@ var handler = function ( req, res, fn ) {
 				});
 			}
 			// Looking in LRU cache for Etag
-			else if ( REGEX_GET.test( req.method ) && !REGEX_HEAD.test( req.method ) && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === self.registry.get( url ) ) {
-				self.register( url, req.headers["if-none-match"].replace( /\"/g, "" ) );
-				self.respond( req, res, messages.NO_CONTENT, codes.NOT_MODIFIED, {Etag: req.headers["if-none-match"]}, timer, false );
+			else if ( REGEX_GET.test( req.method ) && !REGEX_HEAD.test( req.method ) && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === cached.etag ) {
+				self.register( url, cached );
+				self.respond( req, res, messages.NO_CONTENT, codes.NOT_MODIFIED, {"Content-Type": cached.mimetype, Etag: "\"" + cached.etag + "\""}, timer, false );
 			}
 			else {
 				fn.call( self, req, res, timer );

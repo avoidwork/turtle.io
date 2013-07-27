@@ -45,7 +45,7 @@ factory.prototype.write = function ( path, req, res, timer ) {
 									self.error( req, res, e, timer );
 								}
 								else {
-									self.register( url, self.etag( url, stat.size, stat.mtime ), true );
+									self.register( url, {etag: self.etag( url, stat.size, stat.mtime ), mimetype: mime.lookup( path )}, true );
 
 									dtp.fire( "write", function () {
 										return [req.headers.host, req.url, req.method, path, diff( timer )];
