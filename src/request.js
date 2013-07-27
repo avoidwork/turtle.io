@@ -148,16 +148,6 @@ factory.prototype.request = function ( req, res, timer ) {
 										if ( event === "rename" ) {
 											watcher.close();
 										}
-										else {
-											fs.stat( path, function ( e, stat ) {
-												if ( e ) {
-													self.log( e );
-												}
-												else {
-													self.register( url, self.etag( url, stat.size, stat.mtime, true ) );
-												}
-											});
-										}
 									});
 								}
 								else {
