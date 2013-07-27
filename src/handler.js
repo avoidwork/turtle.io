@@ -37,7 +37,7 @@ var handler = function ( req, res, fn ) {
 				});
 			}
 			// Looking in LRU cache for Etag
-			else if ( REGEX_GET.test( req.method ) && !REGEX_HEAD.test( req.method ) && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === cached.etag ) {
+			else if ( cached && REGEX_GET.test( req.method ) && !REGEX_HEAD.test( req.method ) && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === cached.etag ) {
 				self.register( url, cached );
 				self.respond( req, res, messages.NO_CONTENT, codes.NOT_MODIFIED, {"Content-Type": cached.mimetype, Etag: "\"" + cached.etag + "\""}, timer, false );
 			}

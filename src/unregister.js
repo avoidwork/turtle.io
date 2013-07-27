@@ -6,7 +6,6 @@
  * @return {Object}     Instance
  */
 factory.prototype.unregister = function ( url ) {
-	this.stale( url );
 	this.sendMessage( MSG_REG_DEL, url, true, false );
 
 	return this;

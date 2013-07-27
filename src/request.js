@@ -143,6 +143,8 @@ factory.prototype.request = function ( req, res, timer ) {
 
 									// Watching path for changes
 									watcher = fs.watch( path, function ( event ) {
+										self.stale( url );
+
 										if ( event === "rename" ) {
 											self.unregister( url );
 											watcher.close();
