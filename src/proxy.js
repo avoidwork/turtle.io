@@ -29,6 +29,8 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 		    etag       = "",
 		    regex      = /("|')\//g,
 		    replace    = "$1" + route + "/",
+		    url        = self.url( req ),
+		    delay      = $.expires,
 		    date, rewrite;
 
 		try {
@@ -44,7 +46,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 				date = new Date( date );
 			}
 
-			etag = resHeaders.Etag || "\"" + self.hash( req.url + "-" + req.method + "-" + resHeaders["Content-Length"] + "-" + date.getTime() ) + "\"";
+			etag = resHeaders.Etag || "\"" + self.etag( url, resHeaders["Content-Length"], date.getTime(), arg ) + "\"";
 
 			// Setting headers
 			if ( resHeaders.Etag !== etag ) {
@@ -56,6 +58,26 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 			}
 
 			resHeaders.Server = self.config.headers.Server;
+
+			if ( !$.regex.no.test( resHeaders["Cache-Control"] ) ) {
+				// Determining how long rep is valid
+				if ( resHeaders["Cache-Control"] && $.regex.number_present.test( resHeaders["Cache-Control"] ) ) {
+					delay = $.number.parse( $.regex.number_present.exec( resHeaders["Cache-Control"] )[0], 10 );
+				}
+				else if ( resHeaders.Expires !== undefined ) {
+					delay = new Date( resHeaders.Expires ).diff( new Date() );
+				}
+
+				if ( delay > 0 ) {
+					// Updating LRU
+					self.register( url, {etag: etag.replace( /\"/g, "" ), mimetype: resHeaders["Content-Type"]}, true );
+
+					// Removing from LRU when invalid
+					$.delay( function () {
+						self.unregister( url );
+					}, delay );
+				}
+			}
 
 			// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
 			if ( req.headers["if-none-match"] === etag ) {

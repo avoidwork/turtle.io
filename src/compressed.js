@@ -26,18 +26,23 @@ factory.prototype.compressed = function ( req, res, etag, arg, status, headers, 
 			res.setHeader( "Content-Encoding", compression );
 
 			this.cached( etag, compression, function ( ready, npath ) {
-				dtp.fire( "compressed", function () {
-					return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
-				});
-
 				// File is ready!
 				if ( ready ) {
+					dtp.fire( "compressed", function () {
+						return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
+					});
+
 					raw = fs.createReadStream( npath );
 					raw.pipe( res );
 				}
 				// File is not ready, cache it locally & pipe to the client while compressing (2x)
 				else {
-					self.cache( etag, arg, compression );
+					self.cache( etag, arg, compression, false, function () {
+						dtp.fire( "compressed", function () {
+							return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
+						});
+					} );
+
 					raw = fs.createReadStream( arg );
 					raw.pipe( zlib[REGEX_DEF.test( compression ) ? "createDeflate" : "createGzip"]() ).pipe( res );
 				}
