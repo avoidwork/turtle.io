@@ -114,7 +114,7 @@ factory.prototype.request = function ( req, res, timer ) {
 					case "options":
 						mimetype = mime.lookup( path );
 						fs.stat( path, function ( e, stat ) {
-							var size, modified, etag, headers, url, watcher;
+							var size, modified, etag, headers, url;
 
 							if ( e ) {
 								self.error( req, res, e );
@@ -141,30 +141,8 @@ factory.prototype.request = function ( req, res, timer ) {
 										self.compressed( req, res, etag, path, codes.SUCCESS, headers, true, timer );
 									}
 
-									// Watching path for changes
-									watcher = fs.watch( path, function ( event ) {
-										self.stale( url );
-
-										if ( event === "rename" ) {
-											self.unregister( url );
-											watcher.close();
-										}
-										else {
-											fs.stat( path, function ( e, stat ) {
-												if ( e ) {
-													self.log( e );
-													self.unregister( url );
-													watcher.close();
-												}
-												else if ( self.registry.get( url ) ) {
-													self.register( url, {etag: self.etag( url, stat.size, stat.mtime ), mimetype: mimetype}, true );
-												}
-												else {
-													watcher.close();
-												}
-											});
-										}
-									});
+									// Creating `watcher` in master ps to update LRU
+									self.watch( url, path, mimetype );
 								}
 								else {
 									self.respond( req, res, messages.NO_CONTENT, codes.SUCCESS, headers, timer, false );

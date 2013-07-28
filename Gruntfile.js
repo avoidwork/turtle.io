@@ -64,6 +64,8 @@ module.exports = function (grunt) {
 					"src/unregister.js",
 					"src/unset.js",
 					"src/verbs.js",
+					"src/watch.js",
+					"src/watcher.js",
 					"src/write.js",
 					"src/handler.js",
 					"src/messages.js",

@@ -50,6 +50,10 @@ var pass = function ( msg ) {
 			cluster.workers[msg.worker.toString()].send( arg );
 			break;
 
+		case MSG_REG_WAT:
+			this.watcher( msg.arg.url, msg.arg.path, msg.arg.mimetype );
+			break;
+
 		default:
 			cluster.workers[( msg.cmd === MSG_QUE_NEW ? this.config.queue.id : msg.worker ).toString()].send( msg );
 	}
