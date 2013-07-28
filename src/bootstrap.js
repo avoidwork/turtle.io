@@ -28,9 +28,6 @@ factory.prototype.bootstrap = function ( fn ) {
 			probes();
 		}
 
-		// Creating LRU cache to hold Etags (default size of 1000 items)
-		this.registry = $.lru();
-
 		// Creating REGEX_REWRITE
 		REGEX_REWRITE = new RegExp( "^(" + this.config.proxy.rewrite.join( "|" ) + ")$" );
 

@@ -14,6 +14,11 @@ factory.prototype.ready = function ( arg ) {
 	// Setting error pages
 	this.pages = arg.pages;
 
+	// Setting LRU
+	this.registry.cache = arg.registry.cache;
+	this.registry.first = arg.registry.first;
+	this.registry.last  = arg.registry.last;
+
 	// Starting queue worker
 	if ( cluster.worker.id === this.config.queue.id ) {
 		this.mode( true );

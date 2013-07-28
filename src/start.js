@@ -29,6 +29,9 @@ factory.prototype.start = function ( args, errorHandler ) {
 	// Setting error page path
 	pages = this.config.pages ? ( this.config.root + this.config.pages ) : ( __dirname + "/../pages" );
 
+	// Creating LRU cache to hold Etags
+	this.registry = $.lru( this.config.cache || 1000 );
+
 	if ( cluster.isMaster ) {
 		// Message passing
 		msg = function ( msg ) {
