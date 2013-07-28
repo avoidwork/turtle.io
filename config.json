@@ -6,6 +6,7 @@
 	"maxConnections" : 25,
 	"ps"      : 2,
 	"uid"     : null,
+	"cache"   : 1000,
 	"headers" : {
 		"Access-Control-Allow-Origin" : "*",
 		"Access-Control-Allow-Headers": "*",

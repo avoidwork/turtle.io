@@ -11,6 +11,8 @@ factory.prototype.stop = function () {
 		$.array.cast( cluster.workers ).each(function ( i ) {
 			process.kill( i.process.pid, TERM_SIG );
 		});
+
+		this.registry = null;
 	}
 
 	return this;
