@@ -23,7 +23,7 @@ factory.prototype.sendMessage = function ( cmd, arg, all, ack ) {
 	if ( ack ) {
 		$.repeat( function () {
 			process.send( body );
-		}, 1000, id);
+		}, 1000, id );
 	}
 	else {
 		process.send( body );

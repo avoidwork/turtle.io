@@ -23,7 +23,7 @@ factory.prototype.queue = function ( req, res, arg, id, headers, timer ) {
 	body  = {processing: total < this.config.queue.size ? "now" : moment().fromNow( ( total / this.config.queue.size * this.config.queue.time ), " seconds" )};
 
 	if ( this.config.queue.status ) {
-		body.status = parsed.protocol + "//" + req.headers.host + "/queue/" + uuid;
+		body.status = parsed.protocol + "//" + parsed.host + "/queue/" + uuid;
 	}
 
 	this.respond( req, res, body, codes.ACCEPTED, headers, timer, false );
