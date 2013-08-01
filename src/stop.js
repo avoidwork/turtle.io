@@ -13,6 +13,7 @@ factory.prototype.stop = function () {
 		});
 
 		this.registry = null;
+		this.watching = {};
 	}
 
 	return this;

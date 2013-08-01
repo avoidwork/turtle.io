@@ -20,4 +20,5 @@ var factory = function () {
 	this.server       = null;
 	this.sessions     = {};
 	this.version      = "{{VERSION}}";
+	this.watching     = {};
 };
