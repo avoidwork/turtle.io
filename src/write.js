@@ -20,7 +20,7 @@ factory.prototype.write = function ( path, req, res, timer ) {
 	// Updating LRU position
 	self.registry.get( url );
 
-	if ( !put && /\/$/.test( req.url ) ) {
+	if ( !put && $.regex.endslash.test( req.url ) ) {
 		status = del ? codes.CONFLICT : codes.ERROR_APPLICATION;
 		this.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow}, timer, false );
 	}

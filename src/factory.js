@@ -7,7 +7,7 @@
 var factory = function () {
 	this.active       = false;
 	this.bootstrapped = false;
-	this.config       = require(__dirname + "/../config.json");
+	this.config       = require( __dirname + "/../config.json" );
 	this.logQueue     = [];
 	this.pages        = {all: {}},
 	this.registry     = null;
@@ -20,4 +20,5 @@ var factory = function () {
 	this.server       = null;
 	this.sessions     = {};
 	this.version      = "{{VERSION}}";
+	this.watching     = {};
 };

@@ -62,7 +62,7 @@ factory.prototype.respond = function ( req, res, output, status, headers, timer,
 
 	// Compressing response to disk
 	if ( status === 200 && compress ) {
-		self.compressed( req, res, headers.Etag.replace(/"/g, ""), output, status, headers, false, timer );
+		self.compressed( req, res, headers.Etag.replace( /\"/g, "" ), output, status, headers, false, timer );
 	}
 	// Serving content
 	else {

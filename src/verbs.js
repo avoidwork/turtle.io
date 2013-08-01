@@ -59,7 +59,7 @@ factory.prototype.get = function ( route, fn, host ) {
 	var self  = this,
 	    timer = new Date();
 
-	$.route.set(route, function ( req, res ) {
+	$.route.set( route, function ( req, res ) {
 		handler.call( self, req, res, fn );
 	}, "get", host );
 
@@ -83,11 +83,11 @@ factory.prototype.patch = function ( route, fn, host ) {
 	var self  = this,
 	    timer = new Date();
 
-	$.route.set(route, function ( req, res ) {
+	$.route.set( route, function ( req, res ) {
 		handler.call( self, req, res, fn );
 	}, "patch", host );
 
-	dtp.fire("route-set", function () {
+	dtp.fire( "route-set", function () {
 		return [host || "*", route, "PATCH", diff( timer )];
 	});
 
@@ -107,11 +107,11 @@ factory.prototype.post = function ( route, fn, host ) {
 	var self  = this,
 	    timer = new Date();
 
-	$.route.set(route, function ( req, res ) {
+	$.route.set( route, function ( req, res ) {
 		handler.call( self, req, res, fn );
 	}, "post", host );
 
-	dtp.fire("route-set", function () {
+	dtp.fire( "route-set", function () {
 		return [host || "*", route, "POST", diff( timer )];
 	});
 

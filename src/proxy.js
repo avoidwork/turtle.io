@@ -122,15 +122,13 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 	 * @return {Object}      Reshaped response headers
 	 */
 	headers = function ( args ) {
-		var result  = {},
-		    rvalue  = /.*:\s+/,
-		    rheader = /:.*/;
+		var result = {};
 
 		args.trim().split( "\n" ).each( function ( i ) {
 			var header, value;
 
-			value          = i.replace( rvalue, "" );
-			header         = i.replace( rheader, "" );
+			value          = i.replace( $.regex.header_value_replace, "" );
+			header         = i.replace( $.regex.header_replace, "" );
 			header         = header.unhyphenate( true ).replace( /\s+/g, "-" );
 			result[header] = value;
 		});
