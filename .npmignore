@@ -2,6 +2,7 @@
 /log/turtleio.log
 /src/
 /test/
+/.idea/
 .travis.yml
 .git
 .gitignore

@@ -27,7 +27,7 @@ factory.prototype.watcher = function ( url, path, mimetype ) {
 				}
 
 				watcher.close();
-				delete this.watching[path];
+				delete self.watching[path];
 			}
 			else {
 				fs.stat( path, function ( e, stat ) {
@@ -45,7 +45,7 @@ factory.prototype.watcher = function ( url, path, mimetype ) {
 						}
 
 						watcher.close();
-						delete this.watching[path];
+						delete self.watching[path];
 					}
 					else if ( self.registry.get( url ) ) {
 						etag = self.etag( url, stat.size, stat.mtime );
@@ -60,7 +60,7 @@ factory.prototype.watcher = function ( url, path, mimetype ) {
 					}
 					else {
 						watcher.close();
-						delete this.watching[path];
+						delete self.watching[path];
 					}
 				});
 			}
