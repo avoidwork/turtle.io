@@ -2,6 +2,7 @@
  * Bootstraps instance
  *
  * @method bootstrap
+ * @public
  * @param  {Function} fn [Optional] Route error handler
  * @return {Object}      Instance
  */

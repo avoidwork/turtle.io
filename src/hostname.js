@@ -1,6 +1,8 @@
 /**
  * Prepares request host name
  *
+ * @method hostname
+ * @public
  * @param  {Object} req HTTP(S) request Object
  * @return {String}     Hostname
  */

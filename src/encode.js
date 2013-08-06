@@ -1,6 +1,8 @@
 /**
  * Encodes `obj` as JSON if applicable
  *
+ * @method encode
+ * @private
  * @param  {Mixed} obj Object to encode
  * @return {Mixed}     Original Object or JSON string
  */

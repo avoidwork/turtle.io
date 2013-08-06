@@ -1,6 +1,8 @@
 /**
  * Watches `path` for changes & updated LRU
  *
+ * @method watch
+ * @public
  * @param  {String} url      LRUItem url
  * @param  {String} path     File path
  * @param  {String} mimetype Mimetype of URL

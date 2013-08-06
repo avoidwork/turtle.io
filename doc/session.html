@@ -1,0 +1,139 @@
+<!DOCTYPE html><html lang="en"><head><title>session</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="session"><meta name="groc-project-path" content="src/session.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/session.js</div></div><div id="document"><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public </span></p>
+
+<p>Sessions</p></div></div><div class="code"><div class="wrapper"><span class="nx">factory</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">session</span> <span class="o">=</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method create</span></p>
+
+<p>Creates a session</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>req must be an Object.</strong><br/>(HTTP(S) request Object)</p></li>
+<li><p><strong>res must be an Object.</strong><br/>(HTTP(S) response Object)</p></li>
+</ul>
+
+<p><strong>Returns an Object</strong><br/>(Session)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">create</span> <span class="o">:</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">server</span><span class="p">,</span>
+        <span class="nx">parsed</span>   <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">url</span><span class="p">(</span> <span class="nx">req</span> <span class="p">)</span> <span class="p">),</span>
+        <span class="nx">domain</span>   <span class="o">=</span> <span class="nx">parsed</span><span class="p">.</span><span class="nx">host</span><span class="p">.</span><span class="nx">isDomain</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">parsed</span><span class="p">.</span><span class="nx">host</span><span class="p">.</span><span class="nx">isIP</span><span class="p">()</span> <span class="o">?</span> <span class="nx">parsed</span><span class="p">.</span><span class="nx">host</span> <span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+        <span class="nx">secure</span>   <span class="o">=</span> <span class="p">(</span> <span class="nx">parsed</span><span class="p">.</span><span class="nx">protocol</span> <span class="o">===</span> <span class="s2">&quot;https:&quot;</span> <span class="p">),</span>
+        <span class="nx">salt</span>     <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">connection</span><span class="p">.</span><span class="nx">remoteAddress</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">salt</span><span class="p">,</span>
+        <span class="nx">id</span>       <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">uuid</span><span class="p">(</span> <span class="kc">true</span> <span class="p">),</span>
+        <span class="nx">sid</span>      <span class="o">=</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">cipher</span><span class="p">(</span> <span class="nx">id</span><span class="p">,</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">salt</span> <span class="p">),</span>
+        <span class="nx">sesh</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Setting cookie</p></div></div><div class="code"><div class="wrapper">    <span class="nx">instance</span><span class="p">.</span><span class="nx">cookie</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">sid</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">expires</span><span class="p">,</span> <span class="nx">domain</span><span class="p">,</span> <span class="nx">secure</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Creating session instance &amp; announcing it</p></div></div><div class="code"><div class="wrapper">    <span class="nx">sesh</span> <span class="o">=</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Session</span><span class="p">(</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">instance</span> <span class="p">);</span>
+    <span class="nx">sesh</span><span class="p">.</span><span class="nx">save</span><span class="p">();</span>
+
+    <span class="k">return</span> <span class="nx">sesh</span><span class="p">;</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method destroy</span></p>
+
+<p>Destroys a session</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>req must be an Object.</strong><br/>(HTTP(S) request Object)</p></li>
+<li><p><strong>res must be an Object.</strong><br/>(HTTP(S) response Object)</p></li>
+</ul>
+
+<p><strong>Returns an Object</strong><br/>(Instance)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">destroy</span> <span class="o">:</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">server</span><span class="p">,</span>
+        <span class="nx">parsed</span>   <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">url</span><span class="p">(</span> <span class="nx">req</span> <span class="p">)</span> <span class="p">),</span>
+        <span class="nx">domain</span>   <span class="o">=</span> <span class="nx">parsed</span><span class="p">.</span><span class="nx">host</span><span class="p">.</span><span class="nx">isDomain</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">parsed</span><span class="p">.</span><span class="nx">host</span><span class="p">.</span><span class="nx">isIP</span><span class="p">()</span> <span class="o">?</span> <span class="nx">parsed</span><span class="p">.</span><span class="nx">host</span> <span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+        <span class="nx">secure</span>   <span class="o">=</span> <span class="p">(</span> <span class="nx">parsed</span><span class="p">.</span><span class="nx">protocol</span> <span class="o">===</span> <span class="s2">&quot;https:&quot;</span> <span class="p">),</span>
+        <span class="nx">salt</span>     <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">connection</span><span class="p">.</span><span class="nx">remoteAddress</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">salt</span><span class="p">,</span>
+        <span class="nx">sid</span>      <span class="o">=</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">cookie</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">id</span> <span class="p">),</span>
+        <span class="nx">id</span>       <span class="o">=</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">cipher</span><span class="p">(</span> <span class="nx">sid</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="nx">salt</span> <span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="nx">id</span> <span class="o">!==</span> <span class="kc">undefined</span> <span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Expiring cookie</p></div></div><div class="code"><div class="wrapper">      <span class="nx">instance</span><span class="p">.</span><span class="nx">cookie</span><span class="p">.</span><span class="nx">expire</span><span class="p">(</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">domain</span><span class="p">,</span> <span class="nx">secure</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Deleting sesssion</p></div></div><div class="code"><div class="wrapper">      <span class="k">delete</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Announcing deletion of session</p></div></div><div class="code"><div class="wrapper">      <span class="nx">instance</span><span class="p">.</span><span class="nx">sendMessage</span><span class="p">(</span> <span class="nx">MSG_SES_DEL</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="kc">true</span> <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method get</span></p>
+
+<p>Gets a session</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>req must be an Object.</strong><br/>(HTTP(S) request Object)</p></li>
+<li><p><strong>res must be an Object.</strong><br/>(HTTP(S) response Object)</p></li>
+</ul>
+
+<p><strong>Returns a Mixed</strong><br/>(Session or undefined)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">get</span> <span class="o">:</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">instance</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">server</span><span class="p">,</span>
+        <span class="nx">parsed</span>   <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">url</span><span class="p">(</span> <span class="nx">req</span> <span class="p">)</span> <span class="p">),</span>
+        <span class="nx">domain</span>   <span class="o">=</span> <span class="nx">parsed</span><span class="p">.</span><span class="nx">host</span><span class="p">.</span><span class="nx">isDomain</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">parsed</span><span class="p">.</span><span class="nx">host</span><span class="p">.</span><span class="nx">isIP</span><span class="p">()</span> <span class="o">?</span> <span class="nx">parsed</span><span class="p">.</span><span class="nx">host</span> <span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+        <span class="nx">secure</span>   <span class="o">=</span> <span class="p">(</span> <span class="nx">parsed</span><span class="p">.</span><span class="nx">protocol</span> <span class="o">===</span> <span class="s2">&quot;https:&quot;</span> <span class="p">),</span>
+        <span class="nx">sid</span>      <span class="o">=</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">cookie</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">id</span> <span class="p">),</span>
+        <span class="nx">id</span><span class="p">,</span> <span class="nx">salt</span><span class="p">,</span> <span class="nx">sesh</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="nx">sid</span> <span class="o">!==</span> <span class="kc">undefined</span> <span class="p">)</span> <span class="p">{</span>
+      <span class="nx">salt</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">connection</span><span class="p">.</span><span class="nx">remoteAddress</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">salt</span><span class="p">;</span>
+      <span class="nx">id</span>   <span class="o">=</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">cipher</span><span class="p">(</span> <span class="nx">sid</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="nx">salt</span> <span class="p">);</span>
+      <span class="nx">sesh</span> <span class="o">=</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
+
+      <span class="k">if</span> <span class="p">(</span> <span class="nx">sesh</span> <span class="o">!==</span> <span class="kc">undefined</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="nx">sesh</span><span class="p">.</span><span class="nx">_timestamp</span><span class="p">.</span><span class="nx">diff</span><span class="p">(</span> <span class="nx">moment</span><span class="p">().</span><span class="nx">utc</span><span class="p">().</span><span class="nx">unix</span><span class="p">()</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">{</span>
+          <span class="nx">instance</span><span class="p">.</span><span class="nx">cookie</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">instance</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">sid</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">expires</span><span class="p">,</span> <span class="nx">domain</span><span class="p">,</span> <span class="nx">secure</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span> <span class="p">);</span>
+          <span class="nx">sesh</span><span class="p">.</span><span class="nx">save</span><span class="p">();</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+      <span class="k">else</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">destroy</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nx">sesh</span><span class="p">;</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method set</span></p>
+
+<p>Sets a session (cluster normalization)</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>arg must be an Object.</strong><br/>(Message argument from Master)</li>
+</ul>
+
+<p><strong>Returns an Object</strong><br/>(Instance)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">set</span> <span class="o">:</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">arg</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">arg</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span> <span class="o">===</span> <span class="kc">undefined</span> <span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">arg</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Session</span><span class="p">(</span> <span class="nx">arg</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="k">this</span> <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nx">$</span><span class="p">.</span><span class="nx">merge</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">arg</span><span class="p">.</span><span class="nx">id</span><span class="p">],</span> <span class="nx">arg</span><span class="p">.</span><span class="nx">session</span> <span class="p">);</span>
+
+    <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Transformed <code>config.session.valid</code> for $.cookie{}</p></div></div><div class="code"><div class="wrapper">  <span class="nx">expires</span> <span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Determines if a session has expired</p></div></div><div class="code"><div class="wrapper">  <span class="nx">maxDiff</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Set &amp; unset from <code>start()</code> &amp; <code>stop()</code></p></div></div><div class="code"><div class="wrapper">  <span class="nx">server</span> <span class="o">:</span> <span class="kc">null</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-private"><div class="wrapper"><p><span class='doc-section-header'>Private constructor method Session</span></p>
+
+<p>Session factory</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>id must be a String.</strong><br/>(Session ID)</p></li>
+<li><p><strong>server must be an Object.</strong><br/>(Server instance)</p></li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">Session</span> <span class="p">(</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">server</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">_id</span>        <span class="o">=</span> <span class="nx">id</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">_server</span>    <span class="o">=</span> <span class="nx">server</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">_timestamp</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method save</span></p>
+
+<p>Saves session across cluster</p>
+
+<p><strong>Returns an Undefined</strong><br/>(undefined)</p></div></div><div class="code"><div class="wrapper"><span class="nx">Session</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">save</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">body</span> <span class="o">=</span> <span class="p">{};</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">_timestamp</span> <span class="o">=</span> <span class="nx">moment</span><span class="p">().</span><span class="nx">utc</span><span class="p">().</span><span class="nx">unix</span><span class="p">();</span>
+
+  <span class="nx">$</span><span class="p">.</span><span class="nx">iterate</span><span class="p">(</span> <span class="k">this</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">v</span><span class="p">,</span> <span class="nx">k</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">REGEX_SERVER</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span> <span class="nx">k</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
+      <span class="nx">body</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">v</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">});</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Announcing session shape</p></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">_server</span><span class="p">.</span><span class="nx">sendMessage</span><span class="p">(</span> <span class="nx">MSG_SES_SET</span><span class="p">,</span> <span class="p">{</span><span class="nx">id</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span><span class="p">,</span> <span class="nx">session</span><span class="o">:</span> <span class="nx">body</span><span class="p">},</span> <span class="kc">true</span> <span class="p">);</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method expire</span></p>
+
+<p>Expires session across cluster</p>
+
+<p><strong>Returns an Undefined</strong><br/>(undefined)</p></div></div><div class="code"><div class="wrapper"><span class="nx">Session</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">expire</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">delete</span> <span class="k">this</span><span class="p">.</span><span class="nx">_server</span><span class="p">.</span><span class="nx">sessions</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">_id</span><span class="p">];</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">_server</span><span class="p">.</span><span class="nx">sendMessage</span><span class="p">(</span> <span class="nx">MSG_SES_DEL</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span><span class="p">,</span> <span class="kc">true</span> <span class="p">);</span>
+<span class="p">};</span></div></div></div></div></body></html>

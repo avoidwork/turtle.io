@@ -1,6 +1,8 @@
 /**
  * Creates a hash of arg
  *
+ * @method hash
+ * @public
  * @param  {Mixed}  arg     String or Buffer
  * @param  {String} encrypt [Optional] Type of encryption
  * @param  {String} digest  [Optional] Type of digest

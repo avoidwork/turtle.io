@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang="en"><head><title>queue</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="queue"><meta name="groc-project-path" content="src/queue.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/queue.js</div></div><div id="document"><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method queue</span></p>
+
+<p>Queues a request for processing</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>req must be an Object.</strong><br/>(HTTP(S) request Object)</p></li>
+<li><p><strong>res must be an Object.</strong><br/>(HTTP(S) response Object)</p></li>
+<li><p><strong>arg can be of any type.</strong><br/>(Argument to pass to queue)</p></li>
+<li><p><strong>id must be a String.</strong><br/>([Optional] Queue item ID)</p></li>
+<li><p><strong>headers must be an Object.</strong><br/>([Optional] HTTP headers to decorate the response with)</p></li>
+<li><p><strong>timer must be an Object.</strong><br/>([Optional] Date instance)</p></li>
+</ul>
+
+<p><strong>Returns an Object</strong><br/>(Instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">factory</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">queue</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">arg</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">headers</span><span class="p">,</span> <span class="nx">timer</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">uuid</span>   <span class="o">=</span> <span class="nx">id</span> <span class="o">||</span> <span class="nx">$</span><span class="p">.</span><span class="nx">uuid</span><span class="p">(</span> <span class="kc">true</span> <span class="p">),</span>
+      <span class="nx">parsed</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">url</span><span class="p">(</span> <span class="nx">req</span> <span class="p">)</span> <span class="p">),</span>
+      <span class="nx">epoch</span>  <span class="o">=</span> <span class="nx">moment</span><span class="p">().</span><span class="nx">utc</span><span class="p">().</span><span class="nx">unix</span><span class="p">(),</span>
+      <span class="nx">body</span><span class="p">,</span> <span class="nx">total</span><span class="p">;</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">requestQueue</span><span class="p">.</span><span class="nx">registry</span><span class="p">[</span><span class="nx">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="nx">epoch</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">sendMessage</span><span class="p">(</span> <span class="nx">MSG_QUE_NEW</span><span class="p">,</span> <span class="p">{</span><span class="nx">uuid</span><span class="o">:</span> <span class="nx">uuid</span><span class="p">,</span> <span class="nx">data</span><span class="o">:</span> <span class="nx">arg</span><span class="p">,</span> <span class="nx">timestamp</span><span class="o">:</span> <span class="nx">epoch</span><span class="p">},</span> <span class="kc">false</span> <span class="p">);</span>
+
+  <span class="nx">total</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">array</span><span class="p">.</span><span class="nx">cast</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">requestQueue</span><span class="p">.</span><span class="nx">registry</span> <span class="p">).</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="nx">body</span>  <span class="o">=</span> <span class="p">{</span><span class="nx">processing</span><span class="o">:</span> <span class="nx">total</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nx">size</span> <span class="o">?</span> <span class="s2">&quot;now&quot;</span> <span class="o">:</span> <span class="nx">moment</span><span class="p">().</span><span class="nx">fromNow</span><span class="p">(</span> <span class="p">(</span> <span class="nx">total</span> <span class="o">/</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nx">size</span> <span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nx">time</span> <span class="p">),</span> <span class="s2">&quot; seconds&quot;</span> <span class="p">)};</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nx">status</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">body</span><span class="p">.</span><span class="nx">status</span> <span class="o">=</span> <span class="nx">parsed</span><span class="p">.</span><span class="nx">protocol</span> <span class="o">+</span> <span class="s2">&quot;//&quot;</span> <span class="o">+</span> <span class="nx">parsed</span><span class="p">.</span><span class="nx">host</span> <span class="o">+</span> <span class="s2">&quot;/queue/&quot;</span> <span class="o">+</span> <span class="nx">uuid</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">respond</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">body</span><span class="p">,</span> <span class="nx">codes</span><span class="p">.</span><span class="nx">ACCEPTED</span><span class="p">,</span> <span class="nx">headers</span><span class="p">,</span> <span class="nx">timer</span><span class="p">,</span> <span class="kc">false</span> <span class="p">);</span>
+
+  <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+<span class="p">};</span></div></div></div></div></body></html>

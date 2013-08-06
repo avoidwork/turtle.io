@@ -8,6 +8,7 @@ factory.prototype.cookie = {
 	 * Expires a cookie if it exists
 	 *
 	 * @method expire
+	 * @public
 	 * @param  {Object}  res    HTTP(S) response Object
 	 * @param  {String}  name   Name of the cookie to expire
 	 * @param  {String}  domain [Optional] Domain to set the cookie for
@@ -23,6 +24,7 @@ factory.prototype.cookie = {
 	 * Gets a cookie from the request headers
 	 *
 	 * @method get
+	 * @public
 	 * @param  {Object} req  HTTP(S) request Object
 	 * @param  {String} name Name of the cookie to get
 	 * @return {Mixed}       Cookie or undefined
@@ -35,6 +37,7 @@ factory.prototype.cookie = {
 	 * Gets a list cookies from the request headers
 	 *
 	 * @method list
+	 * @public
 	 * @param  {Object} req  HTTP(S) request Object
 	 * @param  {String} name Cookie name
 	 * @return {Object}      Collection of cookies
@@ -47,6 +50,7 @@ factory.prototype.cookie = {
 	 * Sets a cookie in the response headers
 	 *
 	 * @method set
+	 * @public
 	 * @param  {Object}  res    HTTP(S) response Object
 	 * @param  {String}  name   Name of the cookie to create
 	 * @param  {String}  value  Value to set

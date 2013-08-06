@@ -2,6 +2,7 @@
  * Writes files to disk
  *
  * @method write
+ * @public
  * @param  {String} path  File path
  * @param  {Object} req   HTTP request Object
  * @param  {Object} res   HTTP response Object

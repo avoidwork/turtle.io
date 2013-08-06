@@ -2,6 +2,7 @@
  * Restarts instance
  *
  * @method restart
+ * @public
  * @return {Object} instance
  */
 factory.prototype.restart = function () {

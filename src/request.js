@@ -1,8 +1,8 @@
 /**
  * Request handler which provides RESTful CRUD operations
  *
- * Default route is for GET only
- *
+ * @method request
+ * @public
  * @param  {Object} req   HTTP(S) request Object
  * @param  {Object} res   HTTP(S) response Object
  * @param  {Object} timer Date instance
@@ -23,7 +23,7 @@ factory.prototype.request = function ( req, res, timer ) {
 			return [req.headers.host, req.method, req.url, self.server.connections, diff( timer )];
 		});
 
-		return this.respond( req, res, this.page( codes.ERROR_SERVICE, host ), codes.ERROR_SERVICE, {"Retry-After": 60}, timer, false );
+		return this.respond( req, res, this.page( codes.SERVICE_UNAVAILABLE, host ), codes.SERVICE_UNAVAILABLE, {"Retry-After": 60}, timer, false );
 	}
 
 	// Can't find the hostname in vhosts, try the default (if set) or send a 500
@@ -58,7 +58,16 @@ factory.prototype.request = function ( req, res, timer ) {
 		parsed.protocol = "http:";
 	}
 
-	// Handles the request after determining the path
+	/**
+	 * Handles the request after determining the path
+	 *
+	 * @method handle
+	 * @private
+	 * @param  {String} path  File path
+	 * @param  {String} url   Requested URL
+	 * @param  {Object} timer Date instance
+	 * @return {Undefined}    undefined
+	 */
 	handle = function ( path, url, timer ) {
 		var allow, del, post, mimetype, status;
 

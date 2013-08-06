@@ -2,6 +2,7 @@
  * Returns an Object describing the instance's status
  *
  * @method status
+ * @public
  * @return {Object} Status
  */
 factory.prototype.status = function () {

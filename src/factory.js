@@ -2,6 +2,7 @@
  * turtle.io factory
  *
  * @method factory
+ * @public
  * @return {Object} Instance
  */
 var factory = function () {

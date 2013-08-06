@@ -1,6 +1,8 @@
 /**
  * Invalidates LRU & removes cached rep from disk
  *
+ * @method stale
+ * @public
  * @param  {String} key  LRUItem key
  * @param  {String} etag Etag
  * @return {Object}      Instance

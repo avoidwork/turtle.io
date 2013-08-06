@@ -1,6 +1,8 @@
 /**
  * Redirects GETs for a route to another URL
  *
+ * @method redirect
+ * @public
  * @param  {String}  route     Route to redirect
  * @param  {String}  url       URL to redirect the Client to
  * @param  {String}  host      [Optional] Hostname this route is for (default is all)

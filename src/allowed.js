@@ -2,6 +2,7 @@
  * Verifies a method is allowed on a URI
  *
  * @method allowed
+ * @public
  * @param  {String} method HTTP verb
  * @param  {String} uri    URI to query
  * @param  {String} host   Hostname

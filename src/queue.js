@@ -2,6 +2,7 @@
  * Queues a request for processing
  *
  * @method queue
+ * @public
  * @param  {Object} req     HTTP(S) request Object
  * @param  {Object} res     HTTP(S) response Object
  * @param  {Mixed}  arg     Argument to pass to queue

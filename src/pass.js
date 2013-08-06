@@ -2,6 +2,7 @@
  * Sends a command to one or more processes
  *
  * @method pass
+ * @private
  * @param  {Object} msg Command
  * @return {Undefined}  undefined
  */

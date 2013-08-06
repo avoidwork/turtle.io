@@ -2,6 +2,7 @@
  * Default error handler
  *
  * @method errorHandler
+ * @public
  * @param  {Object} req   HTTP(S) request Object
  * @param  {Object} res   HTTP(S) response Object
  * @param  {Object} timer [Optional] Date instance

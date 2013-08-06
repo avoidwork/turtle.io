@@ -2,6 +2,7 @@
  * Unregisters an Etag in the LRU cache
  *
  * @method unregister
+ * @public
  * @param  {String} url URL requested
  * @return {Object}     Instance
  */

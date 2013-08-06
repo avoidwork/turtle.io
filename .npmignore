@@ -1,8 +1,8 @@
 /node_modules/
+/doc/
 /log/turtleio.log
 /src/
 /test/
-/.idea/
 .travis.yml
 .git
 .gitignore

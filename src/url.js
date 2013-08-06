@@ -1,6 +1,8 @@
 /**
  * Concatinates the request URL
  *
+ * @method url
+ * @public
  * @param  {Object} req HTTP(S) request Object
  * @return {String}     Complete request URL
  */

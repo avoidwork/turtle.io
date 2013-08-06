@@ -2,6 +2,7 @@
  * Route handler
  *
  * @method handler
+ * @private
  * @param  {Object}   req HTTP(S) request Object
  * @param  {Object}   res HTTP(S) response Object
  * @param  {Function} fn  Request handler

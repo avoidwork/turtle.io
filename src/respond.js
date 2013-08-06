@@ -2,6 +2,7 @@
  * Constructs a response
  *
  * @method respond
+ * @public
  * @param  {Object}  req      HTTP(S) request Object
  * @param  {Object}  res      HTTP(S) response Object
  * @param  {Mixed}   output   [Optional] Response body

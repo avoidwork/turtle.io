@@ -1,6 +1,7 @@
 /**
  * Sessions
  *
+ * @public
  * @type {Object}
  */
 factory.prototype.session = {
@@ -8,6 +9,7 @@ factory.prototype.session = {
 	 * Creates a session
 	 *
 	 * @method create
+	 * @public
 	 * @param  {Object} req HTTP(S) request Object
 	 * @param  {Object} res HTTP(S) response Object
 	 * @return {Object}     Session
@@ -36,6 +38,7 @@ factory.prototype.session = {
 	 * Destroys a session
 	 *
 	 * @method destroy
+	 * @public
 	 * @param  {Object} req HTTP(S) request Object
 	 * @param  {Object} res HTTP(S) response Object
 	 * @return {Object}     Instance
@@ -67,6 +70,7 @@ factory.prototype.session = {
 	 * Gets a session
 	 *
 	 * @method get
+	 * @public
 	 * @param  {Object} req HTTP(S) request Object
 	 * @param  {Object} res HTTP(S) response Object
 	 * @return {Mixed}      Session or undefined
@@ -102,6 +106,7 @@ factory.prototype.session = {
 	 * Sets a session (cluster normalization)
 	 *
 	 * @method set
+	 * @public
 	 * @param  {Object} arg Message argument from Master
 	 * @return {Object}     Instance
 	 */
@@ -129,6 +134,8 @@ factory.prototype.session = {
  * Session factory
  *
  * @method Session
+ * @private
+ * @constructor
  * @param {String} id     Session ID
  * @param {Object} server Server instance
  */
@@ -142,6 +149,7 @@ function Session ( id, server ) {
  * Saves session across cluster
  *
  * @method save
+ * @public
  * @return {Undefined} undefined
  */
 Session.prototype.save = function () {
@@ -163,6 +171,7 @@ Session.prototype.save = function () {
  * Expires session across cluster
  *
  * @method expire
+ * @public
  * @return {Undefined} undefined
  */
 Session.prototype.expire = function () {
