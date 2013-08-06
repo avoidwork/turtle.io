@@ -3,6 +3,7 @@
  * until acknowledged
  *
  * @method sendMessage
+ * @public
  * @param  {String}  cmd Command
  * @param  {Object}  arg Parameter
  * @param  {Boolean} all [Optional] `true` will broadcast message to other workers

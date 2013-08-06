@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="en"><head><title>log</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="log"><meta name="groc-project-path" content="src/log.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/log.js</div></div><div id="document"><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method log</span></p>
+
+<p>Logs a message</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>msg can be of any type.</strong><br/>(Error Object or String)</li>
+</ul>
+
+<p><strong>Returns an Object</strong><br/>(Instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">factory</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">log</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">msg</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">err</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">callstack</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Determining what to log</p></div></div><div class="code"><div class="wrapper">  <span class="nx">msg</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">callstack</span> <span class="o">||</span> <span class="nx">msg</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Dispatching to syslog server</p></div></div><div class="code"><div class="wrapper">  <span class="nx">syslog</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">syslog</span><span class="p">[</span><span class="o">!</span><span class="nx">err</span> <span class="o">?</span> <span class="s2">&quot;LOG_INFO&quot;</span> <span class="o">:</span> <span class="s2">&quot;LOG_ERR&quot;</span><span class="p">],</span> <span class="nx">msg</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Unrecoverable error, restarting process</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span> <span class="nx">REGEX_HALT</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span> <span class="nx">msg</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">exit</span><span class="p">();</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Adding message to log queue</p></div></div><div class="code"><div class="wrapper">  <span class="k">else</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">logQueue</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="nx">msg</span> <span class="p">);</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Dispatching to STDOUT</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">logs</span><span class="p">.</span><span class="nx">stdout</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">msg</span> <span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+<span class="p">};</span></div></div></div></div></body></html>

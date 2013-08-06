@@ -2,6 +2,7 @@
  * Determines which verbs are allowed against a URL
  *
  * @method allows
+ * @public
  * @param  {String} uri  URL to query
  * @param  {String} host Hostname
  * @return {String}      Allowed methods

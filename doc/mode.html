@@ -1,0 +1,52 @@
+<!DOCTYPE html><html lang="en"><head><title>mode</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="mode"><meta name="groc-project-path" content="src/mode.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/mode.js</div></div><div id="document"><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method mode</span></p>
+
+<p>Moves items out of queue</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>start must be a Boolean.</strong><br/>(<code>true</code> to start, <code>false</code> to stop)</li>
+</ul>
+
+<p><strong>Returns an Object</strong><br/>(Instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">factory</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">mode</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">start</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="nx">start</span>     <span class="o">=</span> <span class="p">(</span> <span class="nx">start</span> <span class="o">===</span> <span class="kc">true</span> <span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">id</span>    <span class="o">=</span> <span class="s2">&quot;queue&quot;</span><span class="p">,</span>
+      <span class="nx">self</span>  <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
+      <span class="nx">limit</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nx">size</span><span class="p">,</span>
+      <span class="nx">fn</span>    <span class="o">=</span> <span class="p">(</span> <span class="nx">self</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nx">handler</span> <span class="k">instanceof</span> <span class="nb">Function</span> <span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="nx">start</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$</span><span class="p">.</span><span class="nx">repeat</span><span class="p">(</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">processed</span> <span class="o">=</span> <span class="p">[],</span>
+          <span class="nx">now</span>       <span class="o">=</span> <span class="nx">moment</span><span class="p">().</span><span class="nx">utc</span><span class="p">().</span><span class="nx">unix</span><span class="p">(),</span>
+          <span class="nx">items</span><span class="p">,</span> <span class="nx">nth</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Resetting queue time tracking every 1000 items</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="p">(</span> <span class="nx">self</span><span class="p">.</span><span class="nx">requestQueue</span><span class="p">.</span><span class="nx">times</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;=</span> <span class="mi">1000</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="nx">self</span><span class="p">.</span><span class="nx">requestQueue</span><span class="p">.</span><span class="nx">times</span> <span class="o">=</span> <span class="p">[];</span>
+      <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Batch processing the queue</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="p">(</span> <span class="nx">self</span><span class="p">.</span><span class="nx">requestQueue</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="nx">items</span> <span class="o">=</span> <span class="nx">self</span><span class="p">.</span><span class="nx">requestQueue</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">limit</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">limit</span> <span class="p">);</span>
+        <span class="nx">nth</span>   <span class="o">=</span> <span class="nx">items</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+
+        <span class="nx">items</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">i</span> <span class="p">)</span> <span class="p">{</span>
+          <span class="k">if</span> <span class="p">(</span> <span class="nx">fn</span> <span class="p">)</span> <span class="p">{</span>
+            <span class="k">try</span> <span class="p">{</span>
+              <span class="nx">self</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nx">handler</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">i</span><span class="p">.</span><span class="nx">data</span> <span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">catch</span> <span class="p">(</span> <span class="nx">e</span> <span class="p">)</span> <span class="p">{</span>
+              <span class="nx">self</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">e</span> <span class="p">);</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+
+          <span class="nx">self</span><span class="p">.</span><span class="nx">requestQueue</span><span class="p">.</span><span class="nx">last</span> <span class="o">=</span> <span class="nx">i</span><span class="p">.</span><span class="nx">uuid</span><span class="p">;</span>
+          <span class="nx">self</span><span class="p">.</span><span class="nx">requestQueue</span><span class="p">.</span><span class="nx">times</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="nx">now</span> <span class="o">-</span> <span class="nx">i</span><span class="p">.</span><span class="nx">timestamp</span> <span class="p">);</span>
+          <span class="k">delete</span> <span class="nx">self</span><span class="p">.</span><span class="nx">requestQueue</span><span class="p">.</span><span class="nx">registry</span><span class="p">[</span><span class="nx">i</span><span class="p">.</span><span class="nx">uuid</span><span class="p">];</span>
+
+          <span class="nx">processed</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="nx">i</span><span class="p">.</span><span class="nx">uuid</span> <span class="p">);</span>
+        <span class="p">});</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Removing processed items</p></div></div><div class="code"><div class="wrapper">        <span class="nx">self</span><span class="p">.</span><span class="nx">requestQueue</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">nth</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Announcing which items where processed</p></div></div><div class="code"><div class="wrapper">        <span class="nx">self</span><span class="p">.</span><span class="nx">sendMessage</span><span class="p">(</span> <span class="nx">MSG_QUE_DEL</span><span class="p">,</span> <span class="nx">processed</span><span class="p">,</span> <span class="kc">true</span> <span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">},</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nx">time</span><span class="p">,</span> <span class="nx">id</span> <span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="p">{</span>
+    <span class="nx">$</span><span class="p">.</span><span class="nx">clearTimer</span><span class="p">(</span> <span class="nx">id</span> <span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+<span class="p">};</span></div></div></div></div></body></html>

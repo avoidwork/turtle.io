@@ -2,6 +2,7 @@
  * Creates a compressed version of the Body of a Response
  *
  * @method cache
+ * @public
  * @param  {String}   filename Filename of the new file (Etag without quotes)
  * @param  {String}   obj      Body or Path to file to compress
  * @param  {Function} encoding Compression encoding (deflate or gzip)

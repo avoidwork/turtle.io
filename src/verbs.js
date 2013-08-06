@@ -2,6 +2,7 @@
  * Sets a route for all verbs
  *
  * @method all
+ * @public
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
  * @param  {String}   host  [Optional] Hostname this route is for (default is all)
@@ -26,6 +27,7 @@ factory.prototype.all = function ( route, fn, host ) {
  * Sets a DELETE route
  *
  * @method delete
+ * @public
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
  * @param  {String}   host  [Optional] Hostname this route is for (default is all)
@@ -50,6 +52,7 @@ factory.prototype["delete"] = function ( route, fn, host ) {
  * Sets a GET route
  *
  * @method get
+ * @public
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
  * @param  {String}   host  [Optional] Hostname this route is for (default is all)
@@ -74,6 +77,7 @@ factory.prototype.get = function ( route, fn, host ) {
  * Sets a PATCH route
  *
  * @method patch
+ * @public
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
  * @param  {String}   host  [Optional] Hostname this route is for (default is all)
@@ -98,6 +102,7 @@ factory.prototype.patch = function ( route, fn, host ) {
  * Sets a POST route
  *
  * @method post
+ * @public
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
  * @param  {String}   host  [Optional] Hostname this route is for (default is all)
@@ -122,6 +127,7 @@ factory.prototype.post = function ( route, fn, host ) {
  * Sets a DELETE route
  *
  * @method put
+ * @public
  * @param  {RegExp}   route Route
  * @param  {Function} fn    Handler
  * @param  {String}   host  [Optional] Hostname this route is for (default is all)

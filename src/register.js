@@ -2,6 +2,7 @@
  * Registers an Etag in the LRU cache
  *
  * @method register
+ * @public
  * @param  {String}  url   URL requested
  * @param  {Object}  state Object describing state `{etag: $etag, mimetype: $mimetype}`
  * @param  {Boolean} stale [Optional] Remove cache from disk

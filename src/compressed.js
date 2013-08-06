@@ -1,6 +1,8 @@
 /**
  * Pipes compressed asset to Client, or schedules the creation of the asset
  *
+ * @method compressed
+ * @public
  * @param  {Object}  req     HTTP(S) request Object
  * @param  {Object}  res     HTTP(S) response Object
  * @param  {String}  etag    Etag header

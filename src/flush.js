@@ -1,6 +1,8 @@
 /**
  * Flushes log queue
  *
+ * @method flush
+ * @public
  * @param {String} file File path
  * @return {Object}     Instance
  */

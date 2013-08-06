@@ -2,6 +2,7 @@
  * Moves items out of queue
  *
  * @method mode
+ * @public
  * @param  {Boolean} start `true` to start, `false` to stop
  * @return {Object}         Instance
  */

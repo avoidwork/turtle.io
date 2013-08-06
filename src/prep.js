@@ -1,6 +1,8 @@
 /**
  * Preparing log message
  *
+ * @method prep
+ * @private
  * @param  {Object} req HTTP(S) request Object
  * @param  {Object} res HTTP(S) response Object
  * @return {String}     Log message

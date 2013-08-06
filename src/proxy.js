@@ -1,6 +1,8 @@
 /**
  * Proxies a (root) URL to a route
  *
+ * @method proxy
+ * @public
  * @param  {String}  origin Host to proxy (e.g. http://hostname)
  * @param  {String}  route  Route to proxy
  * @param  {String}  host   [Optional] Hostname this route is for (default is all)
@@ -17,6 +19,8 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 	/**
 	 * Response handler
 	 *
+	 * @method handle
+	 * @private
 	 * @param  {Mixed}  arg   Proxy response
 	 * @param  {Object} xhr   XmlHttpRequest
 	 * @param  {Object} req   HTTP(S) request Object
@@ -118,6 +122,8 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 	/**
 	 * Capitalizes HTTP headers
 	 *
+	 * @method headers
+	 * @private
 	 * @param  {Object} args Response headers
 	 * @return {Object}      Reshaped response headers
 	 */
@@ -139,6 +145,8 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 	/**
 	 * Wraps the proxy request
 	 *
+	 * @method wrapper
+	 * @private
 	 * @param  {Object} req   HTTP(S) request Object
 	 * @param  {Object} res   HTTP(S) response Object
 	 * @param  {Object} timer [Optional] Date instance

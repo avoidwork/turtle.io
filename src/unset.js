@@ -2,6 +2,7 @@
  * Unsets a route
  *
  * @method unset
+ * @public
  * @param  {String} route URI Route
  * @param  {String} verb  HTTP method
  * @return {Object}       Instance

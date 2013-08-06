@@ -2,6 +2,7 @@
  * Starts instance
  *
  * @method start
+ * @public
  * @param  {Object}   args         Parameters to set
  * @param  {Function} errorHandler [Optional] Error handler
  * @return {Object}                Instance

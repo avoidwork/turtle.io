@@ -1,6 +1,8 @@
 /**
  * Sets response headers
  *
+ * @method headers
+ * @public
  * @param  {Object}  req             HTTP(S) request Object
  * @param  {Object}  res             HTTP(S) response Object
  * @param  {Number}  status          [Optional] Response status code

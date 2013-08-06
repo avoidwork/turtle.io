@@ -2,6 +2,7 @@
  * Generates an Etag
  *
  * @method etag
+ * @public
  * @param  {String} url      URL requested
  * @param  {Number} size     Response size
  * @param  {Number} modified Modified time

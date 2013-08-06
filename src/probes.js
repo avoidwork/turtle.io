@@ -1,6 +1,8 @@
 /**
  * Registers dtrace probes
  *
+ * @method probes
+ * @private
  * @return {Undefined} undefined
  */
 var probes = function () {

@@ -2,6 +2,7 @@
  * Starts worker
  *
  * @method ready
+ * @public
  * @param  {Object} arg Message argument from Master
  * @return {Object}     Instance
  */
