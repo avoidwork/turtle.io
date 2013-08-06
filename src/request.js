@@ -43,7 +43,7 @@ factory.prototype.request = function ( req, res, timer ) {
 				host = this.config["default"];
 			}
 			else {
-				throw new Error( messages.ERROR_APPLICATION );
+				throw new Error( messages.SERVER_ERROR );
 			}
 		}
 	}

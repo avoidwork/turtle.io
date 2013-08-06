@@ -46,11 +46,11 @@ factory.prototype.headers = function ( req, res, status, responseHeaders ) {
 	res.statusCode = status;
 
 	// Removing headers not wanted in the response
-	if ( !get || status >= codes.INVALID_ARGUMENTS ) {
+	if ( !get || status >= codes.BAD_REQUEST ) {
 		delete headers["Cache-Control"];
 	}
 
-	if ( ( status >= codes.FORBIDDEN && status <= codes.NOT_FOUND ) || ( status >= codes.ERROR_APPLICATION ) ) {
+	if ( ( status >= codes.FORBIDDEN && status <= codes.NOT_FOUND ) || ( status >= codes.SERVER_ERROR ) ) {
 		delete headers.Allow;
 		delete headers["Access-Control-Allow-Methods"];
 		delete headers["Last-Modified"];
