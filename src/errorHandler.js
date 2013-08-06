@@ -17,7 +17,7 @@ var errorHandler = function ( req, res, timer ) {
 	// If valid, determine what kind of error to respond with
 	if ( !REGEX_GET.test( method ) && !REGEX_HEAD.test( method ) ) {
 		if ( this.allowed( req.method, req.url, host ) ) {
-			status = codes.ERROR_APPLICATION;
+			status = codes.SERVER_ERROR;
 		}
 		else {
 			status = codes.NOT_ALLOWED;

@@ -21,7 +21,7 @@ factory.prototype.write = function ( path, req, res, timer ) {
 	self.registry.get( url );
 
 	if ( !put && $.regex.endslash.test( req.url ) ) {
-		status = del ? codes.CONFLICT : codes.ERROR_APPLICATION;
+		status = del ? codes.CONFLICT : codes.SERVER_ERROR;
 		this.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow}, timer, false );
 	}
 	else {

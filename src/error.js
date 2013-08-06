@@ -14,6 +14,6 @@ factory.prototype.error = function ( req, res, e, timer ) {
 	$.route.load( "error", req, res );
 
 	dtp.fire( "error", function () {
-		return [req.headers.host, req.url, codes.ERROR_APPLICATION, e || messages.ERROR_APPLICATION, diff( timer )];
+		return [req.headers.host, req.url, codes.SERVER_ERROR, e || messages.SERVER_ERROR, diff( timer )];
 	});
 };

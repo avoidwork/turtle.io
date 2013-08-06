@@ -110,7 +110,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 			}
 		}
 		catch (e) {
-			self.respond( req, res, self.page( codes.ERROR_GATEWAY, self.hostname( req ) ), codes.ERROR_GATEWAY, {Allow: "GET"}, timer, false );
+			self.respond( req, res, self.page( codes.BAD_GATEWAY, self.hostname( req ) ), codes.BAD_GATEWAY, {Allow: "GET"}, timer, false );
 			self.log( e, true );
 		}
 	};
