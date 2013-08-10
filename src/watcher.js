@@ -20,14 +20,7 @@ factory.prototype.watcher = function ( url, path, mimetype ) {
 		watcher = fs.watch( path, function ( event ) {
 			if ( event === "rename" ) {
 				self.stale( url );
-
-				if ( cluster.isMaster ) {
-					pass.call( self, {ack: false, cmd: MSG_ALL, altCmd: MSG_REG_DEL, id: $.uuid( true ), arg: url, worker: MSG_MASTER} );
-				}
-				else {
-					self.unregister( url );
-				}
-
+				pass.call( self, {ack: false, cmd: MSG_ALL, altCmd: MSG_REG_DEL, id: $.uuid( true ), arg: url, worker: MSG_MASTER} );
 				watcher.close();
 				delete self.watching[path];
 			}
@@ -38,27 +31,14 @@ factory.prototype.watcher = function ( url, path, mimetype ) {
 					if ( e ) {
 						self.log( e );
 						self.stale( url );
-
-						if ( cluster.isMaster ) {
-							pass.call( self, {ack: false, cmd: MSG_ALL, altCmd: MSG_REG_DEL, id: $.uuid( true ), arg: url, worker: MSG_MASTER} );
-						}
-						else {
-							self.unregister( url );
-						}
-
+						pass.call( self, {ack: false, cmd: MSG_ALL, altCmd: MSG_REG_DEL, id: $.uuid( true ), arg: url, worker: MSG_MASTER} );
 						watcher.close();
 						delete self.watching[path];
 					}
 					else if ( self.registry.get( url ) ) {
 						etag = self.etag( url, stat.size, stat.mtime );
-						self.stale( url );
-
-						if ( cluster.isMaster ) {
-							pass.call( self, {ack: false, cmd: MSG_ALL, altCmd: MSG_REG_SET, id: $.uuid( true ), arg: {key: url, value: {etag: etag, mimetype: mimetype}}, worker: MSG_MASTER} );
-						}
-						else {
-							self.register( url, {etag: etag, mimetype: mimetype}, true );
-						}
+						self.register( url, {etag: etag, mimetype: mimetype}, true );
+						pass.call( self, {ack: false, cmd: MSG_ALL, altCmd: MSG_REG_SET, id: $.uuid( true ), arg: {key: url, value: {etag: etag, mimetype: mimetype}}, worker: MSG_MASTER} );
 					}
 					else {
 						watcher.close();

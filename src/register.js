@@ -24,7 +24,9 @@ factory.prototype.register = function ( url, state, stale ) {
 	this.registry.set( url, state );
 
 	// Announcing state
-	this.sendMessage( MSG_REG_SET, {key: url, value: state}, true, false );
+	if ( !cluster.isMaster ) {
+		this.sendMessage( MSG_REG_SET, {key: url, value: state}, true, false );
+	}
 
 	return this;
 };
