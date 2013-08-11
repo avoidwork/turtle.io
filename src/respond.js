@@ -36,12 +36,12 @@ factory.prototype.respond = function ( req, res, output, status, headers, timer,
 		headers["Content-Type"] = "application/json";
 	}
 
-	if ( status === 200 ) {
+	if ( status === codes.SUCCESS ) {
 		// CSV hook
-		if ( body && headers["Content-Type"] === "application/json" && req.headers.accept !== undefined && REGEX_CSV.test( req.headers.accept.explode()[0].replace( REGEX_NVAL, "" ) ) ) {
+		if ( body && headers["Content-Type"] === "application/json" && req.headers.accept && REGEX_CSV.test( req.headers.accept.explode()[0].replace( REGEX_NVAL, "" ) ) ) {
 			headers["Content-Type"] = "text/csv";
 
-			if ( headers["Content-Disposition"] === undefined ) {
+			if ( !headers["Content-Disposition"] ) {
 				headers["Content-Disposition"] = "attachment; filename=\"" + req.url.replace( REGEX_NURI, "" ) + ".csv\"";
 			}
 
@@ -49,20 +49,18 @@ factory.prototype.respond = function ( req, res, output, status, headers, timer,
 		}
 
 		// Setting Etag if not present
-		if ( headers.Etag === undefined ) {
+		if ( !headers.Etag ) {
 			headers.Etag = "\"" + self.etag( url, output && output.length || 0, new Date().getTime(), output ) + "\"";
 			this.register( url, {etag: headers.Etag.replace( /\"/g, "" ), mimetype: headers["Content-Type"]}, true );
 		}
-	}
-
-	// Comparing against request headers incase this is a custom route response
-	if ( headers.Etag !== undefined && req.headers["if-none-match"] === headers.Etag ) {
-		status = 304;
-		body   = false;
+		else if ( headers.Etag && req.headers["if-none-match"] === headers.Etag ) {
+			status = codes.NOT_MODIFIED;
+			body   = false;
+		}
 	}
 
 	// Compressing response to disk
-	if ( status === 200 && compress ) {
+	if ( status === codes.SUCCESS && compress ) {
 		self.compressed( req, res, headers.Etag.replace( /\"/g, "" ), output, status, headers, false, timer );
 	}
 	// Serving content
