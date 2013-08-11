@@ -7,7 +7,20 @@
  * @return {Object}     Instance
  */
 factory.prototype.unregister = function ( url ) {
-	this.sendMessage( MSG_REG_DEL, url, true, false );
+	if ( this.registry.cache[url] ) {
+		this.stale( url );
+	}
+
+	// Updating LRU
+	this.registry.remove( url );
+
+	// Announcing state
+	if ( !cluster.isMaster ) {
+		this.sendMessage( MSG_REG_DEL, url, true, false );
+	}
+	else {
+		pass.call( this, {ack: false, cmd: MSG_ALL, altCmd: MSG_REG_DEL, id: $.uuid( true ), arg: url, worker: MSG_MASTER} );
+	}
 
 	return this;
 };

@@ -18,9 +18,6 @@ factory.prototype.write = function ( path, req, res, timer ) {
 	    url   = this.url( req ),
 	    status;
 
-	// Updating LRU position
-	self.registry.get( url );
-
 	if ( !put && $.regex.endslash.test( req.url ) ) {
 		status = del ? codes.CONFLICT : codes.SERVER_ERROR;
 		this.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow}, timer, false );
@@ -41,21 +38,12 @@ factory.prototype.write = function ( path, req, res, timer ) {
 							self.error( req, req, e, timer );
 						}
 						else {
-							fs.stat( path, function ( e, stat ) {
-								if ( e ) {
-									self.error( req, res, e, timer );
-								}
-								else {
-									self.register( url, {etag: self.etag( url, stat.size, stat.mtime ), mimetype: mime.lookup( path )}, true );
-
-									dtp.fire( "write", function () {
-										return [req.headers.host, req.url, req.method, path, diff( timer )];
-									});
-
-									status = put ? codes.NO_CONTENT : codes.CREATED;
-									self.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow}, timer, false );
-								}
+							dtp.fire( "write", function () {
+								return [req.headers.host, req.url, req.method, path, diff( timer )];
 							});
+
+							status = put ? codes.NO_CONTENT : codes.CREATED;
+							self.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow}, timer, false );
 						}
 					});
 				}

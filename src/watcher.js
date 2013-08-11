@@ -10,26 +10,33 @@
  */
 factory.prototype.watcher = function ( url, path, mimetype ) {
 	var self = this,
-	    watcher;
+	    cleanup, watcher;
+
+	/**
+	 * Cleans up caches
+	 *
+	 * @method cleanup
+	 * @private
+	 * @param  {Object} watcher FileSystem Watcher
+	 * @param  {String} url     Stale URL
+	 * @param  {String} path    URL path
+	 * @return {Undefined}      undefined
+	 */
+	cleanup = function ( watcher, url, path ) {
+		watcher.close();
+		self.stale( url );
+		self.unregister( url );
+		delete self.watching[path];
+	};
 
 	if ( !( this.watching[path] ) ) {
 		// Tracking
 		this.watching[path] = 1;
 
 		// Watching path for changes
-		watcher = fs.watch( path, function ( event ) {
-			if ( event === "rename" ) {
-				self.stale( url );
-
-				if ( cluster.isMaster ) {
-					pass.call( self, {ack: false, cmd: MSG_ALL, altCmd: MSG_REG_DEL, id: $.uuid( true ), arg: url, worker: MSG_MASTER} );
-				}
-				else {
-					self.unregister( url );
-				}
-
-				watcher.close();
-				delete self.watching[path];
+		watcher = fs.watch( path, function ( ev ) {
+			if ( REGEX_RENAME.test( ev ) ) {
+				cleanup( watcher, url, path );
 			}
 			else {
 				fs.stat( path, function ( e, stat ) {
@@ -37,32 +44,14 @@ factory.prototype.watcher = function ( url, path, mimetype ) {
 
 					if ( e ) {
 						self.log( e );
-						self.stale( url );
-
-						if ( cluster.isMaster ) {
-							pass.call( self, {ack: false, cmd: MSG_ALL, altCmd: MSG_REG_DEL, id: $.uuid( true ), arg: url, worker: MSG_MASTER} );
-						}
-						else {
-							self.unregister( url );
-						}
-
-						watcher.close();
-						delete self.watching[path];
+						cleanup( watcher, url, path );
 					}
-					else if ( self.registry.get( url ) ) {
+					else if ( self.registry.cache[url] ) {
 						etag = self.etag( url, stat.size, stat.mtime );
-						self.stale( url );
-
-						if ( cluster.isMaster ) {
-							pass.call( self, {ack: false, cmd: MSG_ALL, altCmd: MSG_REG_SET, id: $.uuid( true ), arg: {key: url, value: {etag: etag, mimetype: mimetype}}, worker: MSG_MASTER} );
-						}
-						else {
-							self.register( url, {etag: etag, mimetype: mimetype}, true );
-						}
+						self.register( url, {etag: etag, mimetype: mimetype}, true );
 					}
 					else {
-						watcher.close();
-						delete self.watching[path];
+						cleanup( watcher, url, path );
 					}
 				});
 			}

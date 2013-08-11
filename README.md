@@ -1,9 +1,10 @@
-[![build status](https://secure.travis-ci.org/avoidwork/turtle.io.png)](http://travis-ci.org/avoidwork/turtle.io)
 # turtle.io
 
 turtle.io is a HTTP 1.1 web server built on abaaso & node.js, with a focus on simplicity.
 
 All you need to do is install it, and tell it what directory holds your web sites, & which hostnames to answer for.
+
+[![build status](https://secure.travis-ci.org/avoidwork/turtle.io.png)](http://travis-ci.org/avoidwork/turtle.io)
 
 ## Getting Started
 
@@ -72,5 +73,5 @@ DTrace is supported! 'sudo' is required to run _trace.sh_
 ```
 
 ## License
-Copyright (c) 2012 Jason Mulligan  
+Copyright (c) 2013 Jason Mulligan  
 Licensed under the BSD-3 license.

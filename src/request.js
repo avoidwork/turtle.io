@@ -69,7 +69,7 @@ factory.prototype.request = function ( req, res, timer ) {
 	 * @return {Undefined}    undefined
 	 */
 	handle = function ( path, url, timer ) {
-		var allow, del, post, mimetype, status;
+		var allow, cached, del, post, mimetype, status;
 
 		allow   = self.allows( req.url, host );
 		del     = self.allowed( "DELETE", req.url, host );
@@ -88,16 +88,16 @@ factory.prototype.request = function ( req, res, timer ) {
 				}
 				else {
 					status = codes.NOT_ALLOWED;
-					self.respond( req, res, self.page( status, host ), status, {Allow: allow}, timer, false );
+					self.respond( req, res, self.page( status, host ), status, {Allow: allow}, timer, false, true );
 				}
 			}
 			else if ( !exists ) {
 				status = codes.NOT_FOUND;
-				self.respond( req, res, self.page( status, host ), status, ( post ? {Allow: "POST"} : {} ), timer, false );
+				self.respond( req, res, self.page( status, host ), status, ( post ? {Allow: "POST"} : {} ), timer, false, true );
 			}
 			else if ( !self.allowed( method.toUpperCase(), req.url, host ) ) {
 				status = codes.NOT_ALLOWED;
-				self.respond( req, res, self.page( status, host ), status, {Allow: allow}, timer, false );
+				self.respond( req, res, self.page( status, host ), status, {Allow: allow}, timer, false, true );
 			}
 			else {
 				if ( !REGEX_SLASH.test( req.url ) ) {
@@ -122,8 +122,10 @@ factory.prototype.request = function ( req, res, timer ) {
 					case "head":
 					case "options":
 						mimetype = mime.lookup( path );
+						cached   = self.registry.cache[url];
+
 						fs.stat( path, function ( e, stat ) {
-							var size, modified, etag, headers, url;
+							var size, modified, etag, headers;
 
 							if ( e ) {
 								self.error( req, res, e );
@@ -131,27 +133,23 @@ factory.prototype.request = function ( req, res, timer ) {
 							else {
 								size     = stat.size;
 								modified = stat.mtime.toUTCString();
-								url      = self.url( req );
 								etag     = "\"" + self.etag( url, stat.size, stat.mtime ) + "\"";
 								headers  = {Allow: allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified};
 
 								if ( req.method === "GET" ) {
-									if ( ( Date.parse( req.headers["if-modified-since"] ) >= stat.mtime ) || ( req.headers["if-none-match"] === etag ) ) {
-										if ( req.headers["if-none-match"] === etag ) {
-											self.register( url, {etag: etag.replace( /\"/g, "" ), mimetype: mimetype} );
-										}
+									// Creating `watcher` in master ps to update LRU
+									if ( !cached ) {
+										self.watch( url, path, mimetype );
+									}
 
+									// Client has current version
+									if ( ( req.headers["if-none-match"] === etag ) || ( !req.headers["if-none-match"] && Date.parse( req.headers["if-modified-since"] ) >= stat.mtime ) ) {
 										self.respond( req, res, messages.NO_CONTENT, codes.NOT_MODIFIED, headers, timer, false );
 									}
+									// Sending current version
 									else {
-										headers["Transfer-Encoding"] = "chunked";
-										etag = etag.replace( /\"/g, "" );
-										self.register( url, {etag: etag, mimetype: mimetype}, true );
-										self.compressed( req, res, etag, path, codes.SUCCESS, headers, true, timer );
+										self.respond( req, res, path, codes.SUCCESS, headers, timer, true, true );
 									}
-
-									// Creating `watcher` in master ps to update LRU
-									self.watch( url, path, mimetype );
 								}
 								else {
 									self.respond( req, res, messages.NO_CONTENT, codes.SUCCESS, headers, timer, false );

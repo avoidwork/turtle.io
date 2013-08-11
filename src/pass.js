@@ -15,15 +15,6 @@ var pass = function ( msg ) {
 			msg.cmd = msg.altCmd;
 			delete msg.altCmd;
 
-			switch ( msg.cmd ) {
-				case MSG_REG_SET:
-					this.registry.set( msg.arg.key, msg.arg.value );
-					break;
-				case MSG_REG_DEL:
-					this.registry.remove( msg.arg );
-					break;
-			}
-
 			$.array.cast( cluster.workers ).each( function ( i ) {
 				if ( self.config.queue.id !== i.id && i.id !== msg.worker ) {
 					cluster.workers[i.id.toString()].send( msg );

@@ -17,15 +17,6 @@
       <span class="nx">msg</span><span class="p">.</span><span class="nx">cmd</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">altCmd</span><span class="p">;</span>
       <span class="k">delete</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">altCmd</span><span class="p">;</span>
 
-      <span class="k">switch</span> <span class="p">(</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">cmd</span> <span class="p">)</span> <span class="p">{</span>
-        <span class="k">case</span> <span class="nx">MSG_REG_SET</span><span class="o">:</span>
-          <span class="k">this</span><span class="p">.</span><span class="nx">registry</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">arg</span><span class="p">.</span><span class="nx">key</span><span class="p">,</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">arg</span><span class="p">.</span><span class="nx">value</span> <span class="p">);</span>
-          <span class="k">break</span><span class="p">;</span>
-        <span class="k">case</span> <span class="nx">MSG_REG_DEL</span><span class="o">:</span>
-          <span class="k">this</span><span class="p">.</span><span class="nx">registry</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">arg</span> <span class="p">);</span>
-          <span class="k">break</span><span class="p">;</span>
-      <span class="p">}</span>
-
       <span class="nx">$</span><span class="p">.</span><span class="nx">array</span><span class="p">.</span><span class="nx">cast</span><span class="p">(</span> <span class="nx">cluster</span><span class="p">.</span><span class="nx">workers</span> <span class="p">).</span><span class="nx">each</span><span class="p">(</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">i</span> <span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span> <span class="nx">self</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nx">id</span> <span class="o">!==</span> <span class="nx">i</span><span class="p">.</span><span class="nx">id</span> <span class="o">&amp;&amp;</span> <span class="nx">i</span><span class="p">.</span><span class="nx">id</span> <span class="o">!==</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">worker</span> <span class="p">)</span> <span class="p">{</span>
           <span class="nx">cluster</span><span class="p">.</span><span class="nx">workers</span><span class="p">[</span><span class="nx">i</span><span class="p">.</span><span class="nx">id</span><span class="p">.</span><span class="nx">toString</span><span class="p">()].</span><span class="nx">send</span><span class="p">(</span> <span class="nx">msg</span> <span class="p">);</span>

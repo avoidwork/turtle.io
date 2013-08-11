@@ -88,9 +88,6 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 				self.respond( req, res, messages.NO_CONTENT, codes.NOT_MODIFIED, resHeaders, timer, false );
 			}
 			else {
-				resHeaders["Transfer-Encoding"] = "chunked";
-				etag = etag.replace( /\"/g, "" );
-
 				if ( REGEX_HEAD.test( req.method.toLowerCase() ) ) {
 					arg = messages.NO_CONTENT;
 				}
@@ -104,13 +101,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 					}
 				}
 
-				// Sending compressed version to Client if supported
-				if ( req.headers["accept-encoding"] !== undefined ) {
-					self.compressed( req, res, etag, arg, xhr.status, resHeaders, false, timer );
-				}
-				else {
-					self.respond( req, res, arg, xhr.status, resHeaders, timer, false );
-				}
+				self.respond( req, res, arg, xhr.status, resHeaders, timer, false );
 			}
 		}
 		catch (e) {

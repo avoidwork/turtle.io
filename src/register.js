@@ -13,9 +13,9 @@ factory.prototype.register = function ( url, state, stale ) {
 
 	// Removing stale cache from disk
 	if ( stale === true ) {
-		cached = this.registry.get( url );
+		cached = this.registry.cache[url];
 
-		if ( cached && cached.etag !== state.etag ) {
+		if ( cached && cached.value.etag !== state.etag ) {
 			this.stale( url );
 		}
 	}
@@ -24,7 +24,12 @@ factory.prototype.register = function ( url, state, stale ) {
 	this.registry.set( url, state );
 
 	// Announcing state
-	this.sendMessage( MSG_REG_SET, {key: url, value: state}, true, false );
+	if ( !cluster.isMaster ) {
+		this.sendMessage( MSG_REG_SET, {key: url, value: state}, true, false );
+	}
+	else {
+		pass.call( this, {ack: false, cmd: MSG_ALL, altCmd: MSG_REG_SET, id: $.uuid( true ), arg: {key: url, value: state}, worker: MSG_MASTER} );
+	}
 
 	return this;
 };
