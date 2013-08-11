@@ -11,7 +11,7 @@
 <li><p><strong>arg must be a String.</strong><br/>(Response body)</p></li>
 <li><p><strong>status must be a Number.</strong><br/>(Response status code)</p></li>
 <li><p><strong>headers must be an Object.</strong><br/>(HTTP headers)</p></li>
-<li><p><strong>local must be a Boolean.</strong><br/>([Optional] Indicates arg is a file path, default is false)</p></li>
+<li><p><strong>local must be a Boolean.</strong><br/>([Optional] Indicates <code>arg</code> is a file path, default is <code>false</code>)</p></li>
 <li><p><strong>timer must be an Object.</strong><br/>([Optional] Date instance)</p></li>
 </ul>
 
@@ -20,36 +20,62 @@
   <span class="nx">timer</span>           <span class="o">=</span> <span class="nx">timer</span> <span class="o">||</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
   <span class="kd">var</span> <span class="nx">self</span>        <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
       <span class="nx">compression</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">compression</span><span class="p">(</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;user-agent&quot;</span><span class="p">],</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;accept-encoding&quot;</span><span class="p">]</span> <span class="p">),</span>
-      <span class="nx">raw</span><span class="p">,</span> <span class="nx">body</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Local asset, piping result directly to Client</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span> <span class="nx">local</span> <span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">headers</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">headers</span> <span class="p">);</span>
+      <span class="nx">url</span>         <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">url</span><span class="p">(</span> <span class="nx">req</span> <span class="p">),</span>
+      <span class="nx">cached</span>      <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">registry</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">url</span><span class="p">],</span>
+      <span class="nx">body</span><span class="p">,</span> <span class="nx">facade</span><span class="p">,</span> <span class="nx">raw</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-private"><div class="wrapper"><p><span class='doc-section-header'>Private method facade</span></p>
 
-    <span class="k">if</span> <span class="p">(</span><span class="nx">compression</span> <span class="o">!==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+<p>Cache asset &amp; pipe to the Client while compressing (2x)</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>etag must be a String.</strong><br/>(Etag header)</p></li>
+<li><p><strong>path must be a String.</strong><br/>(Path to asset)</p></li>
+<li><p><strong>compression must be a String.</strong><br/>(Type of compression)</p></li>
+<li><p><strong>req must be an Object.</strong><br/>(HTTP(S) request Object)</p></li>
+<li><p><strong>res must be an Object.</strong><br/>(HTTP(S) response Object)</p></li>
+<li><p><strong>ms must be a Number.</strong><br/>(Dtrace probe value)</p></li>
+</ul>
+
+<p><strong>Returns an Undefined</strong><br/>(undefined)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">facade</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">etag</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">compression</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">ms</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">cache</span><span class="p">(</span> <span class="nx">etag</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">compression</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;compressed&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nx">etag</span><span class="p">,</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">host</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span> <span class="nx">ms</span><span class="p">];</span>
+      <span class="p">});</span>
+    <span class="p">}</span> <span class="p">);</span>
+
+    <span class="nx">raw</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">createReadStream</span><span class="p">(</span> <span class="nx">path</span> <span class="p">);</span>
+    <span class="nx">raw</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span> <span class="nx">zlib</span><span class="p">[</span><span class="nx">REGEX_DEF</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span> <span class="nx">compression</span> <span class="p">)</span> <span class="o">?</span> <span class="s2">&quot;createDeflate&quot;</span> <span class="o">:</span> <span class="s2">&quot;createGzip&quot;</span><span class="p">]()</span> <span class="p">).</span><span class="nx">pipe</span><span class="p">(</span> <span class="nx">res</span> <span class="p">);</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Local asset, piping result directly to Client</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span> <span class="nx">local</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="nx">compression</span> <span class="o">!==</span> <span class="kc">null</span> <span class="p">)</span> <span class="p">{</span>
       <span class="nx">res</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span> <span class="s2">&quot;Content-Encoding&quot;</span><span class="p">,</span> <span class="nx">compression</span> <span class="p">);</span>
 
-      <span class="k">this</span><span class="p">.</span><span class="nx">cached</span><span class="p">(</span> <span class="nx">etag</span><span class="p">,</span> <span class="nx">compression</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">ready</span><span class="p">,</span> <span class="nx">npath</span> <span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>File is ready!</p></div></div><div class="code"><div class="wrapper">        <span class="k">if</span> <span class="p">(</span> <span class="nx">ready</span> <span class="p">)</span> <span class="p">{</span>
-          <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;compressed&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="p">[</span><span class="nx">etag</span><span class="p">,</span> <span class="nx">local</span> <span class="o">?</span> <span class="s2">&quot;local&quot;</span> <span class="o">:</span> <span class="s2">&quot;custom&quot;</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">host</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
-          <span class="p">});</span>
-
-          <span class="nx">raw</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">createReadStream</span><span class="p">(</span> <span class="nx">npath</span> <span class="p">);</span>
-          <span class="nx">raw</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span> <span class="nx">res</span> <span class="p">);</span>
-        <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>File is not ready, cache it locally &amp; pipe to the client while compressing (2x)</p></div></div><div class="code"><div class="wrapper">        <span class="k">else</span> <span class="p">{</span>
-          <span class="nx">self</span><span class="p">.</span><span class="nx">cache</span><span class="p">(</span> <span class="nx">etag</span><span class="p">,</span> <span class="nx">arg</span><span class="p">,</span> <span class="nx">compression</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span> <span class="nx">cached</span> <span class="o">&amp;&amp;</span> <span class="nx">cached</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">etag</span> <span class="o">===</span> <span class="nx">etag</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">cached</span><span class="p">(</span> <span class="nx">etag</span><span class="p">,</span> <span class="nx">compression</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">ready</span><span class="p">,</span> <span class="nx">npath</span> <span class="p">)</span> <span class="p">{</span>
+          <span class="k">if</span> <span class="p">(</span> <span class="nx">ready</span> <span class="p">)</span> <span class="p">{</span>
             <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;compressed&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
               <span class="k">return</span> <span class="p">[</span><span class="nx">etag</span><span class="p">,</span> <span class="nx">local</span> <span class="o">?</span> <span class="s2">&quot;local&quot;</span> <span class="o">:</span> <span class="s2">&quot;custom&quot;</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">host</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
             <span class="p">});</span>
-          <span class="p">}</span> <span class="p">);</span>
 
-          <span class="nx">raw</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">createReadStream</span><span class="p">(</span> <span class="nx">arg</span> <span class="p">);</span>
-          <span class="nx">raw</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span> <span class="nx">zlib</span><span class="p">[</span><span class="nx">REGEX_DEF</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span> <span class="nx">compression</span> <span class="p">)</span> <span class="o">?</span> <span class="s2">&quot;createDeflate&quot;</span> <span class="o">:</span> <span class="s2">&quot;createGzip&quot;</span><span class="p">]()</span> <span class="p">).</span><span class="nx">pipe</span><span class="p">(</span> <span class="nx">res</span> <span class="p">);</span>
-        <span class="p">}</span>
+            <span class="nx">raw</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">createReadStream</span><span class="p">(</span> <span class="nx">npath</span> <span class="p">);</span>
+            <span class="nx">raw</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span> <span class="nx">res</span> <span class="p">);</span>
+          <span class="p">}</span>
+          <span class="k">else</span> <span class="p">{</span>
+            <span class="nx">facade</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span> <span class="k">this</span><span class="p">,</span> <span class="nx">etag</span><span class="p">,</span> <span class="nx">arg</span><span class="p">,</span> <span class="nx">compression</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)</span> <span class="p">);</span>
+          <span class="p">}</span>
+
+          <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;respond&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="p">[</span><span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">host</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">method</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
+          <span class="p">});</span>
+        <span class="p">});</span>
+      <span class="p">}</span>
+      <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">facade</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span> <span class="k">this</span><span class="p">,</span> <span class="nx">etag</span><span class="p">,</span> <span class="nx">arg</span><span class="p">,</span> <span class="nx">compression</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)</span> <span class="p">);</span>
 
         <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;respond&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
           <span class="k">return</span> <span class="p">[</span><span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">host</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">method</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
         <span class="p">});</span>
-
-        <span class="nx">self</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">prep</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">);</span>
-      <span class="p">});</span>
+      <span class="p">}</span>
     <span class="p">}</span>
     <span class="k">else</span> <span class="p">{</span>
       <span class="nx">raw</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">createReadStream</span><span class="p">(</span> <span class="nx">arg</span> <span class="p">);</span>
@@ -71,8 +97,6 @@
 
           <span class="nx">raw</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">createReadStream</span><span class="p">(</span> <span class="nx">npath</span> <span class="p">);</span>
           <span class="nx">raw</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span> <span class="nx">res</span> <span class="p">);</span>
-
-          <span class="nx">self</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">prep</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">);</span>
 
           <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;respond&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
             <span class="k">return</span> <span class="p">[</span><span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">host</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">method</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>

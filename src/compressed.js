@@ -9,7 +9,7 @@
  * @param  {String}  arg     Response body
  * @param  {Number}  status  Response status code
  * @param  {Object}  headers HTTP headers
- * @param  {Boolean} local   [Optional] Indicates arg is a file path, default is false
+ * @param  {Boolean} local   [Optional] Indicates `arg` is a file path, default is `false`
  * @param  {Object}  timer   [Optional] Date instance
  * @return {Objet}           Instance
  */
@@ -18,43 +18,65 @@ factory.prototype.compressed = function ( req, res, etag, arg, status, headers, 
 	timer           = timer || new Date();
 	var self        = this,
 	    compression = this.compression( req.headers["user-agent"], req.headers["accept-encoding"] ),
-	    raw, body;
+	    url         = this.url( req ),
+	    cached      = this.registry.cache[url],
+	    body, facade, raw;
+
+	/**
+	 * Cache asset & pipe to the Client while compressing (2x)
+	 *
+	 * @method facade
+	 * @private
+	 * @param  {String}  etag        Etag header
+	 * @param  {String}  path        Path to asset
+	 * @param  {String}  compression Type of compression
+	 * @param  {Object}  req         HTTP(S) request Object
+	 * @param  {Object}  res         HTTP(S) response Object
+	 * @param  {Number}  ms          Dtrace probe value
+	 * @return {Undefined}           undefined
+	 */
+	facade = function ( etag, path, compression, req, res, ms ) {
+		this.cache( etag, path, compression, false, function () {
+			dtp.fire( "compressed", function () {
+				return [etag, "local", req.headers.host, req.url, ms];
+			});
+		} );
+
+		raw = fs.createReadStream( path );
+		raw.pipe( zlib[REGEX_DEF.test( compression ) ? "createDeflate" : "createGzip"]() ).pipe( res );
+	};
 
 	// Local asset, piping result directly to Client
 	if ( local ) {
-		this.headers( req, res, status, headers );
-
-		if (compression !== null) {
+		if ( compression !== null ) {
 			res.setHeader( "Content-Encoding", compression );
 
-			this.cached( etag, compression, function ( ready, npath ) {
-				// File is ready!
-				if ( ready ) {
-					dtp.fire( "compressed", function () {
-						return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
-					});
-
-					raw = fs.createReadStream( npath );
-					raw.pipe( res );
-				}
-				// File is not ready, cache it locally & pipe to the client while compressing (2x)
-				else {
-					self.cache( etag, arg, compression, false, function () {
+			if ( cached && cached.value.etag === etag ) {
+				this.cached( etag, compression, function ( ready, npath ) {
+					if ( ready ) {
 						dtp.fire( "compressed", function () {
 							return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
 						});
-					} );
 
-					raw = fs.createReadStream( arg );
-					raw.pipe( zlib[REGEX_DEF.test( compression ) ? "createDeflate" : "createGzip"]() ).pipe( res );
-				}
+						raw = fs.createReadStream( npath );
+						raw.pipe( res );
+					}
+					else {
+						facade.call( this, etag, arg, compression, req, res, diff( timer ) );
+					}
+
+					dtp.fire( "respond", function () {
+						return [req.headers.host, req.method, req.url, status, diff( timer )];
+					});
+				});
+			}
+			else {
+				facade.call( this, etag, arg, compression, req, res, diff( timer ) );
 
 				dtp.fire( "respond", function () {
 					return [req.headers.host, req.method, req.url, status, diff( timer )];
 				});
-
-				self.log( prep.call( self, req, res ) );
-			});
+			}
 		}
 		else {
 			raw = fs.createReadStream( arg );
@@ -81,8 +103,6 @@ factory.prototype.compressed = function ( req, res, etag, arg, status, headers, 
 
 					raw = fs.createReadStream( npath );
 					raw.pipe( res );
-
-					self.log( prep.call( self, req, res ) );
 
 					dtp.fire( "respond", function () {
 						return [req.headers.host, req.method, req.url, status, diff( timer )];

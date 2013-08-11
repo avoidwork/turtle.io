@@ -10,35 +10,37 @@
  * @param  {Object}  headers  [Optional] HTTP headers to decorate the response with
  * @param  {Object}  timer    [Optional] Date instance
  * @param  {Boolean} compress [Optional] Enable compression of the response (if supported)
+ * @param  {Boolean} local    [Optional] Indicates `output` is a file path, default is `false`
  * @return {Objet}            Instance
  */
-factory.prototype.respond = function ( req, res, output, status, headers, timer, compress ) {
-	status       = status || codes.SUCCESS;
-	timer        = timer  || new Date(); // Not ideal! This gives a false sense of speed for custom routes
-	compress     = ( compress === true );
-	var body     = !REGEX_HEAD.test( req.method ) && output !== null,
-	    encoding = this.compression( req.headers["user-agent"], req.headers["accept-encoding"] ),
-	    self     = this,
-	    url      = this.url( req );
+factory.prototype.respond = function ( req, res, output, status, headers, timer, compress, local ) {
+	status   = status || codes.SUCCESS;
+	timer    = timer  || new Date(); // Not ideal! This gives a false sense of speed for custom routes
+	var body = !REGEX_HEAD.test( req.method ) && req.method !== "DELETE" && output !== null && output !== undefined,
+	    self = this,
+	    url  = this.url( req ),
+	    cached, etag, modified;
 
 	if ( !( headers instanceof Object ) ) {
 		headers = {};
 	}
 
-	// Determining wether compression is supported
-	compress = compress && body && encoding !== null;
-
-	// Stringifying Array or Object
-	output = encode( output );
+	if ( body ) {
+		compress = ( compress !== false );
+		output   = encode( output );
+	}
+	else {
+		compress = false;
+	}
 
 	// Decorating the proper header for a JSON response
 	if ( typeof output === "string" && $.regex.json_wrap.test( output ) ) {
 		headers["Content-Type"] = "application/json";
 	}
 
-	if ( status === codes.SUCCESS ) {
+	if ( REGEX_GET.test( req.method ) && ( status === codes.SUCCESS || status === codes.NOT_MODIFIED ) ) {
 		// CSV hook
-		if ( body && headers["Content-Type"] === "application/json" && req.headers.accept && REGEX_CSV.test( req.headers.accept.explode()[0].replace( REGEX_NVAL, "" ) ) ) {
+		if ( status === codes.SUCCESS && body && headers["Content-Type"] === "application/json" && req.headers.accept && REGEX_CSV.test( req.headers.accept.explode()[0].replace( REGEX_NVAL, "" ) ) ) {
 			headers["Content-Type"] = "text/csv";
 
 			if ( !headers["Content-Disposition"] ) {
@@ -48,25 +50,35 @@ factory.prototype.respond = function ( req, res, output, status, headers, timer,
 			output = $.json.csv( output );
 		}
 
-		// Setting Etag if not present
+		// Decorating `Last-Modified`
+		if ( !headers["Last-Modified"] ) {
+			modified                 = new Date().getTime();
+			headers["Last-Modified"] = modified.toString();
+		}
+		else {
+			modified = new Date( headers["Last-Modified"] ).getTime();
+		}
+
+		// Decorating `Etag`
 		if ( !headers.Etag ) {
-			headers.Etag = "\"" + self.etag( url, output && output.length || 0, new Date().getTime(), output ) + "\"";
-			this.register( url, {etag: headers.Etag.replace( /\"/g, "" ), mimetype: headers["Content-Type"]}, true );
+			headers.Etag = "\"" + self.etag( url, output && output.length || 0, modified, output ) + "\"";
+			etag         = headers.Etag.replace( /\"/g, "" );
 		}
-		else if ( headers.Etag && req.headers["if-none-match"] === headers.Etag ) {
-			status = codes.NOT_MODIFIED;
-			body   = false;
-		}
+
+		// Updating LRU
+		cached = self.registry.cache[url];
+		self.register( url, {etag: etag, mimetype: headers["Content-Type"]}, ( cached && cached.value !== etag ) );
 	}
+
+	// Applying headers
+	this.headers( req, res, status, headers );
 
 	// Compressing response to disk
 	if ( status === codes.SUCCESS && compress ) {
-		self.compressed( req, res, headers.Etag.replace( /\"/g, "" ), output, status, headers, false, timer );
+		self.compressed( req, res, headers.Etag.replace( /\"/g, "" ), output, status, headers, local, timer );
 	}
 	// Serving content
 	else {
-		this.headers( req, res, status, headers );
-
 		if ( body ) {
 			res.write( output );
 		}
@@ -76,9 +88,10 @@ factory.prototype.respond = function ( req, res, output, status, headers, timer,
 		dtp.fire( "respond", function () {
 			return [req.headers.host, req.method, url, status, diff( timer )];
 		});
-
-		self.log( prep.call( self, req, res ) );
 	}
+
+	// Logging request
+	self.log( prep.call( self, req, res ) );
 
 	return this;
 };

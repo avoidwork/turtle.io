@@ -69,7 +69,7 @@ factory.prototype.request = function ( req, res, timer ) {
 	 * @return {Undefined}    undefined
 	 */
 	handle = function ( path, url, timer ) {
-		var allow, currentEtag, del, post, mimetype, status;
+		var allow, cached, del, post, mimetype, status;
 
 		allow   = self.allows( req.url, host );
 		del     = self.allowed( "DELETE", req.url, host );
@@ -88,16 +88,16 @@ factory.prototype.request = function ( req, res, timer ) {
 				}
 				else {
 					status = codes.NOT_ALLOWED;
-					self.respond( req, res, self.page( status, host ), status, {Allow: allow}, timer, false );
+					self.respond( req, res, self.page( status, host ), status, {Allow: allow}, timer, false, true );
 				}
 			}
 			else if ( !exists ) {
 				status = codes.NOT_FOUND;
-				self.respond( req, res, self.page( status, host ), status, ( post ? {Allow: "POST"} : {} ), timer, false );
+				self.respond( req, res, self.page( status, host ), status, ( post ? {Allow: "POST"} : {} ), timer, false, true );
 			}
 			else if ( !self.allowed( method.toUpperCase(), req.url, host ) ) {
 				status = codes.NOT_ALLOWED;
-				self.respond( req, res, self.page( status, host ), status, {Allow: allow}, timer, false );
+				self.respond( req, res, self.page( status, host ), status, {Allow: allow}, timer, false, true );
 			}
 			else {
 				if ( !REGEX_SLASH.test( req.url ) ) {
@@ -121,8 +121,8 @@ factory.prototype.request = function ( req, res, timer ) {
 					case "get":
 					case "head":
 					case "options":
-						mimetype    = mime.lookup( path );
-						currentEtag = self.registry.get( url );
+						mimetype = mime.lookup( path );
+						cached   = self.registry.cache[url];
 
 						fs.stat( path, function ( e, stat ) {
 							var size, modified, etag, headers;
@@ -137,9 +137,9 @@ factory.prototype.request = function ( req, res, timer ) {
 								headers  = {Allow: allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified};
 
 								if ( req.method === "GET" ) {
-									// Unlinking current cached asset on disk
-									if ( currentEtag && currentEtag !== etag.replace( /\"/g, "" ) ) {
-										self.register( url, {etag: etag.replace( /\"/g, "" ), mimetype: mimetype}, true );
+									// Creating `watcher` in master ps to update LRU
+									if ( !cached ) {
+										self.watch( url, path, mimetype );
 									}
 
 									// Client has current version
@@ -148,15 +148,7 @@ factory.prototype.request = function ( req, res, timer ) {
 									}
 									// Sending current version
 									else {
-										headers["Transfer-Encoding"] = "chunked";
-										etag = etag.replace( /\"/g, "" );
-										self.register( url, {etag: etag, mimetype: mimetype}, true );
-										self.compressed( req, res, etag, path, codes.SUCCESS, headers, true, timer );
-									}
-
-									// Creating `watcher` in master ps to update LRU
-									if ( !currentEtag ) {
-										self.watch( url, path, mimetype );
+										self.respond( req, res, path, codes.SUCCESS, headers, timer, true, true );
 									}
 								}
 								else {

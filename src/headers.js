@@ -44,6 +44,9 @@ factory.prototype.headers = function ( req, res, status, responseHeaders ) {
 		headers["Last-Modified"] = headers.Date;
 	}
 
+	// Decorating "Transfer-Encoding" header
+	headers["Transfer-Encoding"] = "chunked";
+
 	// Setting the response status code
 	res.statusCode = status;
 
