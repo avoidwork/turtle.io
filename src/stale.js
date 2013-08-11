@@ -1,22 +1,20 @@
 /**
- * Invalidates LRU & removes cached rep from disk
+ * Removes stale representation from disk
  *
  * @method stale
  * @public
- * @param  {String} key  LRUItem key
- * @param  {String} etag Etag
- * @return {Object}      Instance
+ * @param  {String} url LRUItem key
+ * @return {Object}     Instance
  */
-factory.prototype.stale = function ( key ) {
+factory.prototype.stale = function ( url ) {
 	var self   = this,
-	    cached = this.registry.get( key ),
+	    cached = this.registry.cached[url],
+	    path   = this.config.tmp + "/",
 	    gz, df;
 
 	if ( cached ) {
-		gz = this.config.tmp + "/" + cached.etag + ".gz";
-		df = this.config.tmp + "/" + cached.etag + ".df";
-
-		this.registry.remove( key );
+		gz = path + cached.value.etag + ".gz";
+		df = path + cached.value.etag + ".df";
 
 		fs.exists( gz, function ( exists ) {
 			if ( exists ) {

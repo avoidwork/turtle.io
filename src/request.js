@@ -69,7 +69,7 @@ factory.prototype.request = function ( req, res, timer ) {
 	 * @return {Undefined}    undefined
 	 */
 	handle = function ( path, url, timer ) {
-		var allow, del, post, mimetype, status;
+		var allow, currentEtag, del, post, mimetype, status;
 
 		allow   = self.allows( req.url, host );
 		del     = self.allowed( "DELETE", req.url, host );
@@ -121,9 +121,11 @@ factory.prototype.request = function ( req, res, timer ) {
 					case "get":
 					case "head":
 					case "options":
-						mimetype = mime.lookup( path );
+						mimetype    = mime.lookup( path );
+						currentEtag = self.registry.get( url );
+
 						fs.stat( path, function ( e, stat ) {
-							var size, modified, etag, headers, url;
+							var size, modified, etag, headers;
 
 							if ( e ) {
 								self.error( req, res, e );
@@ -131,18 +133,20 @@ factory.prototype.request = function ( req, res, timer ) {
 							else {
 								size     = stat.size;
 								modified = stat.mtime.toUTCString();
-								url      = self.url( req );
 								etag     = "\"" + self.etag( url, stat.size, stat.mtime ) + "\"";
 								headers  = {Allow: allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified};
 
 								if ( req.method === "GET" ) {
-									if ( ( Date.parse( req.headers["if-modified-since"] ) >= stat.mtime ) || ( req.headers["if-none-match"] === etag ) ) {
-										if ( req.headers["if-none-match"] === etag ) {
-											self.register( url, {etag: etag.replace( /\"/g, "" ), mimetype: mimetype} );
-										}
+									// Unlinking current cached asset on disk
+									if ( currentEtag && currentEtag !== etag.replace( /\"/g, "" ) ) {
+										self.register( url, {etag: etag.replace( /\"/g, "" ), mimetype: mimetype}, true );
+									}
 
+									// Client has current version
+									if ( ( req.headers["if-none-match"] === etag ) || ( !req.headers["if-none-match"] && Date.parse( req.headers["if-modified-since"] ) >= stat.mtime ) ) {
 										self.respond( req, res, messages.NO_CONTENT, codes.NOT_MODIFIED, headers, timer, false );
 									}
+									// Sending current version
 									else {
 										headers["Transfer-Encoding"] = "chunked";
 										etag = etag.replace( /\"/g, "" );
@@ -151,7 +155,9 @@ factory.prototype.request = function ( req, res, timer ) {
 									}
 
 									// Creating `watcher` in master ps to update LRU
-									self.watch( url, path, mimetype );
+									if ( !currentEtag ) {
+										self.watch( url, path, mimetype );
+									}
 								}
 								else {
 									self.respond( req, res, messages.NO_CONTENT, codes.SUCCESS, headers, timer, false );
