@@ -8,7 +8,7 @@
  */
 factory.prototype.stale = function ( url ) {
 	var self   = this,
-	    cached = this.registry.cached[url],
+	    cached = this.registry.cache[url],
 	    path   = this.config.tmp + "/",
 	    gz, df;
 

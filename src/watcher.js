@@ -35,7 +35,7 @@ factory.prototype.watcher = function ( url, path, mimetype ) {
 
 		// Watching path for changes
 		watcher = fs.watch( path, function ( ev ) {
-			if ( REGEX_RENAME.TEST( ev ) ) {
+			if ( REGEX_RENAME.test( ev ) ) {
 				cleanup( watcher, url, path );
 			}
 			else {
