@@ -61,11 +61,6 @@ var handler = function ( req, res, fn ) {
 		});
 	};
 
-	// Setting listener for unexpected close
-	res.on( "close", function () {
-		self.log( prep.call( self, req, res ) );
-	});
-
 	// Handling request or wrapping it with HTTP Authentication
 	if ( this.config.auth === undefined || !this.config.auth.hasOwnProperty( host ) ) {
 		op();
