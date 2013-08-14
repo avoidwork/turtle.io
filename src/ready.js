@@ -33,6 +33,13 @@ factory.prototype.ready = function ( arg ) {
 			};
 		}
 
+		// Setting message handler
+		if ( typeof this.config.messageHandler !== "function" ) {
+			this.config.messageHandler = function () {
+				self.log( new Error( "Unreceived message" ) );
+			};
+		}
+
 		// Bootstrapping instance
 		this.bootstrap.call( this, this.config.errorHandler );
 	}

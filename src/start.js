@@ -3,11 +3,12 @@
  *
  * @method start
  * @public
- * @param  {Object}   args         Parameters to set
- * @param  {Function} errorHandler [Optional] Error handler
- * @return {Object}                Instance
+ * @param  {Object}   args           Parameters to set
+ * @param  {Function} errorHandler   [Optional] Error handler
+ * @param  {Function} messageHandler [Optional] Custom message handler
+ * @return {Object}                  Instance
  */
-factory.prototype.start = function ( args, errorHandler ) {
+factory.prototype.start = function ( args, errorHandler, messageHandler ) {
 	var self  = this,
 	    i     = -1,
 	    pages, msg, sig;
@@ -25,6 +26,11 @@ factory.prototype.start = function ( args, errorHandler ) {
 	// Setting error handler
 	if ( errorHandler !== undefined ) {
 		this.config.errorHandler = errorHandler;
+	}
+
+	// Setting message handler
+	if ( messageHandler !== undefined ) {
+		this.config.messageHandler = messageHandler;
 	}
 
 	// Setting error page path
