@@ -16,7 +16,7 @@
 factory.prototype.respond = function ( req, res, output, status, headers, timer, compress, local ) {
 	status   = status || codes.SUCCESS;
 	timer    = timer  || new Date(); // Not ideal! This gives a false sense of speed for custom routes
-	var body = !REGEX_HEAD.test( req.method ) && req.method !== "DELETE" && output !== null && output !== undefined,
+	var body = !REGEX_HEAD.test( req.method ) && output !== null && output !== undefined,
 	    self = this,
 	    url  = this.url( req ),
 	    cached, etag, modified;
