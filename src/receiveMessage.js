@@ -55,6 +55,10 @@ factory.prototype.receiveMessage = function ( msg ) {
 		case MSG_REG_DEL:
 			this.registry.remove( msg.arg );
 			break;
+
+		case MSG_CUSTOM:
+			this.config.messageHandler( msg.arg );
+			break;
 	}
 
 	// Acknowledging message
