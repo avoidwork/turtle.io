@@ -50,10 +50,9 @@ factory.prototype.respond = function ( req, res, output, status, headers, timer,
 			output = $.json.csv( output );
 		}
 
-		// Decorating `Last-Modified`
+		// Gathering epoch for Etag generation
 		if ( !headers["Last-Modified"] ) {
-			modified                 = new Date().getTime();
-			headers["Last-Modified"] = modified.toString();
+			modified = 0;
 		}
 		else {
 			modified = new Date( headers["Last-Modified"] ).getTime();
