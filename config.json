@@ -12,6 +12,7 @@
 		"Access-Control-Allow-Headers": "*",
 		"Access-Control-Allow-Methods": "",
 		"Allow"                       : "",
+		"Cache-Control"               : "public, max-age=0",
 		"Content-Type"                : "text/html; charset=utf-8",
 		"Date"                        : "",
 		"Last-Modified"               : ""
