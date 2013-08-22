@@ -133,7 +133,7 @@ factory.prototype.request = function ( req, res, timer ) {
 							else {
 								size     = stat.size;
 								modified = stat.mtime.toUTCString();
-								etag     = "\"" + self.etag( url, stat.size, stat.mtime ) + "\"";
+								etag     = "\"" + self.etag( url, size, stat.mtime ) + "\"";
 								headers  = {Allow: allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified};
 
 								if ( req.method === "GET" ) {

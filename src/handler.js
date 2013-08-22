@@ -19,6 +19,10 @@ var handler = function ( req, res, fn ) {
 		var url = self.url( req ),
 		    cached, payload;
 
+		dtp.fire( "handler", function () {
+			return [req.headers.host, req.url, diff( timer )];
+		});
+
 		try {
 			// Decorating session
 			req.session = self.session.get( req, res );
@@ -55,10 +59,6 @@ var handler = function ( req, res, fn ) {
 		catch ( e ) {
 			self.error( req, res, e, timer );
 		}
-
-		dtp.fire( "handler", function () {
-			return [req.headers.host, req.url, diff( timer )];
-		});
 	};
 
 	// Handling request or wrapping it with HTTP Authentication

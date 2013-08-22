@@ -45,15 +45,7 @@ factory.prototype.watcher = function ( url, path, mimetype ) {
 						cleanup( watcher, url, path );
 					}
 					else if ( self.registry.cache[url] ) {
-						fs.readFile( path, "utf8", function ( e, data ) {
-							if ( e ) {
-								self.log( e );
-								cleanup( watcher, url, path );
-							}
-							else {
-								self.register( url, {etag: self.etag( url, stat.size, stat.mtime, data ), mimetype: mimetype}, true );
-							}
-						} );
+						self.register( url, {etag: self.etag( url, stat.size, stat.mtime ), mimetype: mimetype}, true );
 					}
 					else {
 						cleanup( watcher, url, path );

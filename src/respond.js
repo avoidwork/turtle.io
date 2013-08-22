@@ -67,7 +67,7 @@ factory.prototype.respond = function ( req, res, output, status, headers, timer,
 
 		// Updating LRU
 		cached = self.registry.cache[url];
-		self.register( url, {etag: etag, mimetype: headers["Content-Type"]}, ( cached && cached.value !== etag ) );
+		self.register( url, {etag: etag, mimetype: headers["Content-Type"]}, ( cached !== undefined && cached.value !== etag ) );
 	}
 
 	// Applying headers
