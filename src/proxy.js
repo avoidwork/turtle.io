@@ -50,7 +50,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 				date = new Date( date );
 			}
 
-			etag = resHeaders.Etag || "\"" + self.etag( url, resHeaders["Content-Length"], date.getTime(), arg ) + "\"";
+			etag = resHeaders.Etag || "\"" + self.etag( url, resHeaders["Content-Length"] || 0, resHeaders["Last-Modified"] || 0, arg ) + "\"";
 
 			// Setting headers
 			if ( resHeaders.Etag !== etag ) {

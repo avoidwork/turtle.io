@@ -40,15 +40,20 @@ factory.prototype.watcher = function ( url, path, mimetype ) {
 			}
 			else {
 				fs.stat( path, function ( e, stat ) {
-					var etag;
-
 					if ( e ) {
 						self.log( e );
 						cleanup( watcher, url, path );
 					}
 					else if ( self.registry.cache[url] ) {
-						etag = self.etag( url, stat.size, stat.mtime );
-						self.register( url, {etag: etag, mimetype: mimetype}, true );
+						fs.readFile( path, "utf8", function ( e, data ) {
+							if ( e ) {
+								self.log( e );
+								cleanup( watcher, url, path );
+							}
+							else {
+								self.register( url, {etag: self.etag( url, stat.size, stat.mtime, data ), mimetype: mimetype}, true );
+							}
+						} );
 					}
 					else {
 						cleanup( watcher, url, path );
