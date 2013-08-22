@@ -61,12 +61,13 @@ factory.prototype.respond = function ( req, res, output, status, headers, timer,
 		// Decorating `Etag`
 		if ( !headers.Etag ) {
 			headers.Etag = "\"" + self.etag( url, output && output.length || 0, modified, output ) + "\"";
-			etag         = headers.Etag.replace( /\"/g, "" );
 		}
+
+		etag = headers.Etag.replace( /\"/g, "" );
 
 		// Updating LRU
 		cached = self.registry.cache[url];
-		self.register( url, {etag: etag, mimetype: headers["Content-Type"]}, ( cached && cached.value !== etag ) );
+		self.register( url, {etag: etag, mimetype: headers["Content-Type"]}, ( cached !== undefined && cached.value !== etag ) );
 	}
 
 	// Applying headers

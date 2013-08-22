@@ -40,15 +40,12 @@ factory.prototype.watcher = function ( url, path, mimetype ) {
 			}
 			else {
 				fs.stat( path, function ( e, stat ) {
-					var etag;
-
 					if ( e ) {
 						self.log( e );
 						cleanup( watcher, url, path );
 					}
 					else if ( self.registry.cache[url] ) {
-						etag = self.etag( url, stat.size, stat.mtime );
-						self.register( url, {etag: etag, mimetype: mimetype}, true );
+						self.register( url, {etag: self.etag( url, stat.size, stat.mtime ), mimetype: mimetype}, true );
 					}
 					else {
 						cleanup( watcher, url, path );
