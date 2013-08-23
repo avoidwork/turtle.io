@@ -18,9 +18,8 @@ var $         = require( "abaaso" ),
 function TurtleIO () {
 	this.cache    = $.lru( 1000 );
 	this.config   = {};
+	this.handlers = {all: {regex: [], routes: [], hosts: {}}, "delete": {regex: [], routes: [], hosts: {}}, get: {regex: [], routes: [], hosts: {}}, patch: {regex: [], routes: [], hosts: {}}, post: {regex: [], routes: [], hosts: {}}, put: {regex: [], routes: [], hosts: {}}};
 	this.server   = null;
-	this.routes   = {};
-	this.handlers = {};
 	this.vhosts   = [];
 };
 
@@ -38,6 +37,18 @@ TurtleIO.prototype.constructor = TurtleIO;
  */
 TurtleIO.prototype["delete"] = function ( route, fn, host ) {
 	return this.handler( "delete", route, fn, host );
+};
+
+/**
+ * Error handler
+ *
+ * @method error
+ * @param  {Object} req  Request Object
+ * @param  {Object} res  Response Object
+ * @return {Object}      TurtleIO instance
+ */
+TurtleIO.prototype.error = function ( req, res ) {
+	return this;
 };
 
 /**
@@ -105,22 +116,50 @@ TurtleIO.prototype.put = function ( route, fn, host ) {
 TurtleIO.prototype.handler = function ( method, route, fn, host ) {
 	host = host || "all";
 
-	if ( !!this.routes[host] ) {
-		this.host( host );
+	if ( !!this.handlers[method].hosts[host] ) {
+		this.handlers[method].hosts[host] = {};
 	}
 
-	this.routes[host][method].push( new RegExp( "^" + route + "$" ) );
-	this.handlers[host][method][route] = fn;
+	this.handlers[method].routes.push( route );
+	this.handlers[method].regex.push( new RegExp( "^" + route + "$" ) );
+	this.handlers[method].hosts[host][route] = fn;
 
 	return this;
 };
 
+/**
+ * Default request handler
+ *
+ * @method request
+ * @param  {Object} req Request Object
+ * @param  {Object} res Response Object
+ * @return {Object}     TurtleIO instance
+ */
 TurtleIO.prototype.request = function ( req, res ) {
+	this.respond( req, res, "hi!", 200 );
 
+	return this;
 };
 
+/**
+ * Send a response
+ *
+ * @method respond
+ * @param  {Object} req     Request Object
+ * @param  {Object} res     Response Object
+ * @param  {Mixed}  body    Primitive or Buffer
+ * @param  {Number} status  [Optional] HTTP status, default is `200`
+ * @param  {Object} headers [Optional] HTTP headers
+ * @return {Object}         TurtleIO instance
+ */
 TurtleIO.prototype.respond = function ( req, res, body, status, headers ) {
+	status  = status  || 200;
+	headers = headers || {Allow: "GET, HEAD, OPTIONS", "Content-Type": "text/plain"};
 
+	res.writeHead( status, headers );
+	res.end( body );
+
+	return this;
 };
 
 /**
@@ -144,9 +183,10 @@ TurtleIO.prototype.restart = function () {
  * @return {Object}     TurtleIO instance
  */
 TurtleIO.prototype.route = function ( req, res ) {
-	var parsed = $.parse( req.url ),
+	var self   = this,
+	    parsed = $.parse( req.url ),
 	    method = req.method.toLowerCase(),
-	    host, handler;
+	    host, route;
 
 	// Finding a matching vhost
 	this.vhosts.each( function ( i ) {
@@ -159,10 +199,36 @@ TurtleIO.prototype.route = function ( req, res ) {
 		host = this.config["default"];
 	}
 
-	this.handlers[host][method].
+	// Looking for a match
+	this.handlers[method].regex.each( function ( i, idx ) {
+		var x = self.handlers[method].routes[idx];
 
-	res.writeHead(200, {'Content-Type': 'text/plain'});
-	res.end( "hi from " + host );
+		if ( x in self.handlers[method].hosts[host] || x in self.handlers[method].hosts.all ) {
+			route   = i;
+			handler = self.handlers[method].hosts[host][x] || self.handlers[method].hosts.all[x];
+			return false;
+		}
+	} );
+
+	// Looking for a match against generic routes
+	if ( !route ) {
+		this.handlers.all.regex.each( function ( i, idx ) {
+			var x = self.handlers.all.routes[idx];
+
+			if ( x in self.handlers.all.hosts[host] || x in self.handlers.all.hosts.all ) {
+				route   = i;
+				handler = self.handlers.all.hosts[host][x] || self.handlers.all.hosts.all[x];
+				return false;
+			}
+		} );
+	}
+
+	if ( handler ) {
+		handler( req, res );
+	}
+	else {
+		this.error( req, res );
+	}
 
 	return this;
 };
@@ -202,6 +268,13 @@ TurtleIO.prototype.start = function ( config, err, msg ) {
 		self.host( i );
 	} );
 
+	// Setting a default GET route
+	if ( !this.handlers.get.routes.contains( ".*" ) ) {
+		this.get( ".*", function ( req, res ) {
+			self.request( req, res );
+		}, "all" );
+	}
+
 	// Starting server
 	if ( this.config.cert !== undefined ) {
 		console.log("ssl!");
@@ -226,11 +299,11 @@ TurtleIO.prototype.start = function ( config, err, msg ) {
 TurtleIO.prototype.stop = function () {
 	var port = this.config.port;
 
-	this.cache  = $.lru( 1000 );
-	this.config = {};
-	this.server = null;
-	this.routes = {};
-	this.vhosts = [];
+	this.cache    = $.lru( 1000 );
+	this.config   = {};
+	this.handlers = {all: {regex: [], routes: [], hosts: {}}, "delete": {regex: [], routes: [], hosts: {}}, get: {regex: [], routes: [], hosts: {}}, patch: {regex: [], routes: [], hosts: {}}, post: {regex: [], routes: [], hosts: {}}, put: {regex: [], routes: [], hosts: {}}};
+	this.server   = null;
+	this.vhosts   = [];
 
 	console.log( "Stopped turtle.io on port " + port );
 
@@ -245,25 +318,14 @@ TurtleIO.prototype.stop = function () {
  * @return {Object}     TurtleIO instance
  */
 TurtleIO.prototype.host = function ( arg ) {
-	this.routes[arg] = {
-		all      : [],
-		get      : [],
-		"delete" : [],
-		post     : [],
-		put      : [],
-		patch    : []
-	};
-
-	this.handlers[arg] = {
-		all      : {},
-		get      : {},
-		"delete" : {},
-		post     : {},
-		put      : {},
-		patch    : {}
-	};
-
 	this.vhosts.push( new RegExp( "^" + arg + "$" ) );
+
+	this.handlers.all.hosts[arg]       = {};
+	this.handlers["delete"].hosts[arg] = {};
+	this.handlers.get.hosts[arg]       = {};
+	this.handlers.patch.hosts[arg]     = {};
+	this.handlers.post.hosts[arg]      = {};
+	this.handlers.put.hosts[arg]       = {};
 
 	return this;
 };
