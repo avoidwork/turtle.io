@@ -35,73 +35,69 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 		    replace    = "$1" + route + "/",
 		    url        = self.url( req ),
 		    delay      = $.expires,
-		    date, rewrite;
+		    rewrite;
 
 		try {
 			// Getting or creating an Etag
-			resHeaders = headers( xhr.getAllResponseHeaders() );
-			date       = ( resHeaders["Last-Modified"] || resHeaders.Date ) || undefined;
-			rewrite    = REGEX_REWRITE.test( resHeaders["Content-Type"].replace( REGEX_NVAL, "" ) );
+			if ( xhr.status !== 304 ) {
+				resHeaders = headers( xhr.getAllResponseHeaders() );
+				rewrite    = REGEX_REWRITE.test( resHeaders["Content-Type"].replace( REGEX_NVAL, "" ) );
+				etag       = resHeaders.Etag || "\"" + self.etag( url, resHeaders["Content-Length"] || 0, resHeaders["Last-Modified"] || 0, arg ) + "\"";
 
-			if ( isNaN( new Date( date ).getFullYear() ) ) {
-				date = new Date();
-			}
-			else {
-				date = new Date( date );
-			}
-
-			etag = resHeaders.Etag || "\"" + self.etag( url, resHeaders["Content-Length"] || 0, resHeaders["Last-Modified"] || 0, arg ) + "\"";
-
-			// Setting headers
-			if ( resHeaders.Etag !== etag ) {
-				resHeaders.Etag = etag;
-			}
-
-			if ( resHeaders.Allow === undefined || resHeaders.Allow.isEmpty() ) {
-				resHeaders.Allow = resHeaders["Access-Control-Allow-Methods"] || "GET";
-			}
-
-			resHeaders.Server = self.config.headers.Server;
-
-			if ( !$.regex.no.test( resHeaders["Cache-Control"] ) ) {
-				// Determining how long rep is valid
-				if ( resHeaders["Cache-Control"] && $.regex.number_present.test( resHeaders["Cache-Control"] ) ) {
-					delay = $.number.parse( $.regex.number_present.exec( resHeaders["Cache-Control"] )[0], 10 );
-				}
-				else if ( resHeaders.Expires !== undefined ) {
-					delay = new Date( resHeaders.Expires ).diff( new Date() );
+				// Setting headers
+				if ( resHeaders.Etag !== etag ) {
+					resHeaders.Etag = etag;
 				}
 
-				if ( delay > 0 ) {
-					// Updating LRU
-					self.register( url, {etag: etag.replace( /\"/g, "" ), mimetype: resHeaders["Content-Type"]}, true );
-
-					// Removing from LRU when invalid
-					$.delay( function () {
-						self.unregister( url );
-					}, delay );
+				if ( resHeaders.Allow === undefined || resHeaders.Allow.isEmpty() ) {
+					resHeaders.Allow = resHeaders["Access-Control-Allow-Methods"] || "GET";
 				}
-			}
 
-			// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
-			if ( req.headers["if-none-match"] === etag ) {
-				self.respond( req, res, messages.NO_CONTENT, codes.NOT_MODIFIED, resHeaders, timer, false );
-			}
-			else {
-				if ( REGEX_HEAD.test( req.method.toLowerCase() ) ) {
-					arg = messages.NO_CONTENT;
-				}
-				// Fixing root path of response
-				else if ( rewrite ) {
-					if ( arg instanceof Array || arg instanceof Object ) {
-						arg = $.decode( $.encode( arg ).replace( regex, replace ) );
+				resHeaders.Server = self.config.headers.Server;
+
+				if ( !$.regex.no.test( resHeaders["Cache-Control"] ) ) {
+					// Determining how long rep is valid
+					if ( resHeaders["Cache-Control"] && $.regex.number_present.test( resHeaders["Cache-Control"] ) ) {
+						delay = $.number.parse( $.regex.number_present.exec( resHeaders["Cache-Control"] )[0], 10 );
 					}
-					else if ( typeof arg === "string" ) {
-						arg = arg.replace( regex, replace );
+					else if ( resHeaders.Expires !== undefined ) {
+						delay = new Date( resHeaders.Expires ).diff( new Date() );
+					}
+
+					if ( delay > 0 ) {
+						// Updating LRU
+						self.register( url, {etag: etag.replace( /\"/g, "" ), mimetype: resHeaders["Content-Type"]}, true );
+
+						// Removing from LRU when invalid
+						$.delay( function () {
+							self.unregister( url );
+						}, delay );
 					}
 				}
 
-				self.respond( req, res, arg, xhr.status, resHeaders, timer, false );
+				// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
+				if ( req.headers["if-none-match"] === etag ) {
+					self.respond( req, res, messages.NO_CONTENT, codes.NOT_MODIFIED, resHeaders, timer, false );
+				}
+				else {
+					if ( REGEX_HEAD.test( req.method.toLowerCase() ) ) {
+						arg = messages.NO_CONTENT;
+					}
+					// Fixing root path of response
+					else if ( rewrite ) {
+						if ( arg instanceof Array || arg instanceof Object ) {
+							arg = $.decode( $.encode( arg ).replace( regex, replace ) );
+						}
+						else if ( typeof arg === "string" ) {
+							arg = arg.replace( regex, replace );
+						}
+					}
+
+					self.respond( req, res, arg, xhr.status, resHeaders, timer, false );
+				}
+			}
+			else {
+				self.respond( req, res, arg, xhr.status, {Server: self.config.headers.Server}, timer, false );
 			}
 		}
 		catch (e) {
