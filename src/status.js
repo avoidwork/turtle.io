@@ -35,9 +35,11 @@ factory.prototype.status = function () {
 		uptime      : uptime
 	};
 
-	dtp.fire( "status", function () {
-		return [state.server.connections, uptime, ram.heapUsed, ram.heapTotal];
-	});
+	if ( this.config.probes ) {
+		dtp.fire( "status", function () {
+			return [state.server.connections, uptime, ram.heapUsed, ram.heapTotal];
+		});
+	}
 
 	return state;
 };

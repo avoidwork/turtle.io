@@ -11,12 +11,57 @@
 factory.prototype.start = function ( args, errorHandler, messageHandler ) {
 	var self  = this,
 	    i     = -1,
-	    pages, msg, sig;
+	    pages, prep, msg, sig;
+
+	// Prepare route Arrays
+	prep = function ( arg ) {
+		if ( self.config.routesHash[arg] === undefined ) {
+			self.config.routesHash[arg] = {};
+		}
+
+		if ( self.config.routesHash[arg].all === undefined ) {
+			self.config.routesHash[arg].all = [];
+		}
+
+		if ( self.config.routesHash[arg]["delete"] === undefined ) {
+			self.config.routesHash[arg]["delete"] = [];
+		}
+
+		if ( self.config.routesHash[arg].get === undefined ) {
+			self.config.routesHash[arg].get = [];
+		}
+
+		if ( self.config.routesHash[arg].patch === undefined ) {
+			self.config.routesHash[arg].patch = [];
+		}
+
+		if ( self.config.routesHash[arg].post === undefined ) {
+			self.config.routesHash[arg].post = [];
+		}
+
+		if ( self.config.routesHash[arg].put === undefined ) {
+			self.config.routesHash[arg].put = [];
+		}
+	};
 
 	// Merging config
 	if ( args !== undefined ) {
 		$.merge( this.config, args );
 	}
+
+	// Caching index file count
+	this.config.indexes = self.config.index.length;
+
+	// Setting default route Arrays
+	prep( "all" );
+
+	// Caching vhosts
+	this.config.vhostsList   = $.array.cast( this.config.vhosts, true );
+	this.config.vhostsRegExp = this.config.vhostsList.map( function ( i ) {
+		prep( i );
+
+		return new RegExp( "^" + i.replace( /^\*/, ".*" ) + "$" );
+	});
 
 	// Setting `Server` HTTP header
 	if ( this.config.headers.Server === undefined ) {

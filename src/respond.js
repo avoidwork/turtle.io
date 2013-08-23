@@ -85,13 +85,15 @@ factory.prototype.respond = function ( req, res, output, status, headers, timer,
 
 		res.end();
 
-		dtp.fire( "respond", function () {
-			return [req.headers.host, req.method, url, status, diff( timer )];
-		});
+		if ( this.config.probes ) {
+			dtp.fire( "respond", function () {
+				return [req.headers.host, req.method, url, status, diff( timer )];
+			});
+		}
 	}
 
 	// Logging request
-	self.log( prep.call( self, req, res ) );
+	this.log( prep.call( this, req, res ) );
 
 	return this;
 };

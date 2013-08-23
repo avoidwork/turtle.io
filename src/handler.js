@@ -19,45 +19,42 @@ var handler = function ( req, res, fn ) {
 		var url = self.url( req ),
 		    cached, payload;
 
-		dtp.fire( "handler", function () {
-			return [req.headers.host, req.url, diff( timer )];
-		});
+		if ( self.config.probes ) {
+			dtp.fire( "handler", function () {
+				return [req.headers.host, req.url, diff( timer )];
+			});
+		}
 
-		try {
-			// Decorating session
-			req.session = self.session.get( req, res );
+		// Decorating session
+		req.session = self.session.get( req, res );
 
-			// Setting listeners if expecting a body
-			if ( REGEX_BODY.test( req.method ) ) {
-				req.setEncoding( "utf-8" );
+		// Setting listeners if expecting a body
+		if ( REGEX_BODY.test( req.method ) ) {
+			req.setEncoding( "utf-8" );
 
-				req.on( "data", function ( data ) {
-					payload = payload === undefined ? data : payload + data;
-				});
+			req.on( "data", function ( data ) {
+				payload = payload === undefined ? data : payload + data;
+			});
 
-				req.on( "end", function () {
-					req.body = payload;
-					fn.call( self, req, res, timer );
-				});
-			}
-			// Looking in LRU cache for Etag
-			else if ( REGEX_GET.test( req.method ) ) {
-				cached = self.registry.get( url );
+			req.on( "end", function () {
+				req.body = payload;
+				fn.call( self, req, res, timer );
+			});
+		}
+		// Looking in LRU cache for Etag
+		else if ( REGEX_GET.test( req.method ) ) {
+			cached = self.registry.get( url );
 
-				// Sending a 304 if Client is making a GET & has current representation
-				if ( cached && !REGEX_HEAD.test( req.method ) && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === cached.etag ) {
-					self.respond( req, res, messages.NO_CONTENT, codes.NOT_MODIFIED, {"Content-Type": cached.mimetype, Etag: "\"" + cached.etag + "\""}, timer, false );
-				}
-				else {
-					fn.call( self, req, res, timer );
-				}
+			// Sending a 304 if Client is making a GET & has current representation
+			if ( cached && !REGEX_HEAD.test( req.method ) && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === cached.etag ) {
+				self.respond( req, res, messages.NO_CONTENT, codes.NOT_MODIFIED, {"Content-Type": cached.mimetype, Etag: "\"" + cached.etag + "\""}, timer, false );
 			}
 			else {
 				fn.call( self, req, res, timer );
 			}
 		}
-		catch ( e ) {
-			self.error( req, res, e, timer );
+		else {
+			fn.call( self, req, res, timer );
 		}
 	};
 
@@ -69,6 +66,7 @@ var handler = function ( req, res, fn ) {
 		if ( typeof this.config.auth[host].auth === "undefined" ) {
 			this.config.auth[host].auth = http_auth( this.config.auth[host] );
 		}
+
 		this.config.auth[host].auth.apply( req, res, op );
 	}
 };

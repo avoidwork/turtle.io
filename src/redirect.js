@@ -21,9 +21,11 @@ factory.prototype.redirect = function ( route, url, host, permanent ) {
 		self.respond( req, res, messages.NO_CONTENT, code, {"Location": ( rewrite ? req.url.replace( pattern, url ) : url )}, timer, false );
 	}, host);
 
-	dtp.fire( "redirect-set", function () {
-		return [host || "*", route, url, permanent, diff( timer )];
-	});
+	if ( this.config.probes ) {
+		dtp.fire( "redirect-set", function () {
+			return [host || "*", route, url, permanent, diff( timer )];
+		});
+	}
 
 	return this;
 };

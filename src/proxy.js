@@ -178,9 +178,11 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 
 			proxyReq.end();
 
-			dtp.fire( "proxy", function () {
-				return [req.headers.host, req.method, route, origin, diff( timer )];
-			});
+			if ( self.config.probes ) {
+				dtp.fire( "proxy", function () {
+					return [req.headers.host, req.method, route, origin, diff( timer )];
+				});
+			}
 		}
 		// Acting as a RESTful proxy
 		else {
@@ -211,9 +213,11 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 		self[i]( route, wrapper, host );
 		self[i]( route + "/.*", wrapper, host );
 
-		dtp.fire( "proxy-set", function () {
-			return [host || "*", i.toUpperCase(), origin, route, diff( timer )];
-		});
+		if ( self.config.probes ) {
+			dtp.fire( "proxy-set", function () {
+				return [host || "*", i.toUpperCase(), origin, route, diff( timer )];
+			});
+		}
 	});
 
 	return this;

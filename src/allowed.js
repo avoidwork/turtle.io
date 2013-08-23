@@ -10,12 +10,13 @@
  */
 factory.prototype.allowed = function ( method, uri, host ) {
 	host       = host || "all";
+	method     = method.toLowerCase();
 	var result = false,
 	    timer  = new Date(),
-	    routes = this.routes( method, host ).merge( this.routes( "all", host ) );
+	    routes = this.routes( method, host ).concat( this.routes( "all", host ) );
 
-	if ( host !== undefined ) {
-		routes.merge( this.routes( method, "all" ) ).merge( this.routes( "all", "all" ) );
+	if ( host !== "all" ) {
+		routes = routes.concat( this.routes( method, "all" ).concat( this.routes( "all", "all" ) ) );
 	}
 
 	routes.each( function ( i ) {
@@ -24,9 +25,11 @@ factory.prototype.allowed = function ( method, uri, host ) {
 		}
 	});
 
-	dtp.fire( "allowed", function () {
-		return [host, uri, method.toUpperCase(), diff( timer )];
-	});
+	if ( this.config.probes ) {
+		dtp.fire( "allowed", function () {
+			return [host, uri, method.toUpperCase(), diff( timer )];
+		});
+	}
 
 	return result;
 };

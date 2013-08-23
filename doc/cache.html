@@ -27,9 +27,11 @@
 
         <span class="nx">raw</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span> <span class="nx">zlib</span><span class="p">[</span><span class="nx">REGEX_DEF</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span> <span class="nx">encoding</span> <span class="p">)</span> <span class="o">?</span> <span class="s2">&quot;createDeflate&quot;</span> <span class="o">:</span> <span class="s2">&quot;createGzip&quot;</span><span class="p">]()</span> <span class="p">).</span><span class="nx">pipe</span><span class="p">(</span> <span class="nx">stream</span> <span class="p">);</span>
 
-        <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;compress&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-          <span class="k">return</span> <span class="p">[</span><span class="nx">filename</span><span class="p">,</span> <span class="nx">dest</span><span class="p">,</span> <span class="nx">encoding</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
-        <span class="p">});</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="nx">self</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">probes</span> <span class="p">)</span> <span class="p">{</span>
+          <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;compress&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="p">[</span><span class="nx">filename</span><span class="p">,</span> <span class="nx">dest</span><span class="p">,</span> <span class="nx">encoding</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
+          <span class="p">});</span>
+        <span class="p">}</span>
       <span class="p">}</span>
 
       <span class="k">if</span> <span class="p">(</span> <span class="k">typeof</span> <span class="nx">callback</span> <span class="o">===</span> <span class="s2">&quot;function&quot;</span> <span class="p">)</span> <span class="p">{</span>
@@ -49,9 +51,11 @@
                 <span class="nx">self</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">e</span><span class="p">,</span> <span class="kc">true</span><span class="p">,</span> <span class="kc">false</span> <span class="p">);</span>
               <span class="p">}</span>
               <span class="k">else</span> <span class="p">{</span>
-                <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;compress&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-                  <span class="k">return</span> <span class="p">[</span><span class="nx">filename</span><span class="p">,</span> <span class="nx">dest</span><span class="p">,</span> <span class="nx">encoding</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
-                <span class="p">});</span>
+                <span class="k">if</span> <span class="p">(</span> <span class="nx">self</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">probes</span> <span class="p">)</span> <span class="p">{</span>
+                  <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;compress&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                    <span class="k">return</span> <span class="p">[</span><span class="nx">filename</span><span class="p">,</span> <span class="nx">dest</span><span class="p">,</span> <span class="nx">encoding</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
+                  <span class="p">});</span>
+                <span class="p">}</span>
 
                 <span class="k">if</span> <span class="p">(</span> <span class="k">typeof</span> <span class="nx">callback</span> <span class="o">===</span> <span class="s2">&quot;function&quot;</span> <span class="p">)</span> <span class="p">{</span>
                   <span class="nx">callback</span><span class="p">();</span>

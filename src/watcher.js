@@ -39,7 +39,7 @@ factory.prototype.watcher = function ( url, path, mimetype ) {
 				cleanup( watcher, url, path );
 			}
 			else {
-				fs.stat( path, function ( e, stat ) {
+				fs.lstat( path, function ( e, stat ) {
 					if ( e ) {
 						self.log( e );
 						cleanup( watcher, url, path );

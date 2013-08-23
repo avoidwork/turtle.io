@@ -40,15 +40,19 @@ factory.prototype.compressed = function ( req, res, etag, arg, status, headers, 
 
 			raw.pipe( zlib[REGEX_DEF.test( compression ) ? "createDeflate" : "createGzip"]() ).pipe( res );
 
-			dtp.fire( "respond", function () {
-				return [req.headers.host, req.method, req.url, status, diff( timer )];
-			});
+			if ( self.config.probes ) {
+				dtp.fire( "respond", function () {
+					return [req.headers.host, req.method, req.url, status, diff( timer )];
+				});
+			}
 		} );
 	};
 
-	dtp.fire( "compressed", function () {
-		return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
-	});
+	if ( this.config.probes ) {
+		dtp.fire( "compressed", function () {
+			return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
+		});
+	}
 
 	// Local asset, piping result directly to Client
 	if ( local ) {
@@ -61,9 +65,11 @@ factory.prototype.compressed = function ( req, res, etag, arg, status, headers, 
 						raw = fs.createReadStream( npath );
 						raw.pipe( res );
 
-						dtp.fire( "respond", function () {
-							return [req.headers.host, req.method, req.url, status, diff( timer )];
-						});
+						if ( self.config.probes ) {
+							dtp.fire( "respond", function () {
+								return [req.headers.host, req.method, req.url, status, diff( timer )];
+							});
+						}
 					}
 					else {
 						facade( etag, arg, compression, req, res );
@@ -78,9 +84,11 @@ factory.prototype.compressed = function ( req, res, etag, arg, status, headers, 
 			raw = fs.createReadStream( arg );
 			raw.pipe( res );
 
-			dtp.fire( "respond", function () {
-				return [req.headers.host, req.method, req.url, status, diff( timer )];
-			});
+			if ( this.config.probes ) {
+				dtp.fire( "respond", function () {
+					return [req.headers.host, req.method, req.url, status, diff( timer )];
+				});
+			}
 		}
 	}
 	// Custom or proxy route result
@@ -94,9 +102,11 @@ factory.prototype.compressed = function ( req, res, etag, arg, status, headers, 
 					raw = fs.createReadStream( npath );
 					raw.pipe( res );
 
-					dtp.fire( "respond", function () {
-						return [req.headers.host, req.method, req.url, status, diff( timer )];
-					});
+					if ( self.config.probes ) {
+						dtp.fire( "respond", function () {
+							return [req.headers.host, req.method, req.url, status, diff( timer )];
+						});
+					}
 				}
 				// Compressing asset & writing to disk after responding
 				else {
@@ -113,7 +123,7 @@ factory.prototype.compressed = function ( req, res, etag, arg, status, headers, 
 								if ( e ) {
 									self.log( e, true, false );
 								}
-								else {
+								else if ( self.config.probes ) {
 									dtp.fire( "compress", function () {
 										return [etag, npath, compression, diff( timer )];
 									});

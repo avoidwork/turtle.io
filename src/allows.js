@@ -21,9 +21,11 @@ factory.prototype.allows = function ( uri, host ) {
 
 	result = result.join( ", " ).replace( "GET", "GET, HEAD, OPTIONS" );
 
-	dtp.fire( "allows", function () {
-		return [host, uri, diff( timer )];
-	});
+	if ( this.config.probes ) {
+		dtp.fire( "allows", function () {
+			return [host, uri, diff( timer )];
+		});
+	}
 
 	return result;
 };

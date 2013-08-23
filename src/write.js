@@ -25,7 +25,7 @@ factory.prototype.write = function ( path, req, res, timer ) {
 	else {
 		allow = allow.explode().remove( "POST" ).join(", ");
 
-		fs.stat( path, function ( e, stat ) {
+		fs.lstat( path, function ( e, stat ) {
 			if ( e ) {
 				self.error( req, res, e, timer );
 			}
@@ -38,9 +38,11 @@ factory.prototype.write = function ( path, req, res, timer ) {
 							self.error( req, req, e, timer );
 						}
 						else {
-							dtp.fire( "write", function () {
-								return [req.headers.host, req.url, req.method, path, diff( timer )];
-							});
+							if ( self.config.probes ) {
+								dtp.fire( "write", function () {
+									return [req.headers.host, req.url, req.method, path, diff( timer )];
+								});
+							}
 
 							status = put ? codes.NO_CONTENT : codes.CREATED;
 							self.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow}, timer, false );

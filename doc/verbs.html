@@ -11,16 +11,26 @@
 </ul>
 
 <p><strong>Returns an Object</strong><br/>(Instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">factory</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">all</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">route</span><span class="p">,</span> <span class="nx">fn</span><span class="p">,</span> <span class="nx">host</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="nx">host</span>      <span class="o">=</span> <span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;all&quot;</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">self</span>  <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
       <span class="nx">timer</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
 
   <span class="nx">$</span><span class="p">.</span><span class="nx">route</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span> <span class="nx">route</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">{</span>
     <span class="nx">handler</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">fn</span> <span class="p">);</span>
-  <span class="p">},</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="nx">host</span> <span class="p">);</span>
+  <span class="p">},</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="nx">host</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Caching route</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="nx">all</span><span class="o">:</span> <span class="p">[]};</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">].</span><span class="nx">all</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">].</span><span class="nx">all</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="p">}</span>
 
-  <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;route-set&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">[</span><span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="nx">route</span><span class="p">,</span> <span class="s2">&quot;ALL&quot;</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
-  <span class="p">});</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">].</span><span class="nx">all</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="nx">route</span> <span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">probes</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;route-set&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="p">[</span><span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="nx">route</span><span class="p">,</span> <span class="s2">&quot;ALL&quot;</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
 
   <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
 <span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method delete</span></p>
@@ -36,16 +46,26 @@
 </ul>
 
 <p><strong>Returns an Object</strong><br/>(Instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">factory</span><span class="p">.</span><span class="nx">prototype</span><span class="p">[</span><span class="s2">&quot;delete&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">route</span><span class="p">,</span> <span class="nx">fn</span><span class="p">,</span> <span class="nx">host</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="nx">host</span>      <span class="o">=</span> <span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;all&quot;</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">self</span>  <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
       <span class="nx">timer</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
 
   <span class="nx">$</span><span class="p">.</span><span class="nx">route</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span> <span class="nx">route</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">{</span>
     <span class="nx">handler</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">fn</span> <span class="p">);</span>
-  <span class="p">},</span> <span class="s2">&quot;delete&quot;</span><span class="p">,</span> <span class="nx">host</span> <span class="p">);</span>
+  <span class="p">},</span> <span class="s2">&quot;delete&quot;</span><span class="p">,</span> <span class="nx">host</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Caching route</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;delete&quot;</span><span class="o">:</span> <span class="p">[]};</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">][</span><span class="s2">&quot;delete&quot;</span><span class="p">]</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">][</span><span class="s2">&quot;delete&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="p">}</span>
 
-  <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;route-set&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">[</span><span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="nx">route</span><span class="p">,</span> <span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
-  <span class="p">});</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">][</span><span class="s2">&quot;delete&quot;</span><span class="p">].</span><span class="nx">push</span><span class="p">(</span> <span class="nx">route</span> <span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">probes</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;route-set&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="p">[</span><span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="nx">route</span><span class="p">,</span> <span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
 
   <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
 <span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method get</span></p>
@@ -61,16 +81,26 @@
 </ul>
 
 <p><strong>Returns an Object</strong><br/>(Instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">factory</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">get</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">route</span><span class="p">,</span> <span class="nx">fn</span><span class="p">,</span> <span class="nx">host</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="nx">host</span>      <span class="o">=</span> <span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;all&quot;</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">self</span>  <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
       <span class="nx">timer</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
 
   <span class="nx">$</span><span class="p">.</span><span class="nx">route</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span> <span class="nx">route</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">{</span>
     <span class="nx">handler</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">fn</span> <span class="p">);</span>
-  <span class="p">},</span> <span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="nx">host</span> <span class="p">);</span>
+  <span class="p">},</span> <span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="nx">host</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Caching route</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="nx">get</span><span class="o">:</span> <span class="p">[]};</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">].</span><span class="nx">get</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">].</span><span class="nx">get</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="p">}</span>
 
-  <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;route-set&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">[</span><span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="nx">route</span><span class="p">,</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
-  <span class="p">});</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">].</span><span class="nx">get</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="nx">route</span> <span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">probes</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;route-set&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="p">[</span><span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="nx">route</span><span class="p">,</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
 
   <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
 <span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method patch</span></p>
@@ -86,16 +116,26 @@
 </ul>
 
 <p><strong>Returns an Object</strong><br/>(Instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">factory</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">patch</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">route</span><span class="p">,</span> <span class="nx">fn</span><span class="p">,</span> <span class="nx">host</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="nx">host</span>      <span class="o">=</span> <span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;all&quot;</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">self</span>  <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
       <span class="nx">timer</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
 
   <span class="nx">$</span><span class="p">.</span><span class="nx">route</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span> <span class="nx">route</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">{</span>
     <span class="nx">handler</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">fn</span> <span class="p">);</span>
-  <span class="p">},</span> <span class="s2">&quot;patch&quot;</span><span class="p">,</span> <span class="nx">host</span> <span class="p">);</span>
+  <span class="p">},</span> <span class="s2">&quot;patch&quot;</span><span class="p">,</span> <span class="nx">host</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Caching route</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="nx">patch</span><span class="o">:</span> <span class="p">[]};</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">].</span><span class="nx">patch</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">].</span><span class="nx">patch</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="p">}</span>
 
-  <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;route-set&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">[</span><span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="nx">route</span><span class="p">,</span> <span class="s2">&quot;PATCH&quot;</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
-  <span class="p">});</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">].</span><span class="nx">patch</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="nx">route</span> <span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">probes</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;route-set&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="p">[</span><span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="nx">route</span><span class="p">,</span> <span class="s2">&quot;PATCH&quot;</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
 
   <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
 <span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method post</span></p>
@@ -111,16 +151,26 @@
 </ul>
 
 <p><strong>Returns an Object</strong><br/>(Instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">factory</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">post</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">route</span><span class="p">,</span> <span class="nx">fn</span><span class="p">,</span> <span class="nx">host</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="nx">host</span>      <span class="o">=</span> <span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;all&quot;</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">self</span>  <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
       <span class="nx">timer</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
 
   <span class="nx">$</span><span class="p">.</span><span class="nx">route</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span> <span class="nx">route</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">{</span>
     <span class="nx">handler</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">fn</span> <span class="p">);</span>
-  <span class="p">},</span> <span class="s2">&quot;post&quot;</span><span class="p">,</span> <span class="nx">host</span> <span class="p">);</span>
+  <span class="p">},</span> <span class="s2">&quot;post&quot;</span><span class="p">,</span> <span class="nx">host</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Caching route</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="nx">post</span><span class="o">:</span> <span class="p">[]};</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">].</span><span class="nx">post</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">].</span><span class="nx">post</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="p">}</span>
 
-  <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;route-set&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">[</span><span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="nx">route</span><span class="p">,</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
-  <span class="p">});</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">].</span><span class="nx">post</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="nx">route</span> <span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">probes</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;route-set&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="p">[</span><span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="nx">route</span><span class="p">,</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
 
   <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
 <span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method put</span></p>
@@ -136,16 +186,26 @@
 </ul>
 
 <p><strong>Returns an Object</strong><br/>(Instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">factory</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">put</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">route</span><span class="p">,</span> <span class="nx">fn</span><span class="p">,</span> <span class="nx">host</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="nx">host</span>      <span class="o">=</span> <span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;all&quot;</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">self</span>  <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
       <span class="nx">timer</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
 
   <span class="nx">$</span><span class="p">.</span><span class="nx">route</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span> <span class="nx">route</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">{</span>
     <span class="nx">handler</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">fn</span> <span class="p">);</span>
-  <span class="p">},</span> <span class="s2">&quot;put&quot;</span><span class="p">,</span> <span class="nx">host</span> <span class="p">);</span>
+  <span class="p">},</span> <span class="s2">&quot;put&quot;</span><span class="p">,</span> <span class="nx">host</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Caching route</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="nx">put</span><span class="o">:</span> <span class="p">[]};</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">].</span><span class="nx">put</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">].</span><span class="nx">put</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="p">}</span>
 
-  <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;route-set&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">[</span><span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="nx">route</span><span class="p">,</span> <span class="s2">&quot;PUT&quot;</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
-  <span class="p">});</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">routesHash</span><span class="p">[</span><span class="nx">host</span><span class="p">].</span><span class="nx">put</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="nx">route</span> <span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">probes</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;route-set&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="p">[</span><span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="nx">route</span><span class="p">,</span> <span class="s2">&quot;PUT&quot;</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
 
   <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
 <span class="p">};</span></div></div></div></div></body></html>

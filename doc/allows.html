@@ -23,9 +23,11 @@
 
   <span class="nx">result</span> <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span> <span class="s2">&quot;, &quot;</span> <span class="p">).</span><span class="nx">replace</span><span class="p">(</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;GET, HEAD, OPTIONS&quot;</span> <span class="p">);</span>
 
-  <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;allows&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">[</span><span class="nx">host</span><span class="p">,</span> <span class="nx">uri</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
-  <span class="p">});</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">probes</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;allows&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="p">[</span><span class="nx">host</span><span class="p">,</span> <span class="nx">uri</span><span class="p">,</span> <span class="nx">diff</span><span class="p">(</span> <span class="nx">timer</span> <span class="p">)];</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
 
   <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
 <span class="p">};</span></div></div></div></div></body></html>

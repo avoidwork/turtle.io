@@ -28,9 +28,11 @@ factory.prototype.cache = function ( filename, obj, encoding, body, callback ) {
 
 				raw.pipe( zlib[REGEX_DEF.test( encoding ) ? "createDeflate" : "createGzip"]() ).pipe( stream );
 
-				dtp.fire( "compress", function () {
-					return [filename, dest, encoding, diff( timer )];
-				});
+				if ( self.config.probes ) {
+					dtp.fire( "compress", function () {
+						return [filename, dest, encoding, diff( timer )];
+					});
+				}
 			}
 
 			if ( typeof callback === "function" ) {
@@ -52,9 +54,11 @@ factory.prototype.cache = function ( filename, obj, encoding, body, callback ) {
 								self.log( e, true, false );
 							}
 							else {
-								dtp.fire( "compress", function () {
-									return [filename, dest, encoding, diff( timer )];
-								});
+								if ( self.config.probes ) {
+									dtp.fire( "compress", function () {
+										return [filename, dest, encoding, diff( timer )];
+									});
+								}
 
 								if ( typeof callback === "function" ) {
 									callback();

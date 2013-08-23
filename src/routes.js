@@ -3,10 +3,10 @@
  *
  * @method routes
  * @public
- * @param  {String} method [Optional] HTTP method/verb
- * @param  {String} host   [Optional] Host to lookup, defaults to `all`
- * @return {Object}        Hash of routes
+ * @param  {String} method HTTP method/verb (lower case), or `all`
+ * @param  {String} host   Host to lookup, or `all`
+ * @return {Array}         Routes
  */
 factory.prototype.routes = function ( method, host ) {
-	return $.route.list( method, host );
+	return this.config.routesHash[host][method];
 };

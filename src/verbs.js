@@ -9,6 +9,7 @@
  * @return {Object}         Instance
  */
 factory.prototype.all = function ( route, fn, host ) {
+	host      = host || "all";
 	var self  = this,
 	    timer = new Date();
 
@@ -16,9 +17,21 @@ factory.prototype.all = function ( route, fn, host ) {
 		handler.call( self, req, res, fn );
 	}, "all", host );
 
-	dtp.fire( "route-set", function () {
-		return [host || "*", route, "ALL", diff( timer )];
-	});
+	// Caching route
+	if ( !this.config.routesHash[host] ) {
+		this.config.routesHash[host] = {all: []};
+	}
+	else if ( !this.config.routesHash[host].all ) {
+		this.config.routesHash[host].all = [];
+	}
+
+	this.config.routesHash[host].all.push( route );
+
+	if ( this.config.probes ) {
+		dtp.fire( "route-set", function () {
+			return [host || "*", route, "ALL", diff( timer )];
+		});
+	}
 
 	return this;
 };
@@ -34,6 +47,7 @@ factory.prototype.all = function ( route, fn, host ) {
  * @return {Object}         Instance
  */
 factory.prototype["delete"] = function ( route, fn, host ) {
+	host      = host || "all";
 	var self  = this,
 	    timer = new Date();
 
@@ -41,9 +55,21 @@ factory.prototype["delete"] = function ( route, fn, host ) {
 		handler.call( self, req, res, fn );
 	}, "delete", host );
 
-	dtp.fire( "route-set", function () {
-		return [host || "*", route, "DELETE", diff( timer )];
-	});
+	// Caching route
+	if ( !this.config.routesHash[host] ) {
+		this.config.routesHash[host] = {"delete": []};
+	}
+	else if ( !this.config.routesHash[host]["delete"] ) {
+		this.config.routesHash[host]["delete"] = [];
+	}
+
+	this.config.routesHash[host]["delete"].push( route );
+
+	if ( this.config.probes ) {
+		dtp.fire( "route-set", function () {
+			return [host || "*", route, "DELETE", diff( timer )];
+		});
+	}
 
 	return this;
 };
@@ -59,6 +85,7 @@ factory.prototype["delete"] = function ( route, fn, host ) {
  * @return {Object}         Instance
  */
 factory.prototype.get = function ( route, fn, host ) {
+	host      = host || "all";
 	var self  = this,
 	    timer = new Date();
 
@@ -66,9 +93,21 @@ factory.prototype.get = function ( route, fn, host ) {
 		handler.call( self, req, res, fn );
 	}, "get", host );
 
-	dtp.fire( "route-set", function () {
-		return [host || "*", route, "GET", diff( timer )];
-	});
+	// Caching route
+	if ( !this.config.routesHash[host] ) {
+		this.config.routesHash[host] = {get: []};
+	}
+	else if ( !this.config.routesHash[host].get ) {
+		this.config.routesHash[host].get = [];
+	}
+
+	this.config.routesHash[host].get.push( route );
+
+	if ( this.config.probes ) {
+		dtp.fire( "route-set", function () {
+			return [host || "*", route, "GET", diff( timer )];
+		});
+	}
 
 	return this;
 };
@@ -84,6 +123,7 @@ factory.prototype.get = function ( route, fn, host ) {
  * @return {Object}         Instance
  */
 factory.prototype.patch = function ( route, fn, host ) {
+	host      = host || "all";
 	var self  = this,
 	    timer = new Date();
 
@@ -91,9 +131,21 @@ factory.prototype.patch = function ( route, fn, host ) {
 		handler.call( self, req, res, fn );
 	}, "patch", host );
 
-	dtp.fire( "route-set", function () {
-		return [host || "*", route, "PATCH", diff( timer )];
-	});
+	// Caching route
+	if ( !this.config.routesHash[host] ) {
+		this.config.routesHash[host] = {patch: []};
+	}
+	else if ( !this.config.routesHash[host].patch ) {
+		this.config.routesHash[host].patch = [];
+	}
+
+	this.config.routesHash[host].patch.push( route );
+
+	if ( this.config.probes ) {
+		dtp.fire( "route-set", function () {
+			return [host || "*", route, "PATCH", diff( timer )];
+		});
+	}
 
 	return this;
 };
@@ -109,6 +161,7 @@ factory.prototype.patch = function ( route, fn, host ) {
  * @return {Object}         Instance
  */
 factory.prototype.post = function ( route, fn, host ) {
+	host      = host || "all";
 	var self  = this,
 	    timer = new Date();
 
@@ -116,9 +169,21 @@ factory.prototype.post = function ( route, fn, host ) {
 		handler.call( self, req, res, fn );
 	}, "post", host );
 
-	dtp.fire( "route-set", function () {
-		return [host || "*", route, "POST", diff( timer )];
-	});
+	// Caching route
+	if ( !this.config.routesHash[host] ) {
+		this.config.routesHash[host] = {post: []};
+	}
+	else if ( !this.config.routesHash[host].post ) {
+		this.config.routesHash[host].post = [];
+	}
+
+	this.config.routesHash[host].post.push( route );
+
+	if ( this.config.probes ) {
+		dtp.fire( "route-set", function () {
+			return [host || "*", route, "POST", diff( timer )];
+		});
+	}
 
 	return this;
 };
@@ -134,6 +199,7 @@ factory.prototype.post = function ( route, fn, host ) {
  * @return {Object}         Instance
  */
 factory.prototype.put = function ( route, fn, host ) {
+	host      = host || "all";
 	var self  = this,
 	    timer = new Date();
 
@@ -141,9 +207,21 @@ factory.prototype.put = function ( route, fn, host ) {
 		handler.call( self, req, res, fn );
 	}, "put", host );
 
-	dtp.fire( "route-set", function () {
-		return [host || "*", route, "PUT", diff( timer )];
-	});
+	// Caching route
+	if ( !this.config.routesHash[host] ) {
+		this.config.routesHash[host] = {put: []};
+	}
+	else if ( !this.config.routesHash[host].put ) {
+		this.config.routesHash[host].put = [];
+	}
+
+	this.config.routesHash[host].put.push( route );
+
+	if ( this.config.probes ) {
+		dtp.fire( "route-set", function () {
+			return [host || "*", route, "PUT", diff( timer )];
+		});
+	}
 
 	return this;
 };

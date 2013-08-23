@@ -35,6 +35,7 @@
 	},
 	"port"    : 8000,
 	"root"    : "",
+	"routesHash" : {},
 	"session" : {
 		"id"     : "sid",
 		"salt"   : "turtleio",

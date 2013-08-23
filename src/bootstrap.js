@@ -56,7 +56,7 @@ factory.prototype.bootstrap = function ( fn ) {
 		}
 
 		// Setting default response route
-		if ( !this.routes().get.contains( "/.*" ) ) {
+		if ( !this.config.routesHash.all.get.contains( "/.*" ) ) {
 			this.get( "/.*", this.request );
 		}
 
@@ -70,11 +70,13 @@ factory.prototype.bootstrap = function ( fn ) {
 		toobusy.maxLag( this.config.lag );
 
 		// Socket probe
-		this.server.on( "connection", function () {
-			dtp.fire( "connection", function () {
-				return [self.server.connections];
+		if ( this.config.probes ) {
+			this.server.on( "connection", function () {
+				dtp.fire( "connection", function () {
+					return [self.server.connections];
+				});
 			});
-		});
+		}
 
 		// Flushing logs to disk on a timer
 		fs.appendFile( "/var/log/" + this.config.logs.file, "", function ( e ) {
