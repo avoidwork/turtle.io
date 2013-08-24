@@ -8,4 +8,6 @@ TurtleIO.prototype.restart = function () {
 	var config = this.config;
 
 	this.stop().start( config );
+
+	return this;
 };
