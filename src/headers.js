@@ -30,7 +30,9 @@ TurtleIO.prototype.headers = function ( req, res, status, responseHeaders ) {
 		}).join( ", " ).replace( "GET", "GET, HEAD, OPTIONS" );
 	}
 
-	headers.Date = new Date().toUTCString();
+	if ( !headers.Date ) {
+		headers.Date = new Date().toUTCString();
+	}
 
 	if ( headers["Access-Control-Allow-Methods"].isEmpty() ) {
 		headers["Access-Control-Allow-Methods"] = headers.Allow;
@@ -42,7 +44,9 @@ TurtleIO.prototype.headers = function ( req, res, status, responseHeaders ) {
 	}
 
 	// Decorating "Transfer-Encoding" header
-	headers["Transfer-Encoding"] = "chunked";
+	if ( !headers["Transfer-Encoding"] )  {
+		headers["Transfer-Encoding"] = "chunked";
+	}
 
 	// Removing headers not wanted in the response
 	if ( !get || status >= this.codes.BAD_REQUEST ) {

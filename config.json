@@ -50,6 +50,10 @@
 			"application/json"
 		]
 	},
+	"ssl"     : {
+		"key"  : null,
+		"cert" : null
+	},
 	"tmp"     : "/tmp",
 	"vhosts"  : {}
 }

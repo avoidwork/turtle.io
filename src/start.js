@@ -7,7 +7,8 @@
  * @return {Object}          TurtleIO instance
  */
 TurtleIO.prototype.start = function ( config, err ) {
-	var self = this;
+	var self = this,
+	    pages;
 
 	config = config || {};
 
@@ -29,6 +30,7 @@ TurtleIO.prototype.start = function ( config, err ) {
 	}
 
 	this.config = config;
+	pages       = this.config.pages ? ( this.config.root + this.config.pages ) : ( __dirname + "/../pages" );
 
 	// Setting default routes
 	this.host( "all" );
@@ -45,19 +47,31 @@ TurtleIO.prototype.start = function ( config, err ) {
 		}, "all" );
 	}
 
-	// Starting server
-	if ( config.ssl.cert !== null && config.ssl.key !== null ) {
-		this.server = https.createServer( $.merge( config.ssl, {port: config.port, host: config.ip} ), function ( req, res ) {
-			self.route( req, res );
-		} ).listen( config.port, config.ip );
-	}
-	else {
-		this.server = http.createServer( function ( req, res ) {
-			self.route( req, res );
-		} ).listen( config.port, config.ip );
-	}
+	// Loading default error pages
+	fs.readdir( pages, function ( e, files ) {
+		if ( e ) {
+			console.log( e );
+		}
+		else {
+			files.each(function ( i ) {
+				self.pages.all[i.replace( REGEX_NEXT, "" )] = fs.readFileSync( pages + "/" + i, "utf8"/*{encoding: "utf8"}*/ );
+			});
 
-	console.log( "Started turtle.io on port " + config.port );
+			// Starting server
+			if ( config.ssl.cert !== null && config.ssl.key !== null ) {
+				self.server = https.createServer( $.merge( config.ssl, {port: config.port, host: config.ip} ), function ( req, res ) {
+					self.route( req, res );
+				} ).listen( config.port, config.ip );
+			}
+			else {
+				self.server = http.createServer( function ( req, res ) {
+					self.route( req, res );
+				} ).listen( config.port, config.ip );
+			}
+
+			console.log( "Started turtle.io on port " + config.port );
+		}
+	});
 
 	return this;
 };

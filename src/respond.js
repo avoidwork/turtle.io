@@ -11,8 +11,14 @@
  * @return {Object}           TurtleIO instance
  */
 TurtleIO.prototype.respond = function ( req, res, body, status, headers, compress ) {
+	body    = this.encode( body );
 	status  = status  || 200;
 	headers = this.headers( headers || {"Content-Type": "text/plain"} );
+
+	// Emsuring JSON has proper mimetype
+	if ( $.regex.json_wrap.test( body ) ) {
+		headers["Content-Type"] = "application/json";
+	}
 
 	//if ( compress && this.config.compress ) {
 		// compress here
@@ -20,7 +26,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, compres
 
 	res.statusCode = status;
 	res.writeHead( status, headers );
-	res.end( "hi" );
+	res.end( body );
 
 	return this;
 };

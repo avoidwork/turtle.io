@@ -28,7 +28,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 	this.handlers[method].regex.each( function ( i, idx ) {
 		var x = self.handlers[method].routes[idx];
 
-		if ( x in self.handlers[method].hosts[host] || x in self.handlers[method].hosts.all ) {
+		if ( ( x in self.handlers[method].hosts[host] || x in self.handlers[method].hosts.all ) && i.test( parsed.url ) ) {
 			route   = i;
 			handler = self.handlers[method].hosts[host][x] || self.handlers[method].hosts.all[x];
 			return false;

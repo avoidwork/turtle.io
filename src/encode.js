@@ -1,25 +1,21 @@
 /**
- * Encodes `obj` as JSON if applicable
+ * Encodes `arg` as JSON if applicable
  *
  * @method encode
- * @param  {Mixed} obj Object to encode
+ * @param  {Mixed} arg Object to encode
  * @return {Mixed}     Original Object or JSON string
  */
-TurtleIO.prototype.encode = function ( obj ) {
-	var result;
-
+TurtleIO.prototype.encode = function ( arg ) {
 	// Do not want to coerce this Object to a String!
-	if ( obj instanceof Buffer ) {
-		result = obj;
+	if ( arg instanceof Buffer ) {
+		return arg;
 	}
 	// Converting to JSON
-	else if ( obj instanceof Array || obj instanceof Object ) {
-		result = $.encode( obj );
+	else if ( arg instanceof Array || arg instanceof Object ) {
+		return $.encode( arg );
 	}
 	// Nothing to do, leave it as it is
 	else {
-		result = obj;
+		return arg;
 	}
-
-	return result;
 };
