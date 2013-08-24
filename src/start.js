@@ -63,15 +63,20 @@ TurtleIO.prototype.start = function ( config, err ) {
 			});
 
 			// Starting server
-			if ( config.ssl.cert !== null && config.ssl.key !== null ) {
-				self.server = https.createServer( $.merge( config.ssl, {port: config.port, host: config.ip} ), function ( req, res ) {
-					self.route( req, res );
-				} ).listen( config.port, config.ip );
+			if ( self.server === null ) {
+				if ( config.ssl.cert !== null && config.ssl.key !== null ) {
+					self.server = https.createServer( $.merge( config.ssl, {port: config.port, host: config.ip} ), function ( req, res ) {
+						self.route( req, res );
+					} ).listen( config.port, config.ip );
+				}
+				else {
+					self.server = http.createServer( function ( req, res ) {
+						self.route( req, res );
+					} ).listen( config.port, config.ip );
+				}
 			}
 			else {
-				self.server = http.createServer( function ( req, res ) {
-					self.route( req, res );
-				} ).listen( config.port, config.ip );
+				self.server.listen( config.port, config.ip );
 			}
 
 			console.log( "Started turtle.io on port " + config.port );

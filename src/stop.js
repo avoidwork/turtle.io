@@ -12,9 +12,12 @@ TurtleIO.prototype.stop = function () {
 	this.handlers = {all: {regex: [], routes: [], hosts: {}}, "delete": {regex: [], routes: [], hosts: {}}, get: {regex: [], routes: [], hosts: {}}, patch: {regex: [], routes: [], hosts: {}}, post: {regex: [], routes: [], hosts: {}}, put: {regex: [], routes: [], hosts: {}}};
 	this.pages    = {all: {}};
 	this.sessions = {};
-	this.server   = null;
 	this.vhosts   = [];
 	this.watching = {};
+
+	if ( this.server !== null ) {
+		this.server.close();
+	}
 
 	console.log( "Stopped turtle.io on port " + port );
 
