@@ -33,8 +33,8 @@ TurtleIO.prototype.start = function ( config, err ) {
 	pages       = this.config.pages ? ( this.config.root + this.config.pages ) : ( __dirname + "/../pages" );
 
 	// Setting `Server` HTTP header
-	if ( this.config.headers.Server === undefined ) {
-		this.config.headers.Server = /*( function () { return (*/ "turtle.io/{{VERSION}} (abaaso/" + $.version + " node.js/" + process.versions.node.replace( /^v/, "" ) + process.platform.capitalize() + " V8/" + process.versions.v8.toString().trim() + ")" /*); } )()*/;
+	if ( !this.config.headers.Server ) {
+		this.config.headers.Server = "turtle.io/{{VERSION}} (abaaso/" + $.version + " node.js/" + process.versions.node.replace( /^v/, "" ) + process.platform.capitalize() + " V8/" + process.versions.v8.toString().trim() + ")";
 	}
 
 	// Setting default routes
@@ -59,7 +59,7 @@ TurtleIO.prototype.start = function ( config, err ) {
 		}
 		else {
 			files.each(function ( i ) {
-				self.pages.all[i.replace( REGEX_NEXT, "" )] = fs.readFileSync( pages + "/" + i, "utf8"/*{encoding: "utf8"}*/ );
+				self.pages.all[i.replace( REGEX_NEXT, "" )] = fs.readFileSync( pages + "/" + i, "utf8" );
 			});
 
 			// Starting server
