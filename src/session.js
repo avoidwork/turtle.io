@@ -1,4 +1,49 @@
 /**
+ * Session factory
+ *
+ * @method Session
+ * @private
+ * @constructor
+ * @param {String} id     Session ID
+ * @param {Object} server Server instance
+ */
+function Session ( id, server ) {
+	this._id        = id;
+	this._server    = server;
+	this._timestamp = 0;
+}
+
+/**
+ * Saves session across cluster
+ *
+ * @method save
+ * @public
+ * @return {Undefined} undefined
+ */
+Session.prototype.save = function () {
+	var body = {};
+
+	this._timestamp = moment().utc().unix();
+
+	$.iterate( this, function ( v, k ) {
+		if ( !REGEX_SERVER.test( k ) ) {
+			body[k] = v;
+		}
+	});
+};
+
+/**
+ * Expires session across cluster
+ *
+ * @method expire
+ * @public
+ * @return {Undefined} undefined
+ */
+Session.prototype.expire = function () {
+	delete this._server.sessions[this._id];
+};
+
+/**
  * Sessions
  *
  * @class sessions
@@ -126,49 +171,4 @@ TurtleIO.prototype.session = {
 
 	// Set & unset from `start()` & `stop()`
 	server : null
-};
-
-/**
- * Session factory
- *
- * @method Session
- * @private
- * @constructor
- * @param {String} id     Session ID
- * @param {Object} server Server instance
- */
-function Session ( id, server ) {
-	this._id        = id;
-	this._server    = server;
-	this._timestamp = 0;
-}
-
-/**
- * Saves session across cluster
- *
- * @method save
- * @public
- * @return {Undefined} undefined
- */
-Session.prototype.save = function () {
-	var body = {};
-
-	this._timestamp = moment().utc().unix();
-
-	$.iterate( this, function ( v, k ) {
-		if ( !REGEX_SERVER.test( k ) ) {
-			body[k] = v;
-		}
-	});
-};
-
-/**
- * Expires session across cluster
- *
- * @method expire
- * @public
- * @return {Undefined} undefined
- */
-Session.prototype.expire = function () {
-	delete this._server.sessions[this._id];
 };

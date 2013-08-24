@@ -11,6 +11,7 @@ TurtleIO.prototype.stop = function () {
 	this.config   = {};
 	this.handlers = {all: {regex: [], routes: [], hosts: {}}, "delete": {regex: [], routes: [], hosts: {}}, get: {regex: [], routes: [], hosts: {}}, patch: {regex: [], routes: [], hosts: {}}, post: {regex: [], routes: [], hosts: {}}, put: {regex: [], routes: [], hosts: {}}};
 	this.pages    = {all: {}};
+	this.sessions = {};
 	this.server   = null;
 	this.vhosts   = [];
 	this.watching = {};

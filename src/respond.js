@@ -11,6 +11,10 @@
  * @return {Object}           TurtleIO instance
  */
 TurtleIO.prototype.respond = function ( req, res, body, status, headers, compress ) {
+	var ua       = req.headers["user-agent"],
+	    encoding = req.headers["accept-encoding"],
+	    type;
+
 	body    = this.encode( body );
 	status  = status  || 200;
 	headers = this.headers( headers || {"Content-Type": "text/plain"} );
@@ -20,13 +24,16 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, compres
 		headers["Content-Type"] = "application/json";
 	}
 
-	//if ( compress && this.config.compress ) {
-		// compress here
-	//}
-
 	res.statusCode = status;
 	res.writeHead( status, headers );
-	res.end( body );
+
+	// Determining if response should be compressed
+	if ( compress && this.config.compress && ( type = this.compression( ua, encoding ) ) && type !== null ) {
+		res.end( body );
+	}
+	else {
+		res.end( body );
+	}
 
 	return this;
 };

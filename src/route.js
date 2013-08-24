@@ -49,8 +49,8 @@ TurtleIO.prototype.route = function ( req, res ) {
 	}
 
 	if ( handler ) {
-		// Decorating session
-		req.session = {}; //self.session.get( req, res );
+		// Decorates a session
+		req.session = !req.headers[this.config.session.id] ? null : this.session.get( req, res );
 
 		// Setting listeners if expecting a body
 		if ( REGEX_BODY.test( req.method ) ) {
@@ -67,18 +67,18 @@ TurtleIO.prototype.route = function ( req, res ) {
 		}
 		// Looking in LRU cache for Etag
 		else if ( REGEX_GET.test( req.method ) ) {
-			cached = self.etags.get( url );
+			cached = this.etags.get( url );
 
 			// Sending a 304 if Client is making a GET & has current representation
 			if ( cached && !REGEX_HEAD.test( req.method ) && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === cached.etag ) {
-				self.respond( req, res, messages.NO_CONTENT, self.codes.NOT_MODIFIED, {"Content-Type": cached.mimetype, Etag: "\"" + cached.etag + "\""}, false );
+				this.respond( req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, {"Content-Type": cached.mimetype, Etag: "\"" + cached.etag + "\""}, false );
 			}
 			else {
-				handler.call( self, req, res );
+				handler.call( this, req, res );
 			}
 		}
 		else {
-			handler.call( self, req, res );
+			handler.call( this, req, res );
 		}
 	}
 	else {
