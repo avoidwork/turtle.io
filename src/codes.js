@@ -1,10 +1,9 @@
 /**
- * HTTP (semantic) status codes
+ * HTTP status codes
  *
- * @private
  * @type {Object}
  */
-var codes = {
+TurtleIO.prototype.codes = {
 	CONTINUE            : 100,
 	SWITCH_PROTOCOL     : 101,
 	SUCCESS             : 200,

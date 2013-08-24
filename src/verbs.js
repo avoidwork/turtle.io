@@ -1,227 +1,64 @@
 /**
- * Sets a route for all verbs
- *
- * @method all
- * @public
- * @param  {RegExp}   route Route
- * @param  {Function} fn    Handler
- * @param  {String}   host  [Optional] Hostname this route is for (default is all)
- * @return {Object}         Instance
- */
-factory.prototype.all = function ( route, fn, host ) {
-	host      = host || "all";
-	var self  = this,
-	    timer = new Date();
-
-	$.route.set( route, function ( req, res ) {
-		handler.call( self, req, res, fn );
-	}, "all", host );
-
-	// Caching route
-	if ( !this.config.routesHash[host] ) {
-		this.config.routesHash[host] = {all: []};
-	}
-	else if ( !this.config.routesHash[host].all ) {
-		this.config.routesHash[host].all = [];
-	}
-
-	this.config.routesHash[host].all.push( route );
-
-	if ( this.config.probes ) {
-		dtp.fire( "route-set", function () {
-			return [host || "*", route, "ALL", diff( timer )];
-		});
-	}
-
-	return this;
-};
-
-/**
- * Sets a DELETE route
+ * Sets a DELETE handler
  *
  * @method delete
- * @public
- * @param  {RegExp}   route Route
+ * @param  {String}   route RegExp pattern
  * @param  {Function} fn    Handler
- * @param  {String}   host  [Optional] Hostname this route is for (default is all)
- * @return {Object}         Instance
+ * @param  {String}   host  [Optional] Virtual host, default is `all`
+ * @return {Object}         TurtleIO instance
  */
-factory.prototype["delete"] = function ( route, fn, host ) {
-	host      = host || "all";
-	var self  = this,
-	    timer = new Date();
-
-	$.route.set( route, function ( req, res ) {
-		handler.call( self, req, res, fn );
-	}, "delete", host );
-
-	// Caching route
-	if ( !this.config.routesHash[host] ) {
-		this.config.routesHash[host] = {"delete": []};
-	}
-	else if ( !this.config.routesHash[host]["delete"] ) {
-		this.config.routesHash[host]["delete"] = [];
-	}
-
-	this.config.routesHash[host]["delete"].push( route );
-
-	if ( this.config.probes ) {
-		dtp.fire( "route-set", function () {
-			return [host || "*", route, "DELETE", diff( timer )];
-		});
-	}
-
-	return this;
+TurtleIO.prototype["delete"] = function ( route, fn, host ) {
+	return this.handler( "delete", route, fn, host );
 };
 
 /**
- * Sets a GET route
+ * Sets a GET handler
  *
- * @method get
- * @public
- * @param  {RegExp}   route Route
+ * @method delete
+ * @param  {String}   route RegExp pattern
  * @param  {Function} fn    Handler
- * @param  {String}   host  [Optional] Hostname this route is for (default is all)
- * @return {Object}         Instance
+ * @param  {String}   host  [Optional] Virtual host, default is `all`
+ * @return {Object}         TurtleIO instance
  */
-factory.prototype.get = function ( route, fn, host ) {
-	host      = host || "all";
-	var self  = this,
-	    timer = new Date();
-
-	$.route.set( route, function ( req, res ) {
-		handler.call( self, req, res, fn );
-	}, "get", host );
-
-	// Caching route
-	if ( !this.config.routesHash[host] ) {
-		this.config.routesHash[host] = {get: []};
-	}
-	else if ( !this.config.routesHash[host].get ) {
-		this.config.routesHash[host].get = [];
-	}
-
-	this.config.routesHash[host].get.push( route );
-
-	if ( this.config.probes ) {
-		dtp.fire( "route-set", function () {
-			return [host || "*", route, "GET", diff( timer )];
-		});
-	}
-
-	return this;
+TurtleIO.prototype.get = function ( route, fn, host ) {
+	return this.handler( "get", route, fn, host );
 };
 
 /**
- * Sets a PATCH route
+ * Sets a PATCH handler
  *
- * @method patch
- * @public
- * @param  {RegExp}   route Route
+ * @method delete
+ * @param  {String}   route RegExp pattern
  * @param  {Function} fn    Handler
- * @param  {String}   host  [Optional] Hostname this route is for (default is all)
- * @return {Object}         Instance
+ * @param  {String}   host  [Optional] Virtual host, default is `all`
+ * @return {Object}         TurtleIO instance
  */
-factory.prototype.patch = function ( route, fn, host ) {
-	host      = host || "all";
-	var self  = this,
-	    timer = new Date();
-
-	$.route.set( route, function ( req, res ) {
-		handler.call( self, req, res, fn );
-	}, "patch", host );
-
-	// Caching route
-	if ( !this.config.routesHash[host] ) {
-		this.config.routesHash[host] = {patch: []};
-	}
-	else if ( !this.config.routesHash[host].patch ) {
-		this.config.routesHash[host].patch = [];
-	}
-
-	this.config.routesHash[host].patch.push( route );
-
-	if ( this.config.probes ) {
-		dtp.fire( "route-set", function () {
-			return [host || "*", route, "PATCH", diff( timer )];
-		});
-	}
-
-	return this;
+TurtleIO.prototype.patch = function ( route, fn, host ) {
+	return this.handler( "path", route, fn, host );
 };
 
 /**
- * Sets a POST route
+ * Sets a POST handler
  *
- * @method post
- * @public
- * @param  {RegExp}   route Route
+ * @method delete
+ * @param  {String}   route RegExp pattern
  * @param  {Function} fn    Handler
- * @param  {String}   host  [Optional] Hostname this route is for (default is all)
- * @return {Object}         Instance
+ * @param  {String}   host  [Optional] Virtual host, default is `all`
+ * @return {Object}         TurtleIO instance
  */
-factory.prototype.post = function ( route, fn, host ) {
-	host      = host || "all";
-	var self  = this,
-	    timer = new Date();
-
-	$.route.set( route, function ( req, res ) {
-		handler.call( self, req, res, fn );
-	}, "post", host );
-
-	// Caching route
-	if ( !this.config.routesHash[host] ) {
-		this.config.routesHash[host] = {post: []};
-	}
-	else if ( !this.config.routesHash[host].post ) {
-		this.config.routesHash[host].post = [];
-	}
-
-	this.config.routesHash[host].post.push( route );
-
-	if ( this.config.probes ) {
-		dtp.fire( "route-set", function () {
-			return [host || "*", route, "POST", diff( timer )];
-		});
-	}
-
-	return this;
+TurtleIO.prototype.post = function ( route, fn, host ) {
+	return this.handler( "post", route, fn, host );
 };
 
 /**
- * Sets a DELETE route
+ * Sets a PUT handler
  *
- * @method put
- * @public
- * @param  {RegExp}   route Route
+ * @method delete
+ * @param  {String}   route RegExp pattern
  * @param  {Function} fn    Handler
- * @param  {String}   host  [Optional] Hostname this route is for (default is all)
- * @return {Object}         Instance
+ * @param  {String}   host  [Optional] Virtual host, default is `all`
+ * @return {Object}         TurtleIO instance
  */
-factory.prototype.put = function ( route, fn, host ) {
-	host      = host || "all";
-	var self  = this,
-	    timer = new Date();
-
-	$.route.set( route, function ( req, res ) {
-		handler.call( self, req, res, fn );
-	}, "put", host );
-
-	// Caching route
-	if ( !this.config.routesHash[host] ) {
-		this.config.routesHash[host] = {put: []};
-	}
-	else if ( !this.config.routesHash[host].put ) {
-		this.config.routesHash[host].put = [];
-	}
-
-	this.config.routesHash[host].put.push( route );
-
-	if ( this.config.probes ) {
-		dtp.fire( "route-set", function () {
-			return [host || "*", route, "PUT", diff( timer )];
-		});
-	}
-
-	return this;
+TurtleIO.prototype.put = function ( route, fn, host ) {
+	return this.handler( "put", route, fn, host );
 };

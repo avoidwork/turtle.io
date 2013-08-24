@@ -2,16 +2,14 @@
  * Determines which verbs are allowed against a URL
  *
  * @method allows
- * @public
  * @param  {String} uri  URL to query
  * @param  {String} host Hostname
  * @return {String}      Allowed methods
  */
-factory.prototype.allows = function ( uri, host ) {
+TurtleIO.prototype.allows = function ( uri, host ) {
 	var self   = this,
 	    result = [],
-	    verbs  = ["DELETE", "GET", "POST", "PUT", "PATCH"],
-	    timer  = new Date();
+	    verbs  = ["DELETE", "GET", "POST", "PUT", "PATCH"];
 
 	verbs.each( function ( i ) {
 		if ( self.allowed( i, uri, host ) ) {
@@ -20,12 +18,6 @@ factory.prototype.allows = function ( uri, host ) {
 	});
 
 	result = result.join( ", " ).replace( "GET", "GET, HEAD, OPTIONS" );
-
-	if ( this.config.probes ) {
-		dtp.fire( "allows", function () {
-			return [host, uri, diff( timer )];
-		});
-	}
 
 	return result;
 };

@@ -2,13 +2,12 @@
  * Creates a cipher from two input parameters
  *
  * @method cipher
- * @public
  * @param  {String}  arg    String to encrypt
  * @param  {Boolean} encode [Optional] Encrypt or decrypt `arg` using `salt`, default is `true`
  * @param  {String}  salt   [Optional] Salt for encryption
  * @return {String}         Result of crypto operation
  */
-factory.prototype.cipher = function ( arg, encode, salt ) {
+TurtleIO.prototype.cipher = function ( arg, encode, salt ) {
 	var cipher, crypted;
 
 	try {

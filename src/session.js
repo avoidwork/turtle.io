@@ -1,10 +1,11 @@
 /**
  * Sessions
  *
- * @public
+ * @class sessions
  * @type {Object}
+ * @todo too slow!
  */
-factory.prototype.session = {
+TurtleIO.prototype.session = {
 	/**
 	 * Creates a session
 	 *
@@ -41,7 +42,7 @@ factory.prototype.session = {
 	 * @public
 	 * @param  {Object} req HTTP(S) request Object
 	 * @param  {Object} res HTTP(S) response Object
-	 * @return {Object}     Instance
+	 * @return {Object}     TurtleIO instance
 	 */
 	destroy : function ( req, res ) {
 		var instance = this.server,
@@ -58,9 +59,6 @@ factory.prototype.session = {
 
 			// Deleting sesssion
 			delete instance.sessions[id];
-
-			// Announcing deletion of session
-			instance.sendMessage( MSG_SES_DEL, id, true );
 		}
 
 		return instance;
@@ -108,7 +106,7 @@ factory.prototype.session = {
 	 * @method set
 	 * @public
 	 * @param  {Object} arg Message argument from Master
-	 * @return {Object}     Instance
+	 * @return {Object}     TurtleIO instance
 	 */
 	set : function ( arg ) {
 		if ( this.sessions[arg.id] === undefined ) {
@@ -162,9 +160,6 @@ Session.prototype.save = function () {
 			body[k] = v;
 		}
 	});
-
-	// Announcing session shape
-	this._server.sendMessage( MSG_SES_SET, {id: this._id, session: body}, true );
 };
 
 /**
@@ -176,5 +171,4 @@ Session.prototype.save = function () {
  */
 Session.prototype.expire = function () {
 	delete this._server.sessions[this._id];
-	this._server.sendMessage( MSG_SES_DEL, this._id, true );
 };

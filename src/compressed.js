@@ -2,7 +2,6 @@
  * Pipes compressed asset to Client, or schedules the creation of the asset
  *
  * @method compressed
- * @public
  * @param  {Object}  req     HTTP(S) request Object
  * @param  {Object}  res     HTTP(S) response Object
  * @param  {String}  etag    Etag header
@@ -10,12 +9,10 @@
  * @param  {Number}  status  Response status code
  * @param  {Object}  headers HTTP headers
  * @param  {Boolean} local   [Optional] Indicates `arg` is a file path, default is `false`
- * @param  {Object}  timer   [Optional] Date instance
  * @return {Objet}           Instance
  */
-factory.prototype.compressed = function ( req, res, etag, arg, status, headers, local, timer ) {
+TurtleIO.prototype.compressed = function ( req, res, etag, arg, status, headers, local ) {
 	local           = ( local === true );
-	timer           = timer || new Date();
 	var self        = this,
 	    compression = this.compression( req.headers["user-agent"], req.headers["accept-encoding"] ),
 	    url         = this.url( req ),
@@ -37,22 +34,9 @@ factory.prototype.compressed = function ( req, res, etag, arg, status, headers, 
 	facade = function ( etag, path, compression, req, res ) {
 		self.cache( etag, path, compression, false, function () {
 			raw = fs.createReadStream( path );
-
 			raw.pipe( zlib[REGEX_DEF.test( compression ) ? "createDeflate" : "createGzip"]() ).pipe( res );
-
-			if ( self.config.probes ) {
-				dtp.fire( "respond", function () {
-					return [req.headers.host, req.method, req.url, status, diff( timer )];
-				});
-			}
 		} );
 	};
-
-	if ( this.config.probes ) {
-		dtp.fire( "compressed", function () {
-			return [etag, local ? "local" : "custom", req.headers.host, req.url, diff( timer )];
-		});
-	}
 
 	// Local asset, piping result directly to Client
 	if ( local ) {
@@ -64,12 +48,6 @@ factory.prototype.compressed = function ( req, res, etag, arg, status, headers, 
 					if ( ready ) {
 						raw = fs.createReadStream( npath );
 						raw.pipe( res );
-
-						if ( self.config.probes ) {
-							dtp.fire( "respond", function () {
-								return [req.headers.host, req.method, req.url, status, diff( timer )];
-							});
-						}
 					}
 					else {
 						facade( etag, arg, compression, req, res );
@@ -83,12 +61,6 @@ factory.prototype.compressed = function ( req, res, etag, arg, status, headers, 
 		else {
 			raw = fs.createReadStream( arg );
 			raw.pipe( res );
-
-			if ( this.config.probes ) {
-				dtp.fire( "respond", function () {
-					return [req.headers.host, req.method, req.url, status, diff( timer )];
-				});
-			}
 		}
 	}
 	// Custom or proxy route result
@@ -101,32 +73,19 @@ factory.prototype.compressed = function ( req, res, etag, arg, status, headers, 
 				if ( ready ) {
 					raw = fs.createReadStream( npath );
 					raw.pipe( res );
-
-					if ( self.config.probes ) {
-						dtp.fire( "respond", function () {
-							return [req.headers.host, req.method, req.url, status, diff( timer )];
-						});
-					}
 				}
 				// Compressing asset & writing to disk after responding
 				else {
-					body = encode( arg );
-
+					body = self.encode( arg );
 					zlib[compression]( body, function ( e, compressed ) {
 						if ( e ) {
-							self.error( req, res, e, timer );
+							self.error( req, res, e );
 						}
 						else {
-							self.respond( req, res, compressed, status, headers, timer, false );
-
+							self.respond( req, res, compressed, status, headers, false );
 							fs.writeFile( npath, compressed, function ( e ) {
 								if ( e ) {
 									self.log( e, true, false );
-								}
-								else if ( self.config.probes ) {
-									dtp.fire( "compress", function () {
-										return [etag, npath, compression, diff( timer )];
-									});
 								}
 							});
 						}
@@ -135,7 +94,7 @@ factory.prototype.compressed = function ( req, res, etag, arg, status, headers, 
 			});
 		}
 		else {
-			this.respond( req, res, arg, status, headers, timer, false );
+			this.respond( req, res, arg, status, headers, false );
 		}
 	}
 

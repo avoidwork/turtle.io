@@ -1,14 +1,11 @@
 /**
- * Restarts instance
+ * Restarts the instance
  *
  * @method restart
- * @public
- * @return {Object} instance
+ * @return {Object} TurtleIO instance
  */
-factory.prototype.restart = function () {
-	if ( cluster.isMaster ) {
-		this.stop().start();
-	}
+TurtleIO.prototype.restart = function () {
+	var config = this.config;
 
-	return this;
+	this.stop().start( config );
 };

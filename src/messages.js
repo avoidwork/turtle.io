@@ -1,10 +1,9 @@
 /**
  * HTTP (semantic) status messages
  *
- * @private
  * @type {Object}
  */
-var messages = {
+TurtleIO.prototype.messages = {
 	SUCCESS             : "Successful",
 	CREATED             : "Created",
 	ACCEPTED            : "Accepted",

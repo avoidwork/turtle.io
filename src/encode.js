@@ -2,11 +2,10 @@
  * Encodes `obj` as JSON if applicable
  *
  * @method encode
- * @private
  * @param  {Mixed} obj Object to encode
  * @return {Mixed}     Original Object or JSON string
  */
-var encode = function ( obj ) {
+TurtleIO.prototype.encode = function ( obj ) {
 	var result;
 
 	// Do not want to coerce this Object to a String!

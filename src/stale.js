@@ -4,11 +4,11 @@
  * @method stale
  * @public
  * @param  {String} url LRUItem key
- * @return {Object}     Instance
+ * @return {Object}     TurtleIO instance
  */
-factory.prototype.stale = function ( url ) {
+TurtleIO.prototype.stale = function ( url ) {
 	var self   = this,
-	    cached = this.registry.cache[url],
+	    cached = this.etags.cache[url],
 	    path   = this.config.tmp + "/",
 	    gz, df;
 

@@ -2,13 +2,12 @@
  * Verifies there's a cached version of the compressed file
  *
  * @method cached
- * @public
  * @param  {String}   filename Filename (etag)
  * @param  {String}   format   Type of compression (gzip or deflate)
  * @param  {Function} fn       Callback function
- * @return {Objet}             Instance
+ * @return {Objet}             TurtleIO instance
  */
-factory.prototype.cached = function ( filename, format, fn ) {
+TurtleIO.prototype.cached = function ( filename, format, fn ) {
 	var ext  = REGEX_DEF.test( format ) ? ".df" : ".gz",
 	    path = this.config.tmp + "/" + filename + ext;
 

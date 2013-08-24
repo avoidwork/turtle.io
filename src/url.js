@@ -1,11 +1,10 @@
 /**
- * Concatinates the request URL
+ * Constructs a URL
  *
  * @method url
- * @public
- * @param  {Object} req HTTP(S) request Object
- * @return {String}     Complete request URL
+ * @param  {Object} req Request Object
+ * @return {String}     Requested URL
  */
-factory.prototype.url = function ( req ) {
+TurtleIO.prototype.url = function ( req ) {
 	return "http" + ( this.config.cert !== undefined ? "s" : "" ) + "://" + req.headers.host + req.url;
 };

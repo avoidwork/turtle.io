@@ -2,15 +2,14 @@
  * Sets response headers
  *
  * @method headers
- * @public
  * @param  {Object}  req             HTTP(S) request Object
  * @param  {Object}  res             HTTP(S) response Object
  * @param  {Number}  status          [Optional] Response status code
  * @param  {Object}  responseHeaders [Optional] HTTP headers to decorate the response with
- * @return {Objet}                   Instance
+ * @return {Objet}                   TurtleIO instance
  */
-factory.prototype.headers = function ( req, res, status, responseHeaders ) {
-	status      = status || codes.SUCCESS;
+TurtleIO.prototype.headers = function ( req, res, status, responseHeaders ) {
+	status      = status || this.codes.SUCCESS;
 	var get     = REGEX_GET.test( req.method ),
 	    headers = $.clone( this.config.headers );
 
@@ -47,24 +46,16 @@ factory.prototype.headers = function ( req, res, status, responseHeaders ) {
 	// Decorating "Transfer-Encoding" header
 	headers["Transfer-Encoding"] = "chunked";
 
-	// Setting the response status code
-	res.statusCode = status;
-
 	// Removing headers not wanted in the response
-	if ( !get || status >= codes.BAD_REQUEST ) {
+	if ( !get || status >= this.codes.BAD_REQUEST ) {
 		delete headers["Cache-Control"];
 	}
 
-	if ( ( status >= codes.FORBIDDEN && status <= codes.NOT_FOUND ) || ( status >= codes.SERVER_ERROR ) ) {
+	if ( ( status >= this.codes.FORBIDDEN && status <= this.codes.NOT_FOUND ) || ( status >= this.codes.SERVER_ERROR ) ) {
 		delete headers.Allow;
 		delete headers["Access-Control-Allow-Methods"];
 		delete headers["Last-Modified"];
 	}
 
-	// Decorating response with headers
-	$.iterate( headers, function ( v, k ) {
-		res.setHeader( k, v );
-	});
-
-	return this;
+	return headers;
 };
