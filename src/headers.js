@@ -11,17 +11,15 @@
 TurtleIO.prototype.headers = function ( req, res, status, responseHeaders ) {
 	status      = status || this.codes.SUCCESS;
 	var get     = REGEX_GET.test( req.method ),
-	    headers = $.clone( this.config.headers );
-
-	if ( !( responseHeaders instanceof Object ) ) {
-		responseHeaders = {};
-	}
+	    headers = this.config.headers;
 
 	// Decorating response headers
-	$.merge( headers, responseHeaders );
+	if ( responseHeaders instanceof Object ) {
+		$.merge( headers, responseHeaders );
+	}
 
 	// If passing an empty Object, make sure to set `Allow`
-	if ( headers.Allow.isEmpty() && status !== 404 && status !== 405 ) {
+	if ( !headers.Allow || headers.Allow.isEmpty() && status !== 404 && status !== 405 ) {
 		headers.Allow = "GET";
 	}
 

@@ -11,6 +11,10 @@ TurtleIO.prototype.start = function ( config, err ) {
 
 	config = config || {};
 
+	// Merging custom with default config
+	$.merge( config, defaultConfig );
+
+	// Overriding default error handler
 	if ( typeof err === "function" ) {
 		this.error = err;
 	}
@@ -36,14 +40,16 @@ TurtleIO.prototype.start = function ( config, err ) {
 
 	// Setting a default GET route
 	if ( !this.handlers.get.routes.contains( ".*" ) ) {
-		this.get( ".*", function ( req, res ) {
+		this.get( "/.*", function ( req, res ) {
 			self.request( req, res );
 		}, "all" );
 	}
 
 	// Starting server
-	if ( this.config.cert !== undefined ) {
-		console.log("ssl!");
+	if ( config.ssl.cert !== null && config.ssl.key !== null ) {
+		this.server = https.createServer( $.merge( config.ssl, {port: config.port, host: config.ip} ), function ( req, res ) {
+			self.route( req, res );
+		} ).listen( config.port, config.ip );
 	}
 	else {
 		this.server = http.createServer( function ( req, res ) {

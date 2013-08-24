@@ -34,7 +34,7 @@ TurtleIO.prototype.get = function ( route, fn, host ) {
  * @return {Object}         TurtleIO instance
  */
 TurtleIO.prototype.patch = function ( route, fn, host ) {
-	return this.handler( "path", route, fn, host );
+	return this.handler( "patch", route, fn, host );
 };
 
 /**

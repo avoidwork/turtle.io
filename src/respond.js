@@ -12,15 +12,15 @@
  */
 TurtleIO.prototype.respond = function ( req, res, body, status, headers, compress ) {
 	status  = status  || 200;
-	headers = headers || {Allow: "GET, HEAD, OPTIONS", "Content-Type": "text/plain"};
+	headers = this.headers( headers || {"Content-Type": "text/plain"} );
 
-	if ( compress && this.config.compress ) {
+	//if ( compress && this.config.compress ) {
 		// compress here
-	}
+	//}
 
 	res.statusCode = status;
-	res.writeHead( status, this.headers( headers ) );
-	res.end( body );
+	res.writeHead( status, headers );
+	res.end( "hi" );
 
 	return this;
 };

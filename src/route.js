@@ -9,19 +9,19 @@
 TurtleIO.prototype.route = function ( req, res ) {
 	var self   = this,
 	    url    = this.url( req ),
-	    parsed = $.parse( req.url ),
+	    parsed = $.parse( url ),
 	    method = req.method.toLowerCase(),
-	    cached, host, payload, route;
+	    cached, handler, host, payload, route;
 
 	// Finding a matching vhost
 	this.vhosts.each( function ( i ) {
-		if ( i.test( parsed.host ) ) {
+		if ( i.test( parsed.hostname ) ) {
 			return ! ( host = i.toString().replace( /^\/\^|\$\/$/g, "" ) );
 		}
 	} );
 
 	if ( !host ) {
-		host = this.config["default"];
+		host = this.config["default"] || "all";
 	}
 
 	// Looking for a match
@@ -67,7 +67,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 		}
 		// Looking in LRU cache for Etag
 		else if ( REGEX_GET.test( req.method ) ) {
-			cached = self.cache.get( url );
+			cached = self.etags.get( url );
 
 			// Sending a 304 if Client is making a GET & has current representation
 			if ( cached && !REGEX_HEAD.test( req.method ) && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === cached.etag ) {

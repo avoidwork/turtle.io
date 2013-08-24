@@ -11,8 +11,8 @@
 TurtleIO.prototype.handler = function ( method, route, fn, host ) {
 	host = host || "all";
 
-	if ( !!this.handlers[method].hosts[host] ) {
-		this.handlers[method].hosts[host] = {};
+	if ( this.handlers.all.hosts[host] === undefined ) {
+		this.host( host );
 	}
 
 	this.handlers[method].routes.push( route );
