@@ -2,15 +2,14 @@
  * Send a response
  *
  * @method respond
- * @param  {Object}  req      Request Object
- * @param  {Object}  res      Response Object
- * @param  {Mixed}   body     Primitive or Buffer
- * @param  {Number}  status   [Optional] HTTP status, default is `200`
- * @param  {Object}  headers  [Optional] HTTP headers
- * @param  {Boolean} compress [Optional] Compress response is supported, default is `true`
- * @return {Object}           TurtleIO instance
+ * @param  {Object}  req     Request Object
+ * @param  {Object}  res     Response Object
+ * @param  {Mixed}   body    Primitive or Buffer
+ * @param  {Number}  status  [Optional] HTTP status, default is `200`
+ * @param  {Object}  headers [Optional] HTTP headers
+ * @return {Object}          TurtleIO instance
  */
-TurtleIO.prototype.respond = function ( req, res, body, status, headers, compress ) {
+TurtleIO.prototype.respond = function ( req, res, body, status, headers ) {
 	var ua       = req.headers["user-agent"],
 	    encoding = req.headers["accept-encoding"],
 	    type;

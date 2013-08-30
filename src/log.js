@@ -6,17 +6,19 @@
  * @return {Object}    TurtleIO instance
  */
 TurtleIO.prototype.log = function ( msg ) {
-	var err = !!msg.callstack;
+	var e = msg instanceof Error;
 
 	// Determining what to log
-	msg = msg.callstack || msg;
+	if ( e ) {
+		msg = msg.callstack;
+	}
 
 	// Dispatching to syslog server
-	syslog.log( syslog[!err ? "LOG_INFO" : "LOG_ERR"], msg );
+	syslog.log( syslog[!e ? "LOG_INFO" : "LOG_ERR"], msg );
 
 	// Dispatching to STDOUT
 	if ( this.config.logs.stdout ) {
-		console[!err ? "log" : "error"]( msg );
+		console[!e ? "log" : "error"]( msg );
 	}
 
 	return this;
