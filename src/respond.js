@@ -28,8 +28,8 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, compres
 	res.writeHead( status, headers );
 
 	// Determining if response should be compressed
-	if ( compress && this.config.compress && ( type = this.compression( ua, encoding ) ) && type !== null ) {
-		res.end( body );
+	if ( compress && this.config.compress && ( type = this.compression( ua, encoding, headers["Content-Type"] ) ) && type !== null ) {
+		this.compress( body, type ).pipe( res );
 	}
 	else {
 		res.end( body );

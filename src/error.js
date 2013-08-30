@@ -11,8 +11,7 @@ TurtleIO.prototype.error = function ( req, res ) {
 	    method = req.method.toLowerCase(),
 	    status = this.codes.NOT_FOUND,
 	    url    = this.url( req ),
-	    parsed = $.parse( url ),
-	    host   = parsed.hostname;
+	    host   = $.parse( url ).hostname;
 
 	// If valid, determine what kind of error to respond with
 	if ( !REGEX_GET.test( method ) && !REGEX_HEAD.test( method ) ) {

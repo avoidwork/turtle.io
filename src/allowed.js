@@ -9,7 +9,6 @@
  */
 TurtleIO.prototype.allowed = function ( method, uri, host ) {
 	host       = host || "all";
-	method     = method.toLowerCase();
 	var result = false,
 	    routes = this.routes( method, host ).concat( this.routes( "all", host ) );
 
