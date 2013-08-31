@@ -25,7 +25,7 @@ TurtleIO.prototype.write = function ( path, req, res ) {
 
 		fs.lstat( path, function ( e, stat ) {
 			if ( e ) {
-				self.error( req, res, e );
+				self.error( req, res );
 			}
 			else {
 				var etag = "\"" + self.etag( url, stat.size, stat.mtime ) + "\"";
@@ -33,7 +33,7 @@ TurtleIO.prototype.write = function ( path, req, res ) {
 				if ( !req.headers.hasOwnProperty( "etag" ) || req.headers.etag === etag ) {
 					fs.writeFile( path, body, function ( e ) {
 						if ( e ) {
-							self.error( req, req, e );
+							self.error( req, req );
 						}
 						else {
 							status = put ? self.codes.NO_CONTENT : self.codes.CREATED;

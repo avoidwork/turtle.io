@@ -68,7 +68,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 						// Removing from LRU when invalid
 						$.delay( function () {
 							self.unregister( url );
-						}, delay );
+						}, delay, url );
 					}
 				}
 

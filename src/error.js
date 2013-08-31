@@ -2,13 +2,12 @@
  * Error handler for requests
  *
  * @method error
- * @param  {Object} req   HTTP(S) request Object
- * @param  {Object} res   HTTP(S) response Object
- * @return {Object}       TurtleIO instance
+ * @param  {Object} req HTTP(S) request Object
+ * @param  {Object} res HTTP(S) response Object
+ * @return {Object}     TurtleIO instance
  */
 TurtleIO.prototype.error = function ( req, res ) {
-	var body   = "",
-	    method = req.method.toLowerCase(),
+	var method = req.method.toLowerCase(),
 	    status = this.codes.NOT_FOUND,
 	    url    = this.url( req ),
 	    host   = $.parse( url ).hostname;
@@ -23,9 +22,5 @@ TurtleIO.prototype.error = function ( req, res ) {
 		}
 	}
 
-	body = this.page( status, host );
-
-	this.respond( req, res, body, status, {"Cache-Control": "no-cache"}, false );
-
-	return this;
+	return this.respond( req, res, this.page( status, host ), status, {"Cache-Control": "no-cache"}, false );
 };
