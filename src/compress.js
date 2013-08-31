@@ -2,30 +2,38 @@
  * Pipes compressed asset to Client
  *
  * @method compressed
- * @param  {Object}  stream Stream or Buffer
- * @param  {Object}  type   gzip (gz) or deflate (df)
- * @param  {String}  etag   Etag
- * @param  {Object}  res    HTTP(S) response Object
- * @return {Objet}          TurtleIO instance
+ * @param  {Object}  body Response body
+ * @param  {Object}  type gzip (gz) or deflate (df)
+ * @param  {String}  etag Etag
+ * @param  {Object}  res  HTTP(S) response Object
+ * @return {Objet}        TurtleIO instance
  */
-TurtleIO.prototype.compress = function ( stream, type, etag, res ) {
-	var fn, fp;
+TurtleIO.prototype.compress = function ( body, type, etag, res ) {
+	var method = REGEX_DEF.test( type ) ? "createDeflate" : "createGzip",
+	    fn;
 
 	if ( etag ) {
 		fn = this.config.tmp + "/" + etag + "." + type;
 		fs.exists( fn, function ( exist ) {
 			if ( exist ) {
-				fp = fs.createReadStream( fn );
-				fp.pipe( res );
+				fs.createReadStream( fn ).pipe( res );
 			}
 			else {
-				fp = fs.createWriteStream( fn );
-				zlib[type]( stream ).pipe( fp ).pipe( res );
+				if ( typeof body.pipe === "function" ) {
+					body.pipe( zlib[method]() ).pipe( fs.createWriteStream( fn ) );
+					body.pipe( zlib[method]() ).pipe( res );
+				}
+				else {
+					fs.createReadStream( body ).pipe( zlib[method]() ).pipe( fs.createWriteStream( fn ) );
+					fs.createReadStream( body ).pipe( zlib[method]() ).pipe( res );
+				}
 			}
 		} );
 	}
+	// If Buffer, what do you do?
 	else {
-		zlib[type]( stream ).pipe( res );
+		zlib[type]( body ).pipe( res );
+		zlib[type]( body ).pipe( fs.createWriteStream( fn ) );
 	}
 
 	return this;

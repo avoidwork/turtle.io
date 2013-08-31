@@ -74,7 +74,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 
 				// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
 				if ( req.headers["if-none-match"] === etag ) {
-					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, resHeaders, false );
+					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, resHeaders );
 				}
 				else {
 					if ( REGEX_HEAD.test( req.method.toLowerCase() ) ) {
@@ -90,15 +90,15 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 						}
 					}
 
-					self.respond( req, res, arg, xhr.status, resHeaders, false );
+					self.respond( req, res, arg, xhr.status, resHeaders );
 				}
 			}
 			else {
-				self.respond( req, res, arg, xhr.status, {Server: self.config.headers.Server}, false );
+				self.respond( req, res, arg, xhr.status, {Server: self.config.headers.Server} );
 			}
 		}
 		catch (e) {
-			self.respond( req, res, self.page( self.codes.BAD_GATEWAY, self.hostname( req ) ), self.codes.BAD_GATEWAY, {Allow: "GET"}, false );
+			self.respond( req, res, self.page( self.codes.BAD_GATEWAY, self.hostname( req ) ), self.codes.BAD_GATEWAY, {Allow: "GET"} );
 			self.log( e, true );
 		}
 	};

@@ -37,15 +37,15 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 
 				// Client has current version
 				if ( ( req.headers["if-none-match"] === etag ) || ( !req.headers["if-none-match"] && Date.parse( req.headers["if-modified-since"] ) >= stat.mtime ) ) {
-					this.respond( req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, headers, false );
+					this.respond( req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, headers );
 				}
 				// Sending current version
 				else {
-					this.respond( req, res, fs.createReadStream( path ), this.codes.SUCCESS, headers, true, true );
+					this.respond( req, res, path, this.codes.SUCCESS, headers, true );
 				}
 			}
 			else {
-				this.respond( req, res, this.messages.NO_CONTENT, this.codes.SUCCESS, headers, false );
+				this.respond( req, res, this.messages.NO_CONTENT, this.codes.SUCCESS, headers );
 			}
 		}
 		else if ( method === "DELETE" && del ) {
@@ -56,7 +56,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 					self.error( req, req );
 				}
 				else {
-					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NO_CONTENT, {}, false );
+					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NO_CONTENT, {} );
 				}
 			});
 		}
@@ -80,7 +80,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 					self.error( req, req );
 				}
 				else {
-					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NO_CONTENT, {}, false );
+					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NO_CONTENT, {} );
 				}
 			});
 		}

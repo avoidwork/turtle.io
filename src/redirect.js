@@ -17,7 +17,7 @@ TurtleIO.prototype.redirect = function ( route, url, host, permanent ) {
 	this.get( route, function ( req, res ) {
 		var rewrite = ( pattern.exec( req.url ) || [] ).length > 0;
 
-		self.respond( req, res, self.messages.NO_CONTENT, code, {"Location": ( rewrite ? req.url.replace( pattern, url ) : url )}, false );
+		self.respond( req, res, self.messages.NO_CONTENT, code, {"Location": ( rewrite ? req.url.replace( pattern, url ) : url )} );
 	}, host);
 
 	return this;

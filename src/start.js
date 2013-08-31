@@ -6,14 +6,14 @@
  * @param  {Function} err    Error handler
  * @return {Object}          TurtleIO instance
  */
-TurtleIO.prototype.start = function ( config, err ) {
+TurtleIO.prototype.start = function ( cfg, err ) {
 	var self = this,
-	    pages;
+	    config, pages;
 
-	config = config || {};
+	config = $.clone( defaultConfig );
 
 	// Merging custom with default config
-	$.merge( config, defaultConfig );
+	$.merge( config, cfg || {} );
 
 	// Overriding default error handler
 	if ( typeof err === "function" ) {
@@ -37,6 +37,9 @@ TurtleIO.prototype.start = function ( config, err ) {
 		this.config.headers.Server = "turtle.io/{{VERSION}} (abaaso/" + $.version + " node.js/" + process.versions.node.replace( /^v/, "" ) + process.platform.capitalize() + " V8/" + process.versions.v8.toString().trim() + ")";
 	}
 
+	// Setting acceptable lag
+	toobusy.maxLag( this.config.lag );
+
 	// Setting default routes
 	this.host( "all" );
 
@@ -47,8 +50,8 @@ TurtleIO.prototype.start = function ( config, err ) {
 
 	// Setting a default GET route
 	if ( !this.handlers.get.routes.contains( ".*" ) ) {
-		this.get( "/.*", function ( req, res ) {
-			self.request( req, res );
+		this.get( "/.*", function ( req, res, host ) {
+			self.request( req, res, host );
 		}, "all" );
 	}
 
@@ -82,6 +85,11 @@ TurtleIO.prototype.start = function ( config, err ) {
 			console.log( "Started turtle.io on port " + config.port );
 		}
 	});
+
+	// For toobusy()
+	process.on( "uncaughtException", function ( e ) {
+		self.log( e );
+	} );
 
 	return this;
 };

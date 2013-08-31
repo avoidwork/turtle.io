@@ -18,10 +18,8 @@
 	"index"   : ["index.htm", "index.html"],
 	"lag"     : 50,
 	"logs"    : {
-		"file"   : "turtleio.log",
 		"time"   : "D/MMM/YYYY:HH:mm:ss ZZ",
 		"format" : "{{host}} - {{user}} [{{time}}] \"{{method}} {{path}} HTTP/1.1\" {{status}} {{length}} {{referer}} \"{{user-agent}}\"",
-		"flush"  : 1000,
 		"stdout" : true
 	},
 	"port"    : 8000,

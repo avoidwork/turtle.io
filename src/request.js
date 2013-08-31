@@ -3,28 +3,29 @@
  *
  * @method request
  * @public
- * @param  {Object} req   HTTP(S) request Object
- * @param  {Object} res   HTTP(S) response Object
- * @return {Object}       Instance
+ * @param  {Object} req  HTTP(S) request Object
+ * @param  {Object} res  HTTP(S) response Object
+ * @param  {String} host [Optional] Virtual host
+ * @return {Object}      TurtleIO instance
  */
-TurtleIO.prototype.request = function ( req, res ) {
+TurtleIO.prototype.request = function ( req, res, host ) {
 	var self    = this,
-	    parsed  = $.parse( this.url( req ) ),
-	    host    = parsed.hostname,
+	    url     = this.url( req ),
+	    parsed  = $.parse( url ),
 	    method  = req.method,
 	    handled = false,
 	    found   = false,
 	    count, path, nth, root;
 
 	// Can't find the hostname in vhosts, try the default (if set) or send a 500
-	if ( ! ( host in this.config.vhosts ) ) {
-		this.config.vhostsList.each( function ( i, idx ) {
-			if ( self.config.vhostsRegExp[idx].test( host ) ) {
+	if ( !host || !( host in this.config.vhosts ) ) {
+		this.vhostsRegExp.each( function ( i, idx ) {
+			if ( i.test( req.host ) ) {
 				found = true;
-				host  = i;
+				host  = self.vhosts[idx];
 				return false;
 			}
-		});
+		} );
 
 		if ( !found ) {
 			if ( this.config["default"] !== null ) {
@@ -46,10 +47,10 @@ TurtleIO.prototype.request = function ( req, res ) {
 			self.error( req, res );
 		}
 		else if ( !stats.isDirectory() ) {
-			self.handle( path, parsed.href, false, stats );
+			self.handle( req, res, path, parsed.href, false, stats );
 		}
 		else if ( stats.isDirectory() && !REGEX_GET.test( method ) ) {
-			self.handle( path, parsed.href, true );
+			self.handle( req, res, path, parsed.href, true );
 		}
 		else {
 			count = 0;
@@ -57,24 +58,15 @@ TurtleIO.prototype.request = function ( req, res ) {
 			path += "/";
 
 			self.config.index.each( function ( i ) {
-				fs.exists( path + i, function ( exists ) {
-					if ( !handled ) {
-						if ( exists ) {
-							handled = true;
-							fs.lstat( path + i, function ( e, stats ) {
-								if ( e ) {
-									self.error( req, res );
-								}
-								else {
-									self.handle( path + i, parsed.href + i, false, stats );
-								}
-							} );
-						}
-						else if ( ++count === nth ) {
-							self.error( req, res );
-						}
+				fs.lstat( path + i, function ( e, stats ) {
+					if ( !e && !handled ) {
+						handled = true;
+						self.handle( req, res, path + i, parsed.href + i, false, stats );
 					}
-				});
+					else if ( ++count === nth && !handled ) {
+						self.error( req, res );
+					}
+				} );
 			});
 		}
 	});

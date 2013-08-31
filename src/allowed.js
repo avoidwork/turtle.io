@@ -9,18 +9,36 @@
  */
 TurtleIO.prototype.allowed = function ( method, uri, host ) {
 	host       = host || "all";
-	var result = false,
-	    routes = this.routes( method, host ).concat( this.routes( "all", host ) );
+	var self   = this,
+	    result = false,
+	    exist  = false,
+	    d, hosts;
 
-	if ( host !== "all" ) {
-		routes = routes.concat( this.routes( method, "all" ).concat( this.routes( "all", "all" ) ) );
-	}
+	hosts = self.handlers[method].hosts;
+	d     = hosts[self.config["default"]];
+	exist = ( hosts[host] );
 
-	routes.each( function ( i ) {
-		if ( new RegExp( "^" + i + "$" ).test( uri ) ) {
+	this.handlers[method].regex.each( function ( i, idx ) {
+		var route = self.handlers[method].routes[idx];
+
+		if ( i.test( uri ) && ( ( exist && route in hosts[host] ) || route in d || route in hosts.all ) ) {
 			return !( result = true );
 		}
 	});
+
+	if ( !result ) {
+		hosts = self.handlers.all.hosts;
+		d     = hosts[self.config["default"]];
+		exist = ( hosts[host] );
+
+		this.handlers.all.regex.each( function ( i, idx ) {
+			var route = self.handlers.all.routes[idx];
+
+			if ( i.test( uri ) && ( ( exist && route in hosts[host] ) || route in d || route in hosts.all ) ) {
+				return !( result = true );
+			}
+		});
+	}
 
 	return result;
 };

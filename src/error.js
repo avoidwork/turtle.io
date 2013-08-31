@@ -22,5 +22,5 @@ TurtleIO.prototype.error = function ( req, res ) {
 		}
 	}
 
-	return this.respond( req, res, this.page( status, host ), status, {"Cache-Control": "no-cache"}, false );
+	return this.respond( req, res, this.page( status, host ), status, {"Cache-Control": "no-cache"} );
 };

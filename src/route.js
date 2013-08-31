@@ -14,9 +14,9 @@ TurtleIO.prototype.route = function ( req, res ) {
 	    cached, handler, host, payload, route;
 
 	// Finding a matching vhost
-	this.vhosts.each( function ( i ) {
+	this.vhostsRegExp.each( function ( i, idx ) {
 		if ( i.test( parsed.hostname ) ) {
-			return ! ( host = i.toString().replace( /^\/\^|\$\/$/g, "" ) );
+			return !( host = self.vhosts[idx] );
 		}
 	} );
 
@@ -62,7 +62,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 			req.on( "end", function () {
 				req.body = payload;
-				handler.call( self, req, res );
+				handler.call( self, req, res, host );
 			});
 		}
 		// Looking in LRU cache for Etag
@@ -71,14 +71,14 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 			// Sending a 304 if Client is making a GET & has current representation
 			if ( cached && !REGEX_HEAD.test( method ) && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === cached.etag ) {
-				this.respond( req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, {"Content-Type": cached.mimetype, Etag: "\"" + cached.etag + "\""}, false );
+				this.respond( req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, {"Content-Type": cached.mimetype, Etag: "\"" + cached.etag + "\""} );
 			}
 			else {
-				handler.call( this, req, res );
+				handler.call( this, req, res, host );
 			}
 		}
 		else {
-			handler.call( this, req, res );
+			handler.call( this, req, res, host );
 		}
 	}
 	else {
