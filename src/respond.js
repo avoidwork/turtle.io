@@ -27,8 +27,8 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			headers["Content-Type"] = "application/json";
 		}
 
-		// Ensuring an Etag
 		if ( req.method === "GET" ) {
+			// Ensuring an Etag
 			if ( !headers.Etag ) {
 				headers.Etag = "\"" + this.etag( url, body.length || 0, headers["Last-Modified"] || 0 ) + "\"";
 			}
@@ -43,6 +43,10 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 
 	// Determining if response should be compressed
 	if ( body && this.config.compress && ( type = this.compression( ua, encoding, headers["Content-Type"] ) ) && type !== null ) {
+		if ( body instanceof Buffer ) {
+			headers["Content-Length"] = body.toString().length;
+		}
+
 		headers["Content-Encoding"] = type;
 		res.writeHead( status, headers );
 		this.compress( body, type, headers.Etag.replace( /"/g, "" ), res );
@@ -52,6 +56,10 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		fs.createReadStream( body ).pipe( res );
 	}
 	else {
+		if ( body instanceof Buffer ) {
+			headers["Content-Length"] = body.toString().length;
+		}
+
 		res.writeHead( status, headers );
 		res.end( body );
 	}
