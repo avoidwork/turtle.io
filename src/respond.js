@@ -11,24 +11,30 @@
  * @return {Object}          TurtleIO instance
  */
 TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) {
-	var ua       = req.headers["user-agent"],
+	var url      = this.url( req ),
+	    ua       = req.headers["user-agent"],
 	    encoding = req.headers["accept-encoding"],
 	    type;
 
 	status  = status || 200;
-	headers = this.headers( headers || {"Content-Type": "text/plain"} );
+	headers = this.headers( headers || {"Content-Type": "text/plain"}, status, req.method === "GET" );
 
 	if ( body ) {
 		body = this.encode( body );
 
-		// Ensuring an Etag
-		if ( req.method === "GET" && !headers.Etag ) {
-			headers.Etag = "\"" + this.etag( this.url( req ), body.length || 0, headers["Last-Modified"] || 0 ) + "\"";
-		}
-
 		// Emsuring JSON has proper mimetype
 		if ( $.regex.json_wrap.test( body ) ) {
 			headers["Content-Type"] = "application/json";
+		}
+
+		// Ensuring an Etag
+		if ( req.method === "GET" ) {
+			if ( !headers.Etag ) {
+				headers.Etag = "\"" + this.etag( url, body.length || 0, headers["Last-Modified"] || 0 ) + "\"";
+			}
+
+			// Updating cache
+			this.register( url, {etag: headers.Etag, mimetype: headers["Content-Type"]}, true );
 		}
 	}
 

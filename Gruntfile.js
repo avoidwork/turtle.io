@@ -22,8 +22,6 @@ module.exports = function (grunt) {
 					"src/constructor.js",
 					"src/allowed.js",
 					"src/allows.js",
-					"src/cache.js",
-					"src/cached.js",
 					"src/cipher.js",
 					"src/codes.js",
 					"src/compress.js",

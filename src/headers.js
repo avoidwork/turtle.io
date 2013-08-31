@@ -2,32 +2,24 @@
  * Sets response headers
  *
  * @method headers
- * @param  {Object}  req             HTTP(S) request Object
- * @param  {Object}  res             HTTP(S) response Object
- * @param  {Number}  status          [Optional] Response status code
- * @param  {Object}  responseHeaders [Optional] HTTP headers to decorate the response with
- * @return {Objet}                   TurtleIO instance
+ * @param  {Object}  rHeaders Response headers
+ * @param  {Number}  status   HTTP status code, default is 200
+ * @param  {Boolean} get      Indicates if responding to a GET
+ * @return {Object}           Response headers
  */
-TurtleIO.prototype.headers = function ( req, res, status, responseHeaders ) {
-	status      = status || this.codes.SUCCESS;
-	var get     = REGEX_GET.test( req.method ),
-	    headers = this.config.headers;
+TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
+	var headers = $.clone( this.config.headers, true );
 
 	// Decorating response headers
-	if ( responseHeaders instanceof Object ) {
-		$.merge( headers, responseHeaders );
-	}
-
-	// If passing an empty Object, make sure to set `Allow`
-	if ( !headers.Allow || headers.Allow.isEmpty() && status !== 404 && status !== 405 ) {
-		headers.Allow = "GET";
+	if ( rHeaders instanceof Object ) {
+		$.merge( headers, rHeaders );
 	}
 
 	// Fixing `Allow` header
 	if ( !REGEX_HEAD2.test( headers.Allow ) ) {
-		headers.Allow = headers.Allow.toUpperCase().split( /,|\s+/ ).filter( function ( i ) {
-			return ( !i.isEmpty() && !REGEX_HEAD.test( i ) );
-		}).join( ", " ).replace( "GET", "GET, HEAD, OPTIONS" );
+		headers.Allow = headers.Allow.toUpperCase().explode().filter( function ( i ) {
+			return !REGEX_HEAD.test( i );
+		} ).join( ", " ).replace( "GET", "GET, HEAD, OPTIONS" );
 	}
 
 	if ( !headers.Date ) {
@@ -39,7 +31,7 @@ TurtleIO.prototype.headers = function ( req, res, status, responseHeaders ) {
 	}
 
 	// Decorating "Last-Modified" header
-	if ( headers["Last-Modified"].isEmpty() ) {
+	if ( !headers["Last-Modified"] ) {
 		headers["Last-Modified"] = headers.Date;
 	}
 
