@@ -27,7 +27,6 @@ var $             = require( "abaaso" ),
     REGEX_NVAL    = /;.*/,
     REGEX_NURI    = /.*\//,
     REGEX_RENAME  = /^rename$/,
-    REGEX_SERVER  = /^\_server/,
     REGEX_SPACE   = /\s+/,
     REGEX_REWRITE;
 

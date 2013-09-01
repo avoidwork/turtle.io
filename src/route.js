@@ -15,8 +15,22 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 	op = function () {
 		if ( handler ) {
+			req.cookies = {};
+			req.session = null;
+
+			// Decorating valid cookies
+			if ( req.headers.cookie !== undefined ) {
+				req.headers.cookie.explode( ";" ).map(function ( i ) {
+					return i.split( "=" );
+				} ).each( function ( i ) {
+					req.cookies[i[0]] = i[1];
+				} );
+			}
+
 			// Decorates a session
-			req.session = !req.headers[self.config.session.id] ? null : self.session.get( req, res );
+			if ( req.cookies[self.config.session.id] ) {
+				req.session = self.session.get( req, res );
+			}
 
 			// Setting listeners if expecting a body
 			if ( REGEX_BODY.test( method ) ) {
