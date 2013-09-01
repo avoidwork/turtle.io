@@ -28,6 +28,17 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		}
 
 		if ( req.method === "GET" ) {
+			// CSV hook
+			if ( status === this.codes.SUCCESS && body && headers["Content-Type"] === "application/json" && req.headers.accept && REGEX_CSV.test( req.headers.accept.explode()[0].replace( REGEX_NVAL, "" ) ) ) {
+				headers["Content-Type"] = "text/csv";
+
+				if ( !headers["Content-Disposition"] ) {
+					headers["Content-Disposition"] = "attachment; filename=\"" + req.url.replace( REGEX_NURI, "" ) + ".csv\"";
+				}
+
+				body = $.json.csv( body );
+			}
+
 			// Ensuring an Etag
 			if ( status === 200 && !headers.Etag ) {
 				headers.Etag = "\"" + this.etag( url, body.length || 0, headers["Last-Modified"] || 0 ) + "\"";
