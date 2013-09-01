@@ -33,8 +33,7 @@
     "moment": "~2.0.0",
     "http-auth" : "~1.2.7",
     "node-syslog" : "~1.1.7",
-    "toobusy" : "~0.2.3",
-    "dtrace-provider" : ">=0.2.8"
+    "toobusy" : "~0.2.3"
   },
   "devDependencies": {
     "grunt" : "~0.4.1",

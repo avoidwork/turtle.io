@@ -1,6 +1,6 @@
 # turtle.io
 
-turtle.io is a HTTP 1.1 web server built on abaaso & node.js, with a focus on simplicity.
+turtle.io is a HTTP 1.1 web server with a focus on simplicity.
 
 All you need to do is install it, and tell it what directory holds your web sites, & which hostnames to answer for.
 
@@ -36,8 +36,11 @@ var turtle_io = require("turtle.io"),
 params = {
 	default : "mysite.com",
 	port    : 80,
+<<<<<<< HEAD
 	root    : "/var/www",
 	ps      : 5,
+=======
+>>>>>>> Updating LICENSE, README & package.json, deleting `trace.sh` because I've removed probes (offer little value in this case)
 	root    : "/var/www",
 	pages   : "errors",
 	vhosts  : {
@@ -59,17 +62,9 @@ var config    = require("./config.json"),
     server    = new turtle_io();
 
 // Setting proxy routes
-server.proxy("http://api.abaaso.com", "/api");
+server.proxy("https://api.github.com", "/api");
 
 server.start(config);
-```
-
-## DTrace
-
-DTrace is supported! 'sudo' is required to run _trace.sh_
-
-```console
-./trace.sh
 ```
 
 ## License
