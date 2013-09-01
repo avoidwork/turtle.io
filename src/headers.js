@@ -47,7 +47,9 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 
 	if ( ( status >= this.codes.FORBIDDEN && status <= this.codes.NOT_FOUND ) || ( status >= this.codes.SERVER_ERROR ) ) {
 		delete headers.Allow;
+		delete headers["Access-Control-Allow-Headers"];
 		delete headers["Access-Control-Allow-Methods"];
+		delete headers["Access-Control-Allow-Origin"];
 		delete headers["Last-Modified"];
 	}
 

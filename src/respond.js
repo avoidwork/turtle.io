@@ -29,7 +29,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 
 		if ( req.method === "GET" ) {
 			// Ensuring an Etag
-			if ( !headers.Etag ) {
+			if ( status === 200 && !headers.Etag ) {
 				headers.Etag = "\"" + this.etag( url, body.length || 0, headers["Last-Modified"] || 0 ) + "\"";
 			}
 
@@ -42,7 +42,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	res.statusCode = status;
 
 	// Determining if response should be compressed
-	if ( body && this.config.compress && ( type = this.compression( ua, encoding, headers["Content-Type"] ) ) && type !== null ) {
+	if ( status === 200 && body && this.config.compress && ( type = this.compression( ua, encoding, headers["Content-Type"] ) ) && type !== null ) {
 		if ( body instanceof Buffer ) {
 			headers["Content-Length"] = body.toString().length;
 		}
