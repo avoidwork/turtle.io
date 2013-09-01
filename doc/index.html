@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><title>index</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="index"><meta name="groc-project-path" content="README.md"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">README.md</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="turtleio">turtle.io</h1>
 
-<p>turtle.io is a HTTP 1.1 web server built on abaaso &amp; node.js, with a focus on simplicity.</p>
+<p>turtle.io is a HTTP 1.1 web server with a focus on simplicity.</p>
 
 <p>All you need to do is install it, and tell it what directory holds your web sites, &amp; which hostnames to answer for.</p>
 
@@ -37,7 +37,6 @@
 params = {
     default : "mysite.com",
     port    : 80,
-    ps      : 5,
     root    : "/var/www",
     pages   : "errors",
     vhosts  : {
@@ -58,16 +57,9 @@ server.start(params);
     server    = new turtle_io();
 
 // Setting proxy routes
-server.proxy("http://api.abaaso.com", "/api");
+server.proxy("https://api.github.com", "/api");
 
 server.start(config);
-</code></pre>
-
-<h2 id="dtrace">DTrace</h2>
-
-<p>DTrace is supported! 'sudo' is required to run <em>trace.sh</em></p>
-
-<pre><code class="console">./trace.sh
 </code></pre>
 
 <h2 id="license">License</h2>

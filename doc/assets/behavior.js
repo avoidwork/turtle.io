@@ -81,14 +81,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "DTrace",
-                "slug": "dtrace"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
                 "title": "License",
                 "slug": "license"
               },
@@ -151,14 +143,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "depth": 3
             }
           ]
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "DTrace",
-            "slug": "dtrace"
-          },
-          "depth": 2
         }, {
           "type": "heading",
           "data": {
