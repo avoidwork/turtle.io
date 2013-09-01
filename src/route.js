@@ -88,11 +88,11 @@ TurtleIO.prototype.route = function ( req, res ) {
 	}
 
 	// Handling request or wrapping it with HTTP Authentication
-	if ( this.config.auth === undefined || !this.config.auth.hasOwnProperty( host ) ) {
+	if ( !this.config.auth || !this.config.auth[host] ) {
 		op();
 	}
 	else {
-		if ( typeof this.config.auth[host].auth === "undefined" ) {
+		if ( !this.config.auth[host].auth ) {
 			this.config.auth[host].auth = http_auth( this.config.auth[host] );
 		}
 
