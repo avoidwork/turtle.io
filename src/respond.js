@@ -58,7 +58,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			headers["Content-Length"] = body.toString().length;
 		}
 
-		headers["Content-Encoding"] = type;
+		headers["Content-Encoding"] = REGEX_GZIP.test( type ) ? "gzip" : "deflate";
 		res.writeHead( status, headers );
 		this.compress( body, type, headers.Etag.replace( /"/g, "" ), res );
 	}

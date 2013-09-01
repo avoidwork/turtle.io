@@ -12,21 +12,21 @@ TurtleIO.prototype.compression = function ( agent, encoding, mimetype ) {
 	var result    = null,
 	    encodings = typeof encoding === "string" ? encoding.explode() : [];
 
-	if ( /json|text/.test( mimetype ) && this.config.compress === true && !REGEX_IE.test( agent ) ) {
+	if ( REGEX_COMP.test( mimetype ) && this.config.compress === true && !REGEX_IE.test( agent ) ) {
 		// Iterating supported encodings
 		encodings.each( function ( i ) {
 			if ( REGEX_GZIP.test( i ) ) {
-				result = "gzip";
+				result = "gz";
 			}
 			else if ( REGEX_DEF.test( i ) ) {
-				result = "deflate";
+				result = "zz";
 			}
 
 			// Found a supported encoding
 			if ( result !== null ) {
 				return false;
 			}
-		});
+		} );
 	}
 
 	return result;

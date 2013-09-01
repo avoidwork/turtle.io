@@ -14,7 +14,7 @@ TurtleIO.prototype.stale = function ( url ) {
 
 	if ( cached ) {
 		gz = path + cached.value.etag + ".gz";
-		df = path + cached.value.etag + ".df";
+		df = path + cached.value.etag + ".zz";
 
 		fs.exists( gz, function ( exists ) {
 			if ( exists ) {
