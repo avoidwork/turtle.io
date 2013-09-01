@@ -52,7 +52,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 
 				resHeaders.Server = self.config.headers.Server;
 
-				if ( !$.regex.no.test( resHeaders["Cache-Control"] ) ) {
+				if ( !$.regex.no.test( resHeaders["Cache-Control"] ) && !$.regex.priv.test( resHeaders["Cache-Control"] ) ) {
 					// Determining how long rep is valid
 					if ( resHeaders["Cache-Control"] && $.regex.number_present.test( resHeaders["Cache-Control"] ) ) {
 						delay = $.number.parse( $.regex.number_present.exec( resHeaders["Cache-Control"] )[0], 10 );

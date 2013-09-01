@@ -37,6 +37,9 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 		this.config.headers.Server = "turtle.io/{{VERSION}} (abaaso/" + $.version + " node.js/" + process.versions.node.replace( /^v/, "" ) + process.platform.capitalize() + " V8/" + process.versions.v8.toString().trim() + ")";
 	}
 
+	// Creating REGEX_REWRITE
+	REGEX_REWRITE = new RegExp( "^(" + this.config.proxy.rewrite.join( "|" ) + ")$" );
+
 	// Setting acceptable lag
 	toobusy.maxLag( this.config.lag );
 
