@@ -53,4 +53,6 @@ TurtleIO.prototype.watch = function ( url, path, mimetype ) {
 			}
 		});
 	}
+
+	return this;
 };
