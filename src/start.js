@@ -28,6 +28,11 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	this.config = config;
 	pages       = this.config.pages ? ( this.config.root + this.config.pages ) : ( __dirname + "/../pages" );
 
+	// Dropping process
+	if ( this.config.uid !== null ) {
+		process.setuid( this.config.uid );
+	}
+
 	// Setting `Server` HTTP header
 	if ( !this.config.headers.Server ) {
 		this.config.headers.Server = "turtle.io/{{VERSION}} (abaaso/" + $.version + " node.js/" + process.versions.node.replace( /^v/, "" ) + process.platform.capitalize() + " V8/" + process.versions.v8.toString().trim() + ")";
