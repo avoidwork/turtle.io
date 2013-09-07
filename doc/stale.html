@@ -8,15 +8,15 @@
 <li><strong>url must be a String.</strong><br/>(LRUItem key)</li>
 </ul>
 
-<p><strong>Returns an Object</strong><br/>(Instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">factory</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">stale</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">url</span> <span class="p">)</span> <span class="p">{</span>
+<p><strong>Returns an Object</strong><br/>(TurtleIO instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">TurtleIO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">stale</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">url</span> <span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">self</span>   <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
-      <span class="nx">cached</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">registry</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">url</span><span class="p">],</span>
+      <span class="nx">cached</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">etags</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">url</span><span class="p">],</span>
       <span class="nx">path</span>   <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">tmp</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span>
       <span class="nx">gz</span><span class="p">,</span> <span class="nx">df</span><span class="p">;</span>
 
   <span class="k">if</span> <span class="p">(</span> <span class="nx">cached</span> <span class="p">)</span> <span class="p">{</span>
     <span class="nx">gz</span> <span class="o">=</span> <span class="nx">path</span> <span class="o">+</span> <span class="nx">cached</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">etag</span> <span class="o">+</span> <span class="s2">&quot;.gz&quot;</span><span class="p">;</span>
-    <span class="nx">df</span> <span class="o">=</span> <span class="nx">path</span> <span class="o">+</span> <span class="nx">cached</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">etag</span> <span class="o">+</span> <span class="s2">&quot;.df&quot;</span><span class="p">;</span>
+    <span class="nx">df</span> <span class="o">=</span> <span class="nx">path</span> <span class="o">+</span> <span class="nx">cached</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">etag</span> <span class="o">+</span> <span class="s2">&quot;.zz&quot;</span><span class="p">;</span>
 
     <span class="nx">fs</span><span class="p">.</span><span class="nx">exists</span><span class="p">(</span> <span class="nx">gz</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">exists</span> <span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span> <span class="nx">exists</span> <span class="p">)</span> <span class="p">{</span>

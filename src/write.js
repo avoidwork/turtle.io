@@ -2,14 +2,12 @@
  * Writes files to disk
  *
  * @method write
- * @public
  * @param  {String} path  File path
  * @param  {Object} req   HTTP request Object
  * @param  {Object} res   HTTP response Object
- * @param  {Object} timer Date instance
- * @return {Object}       Instance
+ * @return {Object}       TurtleIO instance
  */
-factory.prototype.write = function ( path, req, res, timer ) {
+TurtleIO.prototype.write = function ( path, req, res ) {
 	var self  = this,
 	    put   = ( req.method === "PUT" ),
 	    body  = req.body,
@@ -19,15 +17,15 @@ factory.prototype.write = function ( path, req, res, timer ) {
 	    status;
 
 	if ( !put && $.regex.endslash.test( req.url ) ) {
-		status = del ? codes.CONFLICT : codes.SERVER_ERROR;
-		this.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow}, timer, false );
+		status = del ? this.codes.CONFLICT : this.codes.SERVER_ERROR;
+		this.respond( req, res, this.page( status, this.hostname( req ) ), status, {Allow: allow}, false );
 	}
 	else {
-		allow = allow.explode().remove( "POST" ).join(", ");
+		allow = allow.explode().remove( "POST" ).join( ", " );
 
-		fs.stat( path, function ( e, stat ) {
+		fs.lstat( path, function ( e, stat ) {
 			if ( e ) {
-				self.error( req, res, e, timer );
+				self.error( req, res );
 			}
 			else {
 				var etag = "\"" + self.etag( url, stat.size, stat.mtime ) + "\"";
@@ -35,20 +33,16 @@ factory.prototype.write = function ( path, req, res, timer ) {
 				if ( !req.headers.hasOwnProperty( "etag" ) || req.headers.etag === etag ) {
 					fs.writeFile( path, body, function ( e ) {
 						if ( e ) {
-							self.error( req, req, e, timer );
+							self.error( req, req );
 						}
 						else {
-							dtp.fire( "write", function () {
-								return [req.headers.host, req.url, req.method, path, diff( timer )];
-							});
-
-							status = put ? codes.NO_CONTENT : codes.CREATED;
-							self.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow}, timer, false );
+							status = put ? self.codes.NO_CONTENT : self.codes.CREATED;
+							self.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow}, false );
 						}
 					});
 				}
 				else if ( req.headers.etag !== etag ) {
-					self.respond( req, res, messages.NO_CONTENT, codes.FAILED, {}, timer, false );
+					self.respond( req, res, self.messages.NO_CONTENT, self.codes.FAILED, {}, false );
 				}
 			}
 		});

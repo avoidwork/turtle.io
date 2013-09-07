@@ -1,5 +1,5 @@
-var turtle = require("../lib/turtle.io"),
-    server = new turtle({logs:{stdout: false}});
+var TurtleIO = require("../lib/turtle.io"),
+    server   = new TurtleIO();
 
 exports["methods"] = {
 	setUp: function (done) {
@@ -21,7 +21,7 @@ exports["start"] = {
 	},
 	tests: function (test) {
 		test.expect(1);
-		test.equal(server.start(), server, "Should be instance of turtle.io");
+		test.equal(server.start() instanceof TurtleIO, true, "Should be instance of turtle.io");
 		test.done();
 	}
 };
@@ -32,7 +32,7 @@ exports["stop"] = {
 	},
 	tests: function (test) {
 		test.expect(1);
-		test.equal(server.stop(), server, "Should be instance of turtle.io");
+		test.equal(server.stop() instanceof TurtleIO, true, "Should be instance of turtle.io");
 		test.done();
 	}
 };
@@ -43,9 +43,9 @@ exports["restart"] = {
 	},
 	tests: function (test) {
 		test.expect(3);
-		test.equal(server.start(),   server, "Should be instance of turtle.io");
-		test.equal(server.restart(), server, "Should be instance of turtle.io");
-		test.equal(server.stop(),    server, "Should be instance of turtle.io");
+		test.equal(server.start() instanceof TurtleIO,   true, "Should be instance of turtle.io");
+		test.equal(server.restart() instanceof TurtleIO, true, "Should be instance of turtle.io");
+		test.equal(server.stop() instanceof TurtleIO,    true, "Should be instance of turtle.io");
 		test.done();
 	}
 };

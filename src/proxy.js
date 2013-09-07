@@ -2,18 +2,16 @@
  * Proxies a (root) URL to a route
  *
  * @method proxy
- * @public
  * @param  {String}  origin Host to proxy (e.g. http://hostname)
  * @param  {String}  route  Route to proxy
  * @param  {String}  host   [Optional] Hostname this route is for (default is all)
  * @param  {Boolean} stream [Optional] Stream response to client (default is false)
- * @return {Object}         Instance
+ * @return {Object}         TurtleIO instance
  */
-factory.prototype.proxy = function ( origin, route, host, stream ) {
+TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 	stream    = ( stream === true );
 	var self  = this,
 	    verbs = ["delete", "get", "post", "put", "patch"],
-	    timer = new Date(),
 	    handle, headers, wrapper;
 
 	/**
@@ -25,15 +23,15 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 	 * @param  {Object} xhr   XmlHttpRequest
 	 * @param  {Object} req   HTTP(S) request Object
 	 * @param  {Object} res   HTTP(S) response Object
-	 * @param  {Object} timer [Optional] Date instance
 	 * @return {Undefined}    undefined
 	 */
-	handle = function ( arg, xhr, req, res, timer ) {
+	handle = function ( arg, xhr, req, res ) {
 		var resHeaders = {},
 		    etag       = "",
 		    regex      = /("|')\//g,
 		    replace    = "$1" + route + "/",
 		    url        = self.url( req ),
+		    parsed     = $.parse( url ),
 		    delay      = $.expires,
 		    rewrite;
 
@@ -55,7 +53,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 
 				resHeaders.Server = self.config.headers.Server;
 
-				if ( !$.regex.no.test( resHeaders["Cache-Control"] ) ) {
+				if ( !$.regex.no.test( resHeaders["Cache-Control"] ) && !$.regex.priv.test( resHeaders["Cache-Control"] ) ) {
 					// Determining how long rep is valid
 					if ( resHeaders["Cache-Control"] && $.regex.number_present.test( resHeaders["Cache-Control"] ) ) {
 						delay = $.number.parse( $.regex.number_present.exec( resHeaders["Cache-Control"] )[0], 10 );
@@ -71,17 +69,17 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 						// Removing from LRU when invalid
 						$.delay( function () {
 							self.unregister( url );
-						}, delay );
+						}, delay, url );
 					}
 				}
 
 				// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
 				if ( req.headers["if-none-match"] === etag ) {
-					self.respond( req, res, messages.NO_CONTENT, codes.NOT_MODIFIED, resHeaders, timer, false );
+					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, resHeaders );
 				}
 				else {
 					if ( REGEX_HEAD.test( req.method.toLowerCase() ) ) {
-						arg = messages.NO_CONTENT;
+						arg = self.messages.NO_CONTENT;
 					}
 					// Fixing root path of response
 					else if ( rewrite ) {
@@ -93,15 +91,15 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 						}
 					}
 
-					self.respond( req, res, arg, xhr.status, resHeaders, timer, false );
+					self.respond( req, res, arg, xhr.status, resHeaders );
 				}
 			}
 			else {
-				self.respond( req, res, arg, xhr.status, {Server: self.config.headers.Server}, timer, false );
+				self.respond( req, res, arg, xhr.status, {Server: self.config.headers.Server} );
 			}
 		}
 		catch (e) {
-			self.respond( req, res, self.page( codes.BAD_GATEWAY, self.hostname( req ) ), codes.BAD_GATEWAY, {Allow: "GET"}, timer, false );
+			self.respond( req, res, self.page( self.codes.BAD_GATEWAY, parsed.hostname ), self.codes.BAD_GATEWAY, {Allow: "GET"} );
 			self.log( e, true );
 		}
 	};
@@ -136,10 +134,9 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 	 * @private
 	 * @param  {Object} req   HTTP(S) request Object
 	 * @param  {Object} res   HTTP(S) response Object
-	 * @param  {Object} timer [Optional] Date instance
 	 * @return {Undefined}    undefined
 	 */
-	wrapper = function ( req, res, timer ) {
+	wrapper = function ( req, res ) {
 		var url     = origin + req.url.replace( new RegExp( "^" + route ), "" ),
 		    method  = req.method.toLowerCase(),
 		    headerz = $.clone( req.headers ),
@@ -148,7 +145,7 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 
 		// Facade to handle()
 		fn = function ( arg, xhr ) {
-			handle( arg, xhr, req, res, timer );
+			handle( arg, xhr, req, res );
 		};
 
 		// Streaming response to Client
@@ -172,15 +169,15 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 				proxyRes.pipe( res );
 			});
 
+			proxyReq.on( "error", function () {
+				self.respond( req, res, self.page( self.codes.BAD_GATEWAY, parsed.hostname ), self.codes.BAD_GATEWAY, {Allow: "GET"} );
+			});
+
 			if ( REGEX_BODY.test( req.method ) ) {
 				proxyReq.write( req.body );
 			}
 
 			proxyReq.end();
-
-			dtp.fire( "proxy", function () {
-				return [req.headers.host, req.method, route, origin, diff( timer )];
-			});
 		}
 		// Acting as a RESTful proxy
 		else {
@@ -210,10 +207,6 @@ factory.prototype.proxy = function ( origin, route, host, stream ) {
 	verbs.each( function ( i ) {
 		self[i]( route, wrapper, host );
 		self[i]( route + "/.*", wrapper, host );
-
-		dtp.fire( "proxy-set", function () {
-			return [host || "*", i.toUpperCase(), origin, route, diff( timer )];
-		});
 	});
 
 	return this;

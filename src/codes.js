@@ -1,10 +1,9 @@
 /**
- * HTTP (semantic) status codes
+ * HTTP status codes
  *
- * @private
  * @type {Object}
  */
-var codes = {
+TurtleIO.prototype.codes = {
 	CONTINUE            : 100,
 	SWITCH_PROTOCOL     : 101,
 	SUCCESS             : 200,
@@ -21,6 +20,7 @@ var codes = {
 	NOT_MODIFIED        : 304,
 	USE_PROXY           : 305,
 	REDIRECT            : 307,
+	PERM_REDIRECT       : 308,
 	BAD_REQUEST         : 400,
 	UNAUTHORIZED        : 401,
 	FORBIDDEN           : 403,

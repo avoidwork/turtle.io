@@ -1,6 +1,5 @@
 /node_modules/
 /doc/
-/log/turtleio.log
 /src/
 /test/
 .travis.yml

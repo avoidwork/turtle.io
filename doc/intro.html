@@ -1,53 +1,31 @@
-<!DOCTYPE html><html lang="en"><head><title>intro</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="intro"><meta name="groc-project-path" content="src/intro.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/intro.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="p">(</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-<span class="s2">&quot;use strict&quot;</span><span class="p">;</span>
+<!DOCTYPE html><html lang="en"><head><title>intro</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="intro"><meta name="groc-project-path" content="src/intro.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/intro.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="s2">&quot;use strict&quot;</span><span class="p">;</span>
 
-<span class="kd">var</span> <span class="nx">$</span>           <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;abaaso&quot;</span> <span class="p">),</span>
-    <span class="nx">cluster</span>     <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;cluster&quot;</span> <span class="p">),</span>
-    <span class="nx">crypto</span>      <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;crypto&quot;</span> <span class="p">),</span>
-    <span class="nx">fs</span>          <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;fs&quot;</span> <span class="p">),</span>
-    <span class="nx">http</span>        <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;http&quot;</span> <span class="p">),</span>
-    <span class="nx">http_auth</span>   <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;http-auth&quot;</span> <span class="p">),</span>
-    <span class="nx">mime</span>        <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;mime&quot;</span> <span class="p">),</span>
-    <span class="nx">moment</span>      <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;moment&quot;</span> <span class="p">),</span>
-    <span class="nx">syslog</span>      <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;node-syslog&quot;</span> <span class="p">),</span>
-    <span class="nx">toobusy</span>     <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;toobusy&quot;</span> <span class="p">),</span>
-    <span class="nx">zlib</span>        <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;zlib&quot;</span> <span class="p">),</span>
-    <span class="nx">d</span>           <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;dtrace-provider&quot;</span> <span class="p">),</span>
-    <span class="nx">dtp</span>         <span class="o">=</span> <span class="nx">d</span><span class="p">.</span><span class="nx">createDTraceProvider</span><span class="p">(</span> <span class="s2">&quot;turtle-io&quot;</span> <span class="p">),</span>
-    <span class="nx">REGEX_BODY</span>  <span class="o">=</span> <span class="sr">/^(put|post|patch)$/i</span><span class="p">,</span>
-    <span class="nx">REGEX_CSV</span>   <span class="o">=</span> <span class="sr">/text\/csv/</span><span class="p">,</span>
-    <span class="nx">REGEX_HALT</span>  <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span> <span class="s2">&quot;^(ReferenceError|&quot;</span> <span class="o">+</span> <span class="nx">$</span><span class="p">.</span><span class="nx">label</span><span class="p">.</span><span class="nx">error</span><span class="p">.</span><span class="nx">invalidArguments</span> <span class="o">+</span> <span class="s2">&quot;)$&quot;</span> <span class="p">),</span>
-    <span class="nx">REGEX_HEAD</span>  <span class="o">=</span> <span class="sr">/^(head|options)$/i</span><span class="p">,</span>
-    <span class="nx">REGEX_HEAD2</span> <span class="o">=</span> <span class="sr">/head|options/i</span><span class="p">,</span>
-    <span class="nx">REGEX_GET</span>   <span class="o">=</span> <span class="sr">/^(get|head|options)$/i</span><span class="p">,</span>
-    <span class="nx">REGEX_DEL</span>   <span class="o">=</span> <span class="sr">/^(del)$/i</span><span class="p">,</span>
-    <span class="nx">REGEX_DEF</span>   <span class="o">=</span> <span class="sr">/deflate/</span><span class="p">,</span>
-    <span class="nx">REGEX_GZIP</span>  <span class="o">=</span> <span class="sr">/gzip/</span><span class="p">,</span>
-    <span class="nx">REGEX_IE</span>    <span class="o">=</span> <span class="sr">/msie/i</span><span class="p">,</span>
-    <span class="nx">REGEX_DIR</span>   <span class="o">=</span> <span class="sr">/\/$/</span><span class="p">,</span>
-    <span class="nx">REGEX_NEXT</span>  <span class="o">=</span> <span class="sr">/\..*/</span><span class="p">,</span>
-    <span class="nx">REGEX_NVAL</span>  <span class="o">=</span> <span class="sr">/;.*/</span><span class="p">,</span>
-    <span class="nx">REGEX_NURI</span>  <span class="o">=</span> <span class="sr">/.*\//</span><span class="p">,</span>
-    <span class="nx">REGEX_PORT</span>  <span class="o">=</span> <span class="sr">/:.*/</span><span class="p">,</span>
-    <span class="nx">REGEX_SERVER</span><span class="o">=</span> <span class="sr">/^\_server/</span><span class="p">,</span>
-    <span class="nx">REGEX_SLASH</span> <span class="o">=</span> <span class="sr">/\/$/</span><span class="p">,</span>
-    <span class="nx">REGEX_SPACE</span> <span class="o">=</span> <span class="sr">/\s+/</span><span class="p">,</span>
-    <span class="nx">REGEX_RENAME</span><span class="o">=</span> <span class="sr">/^rename$/</span><span class="p">,</span>
-    <span class="nx">REGEX_REWRITE</span><span class="p">,</span>
-    <span class="nx">MSG_ACK</span>     <span class="o">=</span> <span class="s2">&quot;acknowledge&quot;</span><span class="p">,</span>
-    <span class="nx">MSG_ALL</span>     <span class="o">=</span> <span class="s2">&quot;announce&quot;</span><span class="p">,</span>
-    <span class="nx">MSG_CUSTOM</span>  <span class="o">=</span> <span class="s2">&quot;custom&quot;</span><span class="p">,</span>
-    <span class="nx">MSG_MASTER</span>  <span class="o">=</span> <span class="s2">&quot;master&quot;</span><span class="p">,</span>
-    <span class="nx">MSG_READY</span>   <span class="o">=</span> <span class="s2">&quot;ready&quot;</span><span class="p">,</span>
-    <span class="nx">MSG_START</span>   <span class="o">=</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span>
-    <span class="nx">MSG_QUE_ID</span>  <span class="o">=</span> <span class="s2">&quot;queue_id&quot;</span><span class="p">,</span>
-    <span class="nx">MSG_QUE_NEW</span> <span class="o">=</span> <span class="s2">&quot;queue_new&quot;</span><span class="p">,</span>
-    <span class="nx">MSG_QUE_DEL</span> <span class="o">=</span> <span class="s2">&quot;queue_delete&quot;</span><span class="p">,</span>
-    <span class="nx">MSG_QUE_SET</span> <span class="o">=</span> <span class="s2">&quot;queue_set&quot;</span><span class="p">,</span>
-    <span class="nx">MSG_SES_DEL</span> <span class="o">=</span> <span class="s2">&quot;session_delete&quot;</span><span class="p">,</span>
-    <span class="nx">MSG_SES_SET</span> <span class="o">=</span> <span class="s2">&quot;session_set&quot;</span><span class="p">,</span>
-    <span class="nx">MSG_REG_SET</span> <span class="o">=</span> <span class="s2">&quot;cache_set&quot;</span><span class="p">,</span>
-    <span class="nx">MSG_REG_DEL</span> <span class="o">=</span> <span class="s2">&quot;cache_delete&quot;</span><span class="p">,</span>
-    <span class="nx">MSG_REG_WAT</span> <span class="o">=</span> <span class="s2">&quot;cache_watch&quot;</span><span class="p">,</span>
-    <span class="nx">TERM_SIG</span>    <span class="o">=</span> <span class="s2">&quot;SIGTERM&quot;</span><span class="p">,</span>
-    <span class="nx">TERM_CODE</span>   <span class="o">=</span> <span class="mi">143</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Hooking syslog output</p></div></div><div class="code"><div class="wrapper"><span class="nx">syslog</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span> <span class="s2">&quot;turtle_io&quot;</span><span class="p">,</span> <span class="nx">syslog</span><span class="p">.</span><span class="nx">LOG_PID</span> <span class="o">|</span> <span class="nx">syslog</span><span class="p">.</span><span class="nx">LOG_ODELAY</span><span class="p">,</span> <span class="nx">syslog</span><span class="p">.</span><span class="nx">LOG_LOCAL0</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Disabling abaaso observer</p></div></div><div class="code"><div class="wrapper"><span class="nx">$</span><span class="p">.</span><span class="nx">discard</span><span class="p">(</span> <span class="kc">true</span> <span class="p">);</span></div></div></div></div></body></html>
+<span class="kd">var</span> <span class="nx">$</span>             <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;abaaso&quot;</span> <span class="p">),</span>
+    <span class="nx">crypto</span>        <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;crypto&quot;</span> <span class="p">),</span>
+    <span class="nx">defaultConfig</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s2">&quot;/../config.json&quot;</span> <span class="p">),</span>
+    <span class="nx">fs</span>            <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;fs&quot;</span> <span class="p">),</span>
+    <span class="nx">http</span>          <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;http&quot;</span> <span class="p">),</span>
+    <span class="nx">https</span>         <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;https&quot;</span> <span class="p">),</span>
+    <span class="nx">http_auth</span>     <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;http-auth&quot;</span> <span class="p">),</span>
+    <span class="nx">mime</span>          <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;mime&quot;</span> <span class="p">),</span>
+    <span class="nx">moment</span>        <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;moment&quot;</span> <span class="p">),</span>
+    <span class="nx">syslog</span>        <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;node-syslog&quot;</span> <span class="p">),</span>
+    <span class="nx">toobusy</span>       <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;toobusy&quot;</span> <span class="p">),</span>
+    <span class="nx">zlib</span>          <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;zlib&quot;</span> <span class="p">),</span>
+    <span class="nx">REGEX_BODY</span>    <span class="o">=</span> <span class="sr">/^(put|post|patch)$/i</span><span class="p">,</span>
+    <span class="nx">REGEX_COMP</span>    <span class="o">=</span> <span class="sr">/javascript|json|text|xml/</span><span class="p">,</span>
+    <span class="nx">REGEX_CSV</span>     <span class="o">=</span> <span class="sr">/text\/csv/</span><span class="p">,</span>
+    <span class="nx">REGEX_HEAD</span>    <span class="o">=</span> <span class="sr">/^(head|options)$/i</span><span class="p">,</span>
+    <span class="nx">REGEX_HEAD2</span>   <span class="o">=</span> <span class="sr">/head|options/i</span><span class="p">,</span>
+    <span class="nx">REGEX_GET</span>     <span class="o">=</span> <span class="sr">/^(get|head|options)$/i</span><span class="p">,</span>
+    <span class="nx">REGEX_DEL</span>     <span class="o">=</span> <span class="sr">/^(del)$/i</span><span class="p">,</span>
+    <span class="nx">REGEX_DEF</span>     <span class="o">=</span> <span class="sr">/deflate/</span><span class="p">,</span>
+    <span class="nx">REGEX_DIR</span>     <span class="o">=</span> <span class="sr">/\/$/</span><span class="p">,</span>
+    <span class="nx">REGEX_GZIP</span>    <span class="o">=</span> <span class="sr">/gz/</span><span class="p">,</span>
+    <span class="nx">REGEX_IE</span>      <span class="o">=</span> <span class="sr">/msie/i</span><span class="p">,</span>
+    <span class="nx">REGEX_NEXT</span>    <span class="o">=</span> <span class="sr">/\..*/</span><span class="p">,</span>
+    <span class="nx">REGEX_NVAL</span>    <span class="o">=</span> <span class="sr">/;.*/</span><span class="p">,</span>
+    <span class="nx">REGEX_NURI</span>    <span class="o">=</span> <span class="sr">/.*\//</span><span class="p">,</span>
+    <span class="nx">REGEX_RENAME</span>  <span class="o">=</span> <span class="sr">/^rename$/</span><span class="p">,</span>
+    <span class="nx">REGEX_SPACE</span>   <span class="o">=</span> <span class="sr">/\s+/</span><span class="p">,</span>
+    <span class="nx">REGEX_REWRITE</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Hooking syslog output</p></div></div><div class="code"><div class="wrapper"><span class="nx">syslog</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span> <span class="s2">&quot;turtle_io&quot;</span><span class="p">,</span> <span class="nx">syslog</span><span class="p">.</span><span class="nx">LOG_PID</span> <span class="o">|</span> <span class="nx">syslog</span><span class="p">.</span><span class="nx">LOG_ODELAY</span><span class="p">,</span> <span class="nx">syslog</span><span class="p">.</span><span class="nx">LOG_LOCAL0</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Disabling abaaso observer</p></div></div><div class="code"><div class="wrapper"><span class="nx">$</span><span class="p">.</span><span class="nx">discard</span><span class="p">(</span> <span class="kc">true</span> <span class="p">);</span></div></div></div></div></body></html>

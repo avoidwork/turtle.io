@@ -2,31 +2,43 @@
  * Verifies a method is allowed on a URI
  *
  * @method allowed
- * @public
  * @param  {String} method HTTP verb
  * @param  {String} uri    URI to query
  * @param  {String} host   Hostname
  * @return {Boolean}       Boolean indicating if method is allowed
  */
-factory.prototype.allowed = function ( method, uri, host ) {
+TurtleIO.prototype.allowed = function ( method, uri, host ) {
 	host       = host || "all";
-	var result = false,
-	    timer  = new Date(),
-	    routes = this.routes( method, host ).merge( this.routes( "all", host ) );
+	var self   = this,
+	    result = false,
+	    exist  = false,
+	    d, hosts;
 
-	if ( host !== undefined ) {
-		routes.merge( this.routes( method, "all" ) ).merge( this.routes( "all", "all" ) );
-	}
+	hosts = self.handlers[method].hosts;
+	d     = hosts[self.config["default"]];
+	exist = ( hosts[host] );
 
-	routes.each( function ( i ) {
-		if ( new RegExp( "^" + i + "$" ).test( uri ) ) {
+	this.handlers[method].regex.each( function ( i, idx ) {
+		var route = self.handlers[method].routes[idx];
+
+		if ( i.test( uri ) && ( ( exist && route in hosts[host] ) || route in d || route in hosts.all ) ) {
 			return !( result = true );
 		}
 	});
 
-	dtp.fire( "allowed", function () {
-		return [host, uri, method.toUpperCase(), diff( timer )];
-	});
+	if ( !result ) {
+		hosts = self.handlers.all.hosts;
+		d     = hosts[self.config["default"]];
+		exist = ( hosts[host] );
+
+		this.handlers.all.regex.each( function ( i, idx ) {
+			var route = self.handlers.all.routes[idx];
+
+			if ( i.test( uri ) && ( ( exist && route in hosts[host] ) || route in d || route in hosts.all ) ) {
+				return !( result = true );
+			}
+		});
+	}
 
 	return result;
 };

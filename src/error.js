@@ -2,19 +2,28 @@
  * Error handler for requests
  *
  * @method error
- * @public
- * @param  {Object} req   HTTP(S) request Object
- * @param  {Object} res   HTTP(S) response Object
- * @param  {Object} timer Date instance
- * @return {Object}       Instance
+ * @param  {Object} req HTTP(S) request Object
+ * @param  {Object} res HTTP(S) response Object
+ * @return {Object}     TurtleIO instance
  */
-factory.prototype.error = function ( req, res, e, timer ) {
-	e     = e.message || e;
-	timer = timer     || new Date();
+TurtleIO.prototype.error = function ( req, res ) {
+	var method = req.method.toLowerCase(),
+	    status = this.codes.NOT_FOUND,
+	    url    = this.url( req ),
+	    host   = $.parse( url ).hostname,
+	    body;
 
-	$.route.load( "error", req, res );
+	// If valid, determine what kind of error to respond with
+	if ( !REGEX_GET.test( method ) && !REGEX_HEAD.test( method ) ) {
+		if ( this.allowed( req.method, req.url, host ) ) {
+			status = this.codes.SERVER_ERROR;
+		}
+		else {
+			status = this.codes.NOT_ALLOWED;
+		}
+	}
 
-	dtp.fire( "error", function () {
-		return [req.headers.host, req.url, codes.SERVER_ERROR, e || messages.SERVER_ERROR, diff( timer )];
-	});
+	body = this.page( status, host );
+
+	return this.respond( req, res, body, status, {"Cache-Control": "no-cache", "Content-Length": body.length} );
 };

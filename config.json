@@ -2,9 +2,6 @@
 	"auth"    : {},
 	"compress": true,
 	"default" : null,
-	"probes"  : true,
-	"maxConnections" : 25,
-	"ps"      : 2,
 	"uid"     : null,
 	"cache"   : 1000,
 	"headers" : {
@@ -20,18 +17,9 @@
 	"index"   : ["index.htm", "index.html"],
 	"lag"     : 50,
 	"logs"    : {
-		"file"   : "turtleio.log",
 		"time"   : "D/MMM/YYYY:HH:mm:ss ZZ",
 		"format" : "{{host}} - {{user}} [{{time}}] \"{{method}} {{path}} HTTP/1.1\" {{status}} {{length}} {{referer}} \"{{user-agent}}\"",
-		"flush"  : 1000,
 		"stdout" : true
-	},
-	"queue"   : {
-		"id"     : 1,
-		"status" : true,
-		"size"   : 200,
-		"time"   : 1000,
-		"handler": null
 	},
 	"port"    : 8000,
 	"root"    : "",
@@ -48,6 +36,10 @@
 			"text/plain",
 			"application/json"
 		]
+	},
+	"ssl"     : {
+		"key"  : null,
+		"cert" : null
 	},
 	"tmp"     : "/tmp",
 	"vhosts"  : {}

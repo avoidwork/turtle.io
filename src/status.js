@@ -5,10 +5,10 @@
  * @public
  * @return {Object} Status
  */
-factory.prototype.status = function () {
+TurtleIO.prototype.status = function () {
 	var ram    = process.memoryUsage(),
 	    uptime = process.uptime(),
-	    state  = {config: {}, process: {}, queue: {}, server: {}};
+	    state  = {config: {}, process: {}, server: {}};
 
 	// Startup parameters
 	$.iterate( this.config, function ( v, k ) {
@@ -21,23 +21,11 @@ factory.prototype.status = function () {
 		pid    : process.pid
 	};
 
-	// Queue
-	state.queue = {
-		average : Math.ceil( this.requestQueue.times.mean() || 0 ),
-		last    : this.requestQueue.last,
-		total   : this.requestQueue.items.length
-	};
-
 	// Server information
 	state.server = {
 		address     : this.server.address(),
-		connections : this.server.connections,
 		uptime      : uptime
 	};
-
-	dtp.fire( "status", function () {
-		return [state.server.connections, uptime, ram.heapUsed, ram.heapTotal];
-	});
 
 	return state;
 };

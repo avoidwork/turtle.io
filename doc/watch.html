@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><title>watch</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="watch"><meta name="groc-project-path" content="src/watch.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/watch.js</div></div><div id="document"><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method watch</span></p>
+<!DOCTYPE html><html lang="en"><head><title>watch</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="watch"><meta name="groc-project-path" content="src/watch.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/watch.js</div></div><div id="document"><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method watcher</span></p>
 
 <p>Watches <code>path</code> for changes &amp; updated LRU</p>
 
@@ -10,6 +10,47 @@
 <li><p><strong>mimetype must be a String.</strong><br/>(Mimetype of URL)</p></li>
 </ul>
 
-<p><strong>Returns an Object</strong><br/>(Instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">factory</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">watch</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">mimetype</span> <span class="p">)</span> <span class="p">{</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">sendMessage</span><span class="p">(</span> <span class="nx">MSG_REG_WAT</span><span class="p">,</span> <span class="p">{</span><span class="nx">url</span><span class="o">:</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">mimetype</span><span class="o">:</span> <span class="nx">mimetype</span><span class="p">},</span> <span class="kc">false</span><span class="p">,</span> <span class="kc">false</span> <span class="p">);</span>
+<p><strong>Returns an Object</strong><br/>(TurtleIO instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">TurtleIO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">watch</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">mimetype</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
+      <span class="nx">cleanup</span><span class="p">,</span> <span class="nx">watcher</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-private"><div class="wrapper"><p><span class='doc-section-header'>Private method cleanup</span></p>
+
+<p>Cleans up caches</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>watcher must be an Object.</strong><br/>(FileSystem Watcher)</p></li>
+<li><p><strong>url must be a String.</strong><br/>(Stale URL)</p></li>
+<li><p><strong>path must be a String.</strong><br/>(URL path)</p></li>
+</ul>
+
+<p><strong>Returns an Undefined</strong><br/>(undefined)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">cleanup</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">watcher</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">path</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">watcher</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
+    <span class="nx">self</span><span class="p">.</span><span class="nx">stale</span><span class="p">(</span> <span class="nx">url</span> <span class="p">);</span>
+    <span class="nx">self</span><span class="p">.</span><span class="nx">unregister</span><span class="p">(</span> <span class="nx">url</span> <span class="p">);</span>
+    <span class="k">delete</span> <span class="nx">self</span><span class="p">.</span><span class="nx">watching</span><span class="p">[</span><span class="nx">path</span><span class="p">];</span>
+  <span class="p">};</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">watching</span><span class="p">[</span><span class="nx">path</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Tracking</p></div></div><div class="code"><div class="wrapper">    <span class="k">this</span><span class="p">.</span><span class="nx">watching</span><span class="p">[</span><span class="nx">path</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Watching path for changes</p></div></div><div class="code"><div class="wrapper">    <span class="nx">watcher</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">watch</span><span class="p">(</span> <span class="nx">path</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">ev</span> <span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span> <span class="nx">REGEX_RENAME</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span> <span class="nx">ev</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="nx">cleanup</span><span class="p">(</span> <span class="nx">watcher</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">path</span> <span class="p">);</span>
+      <span class="p">}</span>
+      <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">fs</span><span class="p">.</span><span class="nx">lstat</span><span class="p">(</span> <span class="nx">path</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">e</span><span class="p">,</span> <span class="nx">stat</span> <span class="p">)</span> <span class="p">{</span>
+          <span class="k">if</span> <span class="p">(</span> <span class="nx">e</span> <span class="p">)</span> <span class="p">{</span>
+            <span class="nx">self</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">e</span> <span class="p">);</span>
+            <span class="nx">cleanup</span><span class="p">(</span> <span class="nx">watcher</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">path</span> <span class="p">);</span>
+          <span class="p">}</span>
+          <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="nx">self</span><span class="p">.</span><span class="nx">registry</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">url</span><span class="p">]</span> <span class="p">)</span> <span class="p">{</span>
+            <span class="nx">self</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span> <span class="nx">url</span><span class="p">,</span> <span class="p">{</span><span class="nx">etag</span><span class="o">:</span> <span class="nx">self</span><span class="p">.</span><span class="nx">etag</span><span class="p">(</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">stat</span><span class="p">.</span><span class="nx">size</span><span class="p">,</span> <span class="nx">stat</span><span class="p">.</span><span class="nx">mtime</span> <span class="p">),</span> <span class="nx">mimetype</span><span class="o">:</span> <span class="nx">mimetype</span><span class="p">},</span> <span class="kc">true</span> <span class="p">);</span>
+          <span class="p">}</span>
+          <span class="k">else</span> <span class="p">{</span>
+            <span class="nx">cleanup</span><span class="p">(</span> <span class="nx">watcher</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">path</span> <span class="p">);</span>
+          <span class="p">}</span>
+        <span class="p">});</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
 <span class="p">};</span></div></div></div></div></body></html>

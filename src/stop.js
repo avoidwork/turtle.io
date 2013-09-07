@@ -1,21 +1,27 @@
 /**
- * Stops instance
+ * Stops the instance
  *
  * @method stop
- * @public
- * @return {Object} Instance
+ * @return {Object} TurtleIO instance
  */
-factory.prototype.stop = function () {
-	if ( cluster.isMaster ) {
-		console.log( "Stopping turtle.io on port " + this.config.port );
+TurtleIO.prototype.stop = function () {
+	var port = this.config.port;
 
-		$.array.cast( cluster.workers ).each( function ( i ) {
-			process.kill( i.process.pid, TERM_SIG );
-		});
+	this.config       = {};
+	this.etags        = $.lru( 1000 );
+	this.handlers     = {all: {regex: [], routes: [], hosts: {}}, "delete": {regex: [], routes: [], hosts: {}}, get: {regex: [], routes: [], hosts: {}}, patch: {regex: [], routes: [], hosts: {}}, post: {regex: [], routes: [], hosts: {}}, put: {regex: [], routes: [], hosts: {}}};
+	this.pages        = {all: {}};
+	this.sessions     = {};
+	this.server       = null;
+	this.vhosts       = [];
+	this.vhostsRegExp = [];
+	this.watching     = {};
 
-		this.registry = null;
-		this.watching = {};
+	if ( this.server !== null ) {
+		this.server.close();
 	}
+
+	console.log( "Stopped turtle.io on port " + port );
 
 	return this;
 };

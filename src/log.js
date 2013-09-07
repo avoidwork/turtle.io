@@ -2,32 +2,23 @@
  * Logs a message
  *
  * @method log
- * @public
  * @param  {Mixed} msg Error Object or String
- * @return {Object}    Instance
+ * @return {Object}    TurtleIO instance
  */
-factory.prototype.log = function ( msg ) {
-	var err = msg.callstack !== undefined;
+TurtleIO.prototype.log = function ( msg ) {
+	var e = msg instanceof Error;
 
-	// Determining what to log
-	msg = msg.callstack || msg;
-
-	// Dispatching to syslog server
-	syslog.log( syslog[!err ? "LOG_INFO" : "LOG_ERR"], msg );
-
-	// Unrecoverable error, restarting process
-	if ( REGEX_HALT.test( msg ) ) {
-		exit();
+	// Determining what to log & dispatching to STDOUT
+	if ( e ) {
+		msg = msg.callstack || msg;
+		console.error( msg );
 	}
-	// Adding message to log queue
-	else {
-		this.logQueue.push( msg );
-	}
-
-	// Dispatching to STDOUT
-	if ( this.config.logs.stdout ) {
+	else if ( this.config.logs.stdout ) {
 		console.log( msg );
 	}
+
+	// Dispatching to syslog server
+	syslog.log( syslog[!e ? "LOG_INFO" : "LOG_ERR"], msg );
 
 	return this;
 };
