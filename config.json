@@ -1,6 +1,5 @@
 {
 	"auth"    : {},
-	"address" : "127.0.0.1",
 	"compress": true,
 	"default" : null,
 	"uid"     : null,
