@@ -61,6 +61,10 @@
 
   <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">host</span> <span class="p">)</span> <span class="p">{</span>
     <span class="nx">host</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">||</span> <span class="s2">&quot;all&quot;</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="nx">REGEX_HEAD</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span> <span class="nx">method</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">method</span> <span class="o">=</span> <span class="s2">&quot;get&quot;</span><span class="p">;</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Looking for a match</p></div></div><div class="code"><div class="wrapper">  <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span><span class="p">[</span><span class="nx">method</span><span class="p">].</span><span class="nx">regex</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">idx</span> <span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="nx">self</span><span class="p">.</span><span class="nx">handlers</span><span class="p">[</span><span class="nx">method</span><span class="p">].</span><span class="nx">routes</span><span class="p">[</span><span class="nx">idx</span><span class="p">];</span>
 
