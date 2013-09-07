@@ -28,11 +28,6 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	this.config = config;
 	pages       = this.config.pages ? ( this.config.root + this.config.pages ) : ( __dirname + "/../pages" );
 
-	// Dropping process
-	if ( this.config.uid !== null ) {
-		process.setuid( this.config.uid );
-	}
-
 	// Setting `Server` HTTP header
 	if ( !this.config.headers.Server ) {
 		this.config.headers.Server = "turtle.io/{{VERSION}} (abaaso/" + $.version + " node.js/" + process.versions.node.replace( /^v/, "" ) + process.platform.capitalize() + " V8/" + process.versions.v8.toString().trim() + ")";
@@ -86,6 +81,11 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 				self.server.listen( config.port, config.address );
 			}
 
+			// Dropping process
+			if ( self.config.uid && !isNaN( self.config.uid ) ) {
+				process.setuid( self.config.uid );
+			}
+
 			console.log( "Started turtle.io on port " + config.port );
 		}
 	});
@@ -93,7 +93,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	// For toobusy()
 	process.on( "uncaughtException", function ( e ) {
 		self.log( e );
-	} );
+	});
 
 	return this;
 };
