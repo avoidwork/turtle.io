@@ -77,6 +77,10 @@ TurtleIO.prototype.route = function ( req, res ) {
 		host = this.config["default"] || "all";
 	}
 
+	if ( REGEX_HEAD.test( method ) ) {
+		method = "get";
+	}
+
 	// Looking for a match
 	this.handlers[method].regex.each( function ( i, idx ) {
 		var x = self.handlers[method].routes[idx];
