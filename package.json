@@ -28,10 +28,10 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "abaaso": "~3.10.11",
-    "mime": "~1.2.9",
-    "moment": "~2.0.0",
-    "http-auth" : "~1.2.7",
+    "abaaso": "~3.10.13",
+    "mime": "~1.2.11",
+    "moment": "~2.1.0",
+    "http-auth" : "~2.0.1",
     "node-syslog" : "~1.1.7",
     "toobusy" : "~0.2.3"
   },
