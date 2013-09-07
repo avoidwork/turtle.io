@@ -11,7 +11,8 @@
  * @return {Object}          TurtleIO instance
  */
 TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) {
-	var url      = this.url( req ),
+	var self     = this,
+	    url      = this.url( req ),
 	    ua       = req.headers["user-agent"],
 	    encoding = req.headers["accept-encoding"],
 	    type;
@@ -64,7 +65,10 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	}
 	else if ( file ) {
 		res.writeHead( status, headers );
-		fs.createReadStream( body ).pipe( res );
+		fs.createReadStream( body ).on( "error", function ( e ) {
+				self.log( e );
+				self.error( req, res );
+		} ).pipe( res );
 	}
 	else {
 		if ( body instanceof Buffer ) {
