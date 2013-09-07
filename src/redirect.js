@@ -11,7 +11,7 @@
  */
 TurtleIO.prototype.redirect = function ( route, url, host, permanent ) {
 	var self    = this,
-	    code    = this.codes[permanent === true ? "MOVED" : "REDIRECT"],
+	    code    = this.codes[permanent === true ? "PERM_REDIRECT" : "REDIRECT"],
 	    pattern = new RegExp( "^" + route + "$" );
 
 	this.get( route, function ( req, res ) {

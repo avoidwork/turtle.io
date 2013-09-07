@@ -20,6 +20,7 @@ TurtleIO.prototype.codes = {
 	NOT_MODIFIED        : 304,
 	USE_PROXY           : 305,
 	REDIRECT            : 307,
+	PERM_REDIRECT       : 308,
 	BAD_REQUEST         : 400,
 	UNAUTHORIZED        : 401,
 	FORBIDDEN           : 403,
