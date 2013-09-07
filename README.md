@@ -14,11 +14,11 @@ All you need to do is install it, and tell it what directory holds your web site
 
 ## Documentation
 
-Please visit the [wiki](https://github.com/avoidwork/turtle.io/wiki).
+API documentation is available at [api.turtle.io](http://api.turtle.io), please visit the [wiki](https://github.com/avoidwork/turtle.io/wiki).
 
 ## Support
 
-If you're having problems with using the project, use the support forum at CodersClan.
+If you're having problems, use the support forum at CodersClan.
 
 <a href="http://codersclan.net/forum/index.php?repo_id=12"><img src="http://www.codersclan.net/graphics/getSupport_blue_big.png" width="160"></a>
 
@@ -36,11 +36,6 @@ var turtle_io = require("turtle.io"),
 params = {
 	default : "mysite.com",
 	port    : 80,
-<<<<<<< HEAD
-	root    : "/var/www",
-	ps      : 5,
-=======
->>>>>>> Updating LICENSE, README & package.json, deleting `trace.sh` because I've removed probes (offer little value in this case)
 	root    : "/var/www",
 	pages   : "errors",
 	vhosts  : {
