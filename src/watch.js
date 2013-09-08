@@ -43,7 +43,7 @@ TurtleIO.prototype.watch = function ( url, path, mimetype ) {
 						self.log( e );
 						cleanup( watcher, url, path );
 					}
-					else if ( self.registry.cache[url] ) {
+					else if ( self.etags.cache[url] ) {
 						self.register( url, {etag: self.etag( url, stat.size, stat.mtime ), mimetype: mimetype}, true );
 					}
 					else {
