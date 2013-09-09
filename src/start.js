@@ -67,6 +67,11 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 			// Starting server
 			if ( self.server === null ) {
 				if ( config.ssl.cert !== null && config.ssl.key !== null ) {
+					// Reading files
+					config.ssl.cert = fs.readFileSync( config.ssl.cert );
+					config.ssl.key  = fs.readFileSync( config.ssl.key );
+
+					// Starting server
 					self.server = https.createServer( $.merge( config.ssl, {port: config.port, host: config.address} ), function ( req, res ) {
 						self.route( req, res );
 					} ).listen( config.port, config.address );
