@@ -36,22 +36,29 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 		    rewrite;
 
 		try {
+			resHeaders        = headers( xhr.getAllResponseHeaders() );
+			resHeaders.Server = self.config.headers.Server;
+
+			// Something went wrong
+			if ( xhr.status >= 500 ) {
+				self.respond( req, res, self.page( self.codes.BAD_GATEWAY, parsed.hostname ), self.codes.BAD_GATEWAY, resHeaders );
+			}
 			// Getting or creating an Etag
-			if ( xhr.status !== 304 ) {
-				resHeaders = headers( xhr.getAllResponseHeaders() );
-				rewrite    = REGEX_REWRITE.test( resHeaders["Content-Type"].replace( REGEX_NVAL, "" ) );
-				etag       = resHeaders.Etag || "\"" + self.etag( url, resHeaders["Content-Length"] || 0, resHeaders["Last-Modified"] || 0, arg ) + "\"";
+			else if ( xhr.status !== 304 ) {
+				rewrite = REGEX_REWRITE.test( ( resHeaders["Content-Type"] || "" ).replace( REGEX_NVAL, "" ) );
 
 				// Setting headers
-				if ( resHeaders.Etag !== etag ) {
-					resHeaders.Etag = etag;
+				if ( xhr.status === 200 ) {
+					etag = resHeaders.Etag || "\"" + self.etag( url, resHeaders["Content-Length"] || 0, resHeaders["Last-Modified"] || 0, arg ) + "\"";
+
+					if ( resHeaders.Etag !== etag ) {
+						resHeaders.Etag = etag;
+					}
 				}
 
 				if ( resHeaders.Allow === undefined || resHeaders.Allow.isEmpty() ) {
 					resHeaders.Allow = resHeaders["Access-Control-Allow-Methods"] || "GET";
 				}
-
-				resHeaders.Server = self.config.headers.Server;
 
 				if ( !$.regex.no.test( resHeaders["Cache-Control"] ) && !$.regex.priv.test( resHeaders["Cache-Control"] ) ) {
 					// Determining how long rep is valid
@@ -95,12 +102,12 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 				}
 			}
 			else {
-				self.respond( req, res, arg, xhr.status, {Server: self.config.headers.Server} );
+				self.respond( req, res, arg, xhr.status, resHeaders );
 			}
 		}
 		catch (e) {
-			self.respond( req, res, self.page( self.codes.BAD_GATEWAY, parsed.hostname ), self.codes.BAD_GATEWAY, {Allow: "GET"} );
-			self.log( e, true );
+			self.respond( req, res, self.page( self.codes.BAD_GATEWAY, parsed.hostname ), self.codes.BAD_GATEWAY, resHeaders );
+			self.log( e.stack || e, true );
 		}
 	};
 
@@ -115,14 +122,16 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 	headers = function ( args ) {
 		var result = {};
 
-		args.trim().split( "\n" ).each( function ( i ) {
-			var header, value;
+		if ( !args.isEmpty() ) {
+			args.trim().split( "\n" ).each( function ( i ) {
+				var header, value;
 
-			value          = i.replace( $.regex.header_value_replace, "" );
-			header         = i.replace( $.regex.header_replace, "" );
-			header         = header.unhyphenate( true ).replace( /\s+/g, "-" );
-			result[header] = value;
-		});
+				value          = i.replace( $.regex.header_value_replace, "" );
+				header         = i.replace( $.regex.header_replace, "" );
+				header         = header.unhyphenate( true ).replace( /\s+/g, "-" );
+				result[header] = value;
+			});
+		}
 
 		return result;
 	};
