@@ -53,7 +53,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 
 			fs.unlink( path, function ( e ) {
 				if ( e ) {
-					self.error( req, req );
+					self.error( req, req, self.codes.SERVER_ERROR );
 				}
 				else {
 					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NO_CONTENT, {} );
@@ -64,7 +64,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 			this.write( path, req, res );
 		}
 		else {
-			this.error( req, req );
+			this.error( req, req, self.codes.SERVER_ERROR );
 		}
 	}
 	// Directory request
@@ -77,7 +77,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 
 			fs.unlink( path, function ( e ) {
 				if ( e ) {
-					self.error( req, req );
+					self.error( req, req, self.codes.SERVER_ERROR );
 				}
 				else {
 					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NO_CONTENT, {} );
@@ -85,7 +85,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 			});
 		}
 		else {
-			this.error( req, req );
+			this.error( req, req, self.codes.NOT_ALLOWED );
 		}
 	}
 

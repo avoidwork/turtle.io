@@ -2,24 +2,28 @@
  * Error handler for requests
  *
  * @method error
- * @param  {Object} req HTTP(S) request Object
- * @param  {Object} res HTTP(S) response Object
- * @return {Object}     TurtleIO instance
+ * @param  {Object} req    Request Object
+ * @param  {Object} res    Response Object
+ * @param  {Number} status [Optional] HTTP status code
+ * @return {Object}        TurtleIO instance
  */
-TurtleIO.prototype.error = function ( req, res ) {
+TurtleIO.prototype.error = function ( req, res, status ) {
 	var method = req.method.toLowerCase(),
-	    status = this.codes.NOT_FOUND,
 	    url    = this.url( req ),
 	    host   = $.parse( url ).hostname,
 	    body;
 
-	// If valid, determine what kind of error to respond with
-	if ( !REGEX_GET.test( method ) && !REGEX_HEAD.test( method ) ) {
-		if ( this.allowed( req.method, req.url, host ) ) {
-			status = this.codes.SERVER_ERROR;
-		}
-		else {
-			status = this.codes.NOT_ALLOWED;
+	if ( isNaN( status ) ) {
+		status = this.codes.NOT_FOUND;
+
+		// If valid, determine what kind of error to respond with
+		if ( !REGEX_GET.test( method ) && !REGEX_HEAD.test( method ) ) {
+			if ( this.allowed( method, req.url, host ) ) {
+				status = this.codes.SERVER_ERROR;
+			}
+			else {
+				status = this.codes.NOT_ALLOWED;
+			}
 		}
 	}
 

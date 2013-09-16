@@ -200,6 +200,24 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "ignorePrefix": "}",
           "name": "JavaScript"
         },
+        "sourcePath": "/Users/jason/Projects/turtle.io/src/auth.js",
+        "projectPath": "src/auth.js",
+        "targetPath": "auth",
+        "title": "auth"
+      },
+      "depth": 1,
+      "outline": []
+    }, {
+      "type": "file",
+      "data": {
+        "language": {
+          "nameMatchers": [".js"],
+          "pygmentsLexer": "javascript",
+          "singleLineComment": ["//"],
+          "multiLineComment": ["/*", "*", "*/"],
+          "ignorePrefix": "}",
+          "name": "JavaScript"
+        },
         "sourcePath": "/Users/jason/Projects/turtle.io/src/cipher.js",
         "projectPath": "src/cipher.js",
         "targetPath": "cipher",

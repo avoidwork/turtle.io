@@ -15,8 +15,9 @@
       <span class="nx">gz</span><span class="p">,</span> <span class="nx">df</span><span class="p">;</span>
 
   <span class="k">if</span> <span class="p">(</span> <span class="nx">cached</span> <span class="p">)</span> <span class="p">{</span>
-    <span class="nx">gz</span> <span class="o">=</span> <span class="nx">path</span> <span class="o">+</span> <span class="nx">cached</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">etag</span> <span class="o">+</span> <span class="s2">&quot;.gz&quot;</span><span class="p">;</span>
-    <span class="nx">df</span> <span class="o">=</span> <span class="nx">path</span> <span class="o">+</span> <span class="nx">cached</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">etag</span> <span class="o">+</span> <span class="s2">&quot;.zz&quot;</span><span class="p">;</span>
+    <span class="nx">path</span> <span class="o">+=</span> <span class="nx">cached</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">etag</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span> <span class="sr">/&quot;/g</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="p">);</span>
+    <span class="nx">gz</span>    <span class="o">=</span> <span class="nx">path</span> <span class="o">+</span> <span class="s2">&quot;.gz&quot;</span><span class="p">;</span>
+    <span class="nx">df</span>    <span class="o">=</span> <span class="nx">path</span> <span class="o">+</span> <span class="s2">&quot;.zz&quot;</span><span class="p">;</span>
 
     <span class="nx">fs</span><span class="p">.</span><span class="nx">exists</span><span class="p">(</span> <span class="nx">gz</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">exists</span> <span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span> <span class="nx">exists</span> <span class="p">)</span> <span class="p">{</span>
@@ -24,9 +25,9 @@
           <span class="k">if</span> <span class="p">(</span> <span class="nx">e</span> <span class="p">)</span> <span class="p">{</span>
             <span class="nx">self</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">e</span> <span class="p">);</span>
           <span class="p">}</span>
-        <span class="p">});</span>
+        <span class="p">}</span> <span class="p">);</span>
       <span class="p">}</span>
-    <span class="p">});</span>
+    <span class="p">}</span> <span class="p">);</span>
 
     <span class="nx">fs</span><span class="p">.</span><span class="nx">exists</span><span class="p">(</span> <span class="nx">df</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">exists</span> <span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span> <span class="nx">exists</span> <span class="p">)</span> <span class="p">{</span>
@@ -34,9 +35,9 @@
           <span class="k">if</span> <span class="p">(</span> <span class="nx">e</span> <span class="p">)</span> <span class="p">{</span>
             <span class="nx">self</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">e</span> <span class="p">);</span>
           <span class="p">}</span>
-        <span class="p">});</span>
+        <span class="p">}</span> <span class="p">);</span>
       <span class="p">}</span>
-    <span class="p">});</span>
+    <span class="p">}</span> <span class="p">);</span>
   <span class="p">}</span>
 
   <span class="k">return</span> <span class="k">this</span><span class="p">;</span>

@@ -32,7 +32,7 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 				host = this.config["default"];
 			}
 			else {
-				this.error( req, res );
+				this.error( req, res, self.codes.SERVER_ERROR );
 			}
 		}
 	}
@@ -44,15 +44,15 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 	// Determining if the request is valid
 	fs.lstat( path, function ( e, stats ) {
 		if ( e ) {
-			self.error( req, res );
+			self.error( req, res, self.codes.NOT_FOUND );
 		}
 		else if ( !stats.isDirectory() ) {
 			self.handle( req, res, path, parsed.href, false, stats );
 		}
-		else if ( stats.isDirectory() && REGEX_GET.test( method ) && !REGEX_DIR.test( req.url ) ) {
+		else if ( REGEX_GET.test( method ) && !REGEX_DIR.test( req.url ) ) {
 			self.respond( req, res, self.messages.NO_CONTENT, self.codes.REDIRECT, {"Location": parsed.href + "/"} );
 		}
-		else if ( stats.isDirectory() && !REGEX_GET.test( method ) ) {
+		else if ( !REGEX_GET.test( method ) ) {
 			self.handle( req, res, path, parsed.href, true );
 		}
 		else {
@@ -67,12 +67,12 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 						self.handle( req, res, path + i, parsed.href + i, false, stats );
 					}
 					else if ( ++count === nth && !handled ) {
-						self.error( req, res );
+						self.error( req, res, self.codes.NOT_FOUND );
 					}
 				} );
-			});
+			} );
 		}
-	});
+	} );
 
 	return this;
 };

@@ -13,8 +13,9 @@ TurtleIO.prototype.stale = function ( url ) {
 	    gz, df;
 
 	if ( cached ) {
-		gz = path + cached.value.etag + ".gz";
-		df = path + cached.value.etag + ".zz";
+		path += cached.value.etag.replace( /"/g, "" );
+		gz    = path + ".gz";
+		df    = path + ".zz";
 
 		fs.exists( gz, function ( exists ) {
 			if ( exists ) {
@@ -22,9 +23,9 @@ TurtleIO.prototype.stale = function ( url ) {
 					if ( e ) {
 						self.log( e );
 					}
-				});
+				} );
 			}
-		});
+		} );
 
 		fs.exists( df, function ( exists ) {
 			if ( exists ) {
@@ -32,9 +33,9 @@ TurtleIO.prototype.stale = function ( url ) {
 					if ( e ) {
 						self.log( e );
 					}
-				});
+				} );
 			}
-		});
+		} );
 	}
 
 	return this;
