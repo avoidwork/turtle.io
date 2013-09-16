@@ -13,7 +13,7 @@
 
   <span class="k">if</span> <span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">logs</span><span class="p">.</span><span class="nx">stdout</span> <span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span> <span class="nx">e</span> <span class="p">)</span> <span class="p">{</span>
-      <span class="nx">msg</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">stack</span> <span class="o">||</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">callstack</span> <span class="o">||</span> <span class="nx">msg</span><span class="p">;</span>
+      <span class="nx">msg</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">stack</span> <span class="o">||</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">message</span> <span class="o">||</span> <span class="nx">msg</span><span class="p">;</span>
       <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span> <span class="nx">msg</span> <span class="p">);</span>
     <span class="p">}</span>
     <span class="k">else</span> <span class="p">{</span>

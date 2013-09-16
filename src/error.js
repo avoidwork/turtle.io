@@ -13,12 +13,12 @@ TurtleIO.prototype.error = function ( req, res, status ) {
 	    host   = $.parse( url ).hostname,
 	    body;
 
-	if ( !isNaN( status ) ) {
+	if ( isNaN( status ) ) {
 		status = this.codes.NOT_FOUND;
 
 		// If valid, determine what kind of error to respond with
 		if ( !REGEX_GET.test( method ) && !REGEX_HEAD.test( method ) ) {
-			if ( this.allowed( req.method, req.url, host ) ) {
+			if ( this.allowed( method, req.url, host ) ) {
 				status = this.codes.SERVER_ERROR;
 			}
 			else {
