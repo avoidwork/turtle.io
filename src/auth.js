@@ -9,9 +9,6 @@
  * @return {Object}        TurtleIO instance
  */
 TurtleIO.prototype.auth = function ( req, res, host, next ) {
-	var self = this,
-	    kerberos;
-
 	// No authentication
 	if ( !this.config.auth || ( this.config.auth && !this.config.auth[host] ) ) {
 		next();

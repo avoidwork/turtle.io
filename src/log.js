@@ -10,7 +10,7 @@ TurtleIO.prototype.log = function ( msg ) {
 
 	if ( this.config.logs.stdout ) {
 		if ( e ) {
-			msg = msg.stack || msg.callstack || msg;
+			msg = msg.stack || msg.message || msg;
 			console.error( msg );
 		}
 		else {

@@ -49,10 +49,10 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 		else if ( !stats.isDirectory() ) {
 			self.handle( req, res, path, parsed.href, false, stats );
 		}
-		else if ( stats.isDirectory() && REGEX_GET.test( method ) && !REGEX_DIR.test( req.url ) ) {
+		else if ( REGEX_GET.test( method ) && !REGEX_DIR.test( req.url ) ) {
 			self.respond( req, res, self.messages.NO_CONTENT, self.codes.REDIRECT, {"Location": parsed.href + "/"} );
 		}
-		else if ( stats.isDirectory() && !REGEX_GET.test( method ) ) {
+		else if ( !REGEX_GET.test( method ) ) {
 			self.handle( req, res, path, parsed.href, true );
 		}
 		else {
@@ -70,9 +70,9 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 						self.error( req, res, self.codes.NOT_FOUND );
 					}
 				} );
-			});
+			} );
 		}
-	});
+	} );
 
 	return this;
 };
