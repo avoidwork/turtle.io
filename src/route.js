@@ -62,7 +62,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 			}
 		}
 		else {
-			self.error( req, res );
+			self.error( req, res, self.codes.SERVER_ERROR );
 		}
 	};
 
@@ -105,17 +105,8 @@ TurtleIO.prototype.route = function ( req, res ) {
 		} );
 	}
 
-	// Handling request or wrapping it with HTTP Authentication
-	if ( !this.config.auth || !this.config.auth[host] ) {
-		op();
-	}
-	else {
-		if ( !this.config.auth[host].auth ) {
-			this.config.auth[host].auth = http_auth( this.config.auth[host] );
-		}
-
-		this.config.auth[host].auth.apply( req, res, op );
-	}
+	// Handling authentication
+	this.auth( req, res, host, op );
 
 	return this;
 };

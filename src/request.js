@@ -32,7 +32,7 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 				host = this.config["default"];
 			}
 			else {
-				this.error( req, res );
+				this.error( req, res, self.codes.SERVER_ERROR );
 			}
 		}
 	}
@@ -44,7 +44,7 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 	// Determining if the request is valid
 	fs.lstat( path, function ( e, stats ) {
 		if ( e ) {
-			self.error( req, res );
+			self.error( req, res, self.codes.NOT_FOUND );
 		}
 		else if ( !stats.isDirectory() ) {
 			self.handle( req, res, path, parsed.href, false, stats );
@@ -67,7 +67,7 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 						self.handle( req, res, path + i, parsed.href + i, false, stats );
 					}
 					else if ( ++count === nth && !handled ) {
-						self.error( req, res );
+						self.error( req, res, self.codes.NOT_FOUND );
 					}
 				} );
 			});

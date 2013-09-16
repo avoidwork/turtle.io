@@ -17,7 +17,7 @@ TurtleIO.prototype.compress = function ( body, type, etag, req, res ) {
 	fs.exists( fn, function ( exist ) {
 		if ( exist ) {
 			fs.createReadStream( fn ).on( "error", function () {
-				self.error( req, res );
+				self.error( req, res, self.codes.SERVER_ERROR );
 			} ).pipe( res );
 		}
 		else if ( typeof body.pipe === "function" ) {
