@@ -34,7 +34,7 @@
             <span class="nx">self</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">e</span> <span class="p">);</span>
           <span class="p">}</span>
 
-          <span class="nx">res</span><span class="p">[</span><span class="nx">res</span><span class="p">.</span><span class="nx">release</span> <span class="o">?</span> <span class="s2">&quot;release&quot;</span> <span class="o">:</span> <span class="s2">&quot;end&quot;</span><span class="p">](</span> <span class="nx">data</span> <span class="p">);</span>
+          <span class="nx">res</span><span class="p">.</span><span class="nx">end</span><span class="p">(</span> <span class="nx">data</span> <span class="p">);</span>
         <span class="p">}</span> <span class="p">);</span>
       <span class="p">}</span> <span class="p">).</span><span class="nx">pipe</span><span class="p">(</span> <span class="nx">zlib</span><span class="p">[</span><span class="nx">method</span><span class="p">]()</span> <span class="p">).</span><span class="nx">pipe</span><span class="p">(</span> <span class="nx">res</span> <span class="p">);</span>
 

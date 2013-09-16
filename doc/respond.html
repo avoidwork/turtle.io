@@ -62,7 +62,7 @@
     <span class="p">}</span>
 
     <span class="nx">res</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">headers</span> <span class="p">);</span>
-    <span class="nx">res</span><span class="p">[</span><span class="nx">res</span><span class="p">.</span><span class="nx">release</span> <span class="o">?</span> <span class="s2">&quot;release&quot;</span> <span class="o">:</span> <span class="s2">&quot;end&quot;</span><span class="p">](</span> <span class="nx">body</span> <span class="p">);</span>
+    <span class="nx">res</span><span class="p">.</span><span class="nx">end</span><span class="p">(</span> <span class="nx">body</span> <span class="p">);</span>
   <span class="p">}</span>
 
   <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">prep</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">);</span>
