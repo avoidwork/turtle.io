@@ -47,7 +47,7 @@
 
     <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;Content-Encoding&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">REGEX_GZIP</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span> <span class="nx">type</span> <span class="p">)</span> <span class="o">?</span> <span class="s2">&quot;gzip&quot;</span> <span class="o">:</span> <span class="s2">&quot;deflate&quot;</span><span class="p">;</span>
     <span class="nx">res</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">headers</span> <span class="p">);</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">compress</span><span class="p">(</span> <span class="nx">body</span><span class="p">,</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">headers</span><span class="p">.</span><span class="nx">Etag</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span> <span class="sr">/&quot;/g</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="p">),</span> <span class="nx">res</span> <span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">compress</span><span class="p">(</span> <span class="nx">body</span><span class="p">,</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">headers</span><span class="p">.</span><span class="nx">Etag</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span> <span class="sr">/&quot;/g</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="p">),</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">);</span>
   <span class="p">}</span>
   <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="nx">file</span> <span class="p">)</span> <span class="p">{</span>
     <span class="nx">res</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">headers</span> <span class="p">);</span>
@@ -62,7 +62,7 @@
     <span class="p">}</span>
 
     <span class="nx">res</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">headers</span> <span class="p">);</span>
-    <span class="nx">res</span><span class="p">.</span><span class="nx">end</span><span class="p">(</span> <span class="nx">body</span> <span class="p">);</span>
+    <span class="nx">res</span><span class="p">[</span><span class="nx">res</span><span class="p">.</span><span class="nx">release</span> <span class="o">?</span> <span class="s2">&quot;release&quot;</span> <span class="o">:</span> <span class="s2">&quot;end&quot;</span><span class="p">](</span> <span class="nx">body</span> <span class="p">);</span>
   <span class="p">}</span>
 
   <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">prep</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">);</span>
