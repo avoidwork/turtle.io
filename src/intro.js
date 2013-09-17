@@ -23,11 +23,13 @@ var $             = require( "abaaso" ),
     REGEX_DIR     = /\/$/,
     REGEX_GZIP    = /gz/,
     REGEX_IE      = /msie/i,
+    REGEX_JSON    = /json/,
     REGEX_NEXT    = /\..*/,
     REGEX_NVAL    = /;.*/,
     REGEX_NURI    = /.*\//,
     REGEX_RENAME  = /^rename$/,
     REGEX_SPACE   = /\s+/,
+    REGEX_STREAM  = /application|audio|chemical|conference|font|image|message|model|xml|video/,
     REGEX_REWRITE;
 
 // Hooking syslog output
