@@ -26,13 +26,15 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 	 * @return {Undefined}    undefined
 	 */
 	handle = function ( arg, xhr, req, res ) {
-		var resHeaders = {},
-		    etag       = "",
-		    regex      = /("|')\//g,
-		    replace    = "$1" + route + "/",
-		    url        = self.url( req ),
-		    parsed     = $.parse( url ),
-		    delay      = $.expires,
+		var resHeaders    = {},
+		    etag          = "",
+		    regex         = /("|')\/[^?\/]/g,
+		    regexOrigin   = new RegExp( origin, "g" ),
+		    replace       = "$1" + route + "/",
+		    url           = self.url( req ),
+		    parsed        = $.parse( url ),
+		    delay         = $.expires,
+		    rewriteOrigin = parsed.protocol + "//" + parsed.host + route,
 		    rewrite;
 
 		try {
@@ -91,10 +93,10 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 					// Fixing root path of response
 					else if ( rewrite ) {
 						if ( arg instanceof Array || arg instanceof Object ) {
-							arg = $.decode( $.encode( arg ).replace( regex, replace ) );
+							arg = $.decode( $.encode( arg ).replace( regexOrigin, rewriteOrigin ).replace( regex, replace ) );
 						}
 						else if ( typeof arg === "string" ) {
-							arg = arg.replace( regex, replace );
+							arg = arg.replace( regexOrigin, rewriteOrigin ).replace( regex, replace );
 						}
 					}
 
