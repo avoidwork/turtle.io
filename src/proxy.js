@@ -26,13 +26,15 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 	 * @return {Undefined}    undefined
 	 */
 	handle = function ( arg, xhr, req, res ) {
-		var resHeaders = {},
-		    etag       = "",
-		    regex      = /("|')\//g,
-		    replace    = "$1" + route + "/",
-		    url        = self.url( req ),
-		    parsed     = $.parse( url ),
-		    delay      = $.expires,
+		var resHeaders    = {},
+		    etag          = "",
+		    regex         = /("|')\/[^?\/]/g,
+		    regexOrigin   = new RegExp( origin, "g" ),
+		    replace       = "$1" + route + "/",
+		    url           = self.url( req ),
+		    parsed        = $.parse( url ),
+		    delay         = $.expires,
+		    rewriteOrigin = parsed.protocol + "//" + parsed.host + route,
 		    rewrite;
 
 		try {
@@ -70,9 +72,6 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 					}
 
 					if ( delay > 0 ) {
-						// Updating LRU
-						self.register( url, {etag: etag.replace( /\"/g, "" ), mimetype: resHeaders["Content-Type"]}, true );
-
 						// Removing from LRU when invalid
 						$.delay( function () {
 							self.unregister( url );
@@ -91,10 +90,10 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 					// Fixing root path of response
 					else if ( rewrite ) {
 						if ( arg instanceof Array || arg instanceof Object ) {
-							arg = $.decode( $.encode( arg ).replace( regex, replace ) );
+							arg = $.decode( $.encode( arg ).replace( regexOrigin, rewriteOrigin ).replace( regex, replace ) );
 						}
 						else if ( typeof arg === "string" ) {
-							arg = arg.replace( regex, replace );
+							arg = arg.replace( regexOrigin, rewriteOrigin ).replace( regex, replace );
 						}
 					}
 
@@ -146,16 +145,22 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 	 * @return {Undefined}    undefined
 	 */
 	wrapper = function ( req, res ) {
-		var url     = origin + req.url.replace( new RegExp( "^" + route ), "" ),
-		    method  = req.method.toLowerCase(),
-		    headerz = $.clone( req.headers ),
-		    parsed  = $.parse( url ),
+		var url      = origin + req.url.replace( new RegExp( "^" + route ), "" ),
+		    method   = req.method.toLowerCase(),
+		    headerz  = $.clone( req.headers ),
+		    parsed   = $.parse( url ),
+		    mimetype = mime.lookup( parsed.pathname ),
 		    fn, options, proxyReq;
 
 		// Facade to handle()
 		fn = function ( arg, xhr ) {
 			handle( arg, xhr, req, res );
 		};
+
+		// Streaming formats that do not need to be rewritten
+		if ( !stream && REGEX_STREAM.test( mimetype ) && ( !REGEX_JSON.test( mimetype ) && !REGEX_DIR.test( parsed.pathname ) ) ) {
+			stream = true;
+		}
 
 		// Streaming response to Client
 		if ( stream ) {
