@@ -147,7 +147,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 	wrapper = function ( req, res ) {
 		var url      = origin + req.url.replace( new RegExp( "^" + route ), "" ),
 		    method   = req.method.toLowerCase(),
-		    headerz  = $.clone( req.headers ),
+		    headerz  = $.clone( req.headers, true ),
 		    parsed   = $.parse( url ),
 		    mimetype = mime.lookup( parsed.pathname ),
 		    fn, options, proxyReq;
@@ -158,7 +158,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 		};
 
 		// Streaming formats that do not need to be rewritten
-		if ( !stream && REGEX_STREAM.test( mimetype ) && ( !REGEX_JSON.test( mimetype ) && !REGEX_DIR.test( parsed.pathname ) ) ) {
+		if ( !stream && ( !REGEX_JSON.test( mimetype ) && !REGEX_DIR.test( parsed.pathname ) ) && REGEX_STREAM.test( mimetype ) ) {
 			stream = true;
 		}
 
