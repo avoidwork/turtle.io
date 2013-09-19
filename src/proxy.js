@@ -92,12 +92,12 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 					else if ( rewrite ) {
 						if ( arg instanceof Array || arg instanceof Object ) {
 							arg = $.encode( arg ).replace( regexOrigin, rewriteOrigin );
-							arg = arg.replace( regex, replace + arg.match( regex )[0].replace( regex_quote, "" ) );
+							arg = arg.replace( regex, replace + ( arg.match( regex ) || [""] )[0].replace( regex_quote, "" ) );
 							arg = $.decode( arg );
 						}
 						else if ( typeof arg === "string" ) {
 							arg = arg.replace( regexOrigin, rewriteOrigin );
-							arg = arg.replace( regex, replace + arg.match( regex )[0].replace( regex_quote, "" ) );
+							arg = arg.replace( regex, replace + ( arg.match( regex ) || [""] )[0].replace( regex_quote, "" ) );
 						}
 					}
 
