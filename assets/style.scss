@@ -170,4 +170,12 @@ ol {
 	.container {
 		width: $ten * 40 !important;
 	}
+
+	header,
+	.container,
+	footer {
+		margin: 0 5px 0 5px;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
 }
