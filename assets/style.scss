@@ -92,7 +92,6 @@ ol {
 }
 
 #intro {
-	min-height: $ten * 35;
 	background-color: $lightgrey;
 	color: $darkgrey;
 	text-align: right;
@@ -167,6 +166,11 @@ ol {
 }
 
 @media screen and (min-width: 1px) and (max-width: 600px) {
+	#intro {
+		h2 {
+			padding-top: $ten * 50;
+		}
+	}
 	.container {
 		width: $ten * 38 !important;
 	}
