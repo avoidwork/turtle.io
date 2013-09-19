@@ -168,14 +168,6 @@ ol {
 
 @media screen and (min-width: 1px) and (max-width: 600px) {
 	.container {
-		width: $ten * 40 !important;
-	}
-
-	header,
-	.container,
-	footer {
-		margin: 0 5px 0 5px;
-		text-overflow: ellipsis;
-		overflow: hidden;
+		width: $ten * 38 !important;
 	}
 }
