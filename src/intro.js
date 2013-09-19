@@ -15,6 +15,7 @@ var $             = require( "abaaso" ),
     REGEX_BODY    = /^(put|post|patch)$/i,
     REGEX_COMP    = /javascript|json|text|xml/,
     REGEX_CSV     = /text\/csv/,
+    REGEX_EXT     = /\.[\w+]{1,}$/, // 1 is for source code files, etc.
     REGEX_HEAD    = /^(head|options)$/i,
     REGEX_HEAD2   = /head|options/i,
     REGEX_GET     = /^(get|head|options)$/i,

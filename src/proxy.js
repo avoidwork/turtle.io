@@ -29,8 +29,9 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 		var resHeaders    = {},
 		    etag          = "",
 		    regex         = /("|')\/[^?\/]/g,
+		    regex_quote   = /^("|')/,
 		    regexOrigin   = new RegExp( origin, "g" ),
-		    replace       = "$1" + route + "/",
+		    replace       = "$1" + route,
 		    url           = self.url( req ),
 		    parsed        = $.parse( url ),
 		    delay         = $.expires,
@@ -90,10 +91,13 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 					// Fixing root path of response
 					else if ( rewrite ) {
 						if ( arg instanceof Array || arg instanceof Object ) {
-							arg = $.decode( $.encode( arg ).replace( regexOrigin, rewriteOrigin ).replace( regex, replace ) );
+							arg = $.encode( arg ).replace( regexOrigin, rewriteOrigin );
+							arg = arg.replace( regex, replace + arg.match( regex )[0].replace( regex_quote, "" ) );
+							arg = $.decode( arg );
 						}
 						else if ( typeof arg === "string" ) {
-							arg = arg.replace( regexOrigin, rewriteOrigin ).replace( regex, replace );
+							arg = arg.replace( regexOrigin, rewriteOrigin );
+							arg = arg.replace( regex, replace + arg.match( regex )[0].replace( regex_quote, "" ) );
 						}
 					}
 
@@ -147,7 +151,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 	wrapper = function ( req, res ) {
 		var url      = origin + req.url.replace( new RegExp( "^" + route ), "" ),
 		    method   = req.method.toLowerCase(),
-		    headerz  = $.clone( req.headers ),
+		    headerz  = $.clone( req.headers, true ),
 		    parsed   = $.parse( url ),
 		    mimetype = mime.lookup( parsed.pathname ),
 		    fn, options, proxyReq;
@@ -158,7 +162,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 		};
 
 		// Streaming formats that do not need to be rewritten
-		if ( !stream && REGEX_STREAM.test( mimetype ) && ( !REGEX_JSON.test( mimetype ) && !REGEX_DIR.test( parsed.pathname ) ) ) {
+		if ( !stream && ( REGEX_EXT.test( parsed.pathname ) && !REGEX_JSON.test( mimetype ) ) && REGEX_STREAM.test( mimetype ) ) {
 			stream = true;
 		}
 
