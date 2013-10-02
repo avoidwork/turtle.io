@@ -43,15 +43,15 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 			resHeaders.Server = self.config.headers.Server;
 
 			// Something went wrong
-			if ( xhr.status >= 500 ) {
+			if ( xhr.status >= self.codes.SERVER_ERROR ) {
 				self.respond( req, res, self.page( self.codes.BAD_GATEWAY, parsed.hostname ), self.codes.BAD_GATEWAY, resHeaders );
 			}
 			// Getting or creating an Etag
-			else if ( xhr.status !== 304 ) {
+			else if ( xhr.status !== self.codes.NOT_MODIFIED ) {
 				rewrite = REGEX_REWRITE.test( ( resHeaders["Content-Type"] || "" ).replace( REGEX_NVAL, "" ) );
 
 				// Setting headers
-				if ( xhr.status === 200 ) {
+				if ( xhr.status === self.codes.SUCCESS ) {
 					etag = resHeaders.Etag || "\"" + self.etag( url, resHeaders["Content-Length"] || 0, resHeaders["Last-Modified"] || 0, arg ) + "\"";
 
 					if ( resHeaders.Etag !== etag ) {

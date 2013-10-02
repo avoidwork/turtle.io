@@ -13,7 +13,7 @@ TurtleIO.prototype.stale = function ( url ) {
 	    gz, df;
 
 	if ( cached ) {
-		path += cached.value.etag.replace( /"/g, "" );
+		path += cached.value.etag;
 		gz    = path + ".gz";
 		df    = path + ".zz";
 
