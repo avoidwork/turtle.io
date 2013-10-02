@@ -17,7 +17,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	    encoding = req.headers["accept-encoding"],
 	    type;
 
-	status  = status || 200;
+	status  = status || this.codes.SUCCESS;
 	headers = this.headers( headers || {"Content-Type": "text/plain"}, status, req.method === "GET" );
 	file    = ( file === true );
 
@@ -41,7 +41,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 				body = $.json.csv( body );
 			}
 
-			if ( status === 200 || status === 304 ) {
+			if ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) {
 				// Ensuring an Etag
 				if ( !headers.Etag ) {
 					headers.Etag = "\"" + this.etag( url, body.length || 0, headers["Last-Modified"] || 0 ) + "\"";
@@ -57,7 +57,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	res.statusCode = status;
 
 	// Determining if response should be compressed
-	if ( status === 200 && body && this.config.compress && ( type = this.compression( ua, encoding, headers["Content-Type"] ) ) && type !== null ) {
+	if ( status === this.codes.SUCCESS && body && this.config.compress && ( type = this.compression( ua, encoding, headers["Content-Type"] ) ) && type !== null ) {
 		if ( body instanceof Buffer ) {
 			headers["Content-Length"] = body.toString().length;
 		}
