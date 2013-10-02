@@ -13,7 +13,7 @@ TurtleIO.prototype.status = function () {
 	// Startup parameters
 	$.iterate( this.config, function ( v, k ) {
 		state.config[k] = v;
-	});
+	} );
 
 	// Process information
 	state.process = {

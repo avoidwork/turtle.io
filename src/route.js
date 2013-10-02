@@ -38,12 +38,12 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 				req.on( "data", function ( data ) {
 					payload = payload === undefined ? data : payload + data;
-				});
+				} );
 
 				req.on( "end", function () {
 					req.body = payload;
 					handler.call( self, req, res, host );
-				});
+				} );
 			}
 			// Looking in LRU cache for Etag
 			else if ( REGEX_GET.test( method ) ) {

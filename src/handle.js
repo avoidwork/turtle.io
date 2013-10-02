@@ -58,7 +58,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 				else {
 					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NO_CONTENT, {} );
 				}
-			});
+			} );
 		}
 		else if ( method === "PUT" && write ) {
 			this.write( path, req, res );
@@ -82,7 +82,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 				else {
 					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NO_CONTENT, {} );
 				}
-			});
+			} );
 		}
 		else {
 			this.error( req, req, self.codes.NOT_ALLOWED );

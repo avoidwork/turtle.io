@@ -24,7 +24,7 @@ TurtleIO.prototype.allowed = function ( method, uri, host ) {
 		if ( i.test( uri ) && ( ( exist && route in hosts[host] ) || route in d || route in hosts.all ) ) {
 			return !( result = true );
 		}
-	});
+	} );
 
 	if ( !result ) {
 		hosts = self.handlers.all.hosts;
@@ -37,7 +37,7 @@ TurtleIO.prototype.allowed = function ( method, uri, host ) {
 			if ( i.test( uri ) && ( ( exist && route in hosts[host] ) || route in d || route in hosts.all ) ) {
 				return !( result = true );
 			}
-		});
+		} );
 	}
 
 	return result;

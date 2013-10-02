@@ -7,48 +7,62 @@
  * @param  {String}  etag Etag
  * @param  {Object}  req  HTTP(S) request Object
  * @param  {Object}  res  HTTP(S) response Object
+ * @param  {Boolean} file Indicates `body` is a file path
  * @return {Objet}        TurtleIO instance
  */
-TurtleIO.prototype.compress = function ( body, type, etag, req, res ) {
-	var self   = this,
-	    method = REGEX_GZIP.test( type ) ? "createGzip" : "createDeflate",
-	    fn     = this.config.tmp + "/" + etag + "." + type;
+TurtleIO.prototype.compress = function ( body, type, etag, req, res, file ) {
+	var self    = this,
+	    method  = REGEX_GZIP.test( type ) ? "createGzip" : "createDeflate",
+	    sMethod = method.replace( "create", "" ).toLowerCase(),
+	    url     = this.url( req ),
+	    fp      = this.config.tmp + "/" + etag + "." + type;
 
-	fs.exists( fn, function ( exist ) {
+	fs.exists( fp, function ( exist ) {
 		if ( exist ) {
-			fs.createReadStream( fn ).on( "error", function () {
+			// Pipe compressed asset to Client
+			fs.createReadStream( fp ).on( "error", function () {
 				self.error( req, res, self.codes.SERVER_ERROR );
 			} ).pipe( res );
 		}
-		else if ( typeof body.pipe === "function" ) {
+		else if ( !file ) {
+			// Pipe Stream through compression to Client & disk
+			if ( typeof body.pipe === "function" ) {
 				body.pipe( zlib[method]() ).pipe( res );
-				body.pipe( zlib[method]() ).pipe( fs.createWriteStream( fn ) );
-		}
-		else {
-			fs.createReadStream( body ).on( "error", function () {
-				zlib[method.replace( "create", "" ).toLowerCase()]( body, function ( e, data ) {
+				body.pipe( zlib[method]() ).pipe( fs.createWriteStream( fp ) );
+			}
+			// Raw response body, compress and send to Client & disk
+			else {
+				zlib[sMethod]( body, function ( e, data ) {
 					if ( e ) {
 						self.log( e );
-					}
-
-					res.end( data );
-				} );
-			} ).pipe( zlib[method]() ).pipe( res );
-
-			fs.createReadStream( body ).on( "error", function () {
-				zlib[method.replace( "create", "" ).toLowerCase()]( body, function ( e, data ) {
-					if ( e ) {
-						self.log( e );
+						self.unregister( url );
+						self.error( req, res, self.codes.SERVER_ERROR );
 					}
 					else {
-						fs.writeFile( fn, data, "utf8", function ( e ) {
+						res.end( data );
+
+						fs.writeFile( fp, data, "utf8", function ( e ) {
 							if ( e ) {
 								self.log( e );
+								self.unregister( url );
 							}
 						} );
 					}
 				} );
-			} ).pipe( zlib[method]() ).pipe( fs.createWriteStream( fn ) );
+			}
+		}
+		else {
+			// Pipe compressed asset to Client
+			fs.createReadStream( body ).on( "error", function ( e ) {
+				self.log( e );
+				self.unregister( url );
+				self.error( req, res, self.codes.SERVER_ERROR );
+			} ).pipe( zlib[method]() ).pipe( res );
+
+			// Pipe compressed asset to disk
+			fs.createReadStream( body ).on( "error", function ( e ) {
+				self.log( e );
+			} ).pipe( zlib[method]() ).pipe( fs.createWriteStream( fp ) );
 		}
 	} );
 
