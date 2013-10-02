@@ -39,13 +39,13 @@ TurtleIO.prototype.write = function ( path, req, res ) {
 							status = put ? self.codes.NO_CONTENT : self.codes.CREATED;
 							self.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow}, false );
 						}
-					});
+					} );
 				}
 				else if ( req.headers.etag !== etag ) {
 					self.respond( req, res, self.messages.NO_CONTENT, self.codes.FAILED, {}, false );
 				}
 			}
-		});
+		} );
 	}
 
 	return this;

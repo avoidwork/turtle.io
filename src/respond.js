@@ -19,6 +19,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 
 	status  = status || 200;
 	headers = this.headers( headers || {"Content-Type": "text/plain"}, status, req.method === "GET" );
+	file    = ( file === true );
 
 	if ( body ) {
 		body = this.encode( body );
@@ -46,7 +47,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			}
 
 			// Updating cache
-			this.register( url, {etag: headers.Etag, mimetype: headers["Content-Type"]}, true );
+			this.register( url, {etag: headers.Etag.replace( /"/g, "" ), mimetype: headers["Content-Type"]}, true );
 		}
 	}
 
@@ -61,7 +62,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 
 		headers["Content-Encoding"] = REGEX_GZIP.test( type ) ? "gzip" : "deflate";
 		res.writeHead( status, headers );
-		this.compress( body, type, headers.Etag.replace( /"/g, "" ), req, res );
+		this.compress( body, type, headers.Etag.replace( /"/g, "" ), req, res, file );
 	}
 	else if ( file ) {
 		res.writeHead( status, headers );

@@ -62,7 +62,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 		else {
 			files.each(function ( i ) {
 				self.pages.all[i.replace( REGEX_NEXT, "" )] = fs.readFileSync( pages + "/" + i, "utf8" );
-			});
+			} );
 
 			// Starting server
 			if ( self.server === null ) {
@@ -93,12 +93,12 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 
 			console.log( "Started turtle.io on port " + config.port );
 		}
-	});
+	} );
 
 	// For toobusy()
 	process.on( "uncaughtException", function ( e ) {
 		self.log( e.stack ? e.stack : e );
-	});
+	} );
 
 	return this;
 };

@@ -134,7 +134,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 				header         = i.replace( $.regex.header_replace, "" );
 				header         = header.unhyphenate( true ).replace( /\s+/g, "-" );
 				result[header] = value;
-			});
+			} );
 		}
 
 		return result;
@@ -186,11 +186,11 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 			proxyReq = http.request( options, function ( proxyRes ) {
 				res.writeHeader(proxyRes.statusCode, proxyRes.headers);
 				proxyRes.pipe( res );
-			});
+			} );
 
 			proxyReq.on( "error", function () {
 				self.respond( req, res, self.page( self.codes.BAD_GATEWAY, parsed.hostname ), self.codes.BAD_GATEWAY, {Allow: "GET"} );
-			});
+			} );
 
 			if ( REGEX_BODY.test( req.method ) ) {
 				proxyReq.write( req.body );
@@ -226,7 +226,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 	verbs.each( function ( i ) {
 		self[i]( route, wrapper, host );
 		self[i]( route + "/.*", wrapper, host );
-	});
+	} );
 
 	return this;
 };

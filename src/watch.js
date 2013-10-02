@@ -23,7 +23,6 @@ TurtleIO.prototype.watch = function ( url, path, mimetype ) {
 	 */
 	cleanup = function ( watcher, url, path ) {
 		watcher.close();
-		self.stale( url );
 		self.unregister( url );
 		delete self.watching[path];
 	};
@@ -49,9 +48,9 @@ TurtleIO.prototype.watch = function ( url, path, mimetype ) {
 					else {
 						cleanup( watcher, url, path );
 					}
-				});
+				} );
 			}
-		});
+		} );
 	}
 
 	return this;

@@ -15,7 +15,7 @@ TurtleIO.prototype.allows = function ( uri, host ) {
 		if ( self.allowed( i, uri, host ) ) {
 			result.push( i );
 		}
-	});
+	} );
 
 	result = result.join( ", " ).toUpperCase().replace( "GET", "GET, HEAD, OPTIONS" );
 
