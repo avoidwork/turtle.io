@@ -18,7 +18,7 @@
     <span class="k">if</span> <span class="p">(</span> <span class="nx">self</span><span class="p">.</span><span class="nx">allowed</span><span class="p">(</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">uri</span><span class="p">,</span> <span class="nx">host</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
       <span class="nx">result</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="nx">i</span> <span class="p">);</span>
     <span class="p">}</span>
-  <span class="p">});</span>
+  <span class="p">}</span> <span class="p">);</span>
 
   <span class="nx">result</span> <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span> <span class="s2">&quot;, &quot;</span> <span class="p">).</span><span class="nx">toUpperCase</span><span class="p">().</span><span class="nx">replace</span><span class="p">(</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;GET, HEAD, OPTIONS&quot;</span> <span class="p">);</span>
 

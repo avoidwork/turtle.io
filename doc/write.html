@@ -42,13 +42,13 @@
               <span class="nx">status</span> <span class="o">=</span> <span class="nx">put</span> <span class="o">?</span> <span class="nx">self</span><span class="p">.</span><span class="nx">codes</span><span class="p">.</span><span class="nx">NO_CONTENT</span> <span class="o">:</span> <span class="nx">self</span><span class="p">.</span><span class="nx">codes</span><span class="p">.</span><span class="nx">CREATED</span><span class="p">;</span>
               <span class="nx">self</span><span class="p">.</span><span class="nx">respond</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">self</span><span class="p">.</span><span class="nx">page</span><span class="p">(</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">self</span><span class="p">.</span><span class="nx">hostname</span><span class="p">(</span> <span class="nx">req</span> <span class="p">)</span> <span class="p">),</span> <span class="nx">status</span><span class="p">,</span> <span class="p">{</span><span class="nx">Allow</span><span class="o">:</span> <span class="nx">allow</span><span class="p">},</span> <span class="kc">false</span> <span class="p">);</span>
             <span class="p">}</span>
-          <span class="p">});</span>
+          <span class="p">}</span> <span class="p">);</span>
         <span class="p">}</span>
         <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">etag</span> <span class="o">!==</span> <span class="nx">etag</span> <span class="p">)</span> <span class="p">{</span>
           <span class="nx">self</span><span class="p">.</span><span class="nx">respond</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">self</span><span class="p">.</span><span class="nx">messages</span><span class="p">.</span><span class="nx">NO_CONTENT</span><span class="p">,</span> <span class="nx">self</span><span class="p">.</span><span class="nx">codes</span><span class="p">.</span><span class="nx">FAILED</span><span class="p">,</span> <span class="p">{},</span> <span class="kc">false</span> <span class="p">);</span>
         <span class="p">}</span>
       <span class="p">}</span>
-    <span class="p">});</span>
+    <span class="p">}</span> <span class="p">);</span>
   <span class="p">}</span>
 
   <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
