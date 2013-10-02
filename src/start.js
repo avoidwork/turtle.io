@@ -97,7 +97,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 
 	// For toobusy()
 	process.on( "uncaughtException", function ( e ) {
-		self.log( e.stack ? e.stack : e );
+		self.log( e.stack || e );
 	} );
 
 	return this;

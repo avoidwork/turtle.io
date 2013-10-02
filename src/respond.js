@@ -41,13 +41,15 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 				body = $.json.csv( body );
 			}
 
-			// Ensuring an Etag
-			if ( status === 200 && !headers.Etag ) {
-				headers.Etag = "\"" + this.etag( url, body.length || 0, headers["Last-Modified"] || 0 ) + "\"";
-			}
+			if ( status === 200 || status === 304 ) {
+				// Ensuring an Etag
+				if ( !headers.Etag ) {
+					headers.Etag = "\"" + this.etag( url, body.length || 0, headers["Last-Modified"] || 0 ) + "\"";
+				}
 
-			// Updating cache
-			this.register( url, {etag: headers.Etag.replace( /"/g, "" ), mimetype: headers["Content-Type"]}, true );
+				// Updating cache
+				this.register( url, {etag: headers.Etag.replace( /"/g, "" ), mimetype: headers["Content-Type"]}, true );
+			}
 		}
 	}
 
