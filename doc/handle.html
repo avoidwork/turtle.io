@@ -51,7 +51,7 @@
         <span class="k">else</span> <span class="p">{</span>
           <span class="nx">self</span><span class="p">.</span><span class="nx">respond</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">self</span><span class="p">.</span><span class="nx">messages</span><span class="p">.</span><span class="nx">NO_CONTENT</span><span class="p">,</span> <span class="nx">self</span><span class="p">.</span><span class="nx">codes</span><span class="p">.</span><span class="nx">NO_CONTENT</span><span class="p">,</span> <span class="p">{}</span> <span class="p">);</span>
         <span class="p">}</span>
-      <span class="p">});</span>
+      <span class="p">}</span> <span class="p">);</span>
     <span class="p">}</span>
     <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="nx">method</span> <span class="o">===</span> <span class="s2">&quot;PUT&quot;</span> <span class="o">&amp;&amp;</span> <span class="nx">write</span> <span class="p">)</span> <span class="p">{</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">);</span>
@@ -73,7 +73,7 @@
         <span class="k">else</span> <span class="p">{</span>
           <span class="nx">self</span><span class="p">.</span><span class="nx">respond</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">self</span><span class="p">.</span><span class="nx">messages</span><span class="p">.</span><span class="nx">NO_CONTENT</span><span class="p">,</span> <span class="nx">self</span><span class="p">.</span><span class="nx">codes</span><span class="p">.</span><span class="nx">NO_CONTENT</span><span class="p">,</span> <span class="p">{}</span> <span class="p">);</span>
         <span class="p">}</span>
-      <span class="p">});</span>
+      <span class="p">}</span> <span class="p">);</span>
     <span class="p">}</span>
     <span class="k">else</span> <span class="p">{</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">self</span><span class="p">.</span><span class="nx">codes</span><span class="p">.</span><span class="nx">NOT_ALLOWED</span> <span class="p">);</span>
