@@ -45,7 +45,7 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 		delete headers["Cache-Control"];
 	}
 
-	if ( ( status >= this.codes.FORBIDDEN && status <= this.codes.NOT_FOUND ) || ( status >= this.codes.SERVER_ERROR ) ) {
+	if ( status === this.codes.NOT_MODIFIED || ( status >= this.codes.FORBIDDEN && status <= this.codes.NOT_FOUND ) || ( status >= this.codes.SERVER_ERROR ) ) {
 		delete headers.Allow;
 		delete headers["Access-Control-Allow-Headers"];
 		delete headers["Access-Control-Allow-Methods"];
