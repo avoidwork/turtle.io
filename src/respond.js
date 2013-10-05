@@ -13,12 +13,13 @@
 TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) {
 	var self     = this,
 	    url      = this.url( req ),
+	    parsed   = $.parse( url ),
 	    ua       = req.headers["user-agent"],
 	    encoding = req.headers["accept-encoding"],
 	    type;
 
 	status  = status || this.codes.SUCCESS;
-	headers = this.headers( headers || {"Content-Type": "text/plain"}, status, req.method === "GET" );
+	headers = this.headers( headers || {Allow: this.allows( parsed.pathname, parsed.hostname ), "Content-Type": "text/plain"}, status, req.method === "GET" );
 	file    = ( file === true );
 
 	if ( body ) {
