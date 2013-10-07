@@ -19,8 +19,12 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	    type;
 
 	status  = status || this.codes.SUCCESS;
-	headers = this.headers( headers || {Allow: this.allows( parsed.pathname, parsed.hostname ), "Content-Type": "text/plain"}, status, req.method === "GET" );
+	headers = this.headers( headers || {"Content-Type": "text/plain"}, status, req.method === "GET" );
 	file    = ( file === true );
+
+	if ( !headers.Allow ) {
+		headers["Access-Control-Allow-Methods"] = headers.Allow = this.allows( parsed.pathname, parsed.hostname );
+	}
 
 	if ( body ) {
 		body = this.encode( body );
@@ -41,16 +45,21 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 
 				body = $.json.csv( body );
 			}
+		}
+	}
 
-			if ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) {
-				// Ensuring an Etag
-				if ( !headers.Etag ) {
-					headers.Etag = "\"" + this.etag( url, body.length || 0, headers["Last-Modified"] || 0 ) + "\"";
-				}
+	if ( req.method === "GET" && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) ) {
+		// Ensuring an Etag
+		if ( !headers.Etag ) {
+			headers.Etag = "\"" + this.etag( url, body.length || 0, headers["Last-Modified"] || 0 ) + "\"";
+		}
 
-				// Updating cache
-				this.register( url, {etag: headers.Etag.replace( /"/g, "" ), mimetype: headers["Content-Type"]}, true );
-			}
+		// Updating cache
+		this.register( url, {etag: headers.Etag.replace( /"/g, "" ), mimetype: headers["Content-Type"]}, true );
+
+		// Setting a watcher on the local path
+		if ( req.path ) {
+			this.watch( url, req.path, headers["Content-Type"] );
 		}
 	}
 

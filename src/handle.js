@@ -30,10 +30,8 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 			headers  = {Allow: allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified};
 
 			if ( method === "GET" ) {
-				// Creating `watcher` in master ps to update LRU
-				if ( !cached ) {
-					this.watch( url, path, mimetype );
-				}
+				// Decorating path for watcher
+				req.path = path;
 
 				// Client has current version
 				if ( ( req.headers["if-none-match"] === etag ) || ( !req.headers["if-none-match"] && Date.parse( req.headers["if-modified-since"] ) >= stat.mtime ) ) {
