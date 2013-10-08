@@ -30,9 +30,9 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 		headers["Access-Control-Allow-Methods"] = headers.Allow;
 	}
 
-	// Decorating "Last-Modified" header
-	if ( !headers["Last-Modified"] ) {
-		headers["Last-Modified"] = headers.Date;
+	// Decorating "Expires" header
+	if ( !headers.Expires && headers["Cache-Control"] && !$.regex.no.test( headers["Cache-Control"] ) && !$.regex.priv.test( headers["Cache-Control"] ) && $.regex.number_present.test( headers["Cache-Control"] ) ) {
+		headers.Expires = new Date( new Date( new Date().getTime() + $.number.parse( $.regex.number_present.exec( headers["Cache-Control"] )[0], 10 ) * 1000 ) ).toUTCString();
 	}
 
 	// Decorating "Transfer-Encoding" header
@@ -43,6 +43,11 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 	// Removing headers not wanted in the response
 	if ( !get || status >= this.codes.BAD_REQUEST ) {
 		delete headers["Cache-Control"];
+		delete headers.Expires;
+		delete headers["Last-Modified"];
+	}
+	else if ( status === this.codes.NOT_MODIFIED ) {
+		delete headers["Last-Modified"];
 	}
 
 	if ( ( status >= this.codes.FORBIDDEN && status <= this.codes.NOT_FOUND ) || status >= this.codes.SERVER_ERROR ) {
@@ -50,6 +55,8 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 		delete headers["Access-Control-Allow-Headers"];
 		delete headers["Access-Control-Allow-Methods"];
 		delete headers["Access-Control-Allow-Origin"];
+		delete headers["Cache-Control"];
+		delete headers.Expires;
 		delete headers["Last-Modified"];
 	}
 
