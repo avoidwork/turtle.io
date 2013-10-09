@@ -52,7 +52,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 
 				// Setting headers
 				if ( xhr.status === self.codes.SUCCESS ) {
-					etag = resHeaders.Etag || "\"" + self.etag( url, resHeaders["Content-Length"] || 0, resHeaders["Last-Modified"] || 0, arg ) + "\"";
+					etag = resHeaders.Etag || "\"" + self.etag( url, resHeaders["Content-Length"] || 0, resHeaders["Last-Modified"] || 0, self.encode( arg ) ) + "\"";
 
 					if ( resHeaders.Etag !== etag ) {
 						resHeaders.Etag = etag;
