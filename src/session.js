@@ -38,11 +38,11 @@ TurtleIO.prototype.session = {
 		    domain   = parsed.host.isDomain() && !parsed.host.isIP() ? parsed.host : undefined,
 		    secure   = ( parsed.protocol === "https:" ),
 		    id       = $.uuid( true ),
-		    salt, sesh, sid;
+		    iv, sesh, sid;
 
-		 salt = req.connection.remoteAddress + "-" + instance.config.session.salt;
+		 iv   = req.connection.remoteAddress + "-" + instance.config.session.iv;
 		 sesh = this.server.sessions[id] = new Session( id, this.server );
-		 sid  = instance.cipher( id, true, salt );
+		 sid  = instance.cipher( id, true, iv );
 
 		instance.cookie.set( res, instance.config.session.id, sid, expires, domain, secure, "/" );
 
@@ -62,9 +62,9 @@ TurtleIO.prototype.session = {
 		    parsed   = $.parse( instance.url( req ) ),
 		    domain   = parsed.host.isDomain() && !parsed.host.isIP() ? parsed.host : undefined,
 		    secure   = ( parsed.protocol === "https:" ),
-		    salt     = req.connection.remoteAddress + "-" + instance.config.session.salt,
+		    iv       = req.connection.remoteAddress + "-" + instance.config.session.iv,
 		    sid      = req.cookies[instance.config.session.id],
-		    id       = instance.cipher( sid, false, salt );
+		    id       = instance.cipher( sid, false, iv );
 
 		if ( id ) {
 			instance.cookie.expire( res, instance.config.session.id, domain, secure, "/" );
@@ -86,11 +86,11 @@ TurtleIO.prototype.session = {
 		var instance = this.server,
 		    sid      = req.cookies[instance.config.session.id],
 		    sesh     = null,
-		    id, salt;
+		    id, iv;
 
 		if ( sid !== undefined ) {
-			salt = req.connection.remoteAddress + "-" + instance.config.session.salt;
-			id   = instance.cipher( sid, false, salt );
+			iv   = req.connection.remoteAddress + "-" + instance.config.session.iv;
+			id   = instance.cipher( sid, false, iv );
 			sesh = instance.sessions[id] || null;
 
 			if ( sesh !== null ) {
@@ -120,9 +120,9 @@ TurtleIO.prototype.session = {
 		    parsed   = $.parse( instance.url( req ) ),
 		    domain   = parsed.host.isDomain() && !parsed.host.isIP() ? parsed.host : undefined,
 		    secure   = ( parsed.protocol === "https:" ),
-		    salt     = req.connection.remoteAddress + "-" + instance.config.session.salt,
+		    iv       = req.connection.remoteAddress + "-" + instance.config.session.iv,
 		    sid      = req.cookies[instance.config.session.id],
-		    id       = instance.cipher( sid, false, salt );
+		    id       = instance.cipher( sid, false, iv );
 
 		if ( id ) {
 			instance.sessions[id]._timestamp = moment().unix();

@@ -51,7 +51,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	if ( req.method === "GET" && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) ) {
 		// Ensuring an Etag
 		if ( !headers.Etag ) {
-			headers.Etag = "\"" + this.etag( url, body.length || 0, headers["Last-Modified"] || 0 ) + "\"";
+			headers.Etag = "\"" + this.etag( url, body.length || 0, headers["Last-Modified"] || 0, body || 0 ) + "\"";
 		}
 
 		// Updating cache

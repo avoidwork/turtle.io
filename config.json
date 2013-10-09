@@ -24,10 +24,10 @@
 	"port"    : 8000,
 	"root"    : "",
 	"session" : {
-		"id"     : "sid",
-		"salt"   : "turtleio",
-		"valid"  : "15 minutes",
-		"gc"     : 60000
+		"id"    : "sid",
+		"iv"    : "turtleio",
+		"valid" : "15 minutes",
+		"gc"    : 60000
 	},
 	"pages"   : null,
 	"proxy"   : {
