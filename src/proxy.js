@@ -145,9 +145,9 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 	 *
 	 * @method wrapper
 	 * @private
-	 * @param  {Object} req   HTTP(S) request Object
-	 * @param  {Object} res   HTTP(S) response Object
-	 * @return {Undefined}    undefined
+	 * @param  {Object} req HTTP(S) request Object
+	 * @param  {Object} res HTTP(S) response Object
+	 * @return {Undefined}  undefined
 	 */
 	wrapper = function ( req, res ) {
 		var url      = origin + req.url.replace( new RegExp( "^" + route ), "" ),
@@ -166,6 +166,9 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 		if ( !stream && ( REGEX_EXT.test( parsed.pathname ) && !REGEX_JSON.test( mimetype ) ) && REGEX_STREAM.test( mimetype ) ) {
 			stream = true;
 		}
+
+		// Stripping existing authorization header because it's not relevant for the remote system
+		delete headerz.authorization;
 
 		// Streaming response to Client
 		if ( stream ) {
