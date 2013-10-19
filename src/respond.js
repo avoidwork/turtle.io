@@ -29,7 +29,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	if ( body ) {
 		body = this.encode( body );
 
-		// Emsuring JSON has proper mimetype
+		// Ensuring JSON has proper mimetype
 		if ( $.regex.json_wrap.test( body ) ) {
 			headers["Content-Type"] = "application/json";
 		}

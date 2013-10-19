@@ -25,7 +25,7 @@
 	"root"    : "",
 	"session" : {
 		"id"    : "sid",
-		"iv"    : "turtleio",
+		"iv"    : null,
 		"valid" : "15 minutes",
 		"gc"    : 60000
 	},
