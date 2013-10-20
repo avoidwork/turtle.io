@@ -14,11 +14,12 @@ TurtleIO.prototype.prep = function ( req, res ) {
 	    token  = header.split( REGEX_SPACE ).pop()  || "",
 	    auth   = new Buffer( token, "base64" ).toString(),
 	    user   = auth.split( ":" )[0] || "-",
-	    refer  = req.headers.referer !== undefined ? ( "\"" + req.headers.referer + "\"" ) : "-";
+	    refer  = req.headers.referer ? ( "\"" + req.headers.referer + "\"" ) : "-",
+	    ip     = req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].explode().last() : req.connection.remoteAddress;
 
 	msg = msg.replace( "{{host}}",       req.headers.host )
 	         .replace( "{{time}}",       moment().format( time ) )
-	         .replace( "{{ip}}",         req.connection.remoteAddress )
+	         .replace( "{{ip}}",         ip )
 	         .replace( "{{method}}",     req.method )
 	         .replace( "{{path}}",       parsed.path )
 	         .replace( "{{status}}",     res.statusCode )

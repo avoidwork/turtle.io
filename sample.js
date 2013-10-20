@@ -20,7 +20,7 @@ config = {
 }
 
 server.get("/status", function (res, req) {
-	server.respond(res, req, server.status(), 200, {Allow: "GET"}, true);
+	server.respond(res, req, server.status(), 200, {Allow: "GET"});
 }, "test");
 
 server.start(config);
