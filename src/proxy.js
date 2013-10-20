@@ -170,6 +170,12 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 		// Stripping existing authorization header because it's not relevant for the remote system
 		delete headerz.authorization;
 
+		// Identifying proxy behavior
+		headerz["x-host"]             = parsed.host;
+		headerz["x-forwarded-for"]    = ( headerz["x-forwarded-for"] ? headerz["x-forwarded-for"] + ", " : "" ) + req.socket.remoteAddress;
+		headerz["x-forwarded-proto"]  = parsed.protocol.replace( ":", "" );
+		headerz["x-forwarded-server"] = self.config.headers.Server;
+
 		// Streaming response to Client
 		if ( stream ) {
 			headerz.host = req.headers.host;

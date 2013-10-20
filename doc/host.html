@@ -1,0 +1,24 @@
+<!DOCTYPE html><html lang="en"><head><title>host</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="host"><meta name="groc-project-path" content="src/host.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/host.js</div></div><div id="document"><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method host</span></p>
+
+<p>Registers a virtual host</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>arg must be a String.</strong><br/>(Virtual host)</li>
+</ul>
+
+<p><strong>Returns an Object</strong><br/>(TurtleIO instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">TurtleIO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">host</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">arg</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span><span class="p">.</span><span class="nx">all</span><span class="p">.</span><span class="nx">hosts</span><span class="p">[</span><span class="nx">arg</span><span class="p">]</span> <span class="o">===</span> <span class="kc">undefined</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">vhosts</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="nx">arg</span> <span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">vhostsRegExp</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span> <span class="s2">&quot;^&quot;</span> <span class="o">+</span> <span class="nx">arg</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span> <span class="sr">/\*/g</span><span class="p">,</span> <span class="s2">&quot;.*&quot;</span> <span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;$&quot;</span> <span class="p">)</span> <span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span><span class="p">.</span><span class="nx">all</span><span class="p">.</span><span class="nx">hosts</span><span class="p">[</span><span class="nx">arg</span><span class="p">]</span>       <span class="o">=</span> <span class="p">{};</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span><span class="p">[</span><span class="s2">&quot;delete&quot;</span><span class="p">].</span><span class="nx">hosts</span><span class="p">[</span><span class="nx">arg</span><span class="p">]</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span><span class="p">.</span><span class="nx">get</span><span class="p">.</span><span class="nx">hosts</span><span class="p">[</span><span class="nx">arg</span><span class="p">]</span>       <span class="o">=</span> <span class="p">{};</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span><span class="p">.</span><span class="nx">patch</span><span class="p">.</span><span class="nx">hosts</span><span class="p">[</span><span class="nx">arg</span><span class="p">]</span>     <span class="o">=</span> <span class="p">{};</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span><span class="p">.</span><span class="nx">post</span><span class="p">.</span><span class="nx">hosts</span><span class="p">[</span><span class="nx">arg</span><span class="p">]</span>      <span class="o">=</span> <span class="p">{};</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span><span class="p">.</span><span class="nx">put</span><span class="p">.</span><span class="nx">hosts</span><span class="p">[</span><span class="nx">arg</span><span class="p">]</span>       <span class="o">=</span> <span class="p">{};</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+<span class="p">};</span></div></div></div></div></body></html>

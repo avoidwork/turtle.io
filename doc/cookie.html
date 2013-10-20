@@ -1,0 +1,64 @@
+<!DOCTYPE html><html lang="en"><head><title>cookie</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="cookie"><meta name="groc-project-path" content="src/cookie.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/cookie.js</div></div><div id="document"><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'> </span></p>
+
+<p>Cookies</p></div></div><div class="code"><div class="wrapper"><span class="nx">TurtleIO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">cookie</span> <span class="o">=</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method expire</span></p>
+
+<p>Expires a cookie if it exists</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>res must be an Object.</strong><br/>(HTTP(S) response Object)</p></li>
+<li><p><strong>name must be a String.</strong><br/>(Name of the cookie to expire)</p></li>
+<li><p><strong>domain must be a String.</strong><br/>([Optional] Domain to set the cookie for)</p></li>
+<li><p><strong>secure must be a Boolean.</strong><br/>([Optional] Make the cookie only accessible via SSL)</p></li>
+<li><p><strong>path must be a String.</strong><br/>([Optional] Path the cookie is for)</p></li>
+</ul>
+
+<p><strong>Returns a String</strong><br/>(Name of the expired cookie)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">expire</span> <span class="o">:</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">domain</span><span class="p">,</span> <span class="nx">secure</span><span class="p">,</span> <span class="nx">path</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">cookie</span><span class="p">.</span><span class="nx">expire</span><span class="p">(</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">domain</span><span class="p">,</span> <span class="nx">secure</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">res</span> <span class="p">);</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method get</span></p>
+
+<p>Gets a cookie from the request headers</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>req must be an Object.</strong><br/>(HTTP(S) request Object)</p></li>
+<li><p><strong>name must be a String.</strong><br/>(Name of the cookie to get)</p></li>
+</ul>
+
+<p><strong>Returns a Mixed</strong><br/>(Cookie or undefined)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">get</span> <span class="o">:</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">name</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span> <span class="nx">req</span> <span class="p">)[</span><span class="nx">name</span><span class="p">];</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method list</span></p>
+
+<p>Gets a list cookies from the request headers</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>req must be an Object.</strong><br/>(HTTP(S) request Object)</p></li>
+<li><p><strong>name must be a String.</strong><br/>(Cookie name)</p></li>
+</ul>
+
+<p><strong>Returns an Object</strong><br/>(Collection of cookies)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">list</span> <span class="o">:</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">cookie</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">cookie</span> <span class="o">||</span> <span class="s2">&quot;&quot;</span> <span class="p">);</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method set</span></p>
+
+<p>Sets a cookie in the response headers</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>res must be an Object.</strong><br/>(HTTP(S) response Object)</p></li>
+<li><p><strong>name must be a String.</strong><br/>(Name of the cookie to create)</p></li>
+<li><p><strong>value must be a String.</strong><br/>(Value to set)</p></li>
+<li><p><strong>offset must be a String.</strong><br/>(A positive or negative integer followed by "d", "h", "m" or "s")</p></li>
+<li><p><strong>domain must be a String.</strong><br/>([Optional] Domain to set the cookie for)</p></li>
+<li><p><strong>secure must be a Boolean.</strong><br/>([Optional] Make the cookie only accessible via SSL)</p></li>
+<li><p><strong>path must be a String.</strong><br/>([Optional] Path the cookie is for)</p></li>
+</ul>
+
+<p><strong>Returns an Undefined</strong><br/>(undefined)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">set</span> <span class="o">:</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">offset</span><span class="p">,</span> <span class="nx">domain</span><span class="p">,</span> <span class="nx">secure</span><span class="p">,</span> <span class="nx">path</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">cookie</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">offset</span><span class="p">,</span> <span class="nx">domain</span><span class="p">,</span> <span class="nx">secure</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">res</span> <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">};</span></div></div></div></div></body></html>

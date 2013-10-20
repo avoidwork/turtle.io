@@ -8,11 +8,14 @@
 TurtleIO.prototype.status = function () {
 	var ram    = process.memoryUsage(),
 	    uptime = process.uptime(),
-	    state  = {config: {}, process: {}, server: {}};
+	    state  = {config: {}, process: {}, server: {}},
+	    invalid = /^(auth|session|ssl)$/;
 
 	// Startup parameters
 	$.iterate( this.config, function ( v, k ) {
-		state.config[k] = v;
+		if ( !invalid.test( k ) ) {
+			state.config[k] = v;
+		}
 	} );
 
 	// Process information
