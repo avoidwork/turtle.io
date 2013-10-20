@@ -172,7 +172,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 
 		// Identifying proxy behavior
 		headerz["x-host"]             = parsed.host;
-		headerz["x-forwarded-for"]    = ( headerz["x-forwarded-for"] ? headerz["x-forwarded-for"] + ", " : "" ) + req.socket.remoteAddress;
+		headerz["x-forwarded-for"]    = ( headerz["x-forwarded-for"] ? headerz["x-forwarded-for"] + ", " : "" ) + req.connection.remoteAddress;
 		headerz["x-forwarded-proto"]  = parsed.protocol.replace( ":", "" );
 		headerz["x-forwarded-server"] = self.config.headers.Server;
 
