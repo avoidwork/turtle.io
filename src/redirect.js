@@ -7,11 +7,10 @@
  * @param  {String}  host      [Optional] Hostname this route is for (default is all)
  * @param  {Boolean} permanent [Optional] `true` will indicate the redirection is permanent
  * @return {Object}            instance
- * @todo Make it faster!
  */
 TurtleIO.prototype.redirect = function ( route, url, host, permanent ) {
 	var self    = this,
-	    code    = this.codes[permanent === true ? "PERM_REDIRECT" : "REDIRECT"],
+	    code    = this.codes[permanent === true ? "MOVED" : "REDIRECT"],
 	    pattern = new RegExp( "^" + route + "$" );
 
 	this.get( route, function ( req, res ) {
