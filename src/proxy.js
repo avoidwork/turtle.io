@@ -43,7 +43,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 			resHeaders.Server = self.config.headers.Server;
 
 			// Something went wrong
-			if ( xhr.status >= self.codes.SERVER_ERROR ) {
+			if ( xhr.status < self.codes.CONTINUE ) {
 				self.respond( req, res, self.page( self.codes.BAD_GATEWAY, parsed.hostname ), self.codes.BAD_GATEWAY, resHeaders );
 			}
 			// Getting or creating an Etag
