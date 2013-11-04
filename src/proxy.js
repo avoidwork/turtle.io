@@ -34,6 +34,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 		    url           = self.url( req ),
 		    parsed        = $.parse( url ),
 		    delay         = $.expires,
+		    get           = req.method === "GET",
 		    rewriteOrigin = parsed.protocol + "//" + parsed.host + route,
 		    resHeaders, rewrite;
 
@@ -45,7 +46,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 			self.respond( req, res, self.page( self.codes.BAD_GATEWAY, parsed.hostname ), self.codes.BAD_GATEWAY, resHeaders );
 		}
 		else {
-			if ( req.method === "GET" && ( xhr.status === self.codes.SUCCESS || xhr.status === self.codes.NOT_MODIFIED ) && !$.regex.no.test( resHeaders["Cache-Control"] ) && !$.regex.priv.test( resHeaders["Cache-Control"] ) ) {
+			if ( get && ( xhr.status === self.codes.SUCCESS || xhr.status === self.codes.NOT_MODIFIED ) && !$.regex.no.test( resHeaders["Cache-Control"] ) && !$.regex.priv.test( resHeaders["Cache-Control"] ) ) {
 				// Determining how long rep is valid
 				if ( resHeaders["Cache-Control"] && $.regex.number_present.test( resHeaders["Cache-Control"] ) ) {
 					delay = $.number.parse( $.regex.number_present.exec( resHeaders["Cache-Control"] )[0], 10 );
@@ -66,7 +67,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 				rewrite = REGEX_REWRITE.test( ( resHeaders["Content-Type"] || "" ).replace( REGEX_NVAL, "" ) );
 
 				// Setting headers
-				if ( req.method === "GET" && xhr.status === self.codes.SUCCESS ) {
+				if ( get && xhr.status === self.codes.SUCCESS ) {
 					etag = resHeaders.Etag || "\"" + self.etag( url, resHeaders["Content-Length"] || 0, resHeaders["Last-Modified"] || 0, self.encode( arg ) ) + "\"";
 
 					if ( resHeaders.Etag !== etag ) {
@@ -79,7 +80,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 				}
 
 				// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
-				if ( req.headers["if-none-match"] === etag ) {
+				if ( get && req.headers["if-none-match"] === etag ) {
 					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, resHeaders );
 				}
 				else {
@@ -191,7 +192,7 @@ TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
 			} );
 
 			proxyReq.on( "error", function () {
-				self.respond( req, res, self.page( self.codes.BAD_GATEWAY, parsed.hostname ), self.codes.BAD_GATEWAY, {Allow: "GET"} );
+				self.respond( req, res, self.page( self.codes.BAD_GATEWAY, parsed.hostname ), self.codes.BAD_GATEWAY );
 			} );
 
 			if ( REGEX_BODY.test( req.method ) ) {
