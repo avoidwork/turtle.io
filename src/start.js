@@ -28,6 +28,12 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	this.config = config;
 	pages       = this.config.pages ? ( this.config.root + this.config.pages ) : ( __dirname + "/../pages" );
 
+	// Looking for required setting
+	if ( !this.config["default"] ) {
+		this.log( new Error( "Invalid default virtual host" ) );
+		process.exit( 1 );
+	}
+
 	// Setting session iv
 	if ( this.config.session.iv === null ) {
 		this.config.session.iv = crypto.randomBytes( 256 ).toString();
