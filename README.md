@@ -24,6 +24,8 @@ If you're having problems, use the support forum at CodersClan.
 
 ## Examples
 
+turtle.io requires a ***default*** virtual host to be specified, because it is the failover, when a request can't be routed.
+
 ### Virtual hosts
 
 Virtual host keys are the hostname, and the value is the directory relative to "root".
