@@ -30,7 +30,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 
 	// Looking for required setting
 	if ( !this.config["default"] ) {
-		self.log( new Error( "Invalid default virtual host" ) );
+		this.log( new Error( "Invalid default virtual host" ) );
 		process.exit( 1 );
 	}
 
