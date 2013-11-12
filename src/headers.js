@@ -55,5 +55,9 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 		headers["Access-Control-Allow-Methods"] = "";
 	}
 
+	if ( headers["Last-Modified"] !== undefined && headers["Last-Modified"].isEmpty() ) {
+		delete headers["Last-Modified"];
+	}
+
 	return headers;
 };

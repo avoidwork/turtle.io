@@ -43,5 +43,9 @@
     <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;Access-Control-Allow-Methods&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
   <span class="p">}</span>
 
+  <span class="k">if</span> <span class="p">(</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;Last-Modified&quot;</span><span class="p">]</span> <span class="o">!==</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;Last-Modified&quot;</span><span class="p">].</span><span class="nx">isEmpty</span><span class="p">()</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">delete</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;Last-Modified&quot;</span><span class="p">];</span>
+  <span class="p">}</span>
+
   <span class="k">return</span> <span class="nx">headers</span><span class="p">;</span>
 <span class="p">};</span></div></div></div></div></body></html>
