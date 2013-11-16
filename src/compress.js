@@ -11,8 +11,7 @@
  * @return {Objet}        TurtleIO instance
  */
 TurtleIO.prototype.compress = function ( body, type, etag, req, res, file ) {
-	var self    = this,
-	    method  = REGEX_GZIP.test( type ) ? "createGzip" : "createDeflate",
+	var method  = REGEX_GZIP.test( type ) ? "createGzip" : "createDeflate",
 	    sMethod = method.replace( "create", "" ).toLowerCase(),
 	    url     = this.url( req ),
 	    fp      = this.config.tmp + "/" + etag + "." + type;
@@ -21,8 +20,8 @@ TurtleIO.prototype.compress = function ( body, type, etag, req, res, file ) {
 		if ( exist ) {
 			// Pipe compressed asset to Client
 			fs.createReadStream( fp ).on( "error", function () {
-				self.error( req, res, self.codes.SERVER_ERROR );
-			} ).pipe( res );
+				this.error( req, res, this.codes.SERVER_ERROR );
+			}.bind( this ) ).pipe( res );
 		}
 		else if ( !file ) {
 			// Pipe Stream through compression to Client & disk
@@ -34,37 +33,37 @@ TurtleIO.prototype.compress = function ( body, type, etag, req, res, file ) {
 			else {
 				zlib[sMethod]( body, function ( e, data ) {
 					if ( e ) {
-						self.log( e );
-						self.unregister( url );
-						self.error( req, res, self.codes.SERVER_ERROR );
+						this.log( e );
+						this.unregister( url );
+						this.error( req, res, this.codes.SERVER_ERROR );
 					}
 					else {
 						res.end( data );
 
 						fs.writeFile( fp, data, "utf8", function ( e ) {
 							if ( e ) {
-								self.log( e );
-								self.unregister( url );
+								this.log( e );
+								this.unregister( url );
 							}
 						} );
 					}
-				} );
+				}.bind( this ) );
 			}
 		}
 		else {
 			// Pipe compressed asset to Client
 			fs.createReadStream( body ).on( "error", function ( e ) {
-				self.log( e );
-				self.unregister( url );
-				self.error( req, res, self.codes.SERVER_ERROR );
-			} ).pipe( zlib[method]() ).pipe( res );
+				this.log( e );
+				this.unregister( url );
+				this.error( req, res, this.codes.SERVER_ERROR );
+			}.bind( this ) ).pipe( zlib[method]() ).pipe( res );
 
 			// Pipe compressed asset to disk
 			fs.createReadStream( body ).on( "error", function ( e ) {
-				self.log( e );
-			} ).pipe( zlib[method]() ).pipe( fs.createWriteStream( fp ) );
+				this.log( e );
+			}.bind( this ) ).pipe( zlib[method]() ).pipe( fs.createWriteStream( fp ) );
 		}
-	} );
+	}.bind( this ) );
 
 	return this;
 };

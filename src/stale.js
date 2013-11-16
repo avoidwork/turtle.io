@@ -7,8 +7,7 @@
  * @return {Object}     TurtleIO instance
  */
 TurtleIO.prototype.stale = function ( url ) {
-	var self   = this,
-	    cached = this.etags.cache[url],
+	var cached = this.etags.cache[url],
 	    path   = this.config.tmp + "/",
 	    gz, df;
 
@@ -21,21 +20,21 @@ TurtleIO.prototype.stale = function ( url ) {
 			if ( exists ) {
 				fs.unlink( gz, function ( e ) {
 					if ( e ) {
-						self.log( e );
+						this.log( e );
 					}
-				} );
+				}.bind( this ) );
 			}
-		} );
+		}.bind( this ) );
 
 		fs.exists( df, function ( exists ) {
 			if ( exists ) {
 				fs.unlink( df, function ( e ) {
 					if ( e ) {
-						self.log( e );
+						this.log( e );
 					}
-				} );
+				}.bind( this ) );
 			}
-		} );
+		}.bind( this ) );
 	}
 
 	return this;

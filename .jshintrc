@@ -17,5 +17,6 @@
 	"boss": true,
 	"eqnull": true,
 	"expr": true,
-	"node": true
+	"node": true,
+	"validthis": true
 }

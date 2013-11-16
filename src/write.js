@@ -8,8 +8,7 @@
  * @return {Object}       TurtleIO instance
  */
 TurtleIO.prototype.write = function ( path, req, res ) {
-	var self  = this,
-	    put   = ( req.method === "PUT" ),
+	var put   = ( req.method === "PUT" ),
 	    body  = req.body,
 	    allow = this.allows( req.url ),
 	    del   = this.allowed( "DELETE", req.url ),
@@ -25,27 +24,27 @@ TurtleIO.prototype.write = function ( path, req, res ) {
 
 		fs.lstat( path, function ( e, stat ) {
 			if ( e ) {
-				self.error( req, res, self.codes.NOT_FOUND );
+				this.error( req, res, this.codes.NOT_FOUND );
 			}
 			else {
-				var etag = "\"" + self.etag( url, stat.size, stat.mtime ) + "\"";
+				var etag = "\"" + this.etag( url, stat.size, stat.mtime ) + "\"";
 
 				if ( !req.headers.hasOwnProperty( "etag" ) || req.headers.etag === etag ) {
 					fs.writeFile( path, body, function ( e ) {
 						if ( e ) {
-							self.error( req, req, self.codes.SERVER_ERROR );
+							this.error( req, req, this.codes.SERVER_ERROR );
 						}
 						else {
-							status = put ? self.codes.NO_CONTENT : self.codes.CREATED;
-							self.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow}, false );
+							status = put ? this.codes.NO_CONTENT : this.codes.CREATED;
+							this.respond( req, res, this.page( status, this.hostname( req ) ), status, {Allow: allow}, false );
 						}
-					} );
+					}.bind( this ) );
 				}
 				else if ( req.headers.etag !== etag ) {
-					self.respond( req, res, self.messages.NO_CONTENT, self.codes.FAILED, {}, false );
+					this.respond( req, res, this.messages.NO_CONTENT, this.codes.FAILED, {}, false );
 				}
 			}
-		} );
+		}.bind( this ) );
 	}
 
 	return this;
