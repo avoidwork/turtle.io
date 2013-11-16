@@ -8,24 +8,20 @@
  * @return {Object}          TurtleIO instance
  */
 TurtleIO.prototype.watch = function ( url, path, mimetype ) {
-	var self = this,
-	    cleanup, watcher;
+	var cleanup, watcher;
 
 	/**
 	 * Cleans up caches
 	 *
 	 * @method cleanup
 	 * @private
-	 * @param  {Object} watcher FileSystem Watcher
-	 * @param  {String} url     Stale URL
-	 * @param  {String} path    URL path
-	 * @return {Undefined}      undefined
+	 * @return {Undefined} undefined
 	 */
-	cleanup = function ( watcher, url, path ) {
+	cleanup = function () {
 		watcher.close();
-		self.unregister( url );
-		delete self.watching[path];
-	};
+		this.unregister( url );
+		delete this.watching[path];
+	}.bind( this );
 
 	if ( !( this.watching[path] ) ) {
 		// Tracking
@@ -34,23 +30,23 @@ TurtleIO.prototype.watch = function ( url, path, mimetype ) {
 		// Watching path for changes
 		watcher = fs.watch( path, function ( ev ) {
 			if ( REGEX_RENAME.test( ev ) ) {
-				cleanup( watcher, url, path );
+				cleanup();
 			}
 			else {
 				fs.lstat( path, function ( e, stat ) {
 					if ( e ) {
-						self.log( e );
-						cleanup( watcher, url, path );
+						this.log( e );
+						cleanup();
 					}
-					else if ( self.etags.cache[url] ) {
-						self.register( url, {etag: self.etag( url, stat.size, stat.mtime ), mimetype: mimetype}, true );
+					else if ( this.etags.cache[url] ) {
+						this.register( url, {etag: this.etag( url, stat.size, stat.mtime ), mimetype: mimetype}, true );
 					}
 					else {
-						cleanup( watcher, url, path );
+						cleanup();
 					}
-				} );
+				}.bind( this ) );
 			}
-		} );
+		}.bind( this ) );
 	}
 
 	return this;

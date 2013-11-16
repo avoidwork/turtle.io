@@ -7,10 +7,9 @@
  * @return {Object}          TurtleIO instance
  */
 TurtleIO.prototype.start = function ( cfg, err ) {
-	var self = this,
-	    config, pages;
+	var config, pages;
 
-	config = $.clone( defaultConfig );
+	config = $.clone( defaultConfig, true );
 
 	// Merging custom with default config
 	$.merge( config, cfg || {} );
@@ -55,14 +54,14 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 
 	// Registering virtual hosts
 	$.array.cast( config.vhosts, true ).each( function ( i ) {
-		self.host( i );
-	} );
+		this.host( i );
+	}.bind( this ) );
 
 	// Setting a default GET route
 	if ( !this.handlers.get.routes.contains( ".*" ) ) {
 		this.get( "/.*", function ( req, res, host ) {
-			self.request( req, res, host );
-		}, "all" );
+			this.request( req, res, host );
+		}.bind( this ), "all" );
 	}
 
 	// Loading default error pages
@@ -71,45 +70,45 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 			console.log( e );
 		}
 		else {
-			files.each(function ( i ) {
-				self.pages.all[i.replace( REGEX_NEXT, "" )] = fs.readFileSync( pages + "/" + i, "utf8" );
-			} );
+			files.each( function ( i ) {
+				this.pages.all[i.replace( REGEX_NEXT, "" )] = fs.readFileSync( pages + "/" + i, "utf8" );
+			}.bind( this ) );
 
 			// Starting server
-			if ( self.server === null ) {
+			if ( this.server === null ) {
 				if ( config.ssl.cert !== null && config.ssl.key !== null ) {
 					// Reading files
 					config.ssl.cert = fs.readFileSync( config.ssl.cert );
 					config.ssl.key  = fs.readFileSync( config.ssl.key );
 
 					// Starting server
-					self.server = https.createServer( $.merge( config.ssl, {port: config.port, host: config.address} ), function ( req, res ) {
-						self.route( req, res );
-					} ).listen( config.port, config.address );
+					this.server = https.createServer( $.merge( config.ssl, {port: config.port, host: config.address} ), function ( req, res ) {
+						this.route( req, res );
+					}.bind( this ) ).listen( config.port, config.address );
 				}
 				else {
-					self.server = http.createServer( function ( req, res ) {
-						self.route( req, res );
-					} ).listen( config.port, config.address );
+					this.server = http.createServer( function ( req, res ) {
+						this.route( req, res );
+					}.bind( this ) ).listen( config.port, config.address );
 				}
 			}
 			else {
-				self.server.listen( config.port, config.address );
+				this.server.listen( config.port, config.address );
 			}
 
 			// Dropping process
-			if ( self.config.uid && !isNaN( self.config.uid ) ) {
-				process.setuid( self.config.uid );
+			if ( this.config.uid && !isNaN( this.config.uid ) ) {
+				process.setuid( this.config.uid );
 			}
 
 			console.log( "Started turtle.io on port " + config.port );
 		}
-	} );
+	}.bind( this ) );
 
 	// For toobusy()
 	process.on( "uncaughtException", function ( e ) {
-		self.log( e.stack || e );
-	} );
+		this.log( e.stack || e );
+	}.bind( this ) );
 
 	return this;
 };

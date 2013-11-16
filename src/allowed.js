@@ -8,36 +8,35 @@
  * @return {Boolean}       Boolean indicating if method is allowed
  */
 TurtleIO.prototype.allowed = function ( method, uri, host ) {
-	host       = host || "all";
-	var self   = this,
-	    result = false,
+	var result = false,
 	    exist  = false,
 	    d, hosts;
 
-	hosts = self.handlers[method].hosts;
-	d     = hosts[self.config["default"]];
+	host  = host || "all";
+	hosts = this.handlers[method].hosts;
+	d     = hosts[this.config["default"]];
 	exist = ( hosts[host] );
 
 	this.handlers[method].regex.each( function ( i, idx ) {
-		var route = self.handlers[method].routes[idx];
+		var route = this.handlers[method].routes[idx];
 
 		if ( i.test( uri ) && ( ( exist && route in hosts[host] ) || route in d || route in hosts.all ) ) {
 			return !( result = true );
 		}
-	} );
+	}.bind( this ) );
 
 	if ( !result ) {
-		hosts = self.handlers.all.hosts;
-		d     = hosts[self.config["default"]];
+		hosts = this.handlers.all.hosts;
+		d     = hosts[this.config["default"]];
 		exist = ( hosts[host] );
 
 		this.handlers.all.regex.each( function ( i, idx ) {
-			var route = self.handlers.all.routes[idx];
+			var route = this.handlers.all.routes[idx];
 
 			if ( i.test( uri ) && ( ( exist && route in hosts[host] ) || route in d || route in hosts.all ) ) {
 				return !( result = true );
 			}
-		} );
+		}.bind( this ) );
 	}
 
 	return result;
