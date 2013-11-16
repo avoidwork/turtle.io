@@ -1,17 +1,17 @@
 <!DOCTYPE html><html lang="en"><head><title>proxy</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="proxy"><meta name="groc-project-path" content="src/proxy.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/proxy.js</div></div><div id="document"><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method proxy</span></p>
 
-<p>Proxies a (root) URL to a route</p>
+<p>Proxies a URL to a route</p>
 
 <p>Parameters:</p>
 
 <ul>
-<li><p><strong>origin must be a String.</strong><br/>(Host to proxy (e.g. http://hostname))</p></li>
 <li><p><strong>route must be a String.</strong><br/>(Route to proxy)</p></li>
+<li><p><strong>origin must be a String.</strong><br/>(Host to proxy (e.g. http://hostname))</p></li>
 <li><p><strong>host must be a String.</strong><br/>([Optional] Hostname this route is for (default is all))</p></li>
 <li><p><strong>stream must be a Boolean.</strong><br/>([Optional] Stream response to client (default is false))</p></li>
 </ul>
 
-<p><strong>Returns an Object</strong><br/>(TurtleIO instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">TurtleIO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">proxy</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">origin</span><span class="p">,</span> <span class="nx">route</span><span class="p">,</span> <span class="nx">host</span><span class="p">,</span> <span class="nx">stream</span> <span class="p">)</span> <span class="p">{</span>
+<p><strong>Returns an Object</strong><br/>(TurtleIO instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">TurtleIO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">proxy</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">route</span><span class="p">,</span> <span class="nx">origin</span><span class="p">,</span> <span class="nx">host</span><span class="p">,</span> <span class="nx">stream</span> <span class="p">)</span> <span class="p">{</span>
   <span class="nx">stream</span>    <span class="o">=</span> <span class="p">(</span> <span class="nx">stream</span> <span class="o">===</span> <span class="kc">true</span> <span class="p">);</span>
   <span class="kd">var</span> <span class="nx">self</span>  <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
       <span class="nx">verbs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;delete&quot;</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;post&quot;</span><span class="p">,</span> <span class="s2">&quot;put&quot;</span><span class="p">,</span> <span class="s2">&quot;patch&quot;</span><span class="p">],</span>

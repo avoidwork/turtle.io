@@ -1,14 +1,14 @@
 /**
- * Proxies a (root) URL to a route
+ * Proxies a URL to a route
  *
  * @method proxy
- * @param  {String}  origin Host to proxy (e.g. http://hostname)
  * @param  {String}  route  Route to proxy
+ * @param  {String}  origin Host to proxy (e.g. http://hostname)
  * @param  {String}  host   [Optional] Hostname this route is for (default is all)
  * @param  {Boolean} stream [Optional] Stream response to client (default is false)
  * @return {Object}         TurtleIO instance
  */
-TurtleIO.prototype.proxy = function ( origin, route, host, stream ) {
+TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	stream    = ( stream === true );
 	var self  = this,
 	    verbs = ["delete", "get", "post", "put", "patch"],
