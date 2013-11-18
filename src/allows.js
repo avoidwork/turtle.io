@@ -7,12 +7,12 @@
  * @return {String}      Allowed methods
  */
 TurtleIO.prototype.allows = function ( uri, host ) {
-	var verbs = ["delete", "get", "post", "put", "patch"],
-	    result;
+	var result = [],
+	    verbs  = ["delete", "get", "post", "put", "patch"];
 
-	result = verbs.map( function ( i ) {
+	verbs.each( function ( i ) {
 		if ( this.allowed( i, uri, host ) ) {
-			return i;
+			result.push( i );
 		}
 	}.bind( this ) );
 
