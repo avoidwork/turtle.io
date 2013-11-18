@@ -18,12 +18,6 @@
 
 <p>API documentation is available at <a href="http://api.turtle.io">api.turtle.io</a>, please visit the <a href="https://github.com/avoidwork/turtle.io/wiki">wiki</a>.</p>
 
-<h2 id="support">Support</h2>
-
-<p>If you're having problems, use the support forum at CodersClan.</p>
-
-<p><a href="http://codersclan.net/forum/index.php?repo_id=12"><img src="http://www.codersclan.net/graphics/getSupport_blue_big.png" width="160"></a></p>
-
 <h2 id="examples">Examples</h2>
 
 <p>turtle.io requires a <strong><em>default</em></strong> virtual host to be specified, because it is the failover, when a request can't be routed.</p>
@@ -59,10 +53,16 @@ server.start(params);
     server    = new turtle_io();
 
 // Setting proxy routes
-server.proxy("https://api.github.com", "/api");
+server.proxy("/api", "https://api.github.com");
 
 server.start(config);
 </code></pre>
+
+<h2 id="support">Support</h2>
+
+<p>If you're having problems, use the support forum at CodersClan.</p>
+
+<p><a href="http://codersclan.net/forum/index.php?repo_id=12"><img src="http://www.codersclan.net/graphics/getSupport_blue_big.png" width="160"></a></p>
 
 <h2 id="license">License</h2>
 
