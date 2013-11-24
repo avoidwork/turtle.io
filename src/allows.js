@@ -7,14 +7,13 @@
  * @return {String}      Allowed methods
  */
 TurtleIO.prototype.allows = function ( uri, host ) {
-	var result = [],
-	    verbs  = ["delete", "get", "post", "put", "patch"];
+	var self   = this,
+	    verbs  = ["delete", "get", "post", "put", "patch"],
+	    result;
 
-	verbs.each( function ( i ) {
-		if ( this.allowed( i, uri, host ) ) {
-			result.push( i );
-		}
-	}.bind( this ) );
+	result = verbs.filter( function ( i ) {
+		return self.allowed( i, uri, host );
+	} );
 
 	result = result.join( ", " ).toUpperCase().replace( "GET", "GET, HEAD, OPTIONS" );
 

@@ -9,7 +9,8 @@
  * @return {Object}         TurtleIO instance
  */
 TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
-	var verbs = ["delete", "get", "post", "put", "patch"];
+	var self  = this,
+	    verbs = ["delete", "get", "post", "put", "patch"];
 
 	/**
 	 * Response handler
@@ -28,7 +29,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		    regex_quote   = /^("|')/,
 		    regexOrigin   = new RegExp( origin, "g" ),
 		    replace       = "$1" + route,
-		    url           = this.url( req ),
+		    url           = self.url( req ),
 		    parsed        = $.parse( url ),
 		    delay         = $.expires,
 		    get           = req.method === "GET",
@@ -36,14 +37,14 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		    resHeaders, rewrite;
 
 		resHeaders        = headers( xhr.getAllResponseHeaders() );
-		resHeaders.Server = this.config.headers.Server;
+		resHeaders.Server = self.config.headers.Server;
 
 		// Something went wrong
-		if ( xhr.status < this.codes.CONTINUE ) {
-			this.respond( req, res, this.page( this.codes.BAD_GATEWAY, parsed.hostname ), this.codes.BAD_GATEWAY, resHeaders );
+		if ( xhr.status < self.codes.CONTINUE ) {
+			self.respond( req, res, self.page( self.codes.BAD_GATEWAY, parsed.hostname ), self.codes.BAD_GATEWAY, resHeaders );
 		}
 		else {
-			if ( get && ( xhr.status === this.codes.SUCCESS || xhr.status === this.codes.NOT_MODIFIED ) && !$.regex.no.test( resHeaders["Cache-Control"] ) && !$.regex.priv.test( resHeaders["Cache-Control"] ) ) {
+			if ( get && ( xhr.status === self.codes.SUCCESS || xhr.status === self.codes.NOT_MODIFIED ) && !$.regex.no.test( resHeaders["Cache-Control"] ) && !$.regex.priv.test( resHeaders["Cache-Control"] ) ) {
 				// Determining how long rep is valid
 				if ( resHeaders["Cache-Control"] && $.regex.number_present.test( resHeaders["Cache-Control"] ) ) {
 					delay = $.number.parse( $.regex.number_present.exec( resHeaders["Cache-Control"] )[0], 10 );
@@ -55,17 +56,17 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 				if ( delay > 0 ) {
 					// Removing from LRU when invalid
 					$.delay( function () {
-						this.unregister( url );
-					}.bind( this ), delay, url );
+						self.unregister( url );
+					}, delay, url );
 				}
 			}
 
-			if ( xhr.status !== this.codes.NOT_MODIFIED ) {
+			if ( xhr.status !== self.codes.NOT_MODIFIED ) {
 				rewrite = REGEX_REWRITE.test( ( resHeaders["Content-Type"] || "" ).replace( REGEX_NVAL, "" ) );
 
 				// Setting headers
-				if ( get && xhr.status === this.codes.SUCCESS ) {
-					etag = resHeaders.Etag || "\"" + this.etag( url, resHeaders["Content-Length"] || 0, resHeaders["Last-Modified"] || 0, this.encode( arg ) ) + "\"";
+				if ( get && xhr.status === self.codes.SUCCESS ) {
+					etag = resHeaders.Etag || "\"" + self.etag( url, resHeaders["Content-Length"] || 0, resHeaders["Last-Modified"] || 0, self.encode( arg ) ) + "\"";
 
 					if ( resHeaders.Etag !== etag ) {
 						resHeaders.Etag = etag;
@@ -78,11 +79,11 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 
 				// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
 				if ( get && req.headers["if-none-match"] === etag ) {
-					this.respond( req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, resHeaders );
+					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, resHeaders );
 				}
 				else {
 					if ( REGEX_HEAD.test( req.method.toLowerCase() ) ) {
-						arg = this.messages.NO_CONTENT;
+						arg = self.messages.NO_CONTENT;
 					}
 					// Fixing root path of response
 					else if ( rewrite ) {
@@ -97,11 +98,11 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 						}
 					}
 
-					this.respond( req, res, arg, xhr.status, resHeaders );
+					self.respond( req, res, arg, xhr.status, resHeaders );
 				}
 			}
 			else {
-				this.respond( req, res, arg, xhr.status, resHeaders );
+				self.respond( req, res, arg, xhr.status, resHeaders );
 			}
 		}
 	}
@@ -150,8 +151,8 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 
 		// Facade to handle()
 		fn = function ( arg, xhr ) {
-			handle.call( this, arg, xhr, req, res );
-		}.bind( this );
+			handle( arg, xhr, req, res );
+		};
 
 		// Streaming formats that do not need to be rewritten
 		if ( !stream && ( REGEX_EXT.test( parsed.pathname ) && !REGEX_JSON.test( mimetype ) ) && REGEX_STREAM.test( mimetype ) ) {
@@ -165,7 +166,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		headerz["x-host"]             = parsed.host;
 		headerz["x-forwarded-for"]    = ( headerz["x-forwarded-for"] ? headerz["x-forwarded-for"] + ", " : "" ) + req.connection.remoteAddress;
 		headerz["x-forwarded-proto"]  = parsed.protocol.replace( ":", "" );
-		headerz["x-forwarded-server"] = this.config.headers.Server;
+		headerz["x-forwarded-server"] = self.config.headers.Server;
 
 		// Streaming response to Client
 		if ( stream ) {
@@ -189,8 +190,8 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 			} );
 
 			proxyReq.on( "error", function () {
-				this.respond( req, res, this.page( this.codes.BAD_GATEWAY, parsed.hostname ), this.codes.BAD_GATEWAY );
-			}.bind( this ) );
+				self.respond( req, res, self.page( self.codes.BAD_GATEWAY, parsed.hostname ), self.codes.BAD_GATEWAY );
+			} );
 
 			if ( REGEX_BODY.test( req.method ) ) {
 				proxyReq.write( req.body );
@@ -226,9 +227,9 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 
 	// Setting route
 	verbs.each( function ( i ) {
-		this[i]( route, wrapper.bind( this ), host );
-		this[i]( route + "/.*", wrapper.bind( this ), host );
-	}.bind( this ) );
+		self[i]( route, wrapper, host );
+		self[i]( route + "/.*", wrapper, host );
+	} );
 
 	return this;
 };

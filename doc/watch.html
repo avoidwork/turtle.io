@@ -11,15 +11,16 @@
 </ul>
 
 <p><strong>Returns an Object</strong><br/>(TurtleIO instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">TurtleIO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">watch</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">mimetype</span> <span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">cleanup</span><span class="p">,</span> <span class="nx">watcher</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-private"><div class="wrapper"><p><span class='doc-section-header'>Private method cleanup</span></p>
+  <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
+      <span class="nx">watcher</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-private"><div class="wrapper"><p><span class='doc-section-header'>Private method cleanup</span></p>
 
 <p>Cleans up caches</p>
 
-<p><strong>Returns an Undefined</strong><br/>(undefined)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">cleanup</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<p><strong>Returns an Undefined</strong><br/>(undefined)</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">cleanup</span> <span class="p">()</span> <span class="p">{</span>
     <span class="nx">watcher</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">unregister</span><span class="p">(</span> <span class="nx">url</span> <span class="p">);</span>
-    <span class="k">delete</span> <span class="k">this</span><span class="p">.</span><span class="nx">watching</span><span class="p">[</span><span class="nx">path</span><span class="p">];</span>
-  <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span> <span class="k">this</span> <span class="p">);</span>
+    <span class="nx">self</span><span class="p">.</span><span class="nx">unregister</span><span class="p">(</span> <span class="nx">url</span> <span class="p">);</span>
+    <span class="k">delete</span> <span class="nx">self</span><span class="p">.</span><span class="nx">watching</span><span class="p">[</span><span class="nx">path</span><span class="p">];</span>
+  <span class="p">}</span>
 
   <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">watching</span><span class="p">[</span><span class="nx">path</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Tracking</p></div></div><div class="code"><div class="wrapper">    <span class="k">this</span><span class="p">.</span><span class="nx">watching</span><span class="p">[</span><span class="nx">path</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Watching path for changes</p></div></div><div class="code"><div class="wrapper">    <span class="nx">watcher</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">watch</span><span class="p">(</span> <span class="nx">path</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">ev</span> <span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span> <span class="nx">REGEX_RENAME</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span> <span class="nx">ev</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
@@ -28,18 +29,18 @@
       <span class="k">else</span> <span class="p">{</span>
         <span class="nx">fs</span><span class="p">.</span><span class="nx">lstat</span><span class="p">(</span> <span class="nx">path</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">e</span><span class="p">,</span> <span class="nx">stat</span> <span class="p">)</span> <span class="p">{</span>
           <span class="k">if</span> <span class="p">(</span> <span class="nx">e</span> <span class="p">)</span> <span class="p">{</span>
-            <span class="k">this</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">e</span> <span class="p">);</span>
+            <span class="nx">self</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">e</span> <span class="p">);</span>
             <span class="nx">cleanup</span><span class="p">();</span>
           <span class="p">}</span>
-          <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">etags</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">url</span><span class="p">]</span> <span class="p">)</span> <span class="p">{</span>
-            <span class="k">this</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span> <span class="nx">url</span><span class="p">,</span> <span class="p">{</span><span class="nx">etag</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">etag</span><span class="p">(</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">stat</span><span class="p">.</span><span class="nx">size</span><span class="p">,</span> <span class="nx">stat</span><span class="p">.</span><span class="nx">mtime</span> <span class="p">),</span> <span class="nx">mimetype</span><span class="o">:</span> <span class="nx">mimetype</span><span class="p">},</span> <span class="kc">true</span> <span class="p">);</span>
+          <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="nx">self</span><span class="p">.</span><span class="nx">etags</span><span class="p">.</span><span class="nx">cache</span><span class="p">[</span><span class="nx">url</span><span class="p">]</span> <span class="p">)</span> <span class="p">{</span>
+            <span class="nx">self</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span> <span class="nx">url</span><span class="p">,</span> <span class="p">{</span><span class="nx">etag</span><span class="o">:</span> <span class="nx">self</span><span class="p">.</span><span class="nx">etag</span><span class="p">(</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">stat</span><span class="p">.</span><span class="nx">size</span><span class="p">,</span> <span class="nx">stat</span><span class="p">.</span><span class="nx">mtime</span> <span class="p">),</span> <span class="nx">mimetype</span><span class="o">:</span> <span class="nx">mimetype</span><span class="p">},</span> <span class="kc">true</span> <span class="p">);</span>
           <span class="p">}</span>
           <span class="k">else</span> <span class="p">{</span>
             <span class="nx">cleanup</span><span class="p">();</span>
           <span class="p">}</span>
-        <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span> <span class="k">this</span> <span class="p">)</span> <span class="p">);</span>
+        <span class="p">}</span> <span class="p">);</span>
       <span class="p">}</span>
-    <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span> <span class="k">this</span> <span class="p">)</span> <span class="p">);</span>
+    <span class="p">}</span> <span class="p">);</span>
   <span class="p">}</span>
 
   <span class="k">return</span> <span class="k">this</span><span class="p">;</span>

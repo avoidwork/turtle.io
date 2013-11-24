@@ -8,7 +8,8 @@
  * @return {Object}          TurtleIO instance
  */
 TurtleIO.prototype.watch = function ( url, path, mimetype ) {
-	var cleanup, watcher;
+	var self = this,
+	    watcher;
 
 	/**
 	 * Cleans up caches
@@ -17,11 +18,11 @@ TurtleIO.prototype.watch = function ( url, path, mimetype ) {
 	 * @private
 	 * @return {Undefined} undefined
 	 */
-	cleanup = function () {
+	function cleanup () {
 		watcher.close();
-		this.unregister( url );
-		delete this.watching[path];
-	}.bind( this );
+		self.unregister( url );
+		delete self.watching[path];
+	}
 
 	if ( !( this.watching[path] ) ) {
 		// Tracking
@@ -35,18 +36,18 @@ TurtleIO.prototype.watch = function ( url, path, mimetype ) {
 			else {
 				fs.lstat( path, function ( e, stat ) {
 					if ( e ) {
-						this.log( e );
+						self.log( e );
 						cleanup();
 					}
-					else if ( this.etags.cache[url] ) {
-						this.register( url, {etag: this.etag( url, stat.size, stat.mtime ), mimetype: mimetype}, true );
+					else if ( self.etags.cache[url] ) {
+						self.register( url, {etag: self.etag( url, stat.size, stat.mtime ), mimetype: mimetype}, true );
 					}
 					else {
 						cleanup();
 					}
-				}.bind( this ) );
+				} );
 			}
-		}.bind( this ) );
+		} );
 	}
 
 	return this;

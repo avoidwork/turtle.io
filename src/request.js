@@ -9,7 +9,8 @@
  * @return {Object}      TurtleIO instance
  */
 TurtleIO.prototype.request = function ( req, res, host ) {
-	var url     = this.url( req ),
+	var self    = this,
+	    url     = this.url( req ),
 	    parsed  = $.parse( url ),
 	    method  = req.method,
 	    handled = false,
@@ -21,17 +22,17 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 		this.vhostsRegExp.each( function ( i, idx ) {
 			if ( i.test( req.host ) ) {
 				found = true;
-				host  = this.vhosts[idx];
+				host  = self.vhosts[idx];
 				return false;
 			}
-		}.bind( this ) );
+		} );
 
 		if ( !found ) {
 			if ( this.config["default"] !== null ) {
 				host = this.config["default"];
 			}
 			else {
-				this.error( req, res, this.codes.SERVER_ERROR );
+				this.error( req, res, self.codes.SERVER_ERROR );
 			}
 		}
 	}
@@ -43,35 +44,35 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 	// Determining if the request is valid
 	fs.lstat( path, function ( e, stats ) {
 		if ( e ) {
-			this.error( req, res, this.codes.NOT_FOUND );
+			self.error( req, res, self.codes.NOT_FOUND );
 		}
 		else if ( !stats.isDirectory() ) {
-			this.handle( req, res, path, parsed.href, false, stats );
+			self.handle( req, res, path, parsed.href, false, stats );
 		}
 		else if ( REGEX_GET.test( method ) && !REGEX_DIR.test( req.url ) ) {
-			this.respond( req, res, this.messages.NO_CONTENT, this.codes.REDIRECT, {"Location": parsed.href + "/"} );
+			self.respond( req, res, self.messages.NO_CONTENT, self.codes.REDIRECT, {"Location": parsed.href + "/"} );
 		}
 		else if ( !REGEX_GET.test( method ) ) {
-			this.handle( req, res, path, parsed.href, true );
+			self.handle( req, res, path, parsed.href, true );
 		}
 		else {
 			count = 0;
-			nth   = this.config.indexes;
+			nth   = self.config.indexes;
 			path += "/";
 
-			this.config.index.each( function ( i ) {
+			self.config.index.each( function ( i ) {
 				fs.lstat( path + i, function ( e, stats ) {
 					if ( !e && !handled ) {
 						handled = true;
-						this.handle( req, res, path + i, parsed.href + i, false, stats );
+						self.handle( req, res, path + i, parsed.href + i, false, stats );
 					}
 					else if ( ++count === nth && !handled ) {
-						this.error( req, res, this.codes.NOT_FOUND );
+						self.error( req, res, self.codes.NOT_FOUND );
 					}
-				}.bind( this ) );
-			}.bind( this ) );
+				} );
+			} );
 		}
-	}.bind( this ) );
+	} );
 
 	return this;
 };

@@ -8,7 +8,13 @@
  * @return {Object}         TurtleIO instance
  */
 TurtleIO.prototype["delete"] = function ( route, fn, host ) {
-	return this.handler( "delete", route, fn, host );
+	var self = this;
+
+	function op () {
+		fn.apply( self, arguments );
+	}
+
+	return this.handler( "delete", route, op, host );
 };
 
 /**
@@ -21,7 +27,13 @@ TurtleIO.prototype["delete"] = function ( route, fn, host ) {
  * @return {Object}         TurtleIO instance
  */
 TurtleIO.prototype.get = function ( route, fn, host ) {
-	return this.handler( "get", route, fn, host );
+	var self = this;
+
+	function op () {
+		fn.apply( self, arguments );
+	}
+
+	return this.handler( "get", route, op, host );
 };
 
 /**
@@ -34,7 +46,13 @@ TurtleIO.prototype.get = function ( route, fn, host ) {
  * @return {Object}         TurtleIO instance
  */
 TurtleIO.prototype.patch = function ( route, fn, host ) {
-	return this.handler( "patch", route, fn, host );
+	var self = this;
+
+	function op () {
+		fn.apply( self, arguments );
+	}
+
+	return this.handler( "patch", route, op, host );
 };
 
 /**
@@ -47,7 +65,13 @@ TurtleIO.prototype.patch = function ( route, fn, host ) {
  * @return {Object}         TurtleIO instance
  */
 TurtleIO.prototype.post = function ( route, fn, host ) {
-	return this.handler( "post", route, fn, host );
+	var self = this;
+
+	function op () {
+		fn.apply( self, arguments );
+	}
+
+	return this.handler( "post", route, op, host );
 };
 
 /**
@@ -60,5 +84,11 @@ TurtleIO.prototype.post = function ( route, fn, host ) {
  * @return {Object}         TurtleIO instance
  */
 TurtleIO.prototype.put = function ( route, fn, host ) {
-	return this.handler( "put", route, fn, host );
+	var self = this;
+
+	function op () {
+		fn.apply( self, arguments );
+	}
+
+	return this.handler( "put", route, op, host );
 };

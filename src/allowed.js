@@ -8,7 +8,8 @@
  * @return {Boolean}       Boolean indicating if method is allowed
  */
 TurtleIO.prototype.allowed = function ( method, uri, host ) {
-	var result = false,
+	var self   = this,
+	    result = false,
 	    exist  = false,
 	    d, hosts;
 
@@ -18,12 +19,12 @@ TurtleIO.prototype.allowed = function ( method, uri, host ) {
 	exist = ( hosts[host] );
 
 	this.handlers[method].regex.each( function ( i, idx ) {
-		var route = this.handlers[method].routes[idx];
+		var route = self.handlers[method].routes[idx];
 
 		if ( i.test( uri ) && ( ( exist && route in hosts[host] ) || route in d || route in hosts.all ) ) {
 			return !( result = true );
 		}
-	}.bind( this ) );
+	} );
 
 	if ( !result ) {
 		hosts = this.handlers.all.hosts;
@@ -31,12 +32,12 @@ TurtleIO.prototype.allowed = function ( method, uri, host ) {
 		exist = ( hosts[host] );
 
 		this.handlers.all.regex.each( function ( i, idx ) {
-			var route = this.handlers.all.routes[idx];
+			var route = self.handlers.all.routes[idx];
 
 			if ( i.test( uri ) && ( ( exist && route in hosts[host] ) || route in d || route in hosts.all ) ) {
 				return !( result = true );
 			}
-		}.bind( this ) );
+		} );
 	}
 
 	return result;

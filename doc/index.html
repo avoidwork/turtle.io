@@ -16,23 +16,24 @@
 
 <h2 id="documentation">Documentation</h2>
 
-<p>API documentation is available at <a href="http://api.turtle.io">api.turtle.io</a>, please visit the <a href="https://github.com/avoidwork/turtle.io/wiki">wiki</a>.</p>
+<p>API documentation is available at <a href="http://api.turtle.io">api.turtle.io</a>. Configuration details are available on the <a href="https://github.com/avoidwork/turtle.io/wiki">wiki</a>.</p>
 
 <h2 id="examples">Examples</h2>
 
-<p>turtle.io requires a <strong><em>default</em></strong> virtual host to be specified, because it is the failover, when a request can't be routed.</p>
+<p>turtle.io requires a <strong><em>default</em></strong> virtual host to be specified, because it is the failover when a request can't be routed.</p>
 
 <h3 id="virtual-hosts">Virtual hosts</h3>
 
 <p>Virtual host keys are the hostname, and the value is the directory relative to "root".</p>
 
-<pre><code class="javascript">var turtle_io = require("turtle.io"),
-    server    = new turtle_io(),
+<pre><code class="javascript">var TurtleIO = require("turtle.io"),
+    server   = new TurtleIO(),
     params;
 
 params = {
     default : "mysite.com",
     port    : 80,
+    uid     : 100,
     root    : "/var/www",
     pages   : "errors",
     vhosts  : {
@@ -46,13 +47,12 @@ server.start(params);
 
 <h3 id="proxy-routes">Proxy routes</h3>
 
-<p>The /api route acts as a proxy to another service. This example also utilizes a <code>config.json</code> file local to the server script, for easy DevOps management.</p>
+<p>This example has <code>/api</code> act as a reverse proxy to another service.</p>
 
-<pre><code class="javascript">var config    = require("./config.json"),
-    turtle_io = require("turtle.io"),
-    server    = new turtle_io();
+<pre><code class="javascript">var config   = require("./config.json"),
+    TurtleIO = require("turtle.io"),
+    server   = new TurtleIO();
 
-// Setting proxy routes
 server.proxy("/api", "https://api.github.com");
 
 server.start(config);
