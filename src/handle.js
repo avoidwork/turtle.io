@@ -11,7 +11,8 @@
  * @return {Object}        TurtleIO instance
  */
 TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
-	var parsed = $.parse( url ),
+	var self   = this,
+	    parsed = $.parse( url ),
 	    allow  = this.allows( parsed.pathname, parsed.hostname ),
 	    write  = allow.indexOf( dir ? "POST" : "PUT" ) > -1,
 	    del    = allow.indexOf( "DELETE" ) > -1,
@@ -50,18 +51,18 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 
 			fs.unlink( path, function ( e ) {
 				if ( e ) {
-					this.error( req, req, this.codes.SERVER_ERROR );
+					self.error( req, req, self.codes.SERVER_ERROR );
 				}
 				else {
-					this.respond( req, res, this.messages.NO_CONTENT, this.codes.NO_CONTENT, {} );
+					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NO_CONTENT, {} );
 				}
-			}.bind( this ) );
+			} );
 		}
 		else if ( method === "PUT" && write ) {
 			this.write( path, req, res );
 		}
 		else {
-			this.error( req, req, this.codes.SERVER_ERROR );
+			this.error( req, req, self.codes.SERVER_ERROR );
 		}
 	}
 	// Directory request
@@ -74,15 +75,15 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 
 			fs.unlink( path, function ( e ) {
 				if ( e ) {
-					this.error( req, req, this.codes.SERVER_ERROR );
+					self.error( req, req, self.codes.SERVER_ERROR );
 				}
 				else {
-					this.respond( req, res, this.messages.NO_CONTENT, this.codes.NO_CONTENT, {} );
+					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NO_CONTENT, {} );
 				}
-			}.bind( this ) );
+			} );
 		}
 		else {
-			this.error( req, req, this.codes.NOT_ALLOWED );
+			this.error( req, req, self.codes.NOT_ALLOWED );
 		}
 	}
 
