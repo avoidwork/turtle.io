@@ -74,11 +74,13 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			headers["Content-Length"] = body.toString().length;
 		}
 
-		headers["Content-Encoding"] = REGEX_GZIP.test( type ) ? "gzip" : "deflate";
+		headers["Content-Encoding"]  = REGEX_GZIP.test( type ) ? "gzip" : "deflate";
+		headers["Transfer-Encoding"] = "chunked";
 		res.writeHead( status, headers );
 		this.compress( body, type, headers.Etag.replace( /"/g, "" ), req, res, file );
 	}
 	else if ( file ) {
+		headers["Transfer-Encoding"] = "chunked";
 		res.writeHead( status, headers );
 		fs.createReadStream( body ).on( "error", function ( e ) {
 			self.log( e );
