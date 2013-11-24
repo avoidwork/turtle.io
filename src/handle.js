@@ -62,7 +62,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 			this.write( path, req, res );
 		}
 		else {
-			this.error( req, req, self.codes.SERVER_ERROR );
+			this.error( req, req, this.codes.SERVER_ERROR );
 		}
 	}
 	// Directory request
@@ -83,7 +83,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 			} );
 		}
 		else {
-			this.error( req, req, self.codes.NOT_ALLOWED );
+			this.error( req, req, this.codes.NOT_ALLOWED );
 		}
 	}
 

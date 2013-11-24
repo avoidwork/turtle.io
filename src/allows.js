@@ -8,13 +8,11 @@
  */
 TurtleIO.prototype.allows = function ( uri, host ) {
 	var self   = this,
-	    result = [],
-	    verbs  = ["delete", "get", "post", "put", "patch"];
+	    verbs  = ["delete", "get", "post", "put", "patch"],
+	    result;
 
-	verbs.each( function ( i ) {
-		if ( self.allowed( i, uri, host ) ) {
-			result.push( i );
-		}
+	result = verbs.filter( function ( i ) {
+		return self.allowed( i, uri, host );
 	} );
 
 	result = result.join( ", " ).toUpperCase().replace( "GET", "GET, HEAD, OPTIONS" );

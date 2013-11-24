@@ -9,14 +9,13 @@
  * @return {Object}            instance
  */
 TurtleIO.prototype.redirect = function ( route, url, host, permanent ) {
-	var self    = this,
-	    code    = this.codes[permanent === true ? "MOVED" : "REDIRECT"],
+	var code    = this.codes[permanent === true ? "MOVED" : "REDIRECT"],
 	    pattern = new RegExp( "^" + route + "$" );
 
 	this.get( route, function ( req, res ) {
 		var rewrite = ( pattern.exec( req.url ) || [] ).length > 0;
 
-		self.respond( req, res, self.messages.NO_CONTENT, code, {"Location": ( rewrite ? req.url.replace( pattern, url ) : url )} );
+		this.respond( req, res, this.messages.NO_CONTENT, code, {"Location": ( rewrite ? req.url.replace( pattern, url ) : url )} );
 	}, host);
 
 	return this;

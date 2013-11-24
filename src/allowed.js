@@ -14,8 +14,8 @@ TurtleIO.prototype.allowed = function ( method, uri, host ) {
 	    exist  = false,
 	    d, hosts;
 
-	hosts = self.handlers[method].hosts;
-	d     = hosts[self.config["default"]];
+	hosts = this.handlers[method].hosts;
+	d     = hosts[this.config["default"]];
 	exist = ( hosts[host] );
 
 	this.handlers[method].regex.each( function ( i, idx ) {
@@ -27,8 +27,8 @@ TurtleIO.prototype.allowed = function ( method, uri, host ) {
 	} );
 
 	if ( !result ) {
-		hosts = self.handlers.all.hosts;
-		d     = hosts[self.config["default"]];
+		hosts = this.handlers.all.hosts;
+		d     = hosts[this.config["default"]];
 		exist = ( hosts[host] );
 
 		this.handlers.all.regex.each( function ( i, idx ) {

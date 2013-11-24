@@ -81,8 +81,8 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	else if ( file ) {
 		res.writeHead( status, headers );
 		fs.createReadStream( body ).on( "error", function ( e ) {
-				self.log( e );
-				self.error( req, res, self.codes.SERVER_ERROR );
+			self.log( e );
+			self.error( req, res, self.codes.SERVER_ERROR );
 		} ).pipe( res );
 	}
 	else {

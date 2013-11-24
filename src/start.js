@@ -61,7 +61,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	// Setting a default GET route
 	if ( !this.handlers.get.routes.contains( ".*" ) ) {
 		this.get( "/.*", function ( req, res, host ) {
-			self.request( req, res, host );
+			this.request( req, res, host );
 		}, "all" );
 	}
 

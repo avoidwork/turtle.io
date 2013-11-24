@@ -9,10 +9,8 @@
  * @return {Object}         TurtleIO instance
  */
 TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
-	stream    = ( stream === true );
 	var self  = this,
-	    verbs = ["delete", "get", "post", "put", "patch"],
-	    handle, headers, wrapper;
+	    verbs = ["delete", "get", "post", "put", "patch"];
 
 	/**
 	 * Response handler
@@ -25,7 +23,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	 * @param  {Object} res   HTTP(S) response Object
 	 * @return {Undefined}    undefined
 	 */
-	handle = function ( arg, xhr, req, res ) {
+	function handle ( arg, xhr, req, res ) {
 		var etag          = "",
 		    regex         = /("|')\/[^?\/]/g,
 		    regex_quote   = /^("|')/,
@@ -107,7 +105,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 				self.respond( req, res, arg, xhr.status, resHeaders );
 			}
 		}
-	};
+	}
 
 	/**
 	 * Capitalizes HTTP headers
@@ -117,7 +115,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	 * @param  {Object} args Response headers
 	 * @return {Object}      Reshaped response headers
 	 */
-	headers = function ( args ) {
+	function headers ( args ) {
 		var result = {};
 
 		if ( !args.isEmpty() ) {
@@ -132,7 +130,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		}
 
 		return result;
-	};
+	}
 
 	/**
 	 * Wraps the proxy request
@@ -143,7 +141,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	 * @param  {Object} res HTTP(S) response Object
 	 * @return {Undefined}  undefined
 	 */
-	wrapper = function ( req, res ) {
+	function wrapper ( req, res ) {
 		var url      = origin + req.url.replace( new RegExp( "^" + route ), "" ),
 		    method   = req.method.toLowerCase(),
 		    headerz  = $.clone( req.headers, true ),
@@ -223,7 +221,9 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 				url.get( fn, fn, headerz );
 			}
 		}
-	};
+	}
+
+	stream = ( stream === true );
 
 	// Setting route
 	verbs.each( function ( i ) {

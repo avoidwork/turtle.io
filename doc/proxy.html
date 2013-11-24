@@ -12,10 +12,8 @@
 </ul>
 
 <p><strong>Returns an Object</strong><br/>(TurtleIO instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">TurtleIO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">proxy</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">route</span><span class="p">,</span> <span class="nx">origin</span><span class="p">,</span> <span class="nx">host</span><span class="p">,</span> <span class="nx">stream</span> <span class="p">)</span> <span class="p">{</span>
-  <span class="nx">stream</span>    <span class="o">=</span> <span class="p">(</span> <span class="nx">stream</span> <span class="o">===</span> <span class="kc">true</span> <span class="p">);</span>
   <span class="kd">var</span> <span class="nx">self</span>  <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
-      <span class="nx">verbs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;delete&quot;</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;post&quot;</span><span class="p">,</span> <span class="s2">&quot;put&quot;</span><span class="p">,</span> <span class="s2">&quot;patch&quot;</span><span class="p">],</span>
-      <span class="nx">handle</span><span class="p">,</span> <span class="nx">headers</span><span class="p">,</span> <span class="nx">wrapper</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-private"><div class="wrapper"><p><span class='doc-section-header'>Private method handle</span></p>
+      <span class="nx">verbs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;delete&quot;</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;post&quot;</span><span class="p">,</span> <span class="s2">&quot;put&quot;</span><span class="p">,</span> <span class="s2">&quot;patch&quot;</span><span class="p">];</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-private"><div class="wrapper"><p><span class='doc-section-header'>Private method handle</span></p>
 
 <p>Response handler</p>
 
@@ -28,7 +26,7 @@
 <li><p><strong>res must be an Object.</strong><br/>(HTTP(S) response Object)</p></li>
 </ul>
 
-<p><strong>Returns an Undefined</strong><br/>(undefined)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">handle</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">arg</span><span class="p">,</span> <span class="nx">xhr</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">{</span>
+<p><strong>Returns an Undefined</strong><br/>(undefined)</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">handle</span> <span class="p">(</span> <span class="nx">arg</span><span class="p">,</span> <span class="nx">xhr</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">etag</span>          <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="nx">regex</span>         <span class="o">=</span> <span class="sr">/(&quot;|&#39;)\/[^?\/]/g</span><span class="p">,</span>
         <span class="nx">regex_quote</span>   <span class="o">=</span> <span class="sr">/^(&quot;|&#39;)/</span><span class="p">,</span>
@@ -95,7 +93,7 @@
         <span class="nx">self</span><span class="p">.</span><span class="nx">respond</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">arg</span><span class="p">,</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">status</span><span class="p">,</span> <span class="nx">resHeaders</span> <span class="p">);</span>
       <span class="p">}</span>
     <span class="p">}</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-private"><div class="wrapper"><p><span class='doc-section-header'>Private method headers</span></p>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-private"><div class="wrapper"><p><span class='doc-section-header'>Private method headers</span></p>
 
 <p>Capitalizes HTTP headers</p>
 
@@ -105,7 +103,7 @@
 <li><strong>args must be an Object.</strong><br/>(Response headers)</li>
 </ul>
 
-<p><strong>Returns an Object</strong><br/>(Reshaped response headers)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">headers</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">args</span> <span class="p">)</span> <span class="p">{</span>
+<p><strong>Returns an Object</strong><br/>(Reshaped response headers)</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">headers</span> <span class="p">(</span> <span class="nx">args</span> <span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">{};</span>
 
     <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">args</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">()</span> <span class="p">)</span> <span class="p">{</span>
@@ -120,7 +118,7 @@
     <span class="p">}</span>
 
     <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-private"><div class="wrapper"><p><span class='doc-section-header'>Private method wrapper</span></p>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-private"><div class="wrapper"><p><span class='doc-section-header'>Private method wrapper</span></p>
 
 <p>Wraps the proxy request</p>
 
@@ -131,7 +129,7 @@
 <li><p><strong>res must be an Object.</strong><br/>(HTTP(S) response Object)</p></li>
 </ul>
 
-<p><strong>Returns an Undefined</strong><br/>(undefined)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">wrapper</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">{</span>
+<p><strong>Returns an Undefined</strong><br/>(undefined)</p></div></div><div class="code"><div class="wrapper">  <span class="kd">function</span> <span class="nx">wrapper</span> <span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">url</span>      <span class="o">=</span> <span class="nx">origin</span> <span class="o">+</span> <span class="nx">req</span><span class="p">.</span><span class="nx">url</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span> <span class="s2">&quot;^&quot;</span> <span class="o">+</span> <span class="nx">route</span> <span class="p">),</span> <span class="s2">&quot;&quot;</span> <span class="p">),</span>
         <span class="nx">method</span>   <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">method</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">(),</span>
         <span class="nx">headerz</span>  <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">clone</span><span class="p">(</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">,</span> <span class="kc">true</span> <span class="p">),</span>
@@ -192,7 +190,9 @@
         <span class="nx">url</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span> <span class="nx">fn</span><span class="p">,</span> <span class="nx">fn</span><span class="p">,</span> <span class="nx">headerz</span> <span class="p">);</span>
       <span class="p">}</span>
     <span class="p">}</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Setting route</p></div></div><div class="code"><div class="wrapper">  <span class="nx">verbs</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">i</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="p">}</span>
+
+  <span class="nx">stream</span> <span class="o">=</span> <span class="p">(</span> <span class="nx">stream</span> <span class="o">===</span> <span class="kc">true</span> <span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Setting route</p></div></div><div class="code"><div class="wrapper">  <span class="nx">verbs</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">i</span> <span class="p">)</span> <span class="p">{</span>
     <span class="nx">self</span><span class="p">[</span><span class="nx">i</span><span class="p">](</span> <span class="nx">route</span><span class="p">,</span> <span class="nx">wrapper</span><span class="p">,</span> <span class="nx">host</span> <span class="p">);</span>
     <span class="nx">self</span><span class="p">[</span><span class="nx">i</span><span class="p">](</span> <span class="nx">route</span> <span class="o">+</span> <span class="s2">&quot;/.*&quot;</span><span class="p">,</span> <span class="nx">wrapper</span><span class="p">,</span> <span class="nx">host</span> <span class="p">);</span>
   <span class="p">}</span> <span class="p">);</span>
