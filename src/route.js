@@ -73,6 +73,9 @@ TurtleIO.prototype.route = function ( req, res ) {
 		}
 	}
 
+	// Decorating parsed Object on request
+	req.parsed = parsed;
+
 	// Finding a matching vhost
 	this.vhostsRegExp.each( function ( i, idx ) {
 		if ( i.test( parsed.hostname ) ) {

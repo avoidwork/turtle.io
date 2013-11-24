@@ -9,8 +9,7 @@
  */
 TurtleIO.prototype.error = function ( req, res, status ) {
 	var method = req.method.toLowerCase(),
-	    url    = this.url( req ),
-	    host   = $.parse( url ).hostname,
+	    host   = req.parsed.hostname,
 	    body;
 
 	if ( isNaN( status ) ) {

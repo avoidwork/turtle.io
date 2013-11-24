@@ -9,7 +9,6 @@
 TurtleIO.prototype.prep = function ( req, res ) {
 	var msg    = this.config.logs.format,
 	    time   = this.config.logs.time,
-	    parsed = $.parse( this.url( req ) ),
 	    header = req.headers.authorization || "",
 	    token  = header.split( REGEX_SPACE ).pop()  || "",
 	    auth   = new Buffer( token, "base64" ).toString(),
@@ -21,7 +20,7 @@ TurtleIO.prototype.prep = function ( req, res ) {
 	         .replace( "{{time}}",       moment().format( time ) )
 	         .replace( "{{ip}}",         ip )
 	         .replace( "{{method}}",     req.method )
-	         .replace( "{{path}}",       parsed.path )
+	         .replace( "{{path}}",       req.parsed.path )
 	         .replace( "{{status}}",     res.statusCode )
 	         .replace( "{{length}}",     res.getHeader( "Content-Length" ) || "-")
 	         .replace( "{{referer}}",    refer )

@@ -37,7 +37,7 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 
 	// Decorating "Transfer-Encoding" header
 	if ( !headers["Transfer-Encoding"] )  {
-		headers["Transfer-Encoding"] = "chunked";
+		headers["Transfer-Encoding"] = "identity";
 	}
 
 	// Removing headers not wanted in the response
