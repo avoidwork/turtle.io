@@ -8,12 +8,12 @@
  * @return {Boolean}       Boolean indicating if method is allowed
  */
 TurtleIO.prototype.allowed = function ( method, uri, host ) {
-	host       = host || "all";
 	var self   = this,
 	    result = false,
 	    exist  = false,
 	    d, hosts;
 
+	host  = host || "all";
 	hosts = this.handlers[method].hosts;
 	d     = hosts[this.config["default"]];
 	exist = ( hosts[host] );

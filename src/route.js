@@ -11,9 +11,16 @@ TurtleIO.prototype.route = function ( req, res ) {
 	    url    = this.url( req ),
 	    parsed = $.parse( url ),
 	    method = req.method.toLowerCase(),
-	    cached, handler, host, op, payload, route;
+	    cached, handler, host, payload, route;
 
-	op = function () {
+	/**
+	 * Operation
+	 *
+	 * @method op
+	 * @private
+	 * @return {Undefined} undefined
+	 */
+	function op () {
 		if ( handler ) {
 			req.cookies = {};
 			req.session = null;
@@ -64,7 +71,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 		else {
 			self.error( req, res );
 		}
-	};
+	}
 
 	// Finding a matching vhost
 	this.vhostsRegExp.each( function ( i, idx ) {
