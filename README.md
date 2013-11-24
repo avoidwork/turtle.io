@@ -14,7 +14,7 @@ All you need to do is install it, and tell it what directory holds your web site
 
 ## Documentation
 
-API documentation is available at [api.turtle.io](http://api.turtle.io), please visit the [wiki](https://github.com/avoidwork/turtle.io/wiki).
+API documentation is available at [api.turtle.io](http://api.turtle.io). Configuration details are available on the [wiki](https://github.com/avoidwork/turtle.io/wiki).
 
 ## Support
 
@@ -31,13 +31,14 @@ turtle.io requires a ***default*** virtual host to be specified, because it is t
 Virtual host keys are the hostname, and the value is the directory relative to "root".
 
 ```javascript
-var turtle_io = require("turtle.io"),
-    server    = new turtle_io(),
+var TurtleIO = require("turtle.io"),
+    server   = new TurtleIO(),
     params;
 
 params = {
 	default : "mysite.com",
 	port    : 80,
+	uid     : 100,
 	root    : "/var/www",
 	pages   : "errors",
 	vhosts  : {
@@ -51,15 +52,14 @@ server.start(params);
 
 ### Proxy routes
 
-The /api route acts as a proxy to another service. This example also utilizes a `config.json` file local to the server script, for easy DevOps management.
+This example has `/api` act as a reverse proxy to another service.
 
 ```javascript
-var config    = require("./config.json"),
-    turtle_io = require("turtle.io"),
-    server    = new turtle_io();
+var config   = require("./config.json"),
+    TurtleIO = require("turtle.io"),
+    server   = new TurtleIO();
 
-// Setting proxy routes
-server.proxy("https://api.github.com", "/api");
+server.proxy("/api", "https://api.github.com");
 
 server.start(config);
 ```
