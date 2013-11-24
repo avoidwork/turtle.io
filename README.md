@@ -18,7 +18,7 @@ API documentation is available at [api.turtle.io](http://api.turtle.io). Configu
 
 ## Examples
 
-turtle.io requires a ***default*** virtual host to be specified, because it is the failover, when a request can't be routed.
+turtle.io requires a ***default*** virtual host to be specified, because it is the failover when a request can't be routed.
 
 ### Virtual hosts
 
