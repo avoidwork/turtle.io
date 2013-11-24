@@ -16,12 +16,6 @@ All you need to do is install it, and tell it what directory holds your web site
 
 API documentation is available at [api.turtle.io](http://api.turtle.io). Configuration details are available on the [wiki](https://github.com/avoidwork/turtle.io/wiki).
 
-## Support
-
-If you're having problems, use the support forum at CodersClan.
-
-<a href="http://codersclan.net/forum/index.php?repo_id=12"><img src="http://www.codersclan.net/graphics/getSupport_blue_big.png" width="160"></a>
-
 ## Examples
 
 turtle.io requires a ***default*** virtual host to be specified, because it is the failover, when a request can't be routed.
@@ -63,6 +57,12 @@ server.proxy("/api", "https://api.github.com");
 
 server.start(config);
 ```
+
+## Support
+
+If you're having problems, use the support forum at CodersClan.
+
+<a href="http://codersclan.net/forum/index.php?repo_id=12"><img src="http://www.codersclan.net/graphics/getSupport_blue_big.png" width="160"></a>
 
 ## License
 Copyright (c) 2013 Jason Mulligan  
