@@ -29,11 +29,10 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		    regex_quote   = /^("|')/,
 		    regexOrigin   = new RegExp( origin, "g" ),
 		    replace       = "$1" + route,
-		    url           = self.url( req ),
-		    parsed        = $.parse( url ),
+		    url           = req.parsed.href,
 		    delay         = $.expires,
 		    get           = req.method === "GET",
-		    rewriteOrigin = parsed.protocol + "//" + parsed.host + route,
+		    rewriteOrigin = req.parsed.protocol + "//" + req.parsed.host + route,
 		    resHeaders, rewrite;
 
 		resHeaders        = headers( xhr.getAllResponseHeaders() );
@@ -41,7 +40,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 
 		// Something went wrong
 		if ( xhr.status < self.codes.CONTINUE ) {
-			self.respond( req, res, self.page( self.codes.BAD_GATEWAY, parsed.hostname ), self.codes.BAD_GATEWAY, resHeaders );
+			self.respond( req, res, self.page( self.codes.BAD_GATEWAY, req.parsed.hostname ), self.codes.BAD_GATEWAY, resHeaders );
 		}
 		else {
 			if ( get && ( xhr.status === self.codes.SUCCESS || xhr.status === self.codes.NOT_MODIFIED ) && !$.regex.no.test( resHeaders["Cache-Control"] ) && !$.regex.priv.test( resHeaders["Cache-Control"] ) ) {

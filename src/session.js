@@ -34,9 +34,8 @@ TurtleIO.prototype.session = {
 	create : function ( req, res ) {
 		var instance = this.server,
 		    expires  = instance.session.expires,
-		    parsed   = $.parse( instance.url( req ) ),
-		    domain   = parsed.host.isDomain() && !parsed.host.isIP() ? parsed.host : undefined,
-		    secure   = ( parsed.protocol === "https:" ),
+		    domain   = req.parsed.host.isDomain() && !req.parsed.host.isIP() ? req.parsed.host : undefined,
+		    secure   = ( req.parsed.protocol === "https:" ),
 		    id       = $.uuid( true ),
 		    iv, sesh, sid;
 
@@ -59,9 +58,8 @@ TurtleIO.prototype.session = {
 	 */
 	destroy : function ( req, res ) {
 		var instance = this.server,
-		    parsed   = $.parse( instance.url( req ) ),
-		    domain   = parsed.host.isDomain() && !parsed.host.isIP() ? parsed.host : undefined,
-		    secure   = ( parsed.protocol === "https:" ),
+		    domain   = req.parsed.host.isDomain() && !req.parsed.host.isIP() ? req.parsed.host : undefined,
+		    secure   = ( req.parsed.protocol === "https:" ),
 		    iv       = req.connection.remoteAddress + "-" + instance.config.session.iv,
 		    sid      = req.cookies[instance.config.session.id],
 		    id       = instance.cipher( sid, false, iv );
@@ -117,9 +115,8 @@ TurtleIO.prototype.session = {
 	save : function ( req, res ) {
 		var instance = this.server,
 		    expires  = instance.session.expires,
-		    parsed   = $.parse( instance.url( req ) ),
-		    domain   = parsed.host.isDomain() && !parsed.host.isIP() ? parsed.host : undefined,
-		    secure   = ( parsed.protocol === "https:" ),
+		    domain   = req.parsed.host.isDomain() && !req.parsed.host.isIP() ? req.parsed.host : undefined,
+		    secure   = ( req.parsed.protocol === "https:" ),
 		    iv       = req.connection.remoteAddress + "-" + instance.config.session.iv,
 		    sid      = req.cookies[instance.config.session.id],
 		    id       = instance.cipher( sid, false, iv );

@@ -12,8 +12,6 @@
  */
 TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) {
 	var self     = this,
-	    url      = this.url( req ),
-	    parsed   = $.parse( url ),
 	    ua       = req.headers["user-agent"],
 	    encoding = req.headers["accept-encoding"],
 	    type;
@@ -23,7 +21,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	file    = ( file === true );
 
 	if ( !headers.Allow ) {
-		headers["Access-Control-Allow-Methods"] = headers.Allow = this.allows( parsed.pathname, parsed.hostname );
+		headers["Access-Control-Allow-Methods"] = headers.Allow = this.allows( req.parsed.pathname, req.parsed.hostname );
 	}
 
 	if ( body ) {
@@ -51,17 +49,17 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	if ( req.method === "GET" && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) ) {
 		// Ensuring an Etag
 		if ( !headers.Etag ) {
-			headers.Etag = "\"" + this.etag( url, body.length || 0, headers["Last-Modified"] || 0, body || 0 ) + "\"";
+			headers.Etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers["Last-Modified"] || 0, body || 0 ) + "\"";
 		}
 
 		// Updating cache
 		if ( !$.regex.no.test( headers["Cache-Control"] ) && !$.regex.priv.test( headers["Cache-Control"] ) ) {
-			this.register( url, {etag: headers.Etag.replace( /"/g, "" ), mimetype: headers["Content-Type"]}, true );
+			this.register( req.parsed.href, {etag: headers.Etag.replace( /"/g, "" ), mimetype: headers["Content-Type"]}, true );
 		}
 
 		// Setting a watcher on the local path
 		if ( req.path ) {
-			this.watch( url, req.path, headers["Content-Type"] );
+			this.watch( req.parsed.href, req.path, headers["Content-Type"] );
 		}
 	}
 
