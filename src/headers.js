@@ -35,6 +35,11 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 		headers.Expires = new Date( new Date( new Date().getTime() + $.number.parse( $.regex.number_present.exec( headers["Cache-Control"] )[0], 10 ) * 1000 ) ).toUTCString();
 	}
 
+	// Decorating "Transfer-Encoding" header
+	if ( !headers["Transfer-Encoding"] )  {
+		headers["Transfer-Encoding"] = "identity";
+	}
+
 	// Removing headers not wanted in the response
 	if ( !get || status >= this.codes.BAD_REQUEST ) {
 		delete headers["Cache-Control"];

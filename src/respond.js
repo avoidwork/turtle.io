@@ -63,15 +63,8 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		}
 	}
 
-	// Decorating response
-	res.statusCode = status;
-
 	// Determining if response should be compressed
 	if ( status === this.codes.SUCCESS && body && this.config.compress && ( type = this.compression( ua, encoding, headers["Content-Type"] ) ) && type !== null ) {
-		if ( body instanceof Buffer ) {
-			headers["Content-Length"] = body.toString().length;
-		}
-
 		headers["Content-Encoding"]  = REGEX_GZIP.test( type ) ? "gzip" : "deflate";
 		headers["Transfer-Encoding"] = "chunked";
 		res.writeHead( status, headers );
@@ -88,6 +81,9 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	else {
 		if ( body instanceof Buffer ) {
 			headers["Content-Length"] = body.toString().length;
+		}
+		else if ( typeof body === "string" ) {
+			headers["Content-Length"] = body.length;
 		}
 
 		res.writeHead( status, headers );
