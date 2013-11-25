@@ -88,12 +88,19 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 					else if ( rewrite ) {
 						if ( arg instanceof Array || arg instanceof Object ) {
 							arg = $.encode( arg ).replace( regexOrigin, rewriteOrigin );
-							arg = arg.replace( /"(\/[^?\/]\w+)\//g, "\"" + route + "$1/" );
+
+							if ( route !== "/" ) {
+								arg = arg.replace( /"(\/[^?\/]\w+)\//g, "\"" + route + "$1/" );
+							}
+
 							arg = $.decode( arg );
 						}
 						else if ( typeof arg === "string" ) {
 							arg = arg.replace( regexOrigin, rewriteOrigin );
-							arg = arg.replace( regex, replace + ( arg.match( regex ) || [""] )[0].replace( regex_quote, "" ) );
+
+							if ( route !== "/" ) {
+								arg = arg.replace( regex, replace + ( arg.match( regex ) || [""] )[0].replace( regex_quote, "" ) );
+							}
 						}
 					}
 
@@ -226,8 +233,13 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 
 	// Setting route
 	verbs.each( function ( i ) {
-		self[i]( route, wrapper, host );
-		self[i]( route + "/.*", wrapper, host );
+		if ( route === "/" ) {
+			self[i]( "/.*", wrapper, host );
+		}
+		else {
+			self[i]( route, wrapper, host );
+			self[i]( route + "/.*", wrapper, host );
+		}
 	} );
 
 	return this;
