@@ -148,7 +148,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	 * @return {Undefined}  undefined
 	 */
 	function wrapper ( req, res ) {
-		var url      = origin + req.url.replace( new RegExp( "^" + route ), "" ),
+		var url      = origin + ( route !== "/" ? req.url.replace( new RegExp( "^" + route ), "" ) : req.url ),
 		    method   = req.method.toLowerCase(),
 		    headerz  = $.clone( req.headers, true ),
 		    parsed   = $.parse( url ),
