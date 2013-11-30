@@ -722,24 +722,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "ignorePrefix": "}",
           "name": "JavaScript"
         },
-        "sourcePath": "/Users/jason/Projects/turtle.io/src/stale.js",
-        "projectPath": "src/stale.js",
-        "targetPath": "stale",
-        "title": "stale"
-      },
-      "depth": 1,
-      "outline": []
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
-          "nameMatchers": [".js"],
-          "pygmentsLexer": "javascript",
-          "singleLineComment": ["//"],
-          "multiLineComment": ["/*", "*", "*/"],
-          "ignorePrefix": "}",
-          "name": "JavaScript"
-        },
         "sourcePath": "/Users/jason/Projects/turtle.io/src/start.js",
         "projectPath": "src/start.js",
         "targetPath": "start",

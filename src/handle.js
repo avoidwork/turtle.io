@@ -46,7 +46,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 			}
 		}
 		else if ( method === "DELETE" && del ) {
-			this.stale( this.url( req ) );
+			this.unregister( this.url( req ) );
 
 			fs.unlink( path, function ( e ) {
 				if ( e ) {
@@ -70,7 +70,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 			this.write( path, req, res );
 		}
 		else if ( method === "DELETE" && del ) {
-			this.stale( this.url( req ) );
+			this.unregister( req.parsed.href );
 
 			fs.unlink( path, function ( e ) {
 				if ( e ) {

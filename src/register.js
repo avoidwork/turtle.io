@@ -15,7 +15,7 @@ TurtleIO.prototype.register = function ( url, state, stale ) {
 		cached = this.etags.cache[url];
 
 		if ( cached && cached.value.etag !== state.etag ) {
-			this.stale( url );
+			this.unregister( url );
 		}
 	}
 

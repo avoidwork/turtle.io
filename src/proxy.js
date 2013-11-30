@@ -131,7 +131,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 				value          = i.replace( $.regex.header_value_replace, "" );
 				header         = i.replace( $.regex.header_replace, "" );
 				header         = header.unhyphenate( true ).replace( /\s+/g, "-" );
-				result[header] = value;
+				result[header] = !isNaN( value ) ? Number( value ) : value;
 			} );
 		}
 
