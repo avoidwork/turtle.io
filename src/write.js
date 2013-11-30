@@ -2,12 +2,12 @@
  * Writes files to disk
  *
  * @method write
- * @param  {String} path  File path
- * @param  {Object} req   HTTP request Object
- * @param  {Object} res   HTTP response Object
- * @return {Object}       TurtleIO instance
+ * @param  {Object} req  HTTP request Object
+ * @param  {Object} res  HTTP response Object
+ * @param  {String} path File path
+ * @return {Object}      TurtleIO instance
  */
-TurtleIO.prototype.write = function ( path, req, res ) {
+TurtleIO.prototype.write = function ( req, res, path ) {
 	var self  = this,
 	    put   = ( req.method === "PUT" ),
 	    body  = req.body,

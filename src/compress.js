@@ -2,15 +2,15 @@
  * Pipes compressed asset to Client
  *
  * @method compressed
+ * @param  {Object}  req  HTTP(S) request Object
+ * @param  {Object}  res  HTTP(S) response Object
  * @param  {Object}  body Response body
  * @param  {Object}  type gzip (gz) or deflate (df)
  * @param  {String}  etag Etag
- * @param  {Object}  req  HTTP(S) request Object
- * @param  {Object}  res  HTTP(S) response Object
  * @param  {Boolean} file Indicates `body` is a file path
  * @return {Objet}        TurtleIO instance
  */
-TurtleIO.prototype.compress = function ( body, type, etag, req, res, file ) {
+TurtleIO.prototype.compress = function ( req, res, body, type, etag, file ) {
 	var self    = this,
 	    method  = REGEX_GZIP.test( type ) ? "createGzip" : "createDeflate",
 	    sMethod = method.replace( "create", "" ).toLowerCase(),

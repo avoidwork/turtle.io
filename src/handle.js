@@ -58,7 +58,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 			} );
 		}
 		else if ( method === "PUT" && write ) {
-			this.write( path, req, res );
+			this.write( req, res, path );
 		}
 		else {
 			this.error( req, req, this.codes.SERVER_ERROR );
@@ -67,7 +67,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 	// Directory request
 	else {
 		if ( ( method === "POST" || method === "PUT" ) && write ) {
-			this.write( path, req, res );
+			this.write( req, res, path );
 		}
 		else if ( method === "DELETE" && del ) {
 			this.unregister( req.parsed.href );

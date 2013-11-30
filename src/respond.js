@@ -68,7 +68,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		headers["Content-Encoding"]  = REGEX_GZIP.test( type ) ? "gzip" : "deflate";
 		headers["Transfer-Encoding"] = "chunked";
 		res.writeHead( status, headers );
-		this.compress( body, type, headers.Etag.replace( /"/g, "" ), req, res, file );
+		this.compress( req, res, body, type, headers.Etag.replace( /"/g, "" ), file );
 	}
 	else if ( file ) {
 		headers["Transfer-Encoding"] = "chunked";
