@@ -17,13 +17,13 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	 *
 	 * @method handle
 	 * @private
-	 * @param  {Mixed}  arg   Proxy response
-	 * @param  {Object} xhr   XmlHttpRequest
-	 * @param  {Object} req   HTTP(S) request Object
-	 * @param  {Object} res   HTTP(S) response Object
-	 * @return {Undefined}    undefined
+	 * @param  {Object} req HTTP(S) request Object
+	 * @param  {Object} res HTTP(S) response Object
+	 * @param  {Mixed}  arg Proxy response
+	 * @param  {Object} xhr XmlHttpRequest
+	 * @return {Undefined}  undefined
 	 */
-	function handle ( arg, xhr, req, res ) {
+	function handle ( req, res, arg, xhr ) {
 		var etag          = "",
 		    regex         = /("|')\/[^?\/]/g,
 		    regex_quote   = /^("|')/,
@@ -157,7 +157,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 
 		// Facade to handle()
 		fn = function ( arg, xhr ) {
-			handle( arg, xhr, req, res );
+			handle( req, res, arg, xhr );
 		};
 
 		// Streaming formats that do not need to be rewritten
