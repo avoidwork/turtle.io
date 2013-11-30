@@ -10,8 +10,6 @@
  */
 TurtleIO.prototype.request = function ( req, res, host ) {
 	var self    = this,
-	    url     = this.url( req ),
-	    parsed  = $.parse( url ),
 	    method  = req.method,
 	    handled = false,
 	    found   = false,
@@ -39,7 +37,7 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 
 	// Preparing file path
 	root = this.config.root + "/" + this.config.vhosts[host];
-	path = ( root + parsed.pathname ).replace( REGEX_DIR, "" );
+	path = ( root + req.parsed.pathname ).replace( REGEX_DIR, "" );
 
 	// Determining if the request is valid
 	fs.lstat( path, function ( e, stats ) {
@@ -47,13 +45,13 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 			self.error( req, res, self.codes.NOT_FOUND );
 		}
 		else if ( !stats.isDirectory() ) {
-			self.handle( req, res, path, parsed.href, false, stats );
+			self.handle( req, res, path, req.parsed.href, false, stats );
 		}
 		else if ( REGEX_GET.test( method ) && !REGEX_DIR.test( req.url ) ) {
-			self.respond( req, res, self.messages.NO_CONTENT, self.codes.REDIRECT, {"Location": parsed.href + "/"} );
+			self.respond( req, res, self.messages.NO_CONTENT, self.codes.REDIRECT, {"Location": req.parsed.href + "/"} );
 		}
 		else if ( !REGEX_GET.test( method ) ) {
-			self.handle( req, res, path, parsed.href, true );
+			self.handle( req, res, path, req.parsed.href, true );
 		}
 		else {
 			count = 0;
@@ -64,7 +62,7 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 				fs.lstat( path + i, function ( e, stats ) {
 					if ( !e && !handled ) {
 						handled = true;
-						self.handle( req, res, path + i, parsed.href + i, false, stats );
+						self.handle( req, res, path + i, req.parsed.href + i, false, stats );
 					}
 					else if ( ++count === nth && !handled ) {
 						self.error( req, res, self.codes.NOT_FOUND );

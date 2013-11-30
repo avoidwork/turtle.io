@@ -39,7 +39,7 @@
       <span class="p">}</span>
     <span class="p">}</span>
     <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="nx">method</span> <span class="o">===</span> <span class="s2">&quot;DELETE&quot;</span> <span class="o">&amp;&amp;</span> <span class="nx">del</span> <span class="p">)</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">stale</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">url</span><span class="p">(</span> <span class="nx">req</span> <span class="p">)</span> <span class="p">);</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">unregister</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">url</span><span class="p">(</span> <span class="nx">req</span> <span class="p">)</span> <span class="p">);</span>
 
       <span class="nx">fs</span><span class="p">.</span><span class="nx">unlink</span><span class="p">(</span> <span class="nx">path</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">e</span> <span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span> <span class="nx">e</span> <span class="p">)</span> <span class="p">{</span>
@@ -61,7 +61,7 @@
       <span class="k">this</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">);</span>
     <span class="p">}</span>
     <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="nx">method</span> <span class="o">===</span> <span class="s2">&quot;DELETE&quot;</span> <span class="o">&amp;&amp;</span> <span class="nx">del</span> <span class="p">)</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">stale</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">url</span><span class="p">(</span> <span class="nx">req</span> <span class="p">)</span> <span class="p">);</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">unregister</span><span class="p">(</span> <span class="nx">req</span><span class="p">.</span><span class="nx">parsed</span><span class="p">.</span><span class="nx">href</span> <span class="p">);</span>
 
       <span class="nx">fs</span><span class="p">.</span><span class="nx">unlink</span><span class="p">(</span> <span class="nx">path</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">e</span> <span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span> <span class="nx">e</span> <span class="p">)</span> <span class="p">{</span>

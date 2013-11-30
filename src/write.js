@@ -13,7 +13,6 @@ TurtleIO.prototype.write = function ( path, req, res ) {
 	    body  = req.body,
 	    allow = this.allows( req.url ),
 	    del   = this.allowed( "DELETE", req.url ),
-	    url   = this.url( req ),
 	    status;
 
 	if ( !put && $.regex.endslash.test( req.url ) ) {
@@ -28,7 +27,7 @@ TurtleIO.prototype.write = function ( path, req, res ) {
 				self.error( req, res, self.codes.NOT_FOUND );
 			}
 			else {
-				var etag = "\"" + self.etag( url, stat.size, stat.mtime ) + "\"";
+				var etag = "\"" + self.etag( req.parsed.href, stat.size, stat.mtime ) + "\"";
 
 				if ( !req.headers.hasOwnProperty( "etag" ) || req.headers.etag === etag ) {
 					fs.writeFile( path, body, function ( e ) {

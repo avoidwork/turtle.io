@@ -14,7 +14,6 @@ TurtleIO.prototype.compress = function ( body, type, etag, req, res, file ) {
 	var self    = this,
 	    method  = REGEX_GZIP.test( type ) ? "createGzip" : "createDeflate",
 	    sMethod = method.replace( "create", "" ).toLowerCase(),
-	    url     = this.url( req ),
 	    fp      = this.config.tmp + "/" + etag + "." + type;
 
 	fs.exists( fp, function ( exist ) {
@@ -35,7 +34,7 @@ TurtleIO.prototype.compress = function ( body, type, etag, req, res, file ) {
 				zlib[sMethod]( body, function ( e, data ) {
 					if ( e ) {
 						self.log( e );
-						self.unregister( url );
+						self.unregister( req.parsed.href );
 						self.error( req, res, self.codes.SERVER_ERROR );
 					}
 					else {
@@ -44,7 +43,7 @@ TurtleIO.prototype.compress = function ( body, type, etag, req, res, file ) {
 						fs.writeFile( fp, data, "utf8", function ( e ) {
 							if ( e ) {
 								self.log( e );
-								self.unregister( url );
+								self.unregister( req.parsed.href );
 							}
 						} );
 					}
@@ -55,7 +54,7 @@ TurtleIO.prototype.compress = function ( body, type, etag, req, res, file ) {
 			// Pipe compressed asset to Client
 			fs.createReadStream( body ).on( "error", function ( e ) {
 				self.log( e );
-				self.unregister( url );
+				self.unregister( req.parsed.href );
 				self.error( req, res, self.codes.SERVER_ERROR );
 			} ).pipe( zlib[method]() ).pipe( res );
 
