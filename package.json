@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Easy to use web server with virtual hosts & reverse proxies",
-  "version": "0.12.35",
+  "version": "1.0.0",
   "homepage": "http://turtle.io",
   "author": {
     "name": "Jason Mulligan",
@@ -28,12 +28,12 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "abaaso": "~3.10.39",
-    "mime": "~1.2.11",
-    "moment": "~2.1.0",
-    "http-auth" : "~1.2.9",
-    "node-syslog" : "~1.1.7",
-    "toobusy" : "~0.2.3"
+    "abaaso": "3.10.42",
+    "mime": "1.2.11",
+    "moment": "2.4.0",
+    "http-auth" : "1.2.9",
+    "node-syslog" : "1.1.7",
+    "toobusy" : "0.2.4"
   },
   "devDependencies": {
     "grunt" : "~0.4.1",
