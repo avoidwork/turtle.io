@@ -14,7 +14,7 @@
 		$("#year").html(new Date().getFullYear());
 
 		"/".headers(function (arg) {
-			$("#version").html(arg.Server.replace(/turtle.io\/(\d\.\d\.\d).*/, "$1"));
+			$("#version").html(arg.Server.split(" ")[0].replace(/.*\//, ""));
 		});
 	});
 })(abaaso);
