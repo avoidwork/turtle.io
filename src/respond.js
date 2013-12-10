@@ -80,10 +80,10 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	}
 	else {
 		if ( body instanceof Buffer ) {
-			headers["Content-Length"] = body.toString().length;
+			headers["Content-Length"] = Buffer.byteLength( body.toString() );
 		}
 		else if ( typeof body === "string" ) {
-			headers["Content-Length"] = body.length;
+			headers["Content-Length"] = Buffer.byteLength( body );
 		}
 
 		res.writeHead( status, headers );

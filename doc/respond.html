@@ -67,10 +67,10 @@
   <span class="p">}</span>
   <span class="k">else</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span> <span class="nx">body</span> <span class="k">instanceof</span> <span class="nx">Buffer</span> <span class="p">)</span> <span class="p">{</span>
-      <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">body</span><span class="p">.</span><span class="nx">toString</span><span class="p">().</span><span class="nx">length</span><span class="p">;</span>
+      <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">Buffer</span><span class="p">.</span><span class="nx">byteLength</span><span class="p">(</span> <span class="nx">body</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span> <span class="p">);</span>
     <span class="p">}</span>
     <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="k">typeof</span> <span class="nx">body</span> <span class="o">===</span> <span class="s2">&quot;string&quot;</span> <span class="p">)</span> <span class="p">{</span>
-      <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">body</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+      <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">Buffer</span><span class="p">.</span><span class="nx">byteLength</span><span class="p">(</span> <span class="nx">body</span> <span class="p">);</span>
     <span class="p">}</span>
 
     <span class="nx">res</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">headers</span> <span class="p">);</span>
