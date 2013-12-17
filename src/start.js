@@ -71,7 +71,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 			console.log( e );
 		}
 		else {
-			files.each(function ( i ) {
+			files.each( function ( i ) {
 				self.pages.all[i.replace( REGEX_NEXT, "" )] = fs.readFileSync( pages + "/" + i, "utf8" );
 			} );
 

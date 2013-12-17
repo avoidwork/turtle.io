@@ -27,7 +27,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 			// Decorating valid cookies
 			if ( req.headers.cookie !== undefined ) {
-				req.headers.cookie.explode( ";" ).map(function ( i ) {
+				req.headers.cookie.explode( ";" ).map( function ( i ) {
 					return i.split( "=" );
 				} ).each( function ( i ) {
 					req.cookies[i[0]] = i[1];
