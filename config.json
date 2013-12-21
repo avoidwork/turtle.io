@@ -25,8 +25,7 @@
 	"root"    : "",
 	"session" : {
 		"id"    : "sid",
-		"iv"    : null,
-		"valid" : "15 minutes",
+		"valid" : "15m",
 		"gc"    : 60000
 	},
 	"pages"   : null,

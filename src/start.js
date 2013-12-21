@@ -34,10 +34,8 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 		process.exit( 1 );
 	}
 
-	// Setting session iv
-	if ( this.config.session.iv === null ) {
-		this.config.session.iv = crypto.randomBytes( 256 ).toString();
-	}
+	// Setting session.expires
+	this.session.valid = this.config.session.valid;
 
 	// Setting `Server` HTTP header
 	if ( !this.config.headers.Server ) {

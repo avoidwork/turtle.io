@@ -9,7 +9,7 @@
 function Session ( id, server ) {
 	this._id        = id;
 	this._server    = server;
-	this._timestamp = 0;
+	this._timestamp = moment().unix();
 }
 
 // Setting constructor loop
@@ -20,7 +20,6 @@ Session.prototype.constructor = Session;
  *
  * @class sessions
  * @type {Object}
- * @todo too slow!
  */
 TurtleIO.prototype.session = {
 	/**
@@ -32,14 +31,17 @@ TurtleIO.prototype.session = {
 	 * @return {Object}     Session
 	 */
 	create : function ( req, res ) {
-		var expires = this.server.session.expires,
-		    domain  = req.parsed.host.isDomain() && !req.parsed.host.isIP() ? req.parsed.host : undefined,
-		    secure  = ( req.parsed.protocol === "https:" ),
-		    sid     = $.uuid( true ),
+		var domain = req.parsed.host,
+		    secure = ( req.parsed.protocol === "https:" ),
+		    sid    = $.uuid( true ),
 		    sesh;
 
-		sesh = this.server.sessions[sid] = new Session( sid, this.server );
-		this.server.cookie.set( res, this.server.config.session.id, sid, expires, domain, secure, "/" );
+		// Creating the session
+		sesh = this.server.sessions[sid] = req.session = new Session( sid, this.server );
+		this.server.cookie.set( res, this.server.config.session.id, sid, this.valid, domain, secure, "/" );
+
+		// Updating the session id cookie in the request object in case of an override
+		req.cookies[this.server.config.session.id] = sid;
 
 		return sesh;
 	},
@@ -102,25 +104,24 @@ TurtleIO.prototype.session = {
 	 * @return {Object}     TurtleIO instance
 	 */
 	save : function ( req, res ) {
-		var expires = this.server.session.expires,
-		    domain  = req.parsed.host.isDomain() && !req.parsed.host.isIP() ? req.parsed.host : undefined,
-		    secure  = ( req.parsed.protocol === "https:" ),
-		    sid     = req.cookies[this.server.config.session.id];
+		var domain = req.parsed.host,
+		    secure = ( req.parsed.protocol === "https:" ),
+		    sid    = req.cookies[this.server.config.session.id];
 
 		if ( sid ) {
 			this.server.sessions[sid]._timestamp = moment().unix();
-			this.server.cookie.set( res, this.server.config.session.id, sid, expires, domain, secure, "/" );
+			this.server.cookie.set( res, this.server.config.session.id, sid, this.valid, domain, secure, "/" );
 		}
 
 		return this.server;
 	},
 
-	// Transformed `config.session.valid` for $.cookie{}
-	expires : "",
-
 	// Determines if a session has expired
 	maxDiff : 0,
 
 	// Set & unset from `start()` & `stop()`
-	server : null
+	server : null,
+
+	// `config.session.valid` for $.cookie{}
+	valid : ""
 };
