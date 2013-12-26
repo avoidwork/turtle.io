@@ -4,12 +4,12 @@
  * @method Session
  * @constructor
  * @param {String} id     Session ID
- * @param {Object} server Server instance
+ * @param {Object} server TurtleIO instance
  */
 function Session ( id, server ) {
 	this._id        = id;
 	this._server    = server;
-	this._timestamp = 0;
+	this._timestamp = moment().unix();
 }
 
 // Setting constructor loop
@@ -20,7 +20,6 @@ Session.prototype.constructor = Session;
  *
  * @class sessions
  * @type {Object}
- * @todo too slow!
  */
 TurtleIO.prototype.session = {
 	/**
@@ -29,23 +28,22 @@ TurtleIO.prototype.session = {
 	 * @method create
 	 * @param  {Object} req HTTP(S) request Object
 	 * @param  {Object} res HTTP(S) response Object
-	 * @return {Object}     Session instance
+	 * @return {Object}     Session
 	 */
 	create : function ( req, res ) {
-		var instance = this.server,
-		    expires  = instance.session.expires,
-		    domain   = req.parsed.host.isDomain() && !req.parsed.host.isIP() ? req.parsed.host : undefined,
-		    secure   = ( req.parsed.protocol === "https:" ),
-		    id       = $.uuid( true ),
-		    iv, sesh, sid;
+		var domain = req.parsed.hostname,
+		    secure = ( req.parsed.protocol === "https:" ),
+		    sid    = $.uuid( true ),
+		    sesh;
 
-		 iv   = req.connection.remoteAddress + "-" + instance.config.session.iv;
-		 sesh = this.server.sessions[id] = new Session( id, this.server );
-		 sid  = instance.cipher( id, true, iv );
+		// Creating the session
+		sesh = this.server.sessions[sid] = req.session = new Session( sid, this.server );
+		this.server.cookie.set( res, this.server.config.session.id, sid, this.valid, domain, secure );
 
-		instance.cookie.set( res, instance.config.session.id, sid, expires, domain, secure, "/" );
+		// Updating the session id cookie in the request object in case of an override
+		req.cookies[this.server.config.session.id] = sid;
 
-		 return sesh;
+		return sesh;
 	},
 
 	/**
@@ -57,19 +55,16 @@ TurtleIO.prototype.session = {
 	 * @return {Object}     TurtleIO instance
 	 */
 	destroy : function ( req, res ) {
-		var instance = this.server,
-		    domain   = req.parsed.host.isDomain() && !req.parsed.host.isIP() ? req.parsed.host : undefined,
-		    secure   = ( req.parsed.protocol === "https:" ),
-		    iv       = req.connection.remoteAddress + "-" + instance.config.session.iv,
-		    sid      = req.cookies[instance.config.session.id],
-		    id       = instance.cipher( sid, false, iv );
+		var domain = req.parsed.hostname,
+		    secure = ( req.parsed.protocol === "https:" ),
+		    sid    = req.cookies[this.server.config.session.id];
 
-		if ( id ) {
-			instance.cookie.expire( res, instance.config.session.id, domain, secure, "/" );
-			delete instance.sessions[id];
+		if ( sid ) {
+			this.server.cookie.expire( res, this.server.config.session.id, domain, secure );
+			delete this.server.sessions[sid];
 		}
 
-		return instance;
+		return this.server;
 	},
 
 	/**
@@ -81,18 +76,14 @@ TurtleIO.prototype.session = {
 	 * @return {Mixed}      Session or undefined
 	 */
 	get : function ( req, res ) {
-		var instance = this.server,
-		    sid      = req.cookies[instance.config.session.id],
-		    sesh     = null,
-		    id, iv;
+		var sid  = req.cookies[this.server.config.session.id],
+		    sesh = null;
 
 		if ( sid !== undefined ) {
-			iv   = req.connection.remoteAddress + "-" + instance.config.session.iv;
-			id   = instance.cipher( sid, false, iv );
-			sesh = instance.sessions[id] || null;
+			sesh = this.server.sessions[sid] || null;
 
 			if ( sesh !== null ) {
-				if ( sesh._timestamp.diff( moment().utc().unix() ) > 1 ) {
+				if ( sesh._timestamp.diff( moment().unix() ) > 1 ) {
 					this.save( req, res );
 				}
 			}
@@ -113,28 +104,24 @@ TurtleIO.prototype.session = {
 	 * @return {Object}     TurtleIO instance
 	 */
 	save : function ( req, res ) {
-		var instance = this.server,
-		    expires  = instance.session.expires,
-		    domain   = req.parsed.host.isDomain() && !req.parsed.host.isIP() ? req.parsed.host : undefined,
-		    secure   = ( req.parsed.protocol === "https:" ),
-		    iv       = req.connection.remoteAddress + "-" + instance.config.session.iv,
-		    sid      = req.cookies[instance.config.session.id],
-		    id       = instance.cipher( sid, false, iv );
+		var domain = req.parsed.hostname,
+		    secure = ( req.parsed.protocol === "https:" ),
+		    sid    = req.cookies[this.server.config.session.id];
 
-		if ( id ) {
-			instance.sessions[id]._timestamp = moment().unix();
-			instance.cookie.set( res, instance.config.session.id, sid, expires, domain, secure, "/" );
+		if ( sid ) {
+			this.server.sessions[sid]._timestamp = moment().unix();
+			this.server.cookie.set( res, this.server.config.session.id, sid, this.valid, domain, secure );
 		}
 
-		return instance;
+		return this.server;
 	},
-
-	// Transformed `config.session.valid` for $.cookie{}
-	expires : "",
 
 	// Determines if a session has expired
 	maxDiff : 0,
 
 	// Set & unset from `start()` & `stop()`
-	server : null
+	server : null,
+
+	// `config.session.valid` for $.cookie{}
+	valid : ""
 };

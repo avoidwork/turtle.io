@@ -11,7 +11,7 @@ TurtleIO.prototype.hash = function ( arg, encrypt, digest ) {
 	encrypt = encrypt || "md5";
 	digest  = digest  || "hex";
 
-	if ( typeof arg !== "string" && !arg instanceof Buffer ) {
+	if ( typeof arg != "string" && !( arg instanceof Buffer ) ) {
 		arg = "";
 	}
 

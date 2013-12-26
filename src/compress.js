@@ -25,7 +25,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file ) {
 		}
 		else if ( !file ) {
 			// Pipe Stream through compression to Client & disk
-			if ( typeof body.pipe === "function" ) {
+			if ( typeof body.pipe == "function" ) {
 				body.pipe( zlib[method]() ).pipe( res );
 				body.pipe( zlib[method]() ).pipe( fs.createWriteStream( fp ) );
 			}

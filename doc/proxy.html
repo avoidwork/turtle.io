@@ -83,7 +83,7 @@
 
               <span class="nx">arg</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">decode</span><span class="p">(</span> <span class="nx">arg</span> <span class="p">);</span>
             <span class="p">}</span>
-            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="k">typeof</span> <span class="nx">arg</span> <span class="o">===</span> <span class="s2">&quot;string&quot;</span> <span class="p">)</span> <span class="p">{</span>
+            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="k">typeof</span> <span class="nx">arg</span> <span class="o">==</span> <span class="s2">&quot;string&quot;</span> <span class="p">)</span> <span class="p">{</span>
               <span class="nx">arg</span> <span class="o">=</span> <span class="nx">arg</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span> <span class="nx">regexOrigin</span><span class="p">,</span> <span class="nx">rewriteOrigin</span> <span class="p">);</span>
 
               <span class="k">if</span> <span class="p">(</span> <span class="nx">route</span> <span class="o">!==</span> <span class="s2">&quot;/&quot;</span> <span class="p">)</span> <span class="p">{</span>
