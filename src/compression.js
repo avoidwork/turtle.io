@@ -12,7 +12,8 @@ TurtleIO.prototype.compression = function ( agent, encoding, mimetype ) {
 	var result    = null,
 	    encodings = typeof encoding == "string" ? encoding.explode() : [];
 
-	if ( REGEX_COMP.test( mimetype ) && this.config.compress === true && !REGEX_IE.test( agent ) ) {
+	// iPad Safari doesn't handle compressed & streamed responses properly, blocked until fixed by Apple
+	if ( this.config.compress === true && REGEX_COMP.test( mimetype ) && !REGEX_IE.test( agent ) && !REGEX_IDEVICE.test( agent ) ) {
 		// Iterating supported encodings
 		encodings.each( function ( i ) {
 			if ( REGEX_GZIP.test( i ) ) {

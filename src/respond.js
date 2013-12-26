@@ -24,7 +24,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		headers["Access-Control-Allow-Methods"] = headers.Allow = this.allows( req.parsed.pathname, req.parsed.hostname );
 	}
 
-	if ( body ) {
+	if ( !file && body ) {
 		body = this.encode( body );
 
 		// Ensuring JSON has proper mimetype
