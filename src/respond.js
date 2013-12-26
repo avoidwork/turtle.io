@@ -82,8 +82,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		if ( body instanceof Buffer ) {
 			headers["Content-Length"] = Buffer.byteLength( body.toString() );
 		}
-		else {
-			body = typeof body.toString == "function" ? body.toString() : "" + body;
+		else if ( typeof body == "string" ) {
 			headers["Content-Length"] = Buffer.byteLength( body );
 		}
 

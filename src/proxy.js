@@ -95,7 +95,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 
 							arg = $.decode( arg );
 						}
-						else if ( typeof arg === "string" ) {
+						else if ( typeof arg == "string" ) {
 							arg = arg.replace( regexOrigin, rewriteOrigin );
 
 							if ( route !== "/" ) {

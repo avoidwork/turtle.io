@@ -10,7 +10,7 @@
  */
 TurtleIO.prototype.compression = function ( agent, encoding, mimetype ) {
 	var result    = null,
-	    encodings = typeof encoding === "string" ? encoding.explode() : [];
+	    encodings = typeof encoding == "string" ? encoding.explode() : [];
 
 	if ( REGEX_COMP.test( mimetype ) && this.config.compress === true && !REGEX_IE.test( agent ) ) {
 		// Iterating supported encodings

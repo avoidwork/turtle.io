@@ -14,7 +14,7 @@
   <span class="nx">encrypt</span> <span class="o">=</span> <span class="nx">encrypt</span> <span class="o">||</span> <span class="s2">&quot;md5&quot;</span><span class="p">;</span>
   <span class="nx">digest</span>  <span class="o">=</span> <span class="nx">digest</span>  <span class="o">||</span> <span class="s2">&quot;hex&quot;</span><span class="p">;</span>
 
-  <span class="k">if</span> <span class="p">(</span> <span class="k">typeof</span> <span class="nx">arg</span> <span class="o">!==</span> <span class="s2">&quot;string&quot;</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">arg</span> <span class="k">instanceof</span> <span class="nx">Buffer</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="k">typeof</span> <span class="nx">arg</span> <span class="o">!=</span> <span class="s2">&quot;string&quot;</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span> <span class="nx">arg</span> <span class="k">instanceof</span> <span class="nx">Buffer</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
     <span class="nx">arg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
   <span class="p">}</span>
 

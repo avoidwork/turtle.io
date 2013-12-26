@@ -7,7 +7,7 @@
  */
 TurtleIO.prototype.encode = function ( arg ) {
 	// Do not want to coerce this Object to a String!
-	if ( arg instanceof Buffer || typeof arg.pipe === "function" ) {
+	if ( arg instanceof Buffer || typeof arg.pipe == "function" ) {
 		return arg;
 	}
 	// Converting to JSON

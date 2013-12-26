@@ -16,7 +16,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	$.merge( config, cfg || {} );
 
 	// Overriding default error handler
-	if ( typeof err === "function" ) {
+	if ( typeof err == "function" ) {
 		this.error = err;
 	}
 
