@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Easy to use web server with virtual hosts & reverse proxies",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "homepage": "http://turtle.io",
   "author": {
     "name": "Jason Mulligan",
@@ -44,5 +44,5 @@
     "grunt-contrib-nodeunit": "~0.1.2",
     "grunt-contrib-watch": "~0.2"
   },
-  "keywords": ["web server", "http", "https", "web", "server", "virtual", "virtual hosts", "proxy", "reverse proxy", "api", "cache", "application"]
+  "keywords": ["web server", "http", "https", "web", "server", "virtual", "virtual hosts", "proxy", "reverse proxy", "api", "cache", "application", "static"]
 }

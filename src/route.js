@@ -9,9 +9,8 @@
 TurtleIO.prototype.route = function ( req, res ) {
 	var self   = this,
 	    url    = this.url( req ),
-	    parsed = $.parse( url ),
 	    method = req.method.toLowerCase(),
-	    cached, handler, host, payload, route;
+	    cached, handler, host, parsed, payload, route;
 
 	/**
 	 * Operation
@@ -71,6 +70,14 @@ TurtleIO.prototype.route = function ( req, res ) {
 		else {
 			self.error( req, res );
 		}
+	}
+
+	// If the URL can't be parsed, respond with a 500
+	try {
+		parsed = $.parse( url );
+	}
+	catch ( e ) {
+		this.error( req, res, this.codes.SERVER_ERROR );
 	}
 
 	// Decorating parsed Object on request
