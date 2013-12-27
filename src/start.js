@@ -100,7 +100,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 				process.setuid( self.config.uid );
 			}
 
-			console.log( "Started turtle.io on port " + config.port );
+			self.log( "Started turtle.io on port " + config.port, false );
 		}
 	} );
 

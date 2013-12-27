@@ -90,5 +90,5 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		res.end( body );
 	}
 
-	return this.log( this.prep( req, res ) );
+	return this.log( this.prep( req, res, headers ) );
 };
