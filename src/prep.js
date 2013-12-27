@@ -2,27 +2,24 @@
  * Preparing log message
  *
  * @method prep
- * @param  {Object} req HTTP(S) request Object
- * @param  {Object} res HTTP(S) response Object
- * @return {String}     Log message
+ * @param  {Object} req     HTTP(S) request Object
+ * @param  {Object} res     HTTP(S) response Object
+ * @param  {Object} headers HTTP(S) response headers
+ * @return {String}         Log message
  */
-TurtleIO.prototype.prep = function ( req, res ) {
-	var msg    = this.config.logs.format,
-	    time   = this.config.logs.time,
-	    header = req.headers.authorization || "",
-	    token  = header.split( REGEX_SPACE ).pop()  || "",
-	    auth   = new Buffer( token, "base64" ).toString(),
-	    user   = auth.split( ":" )[0] || "-",
-	    refer  = req.headers.referer ? ( "\"" + req.headers.referer + "\"" ) : "-",
-	    ip     = req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].explode().last() : req.connection.remoteAddress;
+TurtleIO.prototype.prep = function ( req, res, headers ) {
+	var msg   = this.config.logs.format,
+	    user  = req.parsed.auth.split( ":" )[0] || "-",
+	    refer = req.headers.referer ? ( "\"" + req.headers.referer + "\"" ) : "-",
+	    ip    = req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].explode().last() : req.connection.remoteAddress;
 
 	msg = msg.replace( "{{host}}",       req.headers.host )
-	         .replace( "{{time}}",       moment().format( time ) )
+	         .replace( "{{time}}",       moment().format( this.config.logs.time ) )
 	         .replace( "{{ip}}",         ip )
 	         .replace( "{{method}}",     req.method )
 	         .replace( "{{path}}",       req.parsed.path )
 	         .replace( "{{status}}",     res.statusCode )
-	         .replace( "{{length}}",     res.getHeader( "Content-Length" ) || "-")
+	         .replace( "{{length}}",     headers["Content-Length"] || "-" )
 	         .replace( "{{referer}}",    refer )
 	         .replace( "{{user}}",       user )
 	         .replace( "{{user-agent}}", req.headers["user-agent"] || "-" );

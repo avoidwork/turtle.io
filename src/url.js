@@ -6,5 +6,18 @@
  * @return {String}     Requested URL
  */
 TurtleIO.prototype.url = function ( req ) {
-	return "http" + ( this.config.ssl.cert ? "s" : "" ) + "://" + req.headers.host + req.url;
+	var header = req.headers.authorization || "",
+	    auth   = "",
+	    token;
+
+	if ( !header.isEmpty() ) {
+		token = header.split( REGEX_SPACE ).pop()  || "",
+		auth  = new Buffer( token, "base64" ).toString();
+
+		if ( !auth.isEmpty() ) {
+			auth += "@";
+		}
+	}
+
+	return "http" + ( this.config.ssl.cert ? "s" : "" ) + "://" + auth + req.headers.host + req.url;
 };

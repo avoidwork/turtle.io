@@ -21,7 +21,7 @@ TurtleIO.prototype.stop = function () {
 		this.server.close();
 	}
 
-	console.log( "Stopped turtle.io on port " + port );
+	this.log( "Stopped turtle.io on port " + port, false );
 
 	return this;
 };
