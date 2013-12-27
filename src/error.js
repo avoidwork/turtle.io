@@ -10,7 +10,8 @@
 TurtleIO.prototype.error = function ( req, res, status ) {
 	var method = req.method.toLowerCase(),
 	    host   = req.parsed.hostname,
-	    body;
+	    kdx    = 0,
+	    body, msg;
 
 	if ( isNaN( status ) ) {
 		status = this.codes.NOT_FOUND;
@@ -27,6 +28,17 @@ TurtleIO.prototype.error = function ( req, res, status ) {
 	}
 
 	body = this.page( status, host );
+
+	$.array.cast( this.codes ).each(function ( i, idx ) {
+		if ( i === status ) {
+			kdx = idx;
+			return false;
+		}
+	} );
+
+	msg = kdx ? $.array.cast( this.messages )[kdx] : "Unknown error";
+
+	this.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].explode().last() : req.connection.remoteAddress ) + "] " + msg ), "debug" );
 
 	return this.respond( req, res, body, status, {"Cache-Control": "no-cache", "Content-Length": Buffer.byteLength( body )} );
 };
