@@ -74,7 +74,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		headers["Transfer-Encoding"] = "chunked";
 		res.writeHead( status, headers );
 		fs.createReadStream( body ).on( "error", function ( e ) {
-			self.log( e );
+			self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].explode().last() : req.connection.remoteAddress ) + "] " + e.message ), "error" );
 			self.error( req, res, self.codes.SERVER_ERROR );
 		} ).pipe( res );
 	}
@@ -90,5 +90,5 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		res.end( body );
 	}
 
-	return this.log( this.prep( req, res, headers ) );
+	return this.log( this.prep( req, res, headers ), "info" );
 };

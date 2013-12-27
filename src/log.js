@@ -2,24 +2,38 @@
  * Logs a message
  *
  * @method log
- * @param  {Mixed}   arg    Error Object or String
- * @param  {Boolean} stdout [Optional] `arg` should be emitted, default is `true`
- * @return {Object}         TurtleIO instance
+ * @param  {Mixed}  arg   Error Object or String
+ * @param  {String} level [Optional] `level` must match a valid LogLevel - http://httpd.apache.org/docs/1.3/mod/core.html#loglevel, default is `notice`
+ * @return {Object}       TurtleIO instance
  */
-TurtleIO.prototype.log = function ( arg, stdout ) {
-	var e = arg instanceof Error;
+TurtleIO.prototype.log = function ( arg, level ) {
+	var e = arg instanceof Error,
+	    syslogMethod;
 
-	if ( e ) {
-		arg = arg.stack || arg.message || arg;
+	level = level || "notice";
+
+	if ( this.config.logs.stdout && this.levels.indexOf( level ) <= this.levels.indexOf( this.config.logs.level ) ) {
+		if ( e ) {
+			console.error( "[" + moment().format( this.config.logs.time ) + "] [" + level + "] " + ( arg.stack || arg.message || arg ) );
+		}
+		else {
+			console.log( arg );
+		}
 	}
 
-	stdout = ( stdout !== false );
+	if ( this.config.logs.syslog ) {
+		if ( level === "error" ) {
+			syslogMethod = "LOG_ERR";
+		}
+		else if ( level === "warn" ) {
+			syslogMethod = "LOG_WARNING";
+		}
+		else {
+			syslogMethod = "LOG_" + level.toUpperCase();
+		}
 
-	if ( stdout && this.config.logs.stdout ) {
-		console[ e ? "error" : "log"]( arg );
+		syslog.log( syslog[syslogMethod], arg.stack || arg.message || arg );
 	}
-
-	syslog.log( syslog[!e ? "LOG_INFO" : "LOG_ERR"], arg );
 
 	return this;
 };

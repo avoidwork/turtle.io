@@ -13,16 +13,16 @@ TurtleIO.prototype.prep = function ( req, res, headers ) {
 	    refer = req.headers.referer ? ( "\"" + req.headers.referer + "\"" ) : "-",
 	    ip    = req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].explode().last() : req.connection.remoteAddress;
 
-	msg = msg.replace( "{{host}}",       req.headers.host )
-	         .replace( "{{time}}",       moment().format( this.config.logs.time ) )
-	         .replace( "{{ip}}",         ip )
-	         .replace( "{{method}}",     req.method )
-	         .replace( "{{path}}",       req.parsed.path )
-	         .replace( "{{status}}",     res.statusCode )
-	         .replace( "{{length}}",     headers["Content-Length"] || "-" )
-	         .replace( "{{referer}}",    refer )
-	         .replace( "{{user}}",       user )
-	         .replace( "{{user-agent}}", req.headers["user-agent"] || "-" );
+	msg = msg.replace( "%v",             req.headers.host )
+	         .replace( "%h",             ip )
+	         .replace( "%l",             "-" )
+	         .replace( "%u",             user )
+	         .replace( "%t",             ( "[" + moment().format( this.config.logs.time ) + "]" ) )
+	         .replace( "%r",             req.method + " " + req.parsed.path + " HTTP/1.1" )
+	         .replace( "%>s",            res.statusCode )
+	         .replace( "%b",             headers["Content-Length"] || "-" )
+	         .replace( "%{Referer}i",    refer )
+	         .replace( "%{User-agent}i", req.headers["user-agent"] || "-" );
 
 	return msg;
 };

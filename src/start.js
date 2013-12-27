@@ -30,7 +30,8 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 
 	// Looking for required setting
 	if ( !this.config["default"] ) {
-		this.log( new Error( "Invalid default virtual host" ) );
+		this.log( new Error( "[client 0.0.0.0] Invalid default virtual host" ), "error" );
+		syslog.close();
 		process.exit( 1 );
 	}
 
@@ -66,33 +67,33 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	// Loading default error pages
 	fs.readdir( pages, function ( e, files ) {
 		if ( e ) {
-			console.log( e );
+			self.log( new Error( "[client 0.0.0.0] " + e.message ), "error" );
 		}
-		else {
+		else if ( $.array.keys( self.config ).length > 0 ) {
 			files.each( function ( i ) {
 				self.pages.all[i.replace( REGEX_NEXT, "" )] = fs.readFileSync( pages + "/" + i, "utf8" );
 			} );
 
 			// Starting server
 			if ( self.server === null ) {
-				if ( config.ssl.cert !== null && config.ssl.key !== null ) {
+				if ( self.config.ssl.cert !== null && self.config.ssl.key !== null ) {
 					// Reading files
-					config.ssl.cert = fs.readFileSync( config.ssl.cert );
-					config.ssl.key  = fs.readFileSync( config.ssl.key );
+					self.config.ssl.cert = fs.readFileSync( self.config.ssl.cert );
+					self.config.ssl.key  = fs.readFileSync( self.config.ssl.key );
 
 					// Starting server
-					self.server = https.createServer( $.merge( config.ssl, {port: config.port, host: config.address} ), function ( req, res ) {
+					self.server = https.createServer( $.merge( self.config.ssl, {port: self.config.port, host: self.config.address} ), function ( req, res ) {
 						self.route( req, res );
-					} ).listen( config.port, config.address );
+					} ).listen( self.config.port, self.config.address );
 				}
 				else {
 					self.server = http.createServer( function ( req, res ) {
 						self.route( req, res );
-					} ).listen( config.port, config.address );
+					} ).listen( self.config.port, self.config.address );
 				}
 			}
 			else {
-				self.server.listen( config.port, config.address );
+				self.server.listen( self.config.port, self.config.address );
 			}
 
 			// Dropping process
@@ -100,13 +101,13 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 				process.setuid( self.config.uid );
 			}
 
-			self.log( "Started turtle.io on port " + config.port, false );
+			self.log( "Started turtle.io on port " + self.config.port, "debug" );
 		}
 	} );
 
 	// For toobusy()
 	process.on( "uncaughtException", function ( e ) {
-		self.log( e.stack || e );
+		self.log( e, "error" );
 	} );
 
 	return this;

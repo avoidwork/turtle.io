@@ -18,8 +18,10 @@
 	"lag"     : 50,
 	"logs"    : {
 		"time"   : "D/MMM/YYYY:HH:mm:ss ZZ",
-		"format" : "{{host}} - {{user}} [{{time}}] \"{{method}} {{path}} HTTP/1.1\" {{status}} {{length}} {{referer}} \"{{user-agent}}\"",
-		"stdout" : true
+		"format" : "%v %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"",
+		"level"  : "info",
+		"stdout" : true,
+		"syslog" : true
 	},
 	"port"    : 8000,
 	"root"    : "",

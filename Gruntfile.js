@@ -35,6 +35,7 @@ module.exports = function (grunt) {
 					"src/hash.js",
 					"src/headers.js",
 					"src/host.js",
+					"src/levels.js",
 					"src/log.js",
 					"src/messages.js",
 					"src/page.js",
