@@ -77,7 +77,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 		parsed = $.parse( url );
 	}
 	catch ( e ) {
-		this.error( req, res, this.codes.SERVER_ERROR );
+		return this.error( req, res, this.codes.SERVER_ERROR );
 	}
 
 	// Decorating parsed Object on request
