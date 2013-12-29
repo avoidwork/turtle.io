@@ -20,10 +20,6 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	headers = this.headers( headers || {"Content-Type": "text/plain"}, status, req.method === "GET" );
 	file    = ( file === true );
 
-	if ( !headers.Allow ) {
-		headers["Access-Control-Allow-Methods"] = headers.Allow = this.allows( req.parsed.pathname, req.parsed.hostname );
-	}
-
 	if ( !file && body ) {
 		body = this.encode( body );
 
@@ -46,21 +42,32 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		}
 	}
 
-	if ( req.method === "GET" && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) ) {
-		// Ensuring an Etag
-		if ( !headers.Etag ) {
-			headers.Etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers["Last-Modified"] || 0, body || 0 ) + "\"";
+	// req.parsed may not exist if coming from `error()`
+	if ( req.parsed ) {
+		if ( !headers.Allow ) {
+			headers["Access-Control-Allow-Methods"] = headers.Allow = this.allows( req.parsed.pathname, req.parsed.hostname );
 		}
 
-		// Updating cache
-		if ( !$.regex.no.test( headers["Cache-Control"] ) && !$.regex.priv.test( headers["Cache-Control"] ) ) {
-			this.register( req.parsed.href, {etag: headers.Etag.replace( /"/g, "" ), mimetype: headers["Content-Type"]}, true );
-		}
+		if ( req.method === "GET" && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) ) {
+			// Ensuring an Etag
+			if ( !headers.Etag ) {
+				headers.Etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers["Last-Modified"] || 0, body || 0 ) + "\"";
+			}
 
-		// Setting a watcher on the local path
-		if ( req.path ) {
-			this.watch( req.parsed.href, req.path, headers["Content-Type"] );
+			// Updating cache
+			if ( !$.regex.no.test( headers["Cache-Control"] ) && !$.regex.priv.test( headers["Cache-Control"] ) ) {
+				this.register( req.parsed.href, {etag: headers.Etag.replace( /"/g, "" ), mimetype: headers["Content-Type"]}, true );
+			}
+
+			// Setting a watcher on the local path
+			if ( req.path ) {
+				this.watch( req.parsed.href, req.path, headers["Content-Type"] );
+			}
 		}
+	}
+	else {
+		delete headers.Allow;
+		delete headers["Access-Control-Allow-Methods"];
 	}
 
 	// Determining if response should be compressed
