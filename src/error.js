@@ -10,7 +10,7 @@
 TurtleIO.prototype.error = function ( req, res, status ) {
 	var method = req.method.toLowerCase(),
 	    host   = req.parsed ? req.parsed.hostname : ALL,
-	    kdx    = 0,
+	    kdx    = -1,
 	    body, msg;
 
 	if ( isNaN( status ) ) {

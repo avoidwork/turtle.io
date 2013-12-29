@@ -9,7 +9,7 @@
  */
 TurtleIO.prototype.prep = function ( req, res, headers ) {
 	var msg   = this.config.logs.format,
-	    user  = req.parsed.auth.split( ":" )[0] || "-",
+	    user  = req.parsed ? ( req.parsed.auth.split( ":" )[0] || "-" ) : "-",
 	    refer = req.headers.referer ? ( "\"" + req.headers.referer + "\"" ) : "-",
 	    ip    = req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].explode().last() : req.connection.remoteAddress;
 
@@ -18,7 +18,7 @@ TurtleIO.prototype.prep = function ( req, res, headers ) {
 	         .replace( "%l",             "-" )
 	         .replace( "%u",             user )
 	         .replace( "%t",             ( "[" + moment().format( this.config.logs.time ) + "]" ) )
-	         .replace( "%r",             req.method + " " + req.parsed.path + " HTTP/1.1" )
+	         .replace( "%r",             req.method + " " + req.url + " HTTP/1.1" )
 	         .replace( "%>s",            res.statusCode )
 	         .replace( "%b",             headers["Content-Length"] || "-" )
 	         .replace( "%{Referer}i",    refer )
