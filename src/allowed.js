@@ -13,7 +13,7 @@ TurtleIO.prototype.allowed = function ( method, uri, host ) {
 	    exist  = false,
 	    d, hosts;
 
-	host  = host || "all";
+	host  = host || ALL;
 	hosts = this.handlers[method].hosts;
 	d     = hosts[this.config["default"]];
 	exist = ( hosts[host] );

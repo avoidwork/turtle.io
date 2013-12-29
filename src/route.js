@@ -91,7 +91,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 	} );
 
 	if ( !host ) {
-		host = this.config["default"] || "all";
+		host = this.config["default"] || ALL;
 	}
 
 	if ( REGEX_HEAD.test( method ) ) {

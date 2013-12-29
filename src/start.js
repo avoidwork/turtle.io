@@ -50,7 +50,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	toobusy.maxLag( this.config.lag );
 
 	// Setting default routes
-	this.host( "all" );
+	this.host( ALL );
 
 	// Registering virtual hosts
 	$.array.cast( config.vhosts, true ).each( function ( i ) {
@@ -61,7 +61,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	if ( !this.handlers.get.routes.contains( ".*" ) ) {
 		this.get( "/.*", function ( req, res, host ) {
 			this.request( req, res, host );
-		}, "all" );
+		}, ALL );
 	}
 
 	// Loading default error pages

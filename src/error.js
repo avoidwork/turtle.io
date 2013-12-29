@@ -9,7 +9,7 @@
  */
 TurtleIO.prototype.error = function ( req, res, status ) {
 	var method = req.method.toLowerCase(),
-	    host   = req.parsed.hostname,
+	    host   = req.parsed ? req.parsed.hostname : ALL,
 	    kdx    = 0,
 	    body, msg;
 

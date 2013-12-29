@@ -9,7 +9,7 @@
  * @return {Object}          TurtleIO instance
  */
 TurtleIO.prototype.handler = function ( method, route, fn, host ) {
-	host = host || "all";
+	host = host || ALL;
 
 	if ( this.handlers.all.hosts[host] === undefined ) {
 		this.host( host );
