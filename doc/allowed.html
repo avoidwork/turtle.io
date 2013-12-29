@@ -16,7 +16,7 @@
       <span class="nx">exist</span>  <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
       <span class="nx">d</span><span class="p">,</span> <span class="nx">hosts</span><span class="p">;</span>
 
-  <span class="nx">host</span>  <span class="o">=</span> <span class="nx">host</span> <span class="o">||</span> <span class="s2">&quot;all&quot;</span><span class="p">;</span>
+  <span class="nx">host</span>  <span class="o">=</span> <span class="nx">host</span> <span class="o">||</span> <span class="nx">ALL</span><span class="p">;</span>
   <span class="nx">hosts</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span><span class="p">[</span><span class="nx">method</span><span class="p">].</span><span class="nx">hosts</span><span class="p">;</span>
   <span class="nx">d</span>     <span class="o">=</span> <span class="nx">hosts</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]];</span>
   <span class="nx">exist</span> <span class="o">=</span> <span class="p">(</span> <span class="nx">hosts</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="p">);</span>
