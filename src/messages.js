@@ -10,7 +10,7 @@ TurtleIO.prototype.messages = {
 	CREATED             : "Created",
 	ACCEPTED            : "Accepted",
 	NON_AUTHORITATIVE   : "Non-Authoritative Information",
-	NO_CONTENT          : "No Content",
+	NO_CONTENT          : null,
 	RESET_CONTENT       : "Reset Content",
 	PARTIAL_CONTENT     : "Partial Content",
 	MULTIPLE_CHOICE     : "Multiple Choices",

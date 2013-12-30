@@ -92,6 +92,9 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		else if ( typeof body == "string" ) {
 			headers["Content-Length"] = Buffer.byteLength( body );
 		}
+		else if ( body === undefined ) {
+			body = this.messages.NO_CONTENT;
+		}
 
 		res.writeHead( status, headers );
 		res.end( body );
