@@ -20,6 +20,7 @@ TurtleIO.prototype.stop = function () {
 
 	if ( this.server !== null ) {
 		this.server.close();
+		toobusy.shutdown();
 		this.server = null;
 	}
 

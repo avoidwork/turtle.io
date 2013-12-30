@@ -10,7 +10,7 @@
 TurtleIO.prototype.prep = function ( req, res, headers ) {
 	var msg  = this.config.logs.format,
 	    user = req.parsed ? ( req.parsed.auth.split( ":" )[0] || "-" ) : "-",
-	    ip   = req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].explode().last() : req.connection.remoteAddress;
+	    ip   = ( req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].explode().last() : req.connection.remoteAddress ) || "-";
 
 	msg = msg.replace( "%v",             req.headers.host )
 	         .replace( "%h",             ip )
