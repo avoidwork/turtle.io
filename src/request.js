@@ -47,8 +47,8 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 		else if ( !stats.isDirectory() ) {
 			self.handle( req, res, path, req.parsed.href, false, stats );
 		}
-		else if ( REGEX_GET.test( method ) && !REGEX_DIR.test( req.url ) ) {
-			self.respond( req, res, self.messages.NO_CONTENT, self.codes.REDIRECT, {"Location": req.parsed.href + "/"} );
+		else if ( REGEX_GET.test( method ) && !REGEX_DIR.test( req.parsed.pathname ) ) {
+			self.respond( req, res, self.messages.NO_CONTENT, self.codes.REDIRECT, {"Location": ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + req.parsed.search} );
 		}
 		else if ( !REGEX_GET.test( method ) ) {
 			self.handle( req, res, path, req.parsed.href, true );
@@ -62,7 +62,7 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 				fs.lstat( path + i, function ( e, stats ) {
 					if ( !e && !handled ) {
 						handled = true;
-						self.handle( req, res, path + i, req.parsed.href + i, false, stats );
+						self.handle( req, res, path + i, ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + i + req.parsed.search, false, stats );
 					}
 					else if ( ++count === nth && !handled ) {
 						self.error( req, res, self.codes.NOT_FOUND );
