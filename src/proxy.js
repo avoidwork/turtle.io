@@ -40,7 +40,10 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 
 		// Something went wrong
 		if ( xhr.status < self.codes.CONTINUE ) {
-			self.respond( req, res, self.page( self.codes.BAD_GATEWAY, req.parsed.hostname ), self.codes.BAD_GATEWAY, resHeaders );
+			self.error( req, res, self.codes.BAD_GATEWAY );
+		}
+		else if ( xhr.status >= self.codes.SERVER_ERROR ) {
+			self.error( req, res, xhr.status );
 		}
 		else {
 			if ( get && ( xhr.status === self.codes.SUCCESS || xhr.status === self.codes.NOT_MODIFIED ) && !$.regex.no.test( resHeaders["Cache-Control"] ) && !$.regex.priv.test( resHeaders["Cache-Control"] ) ) {
@@ -195,8 +198,8 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 				proxyRes.pipe( res );
 			} );
 
-			proxyReq.on( "error", function () {
-				self.respond( req, res, self.page( self.codes.BAD_GATEWAY, parsed.hostname ), self.codes.BAD_GATEWAY );
+			proxyReq.on( "error", function ( e ) {
+				self.error( req, res, /ECONNREFUSED/.test( e.message ) ? self.codes.SERVER_UNAVAILABLE : self.codes.SERVER_ERROR );
 			} );
 
 			if ( REGEX_BODY.test( req.method ) ) {
