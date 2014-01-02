@@ -42,32 +42,34 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		}
 	}
 
-	// req.parsed may not exist if coming from `error()`
-	if ( req.parsed ) {
-		if ( !headers.Allow ) {
-			headers["Access-Control-Allow-Methods"] = headers.Allow = this.allows( req.parsed.pathname, req.parsed.hostname );
+	if ( status < this.codes.MULTIPLE_CHOICE || status >= this.codes.BAD_REQUEST ) {
+		// req.parsed may not exist if coming from `error()`
+		if ( req.parsed ) {
+			if ( !headers.Allow ) {
+				headers["Access-Control-Allow-Methods"] = headers.Allow = this.allows( req.parsed.pathname, req.parsed.hostname );
+			}
+
+			if ( req.method === "GET" && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) ) {
+				// Ensuring an Etag
+				if ( !headers.Etag ) {
+					headers.Etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers["Last-Modified"] || 0, body || 0 ) + "\"";
+				}
+
+				// Updating cache
+				if ( !$.regex.no.test( headers["Cache-Control"] ) && !$.regex.priv.test( headers["Cache-Control"] ) ) {
+					this.register( req.parsed.href, {etag: headers.Etag.replace( /"/g, "" ), mimetype: headers["Content-Type"]}, true );
+				}
+
+				// Setting a watcher on the local path
+				if ( req.path ) {
+					this.watch( req.parsed.href, req.path, headers["Content-Type"] );
+				}
+			}
 		}
-
-		if ( req.method === "GET" && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) ) {
-			// Ensuring an Etag
-			if ( !headers.Etag ) {
-				headers.Etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers["Last-Modified"] || 0, body || 0 ) + "\"";
-			}
-
-			// Updating cache
-			if ( !$.regex.no.test( headers["Cache-Control"] ) && !$.regex.priv.test( headers["Cache-Control"] ) ) {
-				this.register( req.parsed.href, {etag: headers.Etag.replace( /"/g, "" ), mimetype: headers["Content-Type"]}, true );
-			}
-
-			// Setting a watcher on the local path
-			if ( req.path ) {
-				this.watch( req.parsed.href, req.path, headers["Content-Type"] );
-			}
+		else {
+			delete headers.Allow;
+			delete headers["Access-Control-Allow-Methods"];
 		}
-	}
-	else {
-		delete headers.Allow;
-		delete headers["Access-Control-Allow-Methods"];
 	}
 
 	// Determining if response should be compressed
