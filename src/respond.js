@@ -42,7 +42,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		}
 	}
 
-	if ( status < this.codes.MULTIPLE_CHOICE || status >= this.codes.BAD_REQUEST ) {
+	if ( status === this.codes.NOT_MODIFIED || status < this.codes.MULTIPLE_CHOICE || status >= this.codes.BAD_REQUEST ) {
 		// req.parsed may not exist if coming from `error()`
 		if ( req.parsed ) {
 			if ( !headers.Allow ) {
