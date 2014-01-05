@@ -11,7 +11,7 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 	var headers;
 
 	// Decorating response headers
-	if ( status >= this.codes.MULTIPLE_CHOICE && status < this.codes.BAD_REQUEST ) {
+	if ( status !== this.codes.NOT_MODIFIED && status >= this.codes.MULTIPLE_CHOICE && status < this.codes.BAD_REQUEST ) {
 		headers = rHeaders;
 	}
 	else if ( rHeaders instanceof Object  ) {
@@ -34,7 +34,7 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 		}
 
 		// Decorating "Expires" header
-		if ( !headers.Expires && headers["Cache-Control"] && !$.regex.no.test( headers["Cache-Control"] ) && !$.regex.priv.test( headers["Cache-Control"] ) && $.regex.number_present.test( headers["Cache-Control"] ) ) {
+		if ( !headers.Expires && headers["Cache-Control"] && $.regex.number_present.test( headers["Cache-Control"] ) ) {
 			headers.Expires = new Date( new Date( new Date().getTime() + $.number.parse( $.regex.number_present.exec( headers["Cache-Control"] )[0], 10 ) * 1000 ) ).toUTCString();
 		}
 
