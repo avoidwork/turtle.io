@@ -15,6 +15,11 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 	    found   = false,
 	    count, path, nth, root;
 
+	// If an expectation can't be met, don't try!
+	if ( req.headers.expect ) {
+		return this.error( req, res, this.codes.EXPECTATION_FAILED );
+	}
+
 	// Can't find the hostname in vhosts, try the default (if set) or send a 500
 	if ( !host || !( host in this.config.vhosts ) ) {
 		this.vhostsRegExp.each( function ( i, idx ) {
