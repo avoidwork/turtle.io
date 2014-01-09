@@ -18,7 +18,7 @@
 	"lag"     : 50,
 	"logs"    : {
 		"time"   : "D/MMM/YYYY:HH:mm:ss ZZ",
-		"format" : "%v %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"",
+		"format" : "%v %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"",
 		"level"  : "info",
 		"stdout" : true,
 		"syslog" : true
