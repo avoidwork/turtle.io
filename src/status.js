@@ -8,7 +8,7 @@
 TurtleIO.prototype.status = function () {
 	var ram    = process.memoryUsage(),
 	    uptime = process.uptime(),
-	    state  = {config: {}, process: {}, server: {}},
+	    state  = {config: {}, etags: {}, process: {}, server: {}},
 	    invalid = /^(auth|session|ssl)$/;
 
 	// Startup parameters
@@ -20,14 +20,20 @@ TurtleIO.prototype.status = function () {
 
 	// Process information
 	state.process = {
-		memory : ram,
-		pid    : process.pid
+		memory  : ram,
+		pid     : process.pid
 	};
 
 	// Server information
 	state.server = {
-		address     : this.server.address(),
-		uptime      : uptime
+		address : this.server.address(),
+		uptime  : uptime
+	};
+
+	// LRU cache
+	state.etags = {
+		items   : this.etags.length,
+		bytes   : Buffer.byteLength( $.array.cast( this.etags.cache ).map( function ( i ){ return i.value; } ).join( "" ) )
 	};
 
 	return state;
