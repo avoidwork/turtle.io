@@ -40,7 +40,8 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 
 	// Setting `Server` HTTP header
 	if ( !this.config.headers.Server ) {
-		this.config.headers.Server = "turtle.io/{{VERSION}} (abaaso/" + $.version + " node.js/" + process.versions.node.replace( /^v/, "" ) + process.platform.capitalize() + " V8/" + process.versions.v8.toString().trim() + ")";
+		this.config.headers.Server = "turtle.io/{{VERSION}}";
+		this.config.headers["X-Powered-By"] = ( "node.js/" + process.versions.node.replace( /^v/, "" ) + " " + process.platform.capitalize() + " V8/" + process.versions.v8.toString() ).trim();
 	}
 
 	// Creating REGEX_REWRITE
