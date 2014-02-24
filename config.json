@@ -36,7 +36,8 @@
 			"text/html",
 			"text/plain",
 			"application/json"
-		]
+		],
+		"maxConnections" : 1000
 	},
 	"ssl"     : {
 		"key"  : null,
