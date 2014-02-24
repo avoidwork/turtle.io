@@ -77,6 +77,15 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 
 			// Starting server
 			if ( self.server === null ) {
+				// For proxy behavior
+				if ( https.globalAgent.maxSockets < self.config.proxy.maxConnections ) {
+					https.globalAgent.maxConnections = self.config.proxy.maxConnections;
+				}
+
+				if ( http.globalAgent.maxSockets < self.config.proxy.maxConnections ) {
+					http.globalAgent.maxConnections = self.config.proxy.maxConnections;
+				}
+
 				if ( self.config.ssl.cert !== null && self.config.ssl.key !== null ) {
 					// Reading files
 					self.config.ssl.cert = fs.readFileSync( self.config.ssl.cert );
