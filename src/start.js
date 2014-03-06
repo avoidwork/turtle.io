@@ -47,9 +47,6 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	// Creating REGEX_REWRITE
 	REGEX_REWRITE = new RegExp( "^(" + this.config.proxy.rewrite.join( "|" ) + ")$" );
 
-	// Setting acceptable lag
-	toobusy.maxLag( this.config.lag );
-
 	// Setting default routes
 	this.host( ALL );
 
@@ -115,9 +112,10 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 		}
 	} );
 
-	// For toobusy()
+	// Something went wrong, server must restart
 	process.on( "uncaughtException", function ( e ) {
 		self.log( e, "error" );
+		process.exit( 1 );
 	} );
 
 	return this;
