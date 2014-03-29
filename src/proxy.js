@@ -58,9 +58,9 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 
 				// Removing from LRU when invalid
 				if ( stale > 0 ) {
-					delay( function () {
+					setTimeout( function () {
 						self.unregister( url );
-					}, stale, url );
+					}, stale );
 				}
 			}
 
