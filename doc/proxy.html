@@ -53,9 +53,9 @@
           <span class="nx">stale</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span> <span class="nx">resHeaders</span><span class="p">.</span><span class="nx">expires</span> <span class="p">);</span>
           <span class="nx">stale</span> <span class="o">=</span> <span class="nx">number</span><span class="p">.</span><span class="nx">diff</span><span class="p">(</span> <span class="nx">stale</span><span class="p">,</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">()</span> <span class="p">);</span>
         <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Removing from LRU when invalid</p></div></div><div class="code"><div class="wrapper">        <span class="k">if</span> <span class="p">(</span> <span class="nx">stale</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">{</span>
-          <span class="nx">delay</span><span class="p">(</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+          <span class="nx">setTimeout</span><span class="p">(</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
             <span class="nx">self</span><span class="p">.</span><span class="nx">unregister</span><span class="p">(</span> <span class="nx">url</span> <span class="p">);</span>
-          <span class="p">},</span> <span class="nx">stale</span><span class="p">,</span> <span class="nx">url</span> <span class="p">);</span>
+          <span class="p">},</span> <span class="nx">stale</span> <span class="p">);</span>
         <span class="p">}</span>
       <span class="p">}</span>
 
