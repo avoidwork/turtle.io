@@ -15,7 +15,9 @@
 </ul>
 
 <p><strong>Returns a String</strong><br/>(Name of the expired cookie)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">expire</span> <span class="o">:</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">domain</span><span class="p">,</span> <span class="nx">secure</span><span class="p">,</span> <span class="nx">path</span> <span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">cookie</span><span class="p">.</span><span class="nx">expire</span><span class="p">(</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">domain</span><span class="p">,</span> <span class="nx">secure</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">res</span> <span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;-1s&quot;</span><span class="p">,</span> <span class="nx">domain</span><span class="p">,</span> <span class="nx">secure</span><span class="p">,</span> <span class="nx">path</span> <span class="p">);</span>
+
+    <span class="k">return</span> <span class="nx">name</span><span class="p">;</span>
   <span class="p">},</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method get</span></p>
 
 <p>Gets a cookie from the request headers</p>
@@ -41,7 +43,18 @@
 </ul>
 
 <p><strong>Returns an Object</strong><br/>(Collection of cookies)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">list</span> <span class="o">:</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span> <span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">cookie</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">cookie</span> <span class="o">||</span> <span class="s2">&quot;&quot;</span> <span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="nx">jar</span>    <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">cookie</span> <span class="o">||</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">string</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">(</span> <span class="nx">jar</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
+      <span class="nx">array</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span> <span class="nx">string</span><span class="p">.</span><span class="nx">explode</span><span class="p">(</span> <span class="nx">jar</span><span class="p">,</span> <span class="s2">&quot;;&quot;</span> <span class="p">),</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">i</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">item</span> <span class="o">=</span> <span class="nx">string</span><span class="p">.</span><span class="nx">explode</span><span class="p">(</span> <span class="nx">i</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span> <span class="p">);</span>
+
+        <span class="nx">result</span><span class="p">[</span><span class="nx">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="nx">coerce</span><span class="p">(</span> <span class="nx">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">);</span>
+      <span class="p">}</span> <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
   <span class="p">},</span></div></div></div><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method set</span></p>
 
 <p>Sets a cookie in the response headers</p>
@@ -59,6 +72,56 @@
 </ul>
 
 <p><strong>Returns an Undefined</strong><br/>(undefined)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">set</span> <span class="o">:</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">offset</span><span class="p">,</span> <span class="nx">domain</span><span class="p">,</span> <span class="nx">secure</span><span class="p">,</span> <span class="nx">path</span> <span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">cookie</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">offset</span><span class="p">,</span> <span class="nx">domain</span><span class="p">,</span> <span class="nx">secure</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">res</span> <span class="p">);</span>
+    <span class="nx">value</span>      <span class="o">=</span> <span class="p">(</span> <span class="nx">value</span> <span class="o">||</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span><span class="p">;</span>
+    <span class="nx">offset</span>     <span class="o">=</span> <span class="nx">offset</span> <span class="o">||</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+    <span class="nx">domain</span>     <span class="o">=</span> <span class="k">typeof</span> <span class="nx">domain</span> <span class="o">==</span> <span class="s2">&quot;string&quot;</span> <span class="o">?</span> <span class="p">(</span> <span class="s2">&quot; Domain=&quot;</span> <span class="o">+</span> <span class="nx">domain</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span> <span class="p">)</span> <span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+    <span class="nx">secure</span>     <span class="o">=</span> <span class="p">(</span> <span class="nx">secure</span> <span class="o">===</span> <span class="kc">true</span> <span class="p">)</span> <span class="o">?</span> <span class="s2">&quot; secure&quot;</span> <span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+    <span class="nx">path</span>       <span class="o">=</span> <span class="k">typeof</span> <span class="nx">path</span> <span class="o">==</span> <span class="s2">&quot;string&quot;</span> <span class="o">?</span> <span class="p">(</span> <span class="s2">&quot; Path=&quot;</span> <span class="o">+</span> <span class="nx">path</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span> <span class="p">)</span> <span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">expire</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nx">span</span>   <span class="o">=</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nx">type</span>   <span class="o">=</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nx">types</span>  <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">],</span>
+        <span class="nx">regex</span>  <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(),</span>
+        <span class="nx">i</span>      <span class="o">=</span> <span class="nx">types</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span>
+        <span class="nx">cookies</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">string</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">(</span> <span class="nx">offset</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
+      <span class="k">while</span> <span class="p">(</span> <span class="nx">i</span><span class="o">--</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="nx">regex</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span> <span class="nx">types</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span> <span class="nx">regex</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span> <span class="nx">offset</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
+          <span class="nx">type</span> <span class="o">=</span> <span class="nx">types</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+          <span class="nx">span</span> <span class="o">=</span> <span class="nx">number</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span> <span class="nx">offset</span><span class="p">,</span> <span class="mi">10</span> <span class="p">);</span>
+          <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+
+      <span class="k">if</span> <span class="p">(</span> <span class="nb">isNaN</span><span class="p">(</span> <span class="nx">span</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span> <span class="s2">&quot;Invalid Arguments&quot;</span> <span class="p">);</span>
+      <span class="p">}</span>
+
+      <span class="nx">expire</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
+
+      <span class="k">if</span> <span class="p">(</span> <span class="nx">type</span> <span class="o">===</span> <span class="s2">&quot;d&quot;</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="nx">expire</span><span class="p">.</span><span class="nx">setDate</span><span class="p">(</span> <span class="nx">expire</span><span class="p">.</span><span class="nx">getDate</span><span class="p">()</span> <span class="o">+</span> <span class="nx">span</span> <span class="p">);</span>
+      <span class="p">}</span>
+      <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="nx">type</span> <span class="o">===</span> <span class="s2">&quot;h&quot;</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="nx">expire</span><span class="p">.</span><span class="nx">setHours</span><span class="p">(</span> <span class="nx">expire</span><span class="p">.</span><span class="nx">getHours</span><span class="p">()</span> <span class="o">+</span> <span class="nx">span</span> <span class="p">);</span>
+      <span class="p">}</span>
+      <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="nx">type</span> <span class="o">===</span> <span class="s2">&quot;m&quot;</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="nx">expire</span><span class="p">.</span><span class="nx">setMinutes</span><span class="p">(</span> <span class="nx">expire</span><span class="p">.</span><span class="nx">getMinutes</span><span class="p">()</span> <span class="o">+</span> <span class="nx">span</span> <span class="p">);</span>
+      <span class="p">}</span>
+      <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="nx">type</span> <span class="o">===</span> <span class="s2">&quot;s&quot;</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="nx">expire</span><span class="p">.</span><span class="nx">setSeconds</span><span class="p">(</span> <span class="nx">expire</span><span class="p">.</span><span class="nx">getSeconds</span><span class="p">()</span> <span class="o">+</span> <span class="nx">span</span> <span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="nx">expire</span> <span class="k">instanceof</span> <span class="nb">Date</span> <span class="p">)</span> <span class="p">{</span>
+      <span class="nx">expire</span> <span class="o">=</span> <span class="s2">&quot; Expires=&quot;</span> <span class="o">+</span> <span class="nx">expire</span><span class="p">.</span><span class="nx">toUTCString</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">cookies</span> <span class="o">=</span> <span class="nx">res</span><span class="p">.</span><span class="nx">getHeader</span><span class="p">(</span> <span class="s2">&quot;set-sookie&quot;</span> <span class="p">)</span> <span class="o">||</span> <span class="p">[];</span>
+    <span class="nx">cookies</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="p">(</span> <span class="nx">string</span><span class="p">.</span><span class="nx">trim</span><span class="p">(</span> <span class="nx">name</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span> <span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">+</span> <span class="nx">value</span> <span class="o">+</span> <span class="nx">expire</span> <span class="o">+</span> <span class="nx">domain</span> <span class="o">+</span> <span class="nx">path</span> <span class="o">+</span> <span class="nx">secure</span> <span class="p">).</span><span class="nx">replace</span><span class="p">(</span> <span class="nx">REGEX_ENDSMCN</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span> <span class="p">);</span>
+    <span class="nx">res</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span> <span class="s2">&quot;set-cookie&quot;</span><span class="p">,</span> <span class="nx">cookies</span> <span class="p">);</span>
   <span class="p">}</span>
 <span class="p">};</span></div></div></div></div></body></html>

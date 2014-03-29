@@ -10,10 +10,10 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	var self = this,
 	    config, pages;
 
-	config = $.clone( defaultConfig );
+	config = clone( defaultConfig );
 
 	// Merging custom with default config
-	$.merge( config, cfg || {} );
+	merge( config, cfg || {} );
 
 	// Overriding default error handler
 	if ( typeof err == "function" ) {
@@ -38,10 +38,18 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	// Setting session.expires
 	this.session.valid = this.config.session.valid;
 
+	// Lowercasing default headers
+	delete this.config.headers;
+	this.config.headers = {};
+
+	iterate( config.headers, function ( value, key ) {
+		self.config.headers[key.toLowerCase()] = value;
+	} );
+
 	// Setting `Server` HTTP header
-	if ( !this.config.headers.Server ) {
-		this.config.headers.Server = "turtle.io/{{VERSION}}";
-		this.config.headers["X-Powered-By"] = ( "node.js/" + process.versions.node.replace( /^v/, "" ) + " " + process.platform.capitalize() + " V8/" + process.versions.v8.toString() ).trim();
+	if ( !this.config.headers.server ) {
+		this.config.headers.server = "turtle.io/{{VERSION}}";
+		this.config.headers["x-powered-by"] = "node.js/" + process.versions.node.replace( /^v/, "" ) + " " + string.capitalize( process.platform ) + " V8/" + string.trim( process.versions.v8.toString() );
 	}
 
 	// Creating REGEX_REWRITE
@@ -51,12 +59,12 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	this.host( ALL );
 
 	// Registering virtual hosts
-	$.array.cast( config.vhosts, true ).each( function ( i ) {
+	array.each( array.cast( config.vhosts, true ), function ( i ) {
 		self.host( i );
 	} );
 
 	// Setting a default GET route
-	if ( !this.handlers.get.routes.contains( ".*" ) ) {
+	if ( !array.contains( this.handlers.get.routes, ".*" ) ) {
 		this.get( "/.*", function ( req, res, host ) {
 			this.request( req, res, host );
 		}, ALL );
@@ -67,8 +75,8 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 		if ( e ) {
 			self.log( new Error( "[client 0.0.0.0] " + e.message ), "error" );
 		}
-		else if ( $.array.keys( self.config ).length > 0 ) {
-			files.each( function ( i ) {
+		else if ( array.keys( self.config ).length > 0 ) {
+			array.each( files, function ( i ) {
 				self.pages.all[i.replace( REGEX_NEXT, "" )] = fs.readFileSync( pages + "/" + i, "utf8" );
 			} );
 
@@ -89,7 +97,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 					self.config.ssl.key  = fs.readFileSync( self.config.ssl.key );
 
 					// Starting server
-					self.server = https.createServer( $.merge( self.config.ssl, {port: self.config.port, host: self.config.address} ), function ( req, res ) {
+					self.server = https.createServer( merge( self.config.ssl, {port: self.config.port, host: self.config.address} ), function ( req, res ) {
 						self.route( req, res );
 					} ).listen( self.config.port, self.config.address );
 				}

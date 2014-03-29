@@ -15,12 +15,12 @@ TurtleIO.prototype.write = function ( req, res, path ) {
 	    del   = this.allowed( "DELETE", req.url ),
 	    status;
 
-	if ( !put && $.regex.endslash.test( req.url ) ) {
+	if ( !put && REGEX_ENDSLSH.test( req.url ) ) {
 		status = del ? this.codes.CONFLICT : this.codes.SERVER_ERROR;
-		this.respond( req, res, this.page( status, this.hostname( req ) ), status, {Allow: allow}, false );
+		this.respond( req, res, this.page( status, this.hostname( req ) ), status, {allow: allow}, false );
 	}
 	else {
-		allow = allow.explode().remove( "POST" ).join( ", " );
+		allow = array.remove( string.explode( allow ), "POST" ).join( ", " );
 
 		fs.lstat( path, function ( e, stat ) {
 			if ( e ) {
@@ -36,7 +36,7 @@ TurtleIO.prototype.write = function ( req, res, path ) {
 						}
 						else {
 							status = put ? self.codes.NO_CONTENT : self.codes.CREATED;
-							self.respond( req, res, self.page( status, self.hostname( req ) ), status, {Allow: allow}, false );
+							self.respond( req, res, self.page( status, self.hostname( req ) ), status, {allow: allow}, false );
 						}
 					} );
 				}

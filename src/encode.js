@@ -12,7 +12,7 @@ TurtleIO.prototype.encode = function ( arg ) {
 	}
 	// Converting to JSON
 	else if ( arg instanceof Array || arg instanceof Object ) {
-		return $.encode( arg );
+		return json.encode( arg );
 	}
 	// Nothing to do, leave it as it is
 	else {
