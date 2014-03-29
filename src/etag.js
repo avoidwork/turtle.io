@@ -9,5 +9,5 @@
  * @return {String}          Etag value
  */
 TurtleIO.prototype.etag = function ( /*url, size, modified, body*/ ) {
-	return this.hash( $.array.cast( arguments ).join( "-" ) );
+	return this.hash( array.cast( arguments ).join( "-" ) );
 };

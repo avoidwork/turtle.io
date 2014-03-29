@@ -5,14 +5,14 @@
 	"uid"     : null,
 	"cache"   : 1000,
 	"headers" : {
-		"Access-Control-Allow-Origin" : "*",
-		"Access-Control-Allow-Headers": "*",
-		"Access-Control-Allow-Methods": "",
-		"Allow"                       : "",
-		"Cache-Control"               : "max-age=60, must-revalidate, public",
-		"Content-Type"                : "text/html; charset=utf-8",
-		"Date"                        : "",
-		"Last-Modified"               : ""
+		"access-control-allow-origin" : "*",
+		"access-control-allow-headers": "*",
+		"access-control-allow-methods": "",
+		"allow"                       : "",
+		"cache-control"               : "max-age=60, must-revalidate, public",
+		"content-type"                : "text/html; charset=utf-8",
+		"date"                        : "",
+		"last-modified"               : ""
 	},
 	"index"   : ["index.htm", "index.html"],
 	"lag"     : 50,

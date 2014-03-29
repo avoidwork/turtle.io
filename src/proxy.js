@@ -30,13 +30,13 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		    regexOrigin   = new RegExp( origin, "g" ),
 		    replace       = "$1" + route,
 		    url           = req.parsed.href,
-		    delay         = $.expires,
+		    stale         = STALE,
 		    get           = req.method === "GET",
 		    rewriteOrigin = req.parsed.protocol + "//" + req.parsed.host + route,
 		    resHeaders, rewrite;
 
 		resHeaders        = headers( xhr.getAllResponseHeaders() );
-		resHeaders.Server = self.config.headers.Server;
+		resHeaders.server = self.config.headers.server;
 
 		// Something went wrong
 		if ( xhr.status < self.codes.CONTINUE ) {
@@ -46,37 +46,38 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 			self.error( req, res, xhr.status );
 		}
 		else {
-			if ( get && ( xhr.status === self.codes.SUCCESS || xhr.status === self.codes.NOT_MODIFIED ) && !$.regex.no.test( resHeaders["Cache-Control"] ) && !$.regex.priv.test( resHeaders["Cache-Control"] ) ) {
+			if ( get && ( xhr.status === self.codes.SUCCESS || xhr.status === self.codes.NOT_MODIFIED ) && !REGEX_NOCACHE.test( resHeaders["cache-control"] ) && !REGEX_PRIVATE.test( resHeaders["cache-control"] ) ) {
 				// Determining how long rep is valid
-				if ( resHeaders["Cache-Control"] && $.regex.number_present.test( resHeaders["Cache-Control"] ) ) {
-					delay = $.number.parse( $.regex.number_present.exec( resHeaders["Cache-Control"] )[0], 10 );
+				if ( resHeaders["cache-control"] && REGEX_NUMBER.test( resHeaders["cache-control"] ) ) {
+					stale = number.parse( REGEX_NUMBER.exec( resHeaders["cache-control"] )[0], 10 );
 				}
-				else if ( resHeaders.Expires !== undefined ) {
-					delay = new Date( resHeaders.Expires ).diff( new Date() );
+				else if ( resHeaders.expires !== undefined ) {
+					stale = new Date( resHeaders.expires );
+					stale = number.diff( stale, new Date() );
 				}
 
-				if ( delay > 0 ) {
-					// Removing from LRU when invalid
-					$.delay( function () {
+				// Removing from LRU when invalid
+				if ( stale > 0 ) {
+					delay( function () {
 						self.unregister( url );
-					}, delay, url );
+					}, stale, url );
 				}
 			}
 
 			if ( xhr.status !== self.codes.NOT_MODIFIED ) {
-				rewrite = REGEX_REWRITE.test( ( resHeaders["Content-Type"] || "" ).replace( REGEX_NVAL, "" ) );
+				rewrite = REGEX_REWRITE.test( ( resHeaders["content-type"] || "" ).replace( REGEX_NVAL, "" ) );
 
 				// Setting headers
 				if ( get && xhr.status === self.codes.SUCCESS ) {
-					etag = resHeaders.Etag || "\"" + self.etag( url, resHeaders["Content-Length"] || 0, resHeaders["Last-Modified"] || 0, self.encode( arg ) ) + "\"";
+					etag = resHeaders.etag || "\"" + self.etag( url, resHeaders["content-length"] || 0, resHeaders["last-modified"] || 0, self.encode( arg ) ) + "\"";
 
-					if ( resHeaders.Etag !== etag ) {
-						resHeaders.Etag = etag;
+					if ( resHeaders.etag !== etag ) {
+						resHeaders.etag = etag;
 					}
 				}
 
-				if ( resHeaders.Allow === undefined || resHeaders.Allow.isEmpty() ) {
-					resHeaders.Allow = resHeaders["Access-Control-Allow-Methods"] || "GET";
+				if ( resHeaders.allow === undefined || string.isEmpty( resHeaders.allow ) ) {
+					resHeaders.allow = resHeaders["access-control-allow-methods"] || "GET";
 				}
 
 				// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
@@ -90,13 +91,13 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 					// Fixing root path of response
 					else if ( rewrite ) {
 						if ( arg instanceof Array || arg instanceof Object ) {
-							arg = $.encode( arg ).replace( regexOrigin, rewriteOrigin );
+							arg = json.encode( arg ).replace( regexOrigin, rewriteOrigin );
 
 							if ( route !== "/" ) {
 								arg = arg.replace( /"(\/[^?\/]\w+)\//g, "\"" + route + "$1/" );
 							}
 
-							arg = $.decode( arg );
+							arg = json.decode( arg );
 						}
 						else if ( typeof arg == "string" ) {
 							arg = arg.replace( regexOrigin, rewriteOrigin );
@@ -127,13 +128,12 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	function headers ( args ) {
 		var result = {};
 
-		if ( !args.isEmpty() ) {
-			args.trim().split( "\n" ).each( function ( i ) {
+		if ( !string.isEmpty( args ) ) {
+			array.each( string.trim( args ).split( "\n" ), function ( i ) {
 				var header, value;
 
-				value          = i.replace( $.regex.header_value_replace, "" );
-				header         = i.replace( $.regex.header_replace, "" );
-				header         = header.unhyphenate( true ).replace( /\s+/g, "-" );
+				value          = i.replace( REGEX_HEADVAL, "" );
+				header         = i.replace( REGEX_HEADKEY, "" ).toLowerCase();
 				result[header] = !isNaN( value ) ? Number( value ) : value;
 			} );
 		}
@@ -153,8 +153,8 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	function wrapper ( req, res ) {
 		var url      = origin + ( route !== "/" ? req.url.replace( new RegExp( "^" + route ), "" ) : req.url ),
 		    method   = req.method.toLowerCase(),
-		    headerz  = $.clone( req.headers, true ),
-		    parsed   = $.parse( url ),
+		    headerz  = clone( req.headers, true ),
+		    parsed   = parse( url ),
 		    mimetype = mime.lookup( parsed.pathname ),
 		    fn, options, proxyReq;
 
@@ -189,7 +189,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 				port     : parsed.port || 80
 			};
 
-			if ( !parsed.auth.isEmpty() ) {
+			if ( !string.isEmpty( parsed.auth ) ) {
 				options.auth = parsed.auth;
 			}
 
@@ -199,7 +199,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 			} );
 
 			proxyReq.on( "error", function ( e ) {
-				self.error( req, res, /ECONNREFUSED/.test( e.message ) ? self.codes.SERVER_UNAVAILABLE : self.codes.SERVER_ERROR );
+				self.error( req, res, REGEX_REFUSED.test( e.message ) ? self.codes.SERVER_UNAVAILABLE : self.codes.SERVER_ERROR );
 			} );
 
 			if ( REGEX_BODY.test( req.method ) ) {
@@ -214,20 +214,20 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 			delete headerz["accept-encoding"];
 
 			if ( REGEX_BODY.test( req.method ) ) {
-				url[method]( fn, fn, req.body, headerz );
+				request( url, method, fn, fn, req.body, headerz );
 			}
 			else if ( REGEX_DEL.test( method ) ) {
-				url.del( fn, fn, headerz );
+				request( url, "delete", fn, fn, null, headerz );
 			}
 			else if ( REGEX_HEAD.test( method ) ) {
 				if ( method === "head" ) {
 					method = "headers";
 				}
 
-				url[method]( fn, fn );
+				request( url, method, fn, fn );
 			}
 			else {
-				url.get( fn, fn, headerz );
+				request( url, "get", fn, fn, headerz );
 			}
 		}
 	}
@@ -235,7 +235,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	stream = ( stream === true );
 
 	// Setting route
-	verbs.each( function ( i ) {
+	array.each( verbs, function ( i ) {
 		if ( route === "/" ) {
 			self[i]( "/.*", wrapper, host );
 		}

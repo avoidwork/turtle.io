@@ -26,9 +26,9 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 			// Decorating valid cookies
 			if ( req.headers.cookie !== undefined ) {
-				req.headers.cookie.explode( ";" ).map( function ( i ) {
+				array.each( string.explode( req.headers.cookie, ";" ).map( function ( i ) {
 					return i.split( "=" );
-				} ).each( function ( i ) {
+				} ), function ( i ) {
 					req.cookies[i[0]] = i[1];
 				} );
 			}
@@ -57,7 +57,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 				// Sending a 304 if Client is making a GET & has current representation
 				if ( cached && !REGEX_HEAD.test( method ) && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === cached.etag ) {
-					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, {"Content-Type": cached.mimetype, Etag: "\"" + cached.etag + "\""} );
+					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, {"content-type": cached.mimetype, etag: "\"" + cached.etag + "\""} );
 				}
 				else {
 					handler.call( self, req, res, host );
@@ -74,7 +74,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 	// If the URL can't be parsed, respond with a 500
 	try {
-		parsed = $.parse( url );
+		parsed = parse( url );
 	}
 	catch ( e ) {
 		return this.error( req, res, this.codes.SERVER_ERROR );
@@ -84,7 +84,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 	req.parsed = parsed;
 
 	// Finding a matching vhost
-	this.vhostsRegExp.each( function ( i, idx ) {
+	array.each( this.vhostsRegExp, function ( i, idx ) {
 		if ( i.test( parsed.hostname ) ) {
 			return !( host = self.vhosts[idx] );
 		}
@@ -99,7 +99,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 	}
 
 	// Looking for a match
-	this.handlers[method].regex.each( function ( i, idx ) {
+	array.each( this.handlers[method].regex, function ( i, idx ) {
 		var x = self.handlers[method].routes[idx];
 
 		if ( ( x in self.handlers[method].hosts[host] || x in self.handlers[method].hosts.all ) && i.test( parsed.pathname ) ) {
@@ -111,7 +111,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 	// Looking for a match against generic routes
 	if ( !route ) {
-		this.handlers.all.regex.each( function ( i, idx ) {
+		array.each( this.handlers.all.regex, function ( i, idx ) {
 			var x = self.handlers.all.routes[idx];
 
 			if ( ( x in self.handlers.all.hosts[host] || x in self.handlers.all.hosts.all ) && i.test( parsed.pathname ) ) {

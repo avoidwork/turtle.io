@@ -26,7 +26,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 			size     = stat.size;
 			modified = stat.mtime.toUTCString();
 			etag     = "\"" + this.etag( url, size, stat.mtime ) + "\"";
-			headers  = {Allow: allow, "Content-Length": size, "Content-Type": mimetype, Etag: etag, "Last-Modified": modified};
+			headers  = {allow: allow, "content-length": size, "content-type": mimetype, etag: etag, "last-modified": modified};
 
 			if ( method === "GET" ) {
 				// Decorating path for watcher

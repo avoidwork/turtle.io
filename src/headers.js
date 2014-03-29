@@ -15,51 +15,51 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 		headers = rHeaders;
 	}
 	else if ( rHeaders instanceof Object  ) {
-		headers = $.clone( this.config.headers, true );
-		$.merge( headers, rHeaders );
+		headers = clone( this.config.headers, true );
+		merge( headers, rHeaders );
 
 		// Fixing `Allow` header
-		if ( !REGEX_HEAD2.test( headers.Allow ) ) {
-			headers.Allow = headers.Allow.toUpperCase().explode().filter( function ( i ) {
+		if ( headers.allow && !REGEX_HEAD2.test( headers.allow ) ) {
+			headers.allow = string.explode( headers.allow.toUpperCase() ).filter( function ( i ) {
 				return !REGEX_HEAD.test( i );
 			} ).join( ", " ).replace( "GET", "GET, HEAD, OPTIONS" );
 		}
 
-		if ( !headers.Date ) {
-			headers.Date = new Date().toUTCString();
+		if ( !headers.date ) {
+			headers.date = new Date().toUTCString();
 		}
 
-		if ( headers["Access-Control-Allow-Methods"].isEmpty() ) {
-			headers["Access-Control-Allow-Methods"] = headers.Allow;
+		if ( headers["access-control-allow-methods"] && string.isEmpty( headers["access-control-allow-methods"] ) && headers.allow ) {
+			headers["access-control-allow-methods"] = headers.allow;
 		}
 
 		// Decorating "Expires" header
-		if ( !headers.Expires && headers["Cache-Control"] && $.regex.number_present.test( headers["Cache-Control"] ) ) {
-			headers.Expires = new Date( new Date( new Date().getTime() + $.number.parse( $.regex.number_present.exec( headers["Cache-Control"] )[0], 10 ) * 1000 ) ).toUTCString();
+		if ( headers.expires === undefined && headers["cache-control"] && REGEX_NUMBER.test( headers["cache-control"] ) ) {
+			headers.expires = new Date( new Date( new Date().getTime() + number.parse( REGEX_NUMBER.exec( headers["cache-control"] )[0], 10 ) * 1000 ) ).toUTCString();
 		}
 
 		// Decorating "Transfer-Encoding" header
-		if ( !headers["Transfer-Encoding"] )  {
-			headers["Transfer-Encoding"] = "identity";
+		if ( !headers["transfer-encoding"] )  {
+			headers["transfer-encoding"] = "identity";
 		}
 
 		// Removing headers not wanted in the response
 		if ( !get || status >= this.codes.BAD_REQUEST ) {
-			delete headers["Cache-Control"];
-			delete headers.Expires;
-			delete headers["Last-Modified"];
+			delete headers["cache-control"];
+			delete headers.expires;
+			delete headers["last-modified"];
 		}
 		else if ( status === this.codes.NOT_MODIFIED ) {
-			delete headers["Last-Modified"];
+			delete headers["last-modified"];
 		}
 
-		if ( status === this.codes.NOT_FOUND ) {
-			headers.Allow = "";
-			headers["Access-Control-Allow-Methods"] = "";
+		if ( status === this.codes.NOT_FOUND && headers.allow ) {
+			delete headers.allow;
+			delete headers["access-control-allow-methods"];
 		}
 
-		if ( headers["Last-Modified"] !== undefined && headers["Last-Modified"].isEmpty() ) {
-			delete headers["Last-Modified"];
+		if ( headers["last-modified"] !== undefined && string.isEmpty( headers["last-modified"] ) ) {
+			delete headers["last-modified"];
 		}
 	}
 

@@ -22,7 +22,7 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 
 	// Can't find the hostname in vhosts, try the default (if set) or send a 500
 	if ( !host || !( host in this.config.vhosts ) ) {
-		this.vhostsRegExp.each( function ( i, idx ) {
+		array.each( this.vhostsRegExp, function ( i, idx ) {
 			if ( i.test( req.host ) ) {
 				found = true;
 				host  = self.vhosts[idx];
@@ -60,10 +60,10 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 		}
 		else {
 			count = 0;
-			nth   = self.config.indexes;
+			nth   = self.config.index.length;
 			path += "/";
 
-			self.config.index.each( function ( i ) {
+			array.each( self.config.index, function ( i ) {
 				fs.lstat( path + i, function ( e, stats ) {
 					if ( !e && !handled ) {
 						handled = true;

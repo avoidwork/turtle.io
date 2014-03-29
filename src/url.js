@@ -10,11 +10,11 @@ TurtleIO.prototype.url = function ( req ) {
 	    auth   = "",
 	    token;
 
-	if ( !header.isEmpty() ) {
+	if ( !string.isEmpty( header ) ) {
 		token = header.split( REGEX_SPACE ).pop()  || "",
 		auth  = new Buffer( token, "base64" ).toString();
 
-		if ( !auth.isEmpty() ) {
+		if ( !string.isEmpty( auth ) ) {
 			auth += "@";
 		}
 	}

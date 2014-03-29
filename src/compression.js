@@ -10,12 +10,12 @@
  */
 TurtleIO.prototype.compression = function ( agent, encoding, mimetype ) {
 	var result    = null,
-	    encodings = typeof encoding == "string" ? encoding.explode() : [];
+	    encodings = typeof encoding == "string" ? string.explode( encoding ) : [];
 
 	// Safari can't handle compression for proxies (socket doesn't close) or on an iDevice for simple GETs
 	if ( this.config.compress === true && REGEX_COMP.test( mimetype ) && !REGEX_IE.test( agent ) && !REGEX_IDEVICE.test( agent ) && ( !REGEX_SAFARI.test( agent ) || REGEX_CHROME.test( agent ) ) ) {
 		// Iterating supported encodings
-		encodings.each( function ( i ) {
+		array.each( encodings, function ( i ) {
 			if ( REGEX_GZIP.test( i ) ) {
 				result = "gz";
 			}

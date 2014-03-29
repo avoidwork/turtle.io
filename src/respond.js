@@ -16,28 +16,32 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	    encoding = req.headers["accept-encoding"],
 	    type;
 
+	if ( body === null ) {
+		body = undefined;
+	}
+
 	status  = status || this.codes.SUCCESS;
-	headers = this.headers( headers || {"Content-Type": "text/plain"}, status, req.method === "GET" );
+	headers = this.headers( headers || {"content-type": "text/plain"}, status, req.method === "GET" );
 	file    = ( file === true );
 
 	if ( !file && body ) {
 		body = this.encode( body );
 
 		// Ensuring JSON has proper mimetype
-		if ( $.regex.json_wrap.test( body ) ) {
-			headers["Content-Type"] = "application/json";
+		if ( ( headers["content-type"] === undefined || string.isEmpty( headers["content-type"] ) ) && REGEX_JSONWRP.test( body ) ) {
+			headers["content-type"] = "application/json";
 		}
 
 		if ( req.method === "GET" ) {
 			// CSV hook
-			if ( status === this.codes.SUCCESS && body && headers["Content-Type"] === "application/json" && req.headers.accept && REGEX_CSV.test( req.headers.accept.explode()[0].replace( REGEX_NVAL, "" ) ) ) {
-				headers["Content-Type"] = "text/csv";
+			if ( status === this.codes.SUCCESS && body && headers["content-type"] === "application/json" && req.headers.accept && REGEX_CSV.test( string.explode( req.headers.accept )[0].replace( REGEX_NVAL, "" ) ) ) {
+				headers["content-type"] = "text/csv";
 
-				if ( !headers["Content-Disposition"] ) {
-					headers["Content-Disposition"] = "attachment; filename=\"" + req.url.replace( REGEX_NURI, "" ) + ".csv\"";
+				if ( !headers["content-disposition"] ) {
+					headers["content-disposition"] = "attachment; filename=\"" + req.parsed.pathname.replace( /.*\//g, "" ).replace(/\..*/, "_" ) + req.parsed.search.replace( "?", "" ).replace( /\&/, "_" ) + ".csv\"";
 				}
 
-				body = $.json.csv( body );
+				body = json.csv( body );
 			}
 		}
 	}
@@ -45,56 +49,59 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	if ( status === this.codes.NOT_MODIFIED || status < this.codes.MULTIPLE_CHOICE || status >= this.codes.BAD_REQUEST ) {
 		// req.parsed may not exist if coming from `error()`
 		if ( req.parsed ) {
-			if ( !headers.Allow ) {
-				headers["Access-Control-Allow-Methods"] = headers.Allow = this.allows( req.parsed.pathname, req.parsed.hostname );
+			if ( !headers.allow && status < 400 ) {
+				headers["access-control-allow-methods"] = headers.allow = this.allows( req.parsed.pathname, req.parsed.hostname );
 			}
 
 			if ( req.method === "GET" && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) ) {
 				// Ensuring an Etag
-				if ( !headers.Etag ) {
-					headers.Etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers["Last-Modified"] || 0, body || 0 ) + "\"";
+				if ( !headers.etag ) {
+					headers.etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers["last-modified"] || 0, body || 0 ) + "\"";
 				}
 
 				// Updating cache
-				if ( !$.regex.no.test( headers["Cache-Control"] ) && !$.regex.priv.test( headers["Cache-Control"] ) ) {
-					this.register( req.parsed.href, {etag: headers.Etag.replace( /"/g, "" ), mimetype: headers["Content-Type"]}, true );
+				if ( !REGEX_NOCACHE.test( headers["cache-control"] ) && !REGEX_PRIVATE.test( headers["cache-control"] ) ) {
+					this.register( req.parsed.href, {etag: headers.etag.replace( /"/g, "" ), mimetype: headers["content-type"]}, true );
 				}
 
 				// Setting a watcher on the local path
 				if ( req.path ) {
-					this.watch( req.parsed.href, req.path, headers["Content-Type"] );
+					this.watch( req.parsed.href, req.path, headers["content-type"] );
 				}
 			}
 		}
 		else {
-			delete headers.Allow;
-			delete headers["Access-Control-Allow-Methods"];
+			delete headers.allow;
+			delete headers["access-control-allow-methods"];
 		}
 	}
 
 	// Determining if response should be compressed
-	if ( status === this.codes.SUCCESS && body && this.config.compress && ( type = this.compression( ua, encoding, headers["Content-Type"] ) ) && type !== null ) {
-		headers["Content-Encoding"]  = REGEX_GZIP.test( type ) ? "gzip" : "deflate";
-		headers["Transfer-Encoding"] = "chunked";
+	if ( status === this.codes.SUCCESS && body && this.config.compress && ( type = this.compression( ua, encoding, headers["content-type"] ) ) && type !== null ) {
+		headers["content-encoding"]  = REGEX_GZIP.test( type ) ? "gzip" : "deflate";
+		headers["transfer-encoding"] = "chunked";
 		res.writeHead( status, headers );
-		this.compress( req, res, body, type, headers.Etag.replace( /"/g, "" ), file );
+		this.compress( req, res, body, type, headers.etag.replace( /"/g, "" ), file );
 	}
 	else if ( file ) {
-		headers["Transfer-Encoding"] = "chunked";
+		headers["transfer-encoding"] = "chunked";
 		res.writeHead( status, headers );
 		fs.createReadStream( body ).on( "error", function ( e ) {
-			self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].explode().last() : req.connection.remoteAddress ) + "] " + e.message ), "error" );
+			self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
 			self.error( req, res, self.codes.SERVER_ERROR );
 		} ).pipe( res );
 	}
 	else {
-		if ( body instanceof Buffer ) {
-			headers["Content-Length"] = Buffer.byteLength( body.toString() );
+		if ( headers["content-length"] === undefined ) {
+			if ( body instanceof Buffer ) {
+				headers["content-length"] = Buffer.byteLength( body.toString() );
+			}
+			else if ( typeof body == "string" ) {
+				headers["content-length"] = Buffer.byteLength( body );
+			}
 		}
-		else if ( typeof body == "string" ) {
-			headers["Content-Length"] = Buffer.byteLength( body );
-		}
-		else if ( body === undefined ) {
+
+		if ( body === undefined ) {
 			body = this.messages.NO_CONTENT;
 		}
 

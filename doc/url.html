@@ -13,11 +13,11 @@
       <span class="nx">auth</span>   <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
       <span class="nx">token</span><span class="p">;</span>
 
-  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">header</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">()</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">string</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">(</span> <span class="nx">header</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
     <span class="nx">token</span> <span class="o">=</span> <span class="nx">header</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span> <span class="nx">REGEX_SPACE</span> <span class="p">).</span><span class="nx">pop</span><span class="p">()</span>  <span class="o">||</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="nx">auth</span>  <span class="o">=</span> <span class="k">new</span> <span class="nx">Buffer</span><span class="p">(</span> <span class="nx">token</span><span class="p">,</span> <span class="s2">&quot;base64&quot;</span> <span class="p">).</span><span class="nx">toString</span><span class="p">();</span>
 
-    <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">auth</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">()</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">string</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">(</span> <span class="nx">auth</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
       <span class="nx">auth</span> <span class="o">+=</span> <span class="s2">&quot;@&quot;</span><span class="p">;</span>
     <span class="p">}</span>
   <span class="p">}</span>

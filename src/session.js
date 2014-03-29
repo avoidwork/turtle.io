@@ -33,7 +33,7 @@ TurtleIO.prototype.session = {
 	create : function ( req, res ) {
 		var domain = req.parsed.hostname,
 		    secure = ( req.parsed.protocol === "https:" ),
-		    sid    = $.uuid( true ),
+		    sid    = uuid( true ),
 		    sesh;
 
 		// Creating the session

@@ -18,7 +18,7 @@ TurtleIO.prototype.allowed = function ( method, uri, host ) {
 	d     = hosts[this.config["default"]];
 	exist = ( hosts[host] );
 
-	this.handlers[method].regex.each( function ( i, idx ) {
+	array.each( this.handlers[method].regex, function ( i, idx ) {
 		var route = self.handlers[method].routes[idx];
 
 		if ( i.test( uri ) && ( ( exist && route in hosts[host] ) || route in d || route in hosts.all ) ) {
@@ -31,7 +31,7 @@ TurtleIO.prototype.allowed = function ( method, uri, host ) {
 		d     = hosts[this.config["default"]];
 		exist = ( hosts[host] );
 
-		this.handlers.all.regex.each( function ( i, idx ) {
+		array.each( this.handlers.all.regex, function ( i, idx ) {
 			var route = self.handlers.all.routes[idx];
 
 			if ( i.test( uri ) && ( ( exist && route in hosts[host] ) || route in d || route in hosts.all ) ) {
