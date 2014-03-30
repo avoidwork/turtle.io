@@ -7,7 +7,7 @@
  * @param  {String} mimetype Mimetype of URL
  * @return {Object}          TurtleIO instance
  */
-TurtleIO.prototype.watch = function ( url, path, mimetype ) {
+TurtleIO.prototype.watch = function ( url, path ) {
 	var self = this,
 	    watcher;
 
@@ -35,12 +35,18 @@ TurtleIO.prototype.watch = function ( url, path, mimetype ) {
 			}
 			else {
 				fs.lstat( path, function ( e, stat ) {
+					var value;
+
 					if ( e ) {
 						self.log( e );
 						cleanup();
 					}
 					else if ( self.etags.cache[url] ) {
-						self.register( url, {etag: self.etag( url, stat.size, stat.mtime ), mimetype: mimetype}, true );
+						value           = self.etags.cache[url].value;
+						value.etag      = self.etag( url, stat.size, stat.mtime );
+						value.timestamp = parseInt( new Date().getTime() / 1000, 10 );
+
+						self.register( url, value, true );
 					}
 					else {
 						cleanup();
