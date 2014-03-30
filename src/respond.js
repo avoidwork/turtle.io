@@ -61,7 +61,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 
 				// Updating cache
 				if ( !REGEX_NOCACHE.test( headers["cache-control"] ) && !REGEX_PRIVATE.test( headers["cache-control"] ) ) {
-					this.register( req.parsed.href, {etag: headers.etag.replace( /"/g, "" ), mimetype: headers["content-type"]}, true );
+					this.register( req.parsed.href, {etag: headers.etag.replace( /"/g, "" ), headers: headers, mimetype: headers["content-type"], timestamp: parseInt( new Date().getTime() / 1000, 10 )}, true );
 				}
 
 				// Setting a watcher on the local path
