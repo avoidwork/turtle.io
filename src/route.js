@@ -10,7 +10,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 	var self   = this,
 	    url    = this.url( req ),
 	    method = req.method.toLowerCase(),
-	    cached, handler, host, parsed, payload, route;
+	    handler, host, parsed, payload, route;
 
 	/**
 	 * Operation
@@ -20,6 +20,8 @@ TurtleIO.prototype.route = function ( req, res ) {
 	 * @return {Undefined} undefined
 	 */
 	function op () {
+		var cached, headers;
+
 		if ( handler ) {
 			req.cookies = {};
 			req.session = null;
@@ -57,7 +59,13 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 				// Sending a 304 if Client is making a GET & has current representation
 				if ( cached && !REGEX_HEAD.test( method ) && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === cached.etag ) {
-					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, {"content-type": cached.mimetype, etag: "\"" + cached.etag + "\""} );
+					headers     = cached.headers;
+					headers.age = parseInt( new Date().getTime() / 1000 - cached.timestamp, 10 );
+
+					delete headers["content-encoding"];
+					delete headers["transfer-encoding"];
+
+					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, headers );
 				}
 				else {
 					handler.call( self, req, res, host );

@@ -33,7 +33,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		    stale         = STALE,
 		    get           = req.method === "GET",
 		    rewriteOrigin = req.parsed.protocol + "//" + req.parsed.host + route,
-		    resHeaders, rewrite;
+		    cached, resHeaders, rewrite;
 
 		resHeaders        = headers( xhr.getAllResponseHeaders() );
 		resHeaders.server = self.config.headers.server;
@@ -46,6 +46,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 			self.error( req, res, xhr.status );
 		}
 		else {
+			// Determining if the response will be cached
 			if ( get && ( xhr.status === self.codes.SUCCESS || xhr.status === self.codes.NOT_MODIFIED ) && !REGEX_NOCACHE.test( resHeaders["cache-control"] ) && !REGEX_PRIVATE.test( resHeaders["cache-control"] ) ) {
 				// Determining how long rep is valid
 				if ( resHeaders["cache-control"] && REGEX_NUMBER.test( resHeaders["cache-control"] ) ) {
@@ -60,7 +61,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 				if ( stale > 0 ) {
 					setTimeout( function () {
 						self.unregister( url );
-					}, stale );
+					}, stale * 1000 );
 				}
 			}
 
@@ -82,6 +83,12 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 
 				// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
 				if ( get && req.headers["if-none-match"] === etag ) {
+					cached = self.etags.get( url );
+
+					if ( cached ) {
+						resHeaders.age = parseInt( new Date().getTime() / 1000 - cached.value.timestamp, 10 );
+					}
+
 					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, resHeaders );
 				}
 				else {
@@ -118,7 +125,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	}
 
 	/**
-	 * Capitalizes HTTP headers
+	 * Converts HTTP header String to an Object
 	 *
 	 * @method headers
 	 * @private
