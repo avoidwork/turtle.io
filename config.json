@@ -8,6 +8,7 @@
 		"access-control-allow-origin" : "*",
 		"access-control-allow-headers": "*",
 		"access-control-allow-methods": "",
+		"accept-ranges"                : "bytes",
 		"allow"                       : "",
 		"cache-control"               : "max-age=60, must-revalidate, public",
 		"content-type"                : "text/html; charset=utf-8",

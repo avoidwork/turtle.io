@@ -76,6 +76,11 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		}
 	}
 
+	// Fixing 'accept-ranges' for non-filesystem based responses
+	if ( !file ) {
+		headers["accept-ranges"] = "none";
+	}
+
 	// Determining if response should be compressed
 	if ( status === this.codes.SUCCESS && body && this.config.compress && ( type = this.compression( ua, encoding, headers["content-type"] ) ) && type !== null ) {
 		headers["content-encoding"]  = REGEX_GZIP.test( type ) ? "gzip" : "deflate";
