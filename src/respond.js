@@ -94,7 +94,8 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 				options[idx === 0 ? "start" : "end"] = parseInt( i, 10 );
 			} );
 
-			headers["content-length"] = number.diff( options.end, options.start );
+			headers["content-range"]  = "bytes " + options.start + "-" + options.end + "/" + headers["content-length"];
+			headers["content-length"] = number.diff( options.end, options.start ) + 1;
 		}
 
 		res.writeHead( status, headers );
@@ -109,7 +110,8 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 				options[idx === 0 ? "start" : "end"] = parseInt( i, 10 );
 			} );
 
-			headers["content-length"] = number.diff( options.end, options.start );
+			headers["content-range"]  = "bytes " + options.start + "-" + options.end + "/" + headers["content-length"];
+			headers["content-length"] = number.diff( options.end, options.start ) + 1;
 		}
 
 		headers["transfer-encoding"] = "chunked";
