@@ -85,8 +85,20 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	if ( status === this.codes.SUCCESS && body && this.config.compress && ( type = this.compression( ua, encoding, headers["content-type"] ) ) && type !== null ) {
 		headers["content-encoding"]  = REGEX_GZIP.test( type ) ? "gzip" : "deflate";
 		headers["transfer-encoding"] = "chunked";
+
+		if ( file && req.headers.range ) {
+			status  = this.codes.PARTIAL_CONTENT;
+			options = {};
+
+			array.each( req.headers.range.match( /\d+/g ), function ( i, idx ) {
+				options[idx === 0 ? "start" : "end"] = parseInt( i, 10 );
+			} );
+
+			headers["content-length"] = number.diff( options.end, options.start );
+		}
+
 		res.writeHead( status, headers );
-		this.compress( req, res, body, type, headers.etag.replace( /"/g, "" ), file );
+		this.compress( req, res, body, type, headers.etag.replace( /"/g, "" ), file, options );
 	}
 	else if ( file ) {
 		if ( req.headers.range ) {
