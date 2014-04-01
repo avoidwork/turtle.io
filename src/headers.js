@@ -45,6 +45,7 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 
 		// Removing headers not wanted in the response
 		if ( !get || status >= this.codes.BAD_REQUEST ) {
+			delete headers["accept-ranges"];
 			delete headers["cache-control"];
 			delete headers.expires;
 			delete headers["last-modified"];
@@ -55,6 +56,7 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 
 		if ( status === this.codes.NOT_FOUND && headers.allow ) {
 			delete headers.allow;
+			delete headers["accept-ranges"];
 			delete headers["access-control-allow-methods"];
 		}
 
