@@ -23,7 +23,9 @@ TurtleIO.prototype.route = function ( req, res ) {
 		var cached, headers;
 
 		// Running middleware
-		self.run( req, res, host );
+		if ( !self.run( req, res, host ) ) {
+			return void 0;
+		}
 
 		if ( handler ) {
 			// Adding custom properties, if there's no collision

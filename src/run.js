@@ -9,24 +9,39 @@
  */
 TurtleIO.prototype.run = function ( req, res, host ) {
 	var self       = this,
-		middleware = ( this.middleware[host] || [] ).concat( this.middleware.all );
+		middleware = this.middleware.all.concat( this.middleware[host] || [] );
 
-	function chain ( idx ) {
-		middleware[idx]( req, res, function ( err ) {
-			if ( !( err instanceof Error ) ) {
-				if ( !res.headersSent && middleware[idx + 1] ) {
-					chain( idx + 1 );
+	// Chains middleware execution
+	function chain ( idx, err ) {
+		var i = idx + 1;
+
+		try {
+			middleware[idx]( err || null, req, res, function ( arg ) {
+				if ( !res.headersSent && middleware[i] ) {
+					return chain( i, arg );
 				}
+				else if ( !res.headersSent && !middleware[i] && arg instanceof Error ) {
+					self.error( req, res, self.codes.SERVER_ERROR );
+
+					return false;
+				}
+			} );
+		}
+		catch ( e ) {
+			if ( !res.headersSent && middleware[i] ) {
+				return chain( i, e );
 			}
-			else {
+			else if ( !res.headersSent ) {
 				self.error( req, res, self.codes.SERVER_ERROR );
+
+				return false;
 			}
-		} );
+		}
 	}
 
 	if ( middleware.length > 0 ) {
-		chain( 0 );
+		return chain( 0 );
 	}
 
-	return this;
+	return true;
 };
