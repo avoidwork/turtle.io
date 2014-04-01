@@ -81,6 +81,11 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		headers["accept-ranges"] = "none";
 	}
 
+	// Removing header because it's ambiguous
+	if ( status === this.codes.NOT_MODIFIED ) {
+		delete headers["accept-ranges"];
+	}
+
 	// Determining if response should be compressed
 	if ( status === this.codes.SUCCESS && body && this.config.compress && ( type = this.compression( ua, encoding, headers["content-type"] ) ) && type !== null ) {
 		headers["content-encoding"]  = REGEX_GZIP.test( type ) ? "gzip" : "deflate";
