@@ -22,22 +22,31 @@ TurtleIO.prototype.route = function ( req, res ) {
 	function op () {
 		var cached, headers;
 
+		// Running middleware
+		self.run( req, res, host );
+
 		if ( handler ) {
-			req.cookies = {};
-			req.session = null;
+			// Adding custom properties, if there's no collision
+			if ( !req.cookies ) {
+				req.cookies = {};
 
-			// Decorating valid cookies
-			if ( req.headers.cookie !== undefined ) {
-				array.each( string.explode( req.headers.cookie, ";" ).map( function ( i ) {
-					return i.split( "=" );
-				} ), function ( i ) {
-					req.cookies[i[0]] = i[1];
-				} );
-			}
+				// Decorating valid cookies
+				if ( req.headers.cookie !== undefined ) {
+					array.each( string.explode( req.headers.cookie, ";" ).map( function ( i ) {
+						return i.split( "=" );
+					} ), function ( i ) {
+						req.cookies[i[0]] = i[1];
+					} );
+				}
 
-			// Decorates a session
-			if ( req.cookies[self.config.session.id] ) {
-				req.session = self.session.get( req, res );
+				if ( !req.session ) {
+					req.session = null;
+
+					// Decorates a session
+					if ( req.cookies[self.config.session.id] ) {
+						req.session = self.session.get( req, res );
+					}
+				}
 			}
 
 			// Setting listeners if expecting a body
@@ -136,6 +145,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 	}
 
 	// Handling authentication
+	// @todo deprecate this when possible
 	this.auth( req, res, host, op );
 
 	return this;

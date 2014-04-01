@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang="en"><head><title>run</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="run"><meta name="groc-project-path" content="src/run.js"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/run.js</div></div><div id="document"><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'>Method run</span></p>
+
+<p>Runs middleware in a chain</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>req must be an Object.</strong><br/>(Request Object)</p></li>
+<li><p><strong>res must be an Object.</strong><br/>(Response Object)</p></li>
+<li><p><strong>host must be a String.</strong><br/>([Optional] Host)</p></li>
+</ul>
+
+<p><strong>Returns an Object</strong><br/>(TurtleIO instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">TurtleIO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">run</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">host</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">self</span>       <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
+    <span class="nx">middleware</span> <span class="o">=</span> <span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">middleware</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="o">||</span> <span class="p">[]</span> <span class="p">).</span><span class="nx">concat</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">middleware</span><span class="p">.</span><span class="nx">all</span> <span class="p">);</span>
+
+  <span class="kd">function</span> <span class="nx">chain</span> <span class="p">(</span> <span class="nx">idx</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">middleware</span><span class="p">[</span><span class="nx">idx</span><span class="p">](</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">err</span> <span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="p">(</span> <span class="nx">err</span> <span class="k">instanceof</span> <span class="nb">Error</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">res</span><span class="p">.</span><span class="nx">headersSent</span> <span class="o">&amp;&amp;</span> <span class="nx">middleware</span><span class="p">[</span><span class="nx">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">{</span>
+          <span class="nx">chain</span><span class="p">(</span> <span class="nx">idx</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">);</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+      <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">self</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">self</span><span class="p">.</span><span class="nx">codes</span><span class="p">.</span><span class="nx">SERVER_ERROR</span> <span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="nx">middleware</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">chain</span><span class="p">(</span> <span class="mi">0</span> <span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+<span class="p">};</span></div></div></div></div></body></html>

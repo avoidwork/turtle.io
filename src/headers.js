@@ -54,7 +54,7 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 			delete headers["last-modified"];
 		}
 
-		if ( status === this.codes.NOT_FOUND && headers.allow ) {
+		if ( ( status === this.codes.NOT_FOUND && headers.allow ) || ( status >= this.codes.SERVER_ERROR ) ) {
 			delete headers.allow;
 			delete headers["accept-ranges"];
 			delete headers["access-control-allow-methods"];
