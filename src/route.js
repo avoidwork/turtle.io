@@ -55,17 +55,22 @@ TurtleIO.prototype.route = function ( req, res ) {
 			}
 			// Looking in LRU cache for Etag
 			else if ( REGEX_GET.test( method ) ) {
-				cached = self.etags.get( url );
+				if ( !req.headers.range ) {
+					cached = self.etags.get( url );
 
-				// Sending a 304 if Client is making a GET & has current representation
-				if ( cached && !REGEX_HEAD.test( method ) && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === cached.etag ) {
-					headers     = cached.headers;
-					headers.age = parseInt( new Date().getTime() / 1000 - cached.timestamp, 10 );
+					// Sending a 304 if Client is making a GET & has current representation
+					if ( cached && !REGEX_HEAD.test( method ) && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === cached.etag ) {
+						headers = cached.headers;
+						headers.age = parseInt( new Date().getTime() / 1000 - cached.timestamp, 10 );
 
-					delete headers["content-encoding"];
-					delete headers["transfer-encoding"];
+						delete headers["content-encoding"];
+						delete headers["transfer-encoding"];
 
-					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, headers );
+						self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, headers );
+					}
+					else {
+						handler.call( self, req, res, host );
+					}
 				}
 				else {
 					handler.call( self, req, res, host );

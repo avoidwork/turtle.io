@@ -14,7 +14,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	var self     = this,
 	    ua       = req.headers["user-agent"],
 	    encoding = req.headers["accept-encoding"],
-	    type;
+	    type, options;
 
 	if ( body === null ) {
 		body = undefined;
@@ -76,17 +76,48 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		}
 	}
 
+	// Fixing 'accept-ranges' for non-filesystem based responses
+	if ( !file ) {
+		headers["accept-ranges"] = "none";
+	}
+
 	// Determining if response should be compressed
 	if ( status === this.codes.SUCCESS && body && this.config.compress && ( type = this.compression( ua, encoding, headers["content-type"] ) ) && type !== null ) {
 		headers["content-encoding"]  = REGEX_GZIP.test( type ) ? "gzip" : "deflate";
 		headers["transfer-encoding"] = "chunked";
+
+		if ( file && req.headers.range ) {
+			status  = this.codes.PARTIAL_CONTENT;
+			options = {};
+
+			array.each( req.headers.range.match( /\d+/g ), function ( i, idx ) {
+				options[idx === 0 ? "start" : "end"] = parseInt( i, 10 );
+			} );
+
+			headers["content-range"]  = "bytes " + options.start + "-" + options.end + "/" + headers["content-length"];
+			headers["content-length"] = number.diff( options.end, options.start ) + 1;
+		}
+
 		res.writeHead( status, headers );
-		this.compress( req, res, body, type, headers.etag.replace( /"/g, "" ), file );
+		this.compress( req, res, body, type, headers.etag.replace( /"/g, "" ), file, options );
 	}
 	else if ( file ) {
+		if ( req.headers.range ) {
+			status  = this.codes.PARTIAL_CONTENT;
+			options = {};
+
+			array.each( req.headers.range.match( /\d+/g ), function ( i, idx ) {
+				options[idx === 0 ? "start" : "end"] = parseInt( i, 10 );
+			} );
+
+			headers["content-range"]  = "bytes " + options.start + "-" + options.end + "/" + headers["content-length"];
+			headers["content-length"] = number.diff( options.end, options.start ) + 1;
+		}
+
 		headers["transfer-encoding"] = "chunked";
 		res.writeHead( status, headers );
-		fs.createReadStream( body ).on( "error", function ( e ) {
+
+		fs.createReadStream( body, options ).on( "error", function ( e ) {
 			self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
 			self.error( req, res, self.codes.SERVER_ERROR );
 		} ).pipe( res );

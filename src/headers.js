@@ -29,7 +29,7 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 			headers.date = new Date().toUTCString();
 		}
 
-		if ( headers["access-control-allow-methods"] && string.isEmpty( headers["access-control-allow-methods"] ) && headers.allow ) {
+		if ( headers["access-control-allow-methods"] !== headers.allow ) {
 			headers["access-control-allow-methods"] = headers.allow;
 		}
 

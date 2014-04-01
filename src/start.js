@@ -8,12 +8,15 @@
  */
 TurtleIO.prototype.start = function ( cfg, err ) {
 	var self = this,
-	    config, pages;
+	    config, headers, pages;
 
-	config = clone( defaultConfig );
+	config = clone( defaultConfig, true );
 
 	// Merging custom with default config
 	merge( config, cfg || {} );
+
+	// Duplicating headers for re-decoration
+	headers = clone( config.headers, true );
 
 	// Overriding default error handler
 	if ( typeof err == "function" ) {
@@ -42,7 +45,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	delete this.config.headers;
 	this.config.headers = {};
 
-	iterate( config.headers, function ( value, key ) {
+	iterate( headers, function ( value, key ) {
 		self.config.headers[key.toLowerCase()] = value;
 	} );
 

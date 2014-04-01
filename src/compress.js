@@ -2,22 +2,23 @@
  * Pipes compressed asset to Client
  *
  * @method compressed
- * @param  {Object}  req  HTTP(S) request Object
- * @param  {Object}  res  HTTP(S) response Object
- * @param  {Object}  body Response body
- * @param  {Object}  type gzip (gz) or deflate (df)
- * @param  {String}  etag Etag
- * @param  {Boolean} file Indicates `body` is a file path
- * @return {Objet}        TurtleIO instance
+ * @param  {Object}  req     HTTP(S) request Object
+ * @param  {Object}  res     HTTP(S) response Object
+ * @param  {Object}  body    Response body
+ * @param  {Object}  type    gzip (gz) or deflate (df)
+ * @param  {String}  etag    Etag
+ * @param  {Boolean} file    Indicates `body` is a file path
+ * @param  {Object}  options [Optional] Stream options
+ * @return {Object}          TurtleIO instance
  */
-TurtleIO.prototype.compress = function ( req, res, body, type, etag, file ) {
+TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, options ) {
 	var self    = this,
 	    method  = REGEX_GZIP.test( type ) ? "createGzip" : "createDeflate",
 	    sMethod = method.replace( "create", "" ).toLowerCase(),
 	    fp      = this.config.tmp + "/" + etag + "." + type;
 
 	fs.exists( fp, function ( exist ) {
-		if ( exist ) {
+		if ( exist && !options ) {
 			// Pipe compressed asset to Client
 			fs.createReadStream( fp ).on( "error", function ( e ) {
 				self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
@@ -53,16 +54,18 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file ) {
 		}
 		else {
 			// Pipe compressed asset to Client
-			fs.createReadStream( body ).on( "error", function ( e ) {
+			fs.createReadStream( body, options ).on( "error", function ( e ) {
 				self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
 				self.unregister( req.parsed.href );
 				self.error( req, res, self.codes.SERVER_ERROR );
 			} ).pipe( zlib[method]() ).pipe( res );
 
 			// Pipe compressed asset to disk
-			fs.createReadStream( body ).on( "error", function ( e ) {
-				self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
-			} ).pipe( zlib[method]() ).pipe( fs.createWriteStream( fp ) );
+			if ( !exist ) {
+				fs.createReadStream( body ).on( "error", function ( e ) {
+					self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
+				} ).pipe( zlib[method]() ).pipe( fs.createWriteStream( fp ) );
+			}
 		}
 	} );
 
