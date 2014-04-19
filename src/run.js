@@ -13,34 +13,47 @@ TurtleIO.prototype.run = function ( req, res, host ) {
 
 	// Chains middleware execution
 	function chain ( idx, err ) {
-		var i = idx + 1;
+		var i = idx + 1,
+			args;
+
+		// Chain passed to middleware
+		function next ( arg ) {
+			if ( middleware[i] ) {
+				chain( i, arg );
+			}
+			else if ( !res.finished ) {
+				if ( !( arg instanceof Error ) ) {
+					self.respond( req, res );
+				}
+				else {
+					self.error( req, res, self.codes.SERVER_ERROR );
+				}
+			}
+		}
 
 		try {
-			middleware[idx]( err || null, req, res, function ( arg ) {
-				if ( !res.headersSent && middleware[i] ) {
-					return chain( i, arg );
-				}
-				else if ( !res.headersSent && !middleware[i] && arg instanceof Error ) {
-					self.error( req, res, self.codes.SERVER_ERROR );
+			args = middleware[idx].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
 
-					return false;
+			if ( args === 4 ) {
+				if ( !( err instanceof Error ) ) {
+					err = null;
 				}
-			} );
+
+				middleware[idx]( err, req, res, next );
+			}
+			else {
+				middleware[idx]( req, res, next );
+			}
 		}
 		catch ( e ) {
-			if ( !res.headersSent && middleware[i] ) {
-				return chain( i, e );
-			}
-			else if ( !res.headersSent ) {
-				self.error( req, res, self.codes.SERVER_ERROR );
-
-				return false;
-			}
+			next( e );
 		}
 	}
 
 	if ( middleware.length > 0 ) {
-		return chain( 0 );
+		chain( 0 );
+
+		return false;
 	}
 
 	return true;
