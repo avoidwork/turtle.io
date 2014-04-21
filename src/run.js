@@ -9,12 +9,17 @@
  */
 TurtleIO.prototype.run = function ( req, res, host ) {
 	var self       = this,
-		middleware = this.middleware.all.concat( this.middleware[host] || [] );
+		all        = this.middleware.all   || {},
+		h          = this.middleware[host] || {},
+		middleware = ( all["/*"] || [] ).concat( all[req.parsed.pathname] || [] ).concat( h["/*"] || [] ).concat( h[req.parsed.pathname] || [] ),
+		nth        = middleware.length;
 
 	// Chains middleware execution
 	function chain ( idx, err ) {
-		var i = idx + 1,
-			args;
+		var i     = idx + 1,
+			find  = err !== undefined,
+			found = false,
+			arity;
 
 		// Chain passed to middleware
 		function next ( arg ) {
@@ -32,14 +37,32 @@ TurtleIO.prototype.run = function ( req, res, host ) {
 		}
 
 		try {
-			args = middleware[idx].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
+			arity = middleware[idx].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
 
-			if ( args === 4 ) {
-				if ( !( err instanceof Error ) ) {
-					err = null;
+			if ( find ) {
+				if ( arity < 4 ) {
+					while ( ++idx < nth ) {
+						arity = middleware[idx].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
+
+						if ( arity === 4 ) {
+							found = true;
+							i     = idx + 1;
+							break;
+						}
+					}
 				}
+				else {
+					found = true;
+				}
+			}
 
-				middleware[idx]( err, req, res, next );
+			if ( find ) {
+				if ( found ) {
+					middleware[idx]( err, req, res, next );
+				}
+				else {
+					self.error( req, res, self.codes.SERVER_ERROR );
+				}
 			}
 			else {
 				middleware[idx]( req, res, next );
@@ -50,7 +73,7 @@ TurtleIO.prototype.run = function ( req, res, host ) {
 		}
 	}
 
-	if ( middleware.length > 0 ) {
+	if ( nth > 0 ) {
 		chain( 0 );
 
 		return false;
