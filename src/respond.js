@@ -56,7 +56,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			if ( req.method === "GET" && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) ) {
 				// Ensuring an Etag
 				if ( !headers.etag ) {
-					headers.etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers["last-modified"] || 0, body || 0 ) + "\"";
+					headers.etag = "\"" + this.etag( req.parsed.href, body && body.length || 0, headers["last-modified"] || 0, body || 0 ) + "\"";
 				}
 
 				// Updating cache
@@ -128,6 +128,10 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		} ).pipe( res );
 	}
 	else {
+		if ( body === undefined ) {
+			body = this.messages.NO_CONTENT;
+		}
+
 		if ( headers["content-length"] === undefined ) {
 			if ( body instanceof Buffer ) {
 				headers["content-length"] = Buffer.byteLength( body.toString() );
@@ -135,10 +139,6 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			else if ( typeof body == "string" ) {
 				headers["content-length"] = Buffer.byteLength( body );
 			}
-		}
-
-		if ( body === undefined ) {
-			body = this.messages.NO_CONTENT;
 		}
 
 		res.writeHead( status, headers );

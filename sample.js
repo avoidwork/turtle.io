@@ -19,8 +19,8 @@ config = {
 	}
 }
 
-server.get("/status", function (res, req) {
-	this.respond(res, req, this.status());
+server.get("/status", function (req, res) {
+	this.respond(req, res, this.status());
 }, "test");
 
 server.start(config);
