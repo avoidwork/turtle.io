@@ -8,7 +8,7 @@
  * @return {Object}        TurtleIO instance
  */
 TurtleIO.prototype.use = function ( path, fn, host ) {
-	if ( typeof path == "function" ) {
+	if ( typeof path != "string" ) {
 		host = fn;
 		fn   = path;
 		path = "/*";
@@ -16,7 +16,7 @@ TurtleIO.prototype.use = function ( path, fn, host ) {
 
 	host = host || "all";
 
-	if ( typeof fn != "function" ) {
+	if ( typeof fn != "function" && ( fn && typeof fn.handle != "function" ) ) {
 		throw new Error( "Invalid middleware" );
 	}
 
@@ -32,7 +32,7 @@ TurtleIO.prototype.use = function ( path, fn, host ) {
 		this.middleware[host][path] = [];
 	}
 
-	this.middleware[host][path].push( fn );
+	this.middleware[host][path].push( fn.handle || fn );
 
 	return this;
 };
