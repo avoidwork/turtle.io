@@ -3,6 +3,7 @@ $ten: 10px;
 $lightestgrey: #f2f2f2;
 $lightgrey: #7e7e7e;
 $darkgrey: #282828;
+$midgrey: #3D3D3D;
 $white: #fff;
 
 html,
@@ -117,9 +118,13 @@ ol {
 	}
 }
 
-#rate,
-#middleware {
+#rate {
 	background-color: $darkgrey;
+	color: $white;
+}
+
+#middleware {
+	background-color: $midgrey;
 	color: $white;
 }
 
@@ -132,7 +137,7 @@ ol {
 	padding-bottom: $ten * 5;
 
 	h2 {
-		padding-top: $ten;
+		padding-top: $ten * 5;
 	}
 }
 
