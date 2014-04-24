@@ -1,10 +1,12 @@
-(function ($) {
-	$.on("ready", function () {
-		// Setting footer copyright
-		$("#year").html(new Date().getFullYear());
+(function (util) {
+	var $       = util.$,
+	    element = util.element,
+	    request = util.request;
 
-		"/".headers(function (arg) {
-			$("#version").html(arg.Server.split(" ")[0].replace(/.*\//, ""));
-		});
-	});
-})(abaaso);
+element.html($("#year")[0], new Date().getFullYear());
+
+request("/", "head").then(function (headers) {
+	element.html($("#version")[0], headers.server.split(" ")[0].replace(/.*\//, ""));
+});
+
+})(keigai.util);

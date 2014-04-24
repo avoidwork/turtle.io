@@ -87,7 +87,8 @@ ol {
 }
 
 #rate,
-#tip {
+#tip,
+#middleware {
 	text-align: center;
 }
 
@@ -107,7 +108,8 @@ ol {
 }
 
 #rate,
-#tip {
+#tip,
+#middleware {
 	height: $ten * 20;
 
 	> * {
@@ -115,7 +117,8 @@ ol {
 	}
 }
 
-#rate {
+#rate,
+#middleware {
 	background-color: $darkgrey;
 	color: $white;
 }
