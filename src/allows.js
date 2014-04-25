@@ -9,7 +9,7 @@
 TurtleIO.prototype.allows = function ( uri, host ) {
 	var self   = this,
 	    verbs  = ["delete", "get", "post", "put", "patch"],
-		timer  = precise().start(),
+	    timer  = precise().start(),
 	    result;
 
 	result = verbs.filter( function ( i ) {

@@ -11,7 +11,7 @@ TurtleIO.prototype.allowed = function ( method, uri, host ) {
 	var self   = this,
 	    result = false,
 	    exist  = false,
-		timer  = precise().start(),
+	    timer  = precise().start(),
 	    d, hosts;
 
 	host  = host || ALL;

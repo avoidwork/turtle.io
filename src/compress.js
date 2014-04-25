@@ -16,7 +16,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 	    method  = REGEX_GZIP.test( type ) ? "createGzip" : "createDeflate",
 	    sMethod = method.replace( "create", "" ).toLowerCase(),
 	    fp      = this.config.tmp + "/" + etag + "." + type,
-		timer   = precise().start();
+	    timer   = precise().start();
 
 	fs.exists( fp, function ( exist ) {
 		if ( exist && !options ) {
