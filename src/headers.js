@@ -45,6 +45,7 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 
 		// Removing headers not wanted in the response
 		if ( !get || status >= this.codes.BAD_REQUEST ) {
+			headers.inhere = "word";
 			delete headers["accept-ranges"];
 			delete headers["cache-control"];
 			delete headers.expires;

@@ -11,6 +11,7 @@ TurtleIO.prototype.allowed = function ( method, uri, host ) {
 	var self   = this,
 	    result = false,
 	    exist  = false,
+		time   = process.hrtime(),
 	    d, hosts;
 
 	host  = host || ALL;
@@ -39,6 +40,10 @@ TurtleIO.prototype.allowed = function ( method, uri, host ) {
 			}
 		} );
 	}
+
+	this.dtp.fire( "allowed", function () {
+		return [host, uri, method.toUpperCase(), diff( time )];
+	});
 
 	return result;
 };

@@ -23,5 +23,7 @@ TurtleIO.prototype.stop = function () {
 		this.server = null;
 	}
 
+	this.dtp.disable();
+
 	return this;
 };

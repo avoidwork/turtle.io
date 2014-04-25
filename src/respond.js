@@ -77,7 +77,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	}
 
 	// Fixing 'accept-ranges' for non-filesystem based responses
-	if ( !file ) {
+	if ( !file && req.method !== "HEAD" ) {
 		headers["accept-ranges"] = "none";
 	}
 
