@@ -5,7 +5,6 @@ sudo dtrace -Z -n 'turtle-io*:::allowed{ trace(copyinstr(arg0)); trace(copyinstr
                -n 'turtle-io*:::compress{ trace(copyinstr(arg0)); trace(copyinstr(arg1)); trace(arg2); }'  \
                -n 'turtle-io*:::compression{ trace(copyinstr(arg0)); trace(arg1); }'  \
                -n 'turtle-io*:::error{ trace(copyinstr(arg0)); trace(copyinstr(arg1)); trace(arg2); trace(copyinstr(arg3)); trace(arg4); }'  \
-               -n 'turtle-io*:::handler{ trace(copyinstr(arg0)); trace(copyinstr(arg1)); trace(arg2); }'  \
                -n 'turtle-io*:::proxy{ trace(copyinstr(arg0)); trace(copyinstr(arg1)); trace(copyinstr(arg2)); trace(copyinstr(arg3)); trace(arg4); }'  \
                -n 'turtle-io*:::proxy-set{ trace(copyinstr(arg0)); trace(copyinstr(arg1)); trace(copyinstr(arg2)); trace(copyinstr(arg3)); trace(arg4); }'  \
                -n 'turtle-io*:::redirect-set{ trace(copyinstr(arg0)); trace(copyinstr(arg1)); trace(copyinstr(arg2)); trace(arg3); trace(arg4); }'  \

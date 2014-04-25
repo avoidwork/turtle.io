@@ -18,8 +18,10 @@ TurtleIO.prototype.allows = function ( uri, host ) {
 
 	result = result.join( ", " ).toUpperCase().replace( "GET", "GET, HEAD, OPTIONS" );
 
+	timer.stop();
+
 	this.dtp.fire( "allows", function () {
-		return [host, uri, timer.stop().diff()];
+		return [host, uri, timer.diff()];
 	});
 
 	return result;

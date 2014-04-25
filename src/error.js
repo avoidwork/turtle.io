@@ -11,6 +11,7 @@ TurtleIO.prototype.error = function ( req, res, status ) {
 	var method = req.method.toLowerCase(),
 	    host   = req.parsed ? req.parsed.hostname : ALL,
 	    kdx    = -1,
+		timer  = precise().start(),
 	    body, msg;
 
 	if ( isNaN( status ) ) {
@@ -39,6 +40,12 @@ TurtleIO.prototype.error = function ( req, res, status ) {
 	msg = kdx ? array.cast( this.messages )[kdx] : "Unknown error";
 
 	this.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + msg ), "debug" );
+
+	timer.stop();
+
+	this.dtp.fire( "error", function () {
+		return [req.headers.host, req.parsed.path, status, msg, timer.diff()];
+	});
 
 	return this.respond( req, res, body, status, {"cache-control": "no-cache", "content-length": Buffer.byteLength( body )} );
 };

@@ -10,7 +10,6 @@ TurtleIO.prototype.probes = function () {
 	this.dtp.addProbe("compress",       "char *", "char *", "int");
 	this.dtp.addProbe("compression",    "char *", "int");
 	this.dtp.addProbe("error",          "char *",  "char *", "int", "char *", "int");
-	this.dtp.addProbe("handler",        "char *",  "char *", "int");
 	this.dtp.addProbe("proxy",          "char *", "char *", "char *", "char *", "int");
 	this.dtp.addProbe("proxy-set",      "char *", "char *", "char *", "char *", "int");
 	this.dtp.addProbe("redirect-set",   "char *", "char *", "char *", "int", "int");

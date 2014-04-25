@@ -26,8 +26,10 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 				self.error( req, res, self.codes.SERVER_ERROR );
 			} ).pipe( res );
 
+			timer.stop();
+
 			self.dtp.fire( "compress", function () {
-				return [etag, fp, timer.stop().diff()];
+				return [etag, fp, timer.diff()];
 			});
 		}
 		else if ( !file ) {
@@ -36,8 +38,10 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 				body.pipe( zlib[method]() ).pipe( res );
 				body.pipe( zlib[method]() ).pipe( fs.createWriteStream( fp ) );
 
+				timer.stop();
+
 				self.dtp.fire( "compress", function () {
-					return [etag, fp, timer.stop().diff()];
+					return [etag, fp, timer.diff()];
 				});
 			}
 			// Raw response body, compress and send to Client & disk
@@ -58,8 +62,10 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 							}
 						} );
 
+						timer.stop();
+
 						self.dtp.fire( "compress", function () {
-							return [etag, fp, timer.stop().diff()];
+							return [etag, fp, timer.diff()];
 						});
 					}
 				} );
@@ -80,8 +86,10 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 				} ).pipe( zlib[method]() ).pipe( fs.createWriteStream( fp ) );
 			}
 
+			timer.stop();
+
 			self.dtp.fire( "compress", function () {
-				return [etag, fp, timer.stop().diff()];
+				return [etag, fp, timer.diff()];
 			});
 		}
 	} );

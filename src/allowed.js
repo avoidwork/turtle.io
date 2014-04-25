@@ -41,8 +41,10 @@ TurtleIO.prototype.allowed = function ( method, uri, host ) {
 		} );
 	}
 
+	timer.stop();
+
 	this.dtp.fire( "allowed", function () {
-		return [host, uri, method.toUpperCase(), timer.stop().diff()];
+		return [host, uri, method.toUpperCase(), timer.diff()];
 	});
 
 	return result;

@@ -31,8 +31,10 @@ TurtleIO.prototype.compression = function ( agent, encoding, mimetype ) {
 		} );
 	}
 
+	timer.stop();
+
 	this.dtp.fire( "compression", function () {
-		return [agent, timer.stop().diff()];
+		return [agent, timer.diff()];
 	});
 
 	return result;
