@@ -3,6 +3,7 @@
 var crypto        = require( "crypto" ),
     defaultConfig = require( __dirname + "/../config.json" ),
     dtrace        = require( "dtrace-provider" ),
+	precise       = require( "precise" ),
 	util          = require( "keigai" ).util,
     array         = util.array,
     clone         = util.clone,

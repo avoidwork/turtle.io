@@ -9,7 +9,7 @@
 TurtleIO.prototype.allows = function ( uri, host ) {
 	var self   = this,
 	    verbs  = ["delete", "get", "post", "put", "patch"],
-		time   = process.hrtime(),
+		timer  = precise().start(),
 	    result;
 
 	result = verbs.filter( function ( i ) {
@@ -19,7 +19,7 @@ TurtleIO.prototype.allows = function ( uri, host ) {
 	result = result.join( ", " ).toUpperCase().replace( "GET", "GET, HEAD, OPTIONS" );
 
 	this.dtp.fire( "allows", function () {
-		return [host, uri, diff( time )];
+		return [host, uri, timer.stop().diff()];
 	});
 
 	return result;

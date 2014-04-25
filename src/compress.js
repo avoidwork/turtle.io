@@ -16,7 +16,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 	    method  = REGEX_GZIP.test( type ) ? "createGzip" : "createDeflate",
 	    sMethod = method.replace( "create", "" ).toLowerCase(),
 	    fp      = this.config.tmp + "/" + etag + "." + type,
-		time    = process.hrtime();
+		timer   = precise().start();
 
 	fs.exists( fp, function ( exist ) {
 		if ( exist && !options ) {
@@ -27,7 +27,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 			} ).pipe( res );
 
 			self.dtp.fire( "compress", function () {
-				return [etag, fp, diff( time )];
+				return [etag, fp, timer.stop().diff()];
 			});
 		}
 		else if ( !file ) {
@@ -37,7 +37,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 				body.pipe( zlib[method]() ).pipe( fs.createWriteStream( fp ) );
 
 				self.dtp.fire( "compress", function () {
-					return [etag, fp, diff( time )];
+					return [etag, fp, timer.stop().diff()];
 				});
 			}
 			// Raw response body, compress and send to Client & disk
@@ -59,7 +59,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 						} );
 
 						self.dtp.fire( "compress", function () {
-							return [etag, fp, diff( time )];
+							return [etag, fp, timer.stop().diff()];
 						});
 					}
 				} );
@@ -81,7 +81,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 			}
 
 			self.dtp.fire( "compress", function () {
-				return [etag, fp, diff( time )];
+				return [etag, fp, timer.stop().diff()];
 			});
 		}
 	} );

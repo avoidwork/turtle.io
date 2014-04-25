@@ -11,7 +11,7 @@
 TurtleIO.prototype.compression = function ( agent, encoding, mimetype ) {
 	var result    = null,
 	    encodings = typeof encoding == "string" ? string.explode( encoding ) : [],
-		time      = process.hrtime();
+		timer     = precise().start();
 
 	// Safari can't handle compression for proxies (socket doesn't close) or on an iDevice for simple GETs
 	if ( this.config.compress === true && REGEX_COMP.test( mimetype ) && !REGEX_IE.test( agent ) && !REGEX_IDEVICE.test( agent ) && ( !REGEX_SAFARI.test( agent ) || REGEX_CHROME.test( agent ) ) ) {
@@ -32,7 +32,7 @@ TurtleIO.prototype.compression = function ( agent, encoding, mimetype ) {
 	}
 
 	this.dtp.fire( "compression", function () {
-		return [agent, diff( time )];
+		return [agent, timer.stop().diff()];
 	});
 
 	return result;

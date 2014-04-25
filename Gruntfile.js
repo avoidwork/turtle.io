@@ -19,7 +19,6 @@ module.exports = function (grunt) {
 				src : [
 					"<banner>",
 					"src/intro.js",
-					"src/diff.js",
 					"src/constructor.js",
 					"src/allowed.js",
 					"src/allows.js",
