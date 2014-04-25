@@ -8,11 +8,11 @@
  * @return {Object}        TurtleIO instance
  */
 TurtleIO.prototype.error = function ( req, res, status ) {
-	var method = req.method.toLowerCase(),
+	var timer  = precise().start(),
+	    method = req.method.toLowerCase(),
 	    host   = req.parsed ? req.parsed.hostname : ALL,
 	    kdx    = -1,
-		timer  = precise().start(),
-	    body, msg;
+		body, msg;
 
 	if ( isNaN( status ) ) {
 		status = this.codes.NOT_FOUND;
@@ -45,7 +45,7 @@ TurtleIO.prototype.error = function ( req, res, status ) {
 
 	this.dtp.fire( "error", function () {
 		return [req.headers.host, req.parsed.path, status, msg, timer.diff()];
-	});
+	} );
 
 	return this.respond( req, res, body, status, {"cache-control": "no-cache", "content-length": Buffer.byteLength( body )} );
 };

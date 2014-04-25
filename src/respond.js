@@ -12,6 +12,7 @@
  */
 TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) {
 	var self     = this,
+		timer    = precise().start(),
 	    ua       = req.headers["user-agent"],
 	    encoding = req.headers["accept-encoding"],
 	    type, options;
@@ -144,6 +145,12 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		res.writeHead( status, headers );
 		res.end( body );
 	}
+
+	timer.stop();
+
+	this.dtp.fire( "respond", function () {
+		return [req.headers.host, req.method, req.url, status, timer.diff()];
+	} );
 
 	return this.log( this.prep( req, res, headers ), "info" );
 };

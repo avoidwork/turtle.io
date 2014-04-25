@@ -9,6 +9,7 @@
  */
 TurtleIO.prototype.write = function ( req, res, path ) {
 	var self  = this,
+	    timer = precise().start(),
 	    put   = ( req.method === "PUT" ),
 	    body  = req.body,
 	    allow = this.allows( req.url ),
@@ -17,6 +18,13 @@ TurtleIO.prototype.write = function ( req, res, path ) {
 
 	if ( !put && REGEX_ENDSLSH.test( req.url ) ) {
 		status = del ? this.codes.CONFLICT : this.codes.SERVER_ERROR;
+
+		timer.stop();
+
+		this.dtp.fire( "write", function () {
+			return [req.headers.host, req.url, req.method, path, timer.diff()];
+		});
+
 		this.respond( req, res, this.page( status, this.hostname( req ) ), status, {allow: allow}, false );
 	}
 	else {
@@ -45,6 +53,12 @@ TurtleIO.prototype.write = function ( req, res, path ) {
 				}
 			}
 		} );
+
+		timer.stop();
+
+		this.dtp.fire( "write", function () {
+			return [req.headers.host, req.url, req.method, path, timer.diff()];
+		});
 	}
 
 	return this;

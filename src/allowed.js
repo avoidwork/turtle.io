@@ -9,9 +9,9 @@
  */
 TurtleIO.prototype.allowed = function ( method, uri, host ) {
 	var self   = this,
+		timer  = precise().start(),
 	    result = false,
 	    exist  = false,
-	    timer  = precise().start(),
 	    d, hosts;
 
 	host  = host || ALL;
@@ -45,7 +45,7 @@ TurtleIO.prototype.allowed = function ( method, uri, host ) {
 
 	this.dtp.fire( "allowed", function () {
 		return [host, uri, method.toUpperCase(), timer.diff()];
-	});
+	} );
 
 	return result;
 };

@@ -16,10 +16,11 @@ TurtleIO.prototype.run = function ( req, res, host ) {
 
 	// Chains middleware execution
 	function chain ( idx, err ) {
-		var i     = idx + 1,
-			find  = err !== undefined,
-			found = false,
-			arity;
+		var timer = precise().start(),
+		    i     = idx + 1,
+		    find  = err !== undefined,
+		    found = false,
+		    arity;
 
 		// Chain passed to middleware
 		function next ( arg ) {
@@ -55,6 +56,12 @@ TurtleIO.prototype.run = function ( req, res, host ) {
 					found = true;
 				}
 			}
+
+			timer.stop();
+
+			self.dtp.fire( "middleware", function () {
+				return [host, req.url, timer.diff()];
+			} );
 
 			if ( find ) {
 				if ( found ) {

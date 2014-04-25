@@ -13,10 +13,10 @@
  */
 TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, options ) {
 	var self    = this,
+	    timer   = precise().start(),
 	    method  = REGEX_GZIP.test( type ) ? "createGzip" : "createDeflate",
 	    sMethod = method.replace( "create", "" ).toLowerCase(),
-	    fp      = this.config.tmp + "/" + etag + "." + type,
-	    timer   = precise().start();
+	    fp      = this.config.tmp + "/" + etag + "." + type;
 
 	fs.exists( fp, function ( exist ) {
 		if ( exist && !options ) {
@@ -30,7 +30,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 
 			self.dtp.fire( "compress", function () {
 				return [etag, fp, timer.diff()];
-			});
+			} );
 		}
 		else if ( !file ) {
 			// Pipe Stream through compression to Client & disk
@@ -42,7 +42,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 
 				self.dtp.fire( "compress", function () {
 					return [etag, fp, timer.diff()];
-				});
+				} );
 			}
 			// Raw response body, compress and send to Client & disk
 			else {
@@ -66,7 +66,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 
 						self.dtp.fire( "compress", function () {
 							return [etag, fp, timer.diff()];
-						});
+						} );
 					}
 				} );
 			}
@@ -90,7 +90,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 
 			self.dtp.fire( "compress", function () {
 				return [etag, fp, timer.diff()];
-			});
+			} );
 		}
 	} );
 

@@ -8,7 +8,8 @@
  * @return {Object}           Response headers
  */
 TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
-	var headers;
+	var timer = precise().start(),
+	    headers;
 
 	// Decorating response headers
 	if ( status !== this.codes.NOT_MODIFIED && status >= this.codes.MULTIPLE_CHOICE && status < this.codes.BAD_REQUEST ) {
@@ -65,6 +66,12 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 			delete headers["last-modified"];
 		}
 	}
+
+	timer.stop();
+
+	this.dtp.fire( "headers", function () {
+		return [status, timer.diff()];
+	} );
 
 	return headers;
 };

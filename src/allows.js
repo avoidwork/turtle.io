@@ -8,8 +8,8 @@
  */
 TurtleIO.prototype.allows = function ( uri, host ) {
 	var self   = this,
-	    verbs  = ["delete", "get", "post", "put", "patch"],
 	    timer  = precise().start(),
+	    verbs  = ["delete", "get", "post", "put", "patch"],
 	    result;
 
 	result = verbs.filter( function ( i ) {
@@ -22,7 +22,7 @@ TurtleIO.prototype.allows = function ( uri, host ) {
 
 	this.dtp.fire( "allows", function () {
 		return [host, uri, timer.diff()];
-	});
+	} );
 
 	return result;
 };
