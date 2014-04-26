@@ -28,8 +28,13 @@
   <span class="nx">headers</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">headers</span><span class="p">(</span> <span class="nx">headers</span> <span class="o">||</span> <span class="p">{</span><span class="s2">&quot;content-type&quot;</span><span class="o">:</span> <span class="s2">&quot;text/plain&quot;</span><span class="p">},</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">REGEX_GET</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span> <span class="nx">req</span><span class="p">.</span><span class="nx">method</span> <span class="p">)</span> <span class="p">);</span>
   <span class="nx">file</span>    <span class="o">=</span> <span class="nx">file</span> <span class="o">===</span> <span class="kc">true</span><span class="p">;</span>
 
-  <span class="k">if</span> <span class="p">(</span> <span class="nx">REGEX_HEAD</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span> <span class="nx">req</span><span class="p">.</span><span class="nx">method</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
-    <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;content-length&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="nx">req</span><span class="p">.</span><span class="nx">method</span> <span class="o">==</span> <span class="s2">&quot;OPTIONS&quot;</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">delete</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;accept-ranges&quot;</span><span class="p">];</span>
+    <span class="k">delete</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;content-length&quot;</span><span class="p">];</span>
+    <span class="k">delete</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;cache-control&quot;</span><span class="p">];</span>
+    <span class="k">delete</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;content-type&quot;</span><span class="p">];</span>
+    <span class="k">delete</span> <span class="nx">headers</span><span class="p">.</span><span class="nx">etag</span><span class="p">;</span>
+    <span class="k">delete</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;last-modified&quot;</span><span class="p">];</span>
     <span class="k">delete</span> <span class="nx">headers</span><span class="p">.</span><span class="nx">expires</span><span class="p">;</span>
     <span class="k">delete</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;transfer-encoding&quot;</span><span class="p">];</span>
   <span class="p">}</span>
@@ -124,8 +129,9 @@
         <span class="p">}</span>
       <span class="p">}</span>
     <span class="p">}</span>
-    <span class="k">else</span> <span class="p">{</span>
-      <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;content-length&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="nx">req</span><span class="p">.</span><span class="nx">method</span> <span class="o">!==</span> <span class="s2">&quot;OPTIONS&quot;</span> <span class="p">)</span> <span class="p">{</span>
+      <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;content-length&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;content-length&quot;</span><span class="p">]</span> <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="nx">res</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">headers</span> <span class="p">);</span>
