@@ -13,6 +13,7 @@
  */
 TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, options ) {
 	var self    = this,
+	    timer   = precise().start(),
 	    method  = REGEX_GZIP.test( type ) ? "createGzip" : "createDeflate",
 	    sMethod = method.replace( "create", "" ).toLowerCase(),
 	    fp      = this.config.tmp + "/" + etag + "." + type;
@@ -24,12 +25,24 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 				self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
 				self.error( req, res, self.codes.SERVER_ERROR );
 			} ).pipe( res );
+
+			timer.stop();
+
+			self.dtp.fire( "compress", function () {
+				return [etag, fp, timer.diff()];
+			} );
 		}
 		else if ( !file ) {
 			// Pipe Stream through compression to Client & disk
 			if ( typeof body.pipe == "function" ) {
 				body.pipe( zlib[method]() ).pipe( res );
 				body.pipe( zlib[method]() ).pipe( fs.createWriteStream( fp ) );
+
+				timer.stop();
+
+				self.dtp.fire( "compress", function () {
+					return [etag, fp, timer.diff()];
+				} );
 			}
 			// Raw response body, compress and send to Client & disk
 			else {
@@ -47,6 +60,12 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 								self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
 								self.unregister( req.parsed.href );
 							}
+						} );
+
+						timer.stop();
+
+						self.dtp.fire( "compress", function () {
+							return [etag, fp, timer.diff()];
 						} );
 					}
 				} );
@@ -66,6 +85,12 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 					self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
 				} ).pipe( zlib[method]() ).pipe( fs.createWriteStream( fp ) );
 			}
+
+			timer.stop();
+
+			self.dtp.fire( "compress", function () {
+				return [etag, fp, timer.diff()];
+			} );
 		}
 	} );
 

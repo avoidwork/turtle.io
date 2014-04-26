@@ -39,6 +39,7 @@ module.exports = function (grunt) {
 					"src/log.js",
 					"src/messages.js",
 					"src/page.js",
+					"src/probes.js",
 					"src/prep.js",
 					"src/proxy.js",
 					"src/redirect.js",

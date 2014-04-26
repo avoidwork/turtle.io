@@ -9,7 +9,8 @@
  * @return {Mixed}           Supported compression or null
  */
 TurtleIO.prototype.compression = function ( agent, encoding, mimetype ) {
-	var result    = null,
+	var timer     = precise().start(),
+	    result    = null,
 	    encodings = typeof encoding == "string" ? string.explode( encoding ) : [];
 
 	// Safari can't handle compression for proxies (socket doesn't close) or on an iDevice for simple GETs
@@ -29,6 +30,12 @@ TurtleIO.prototype.compression = function ( agent, encoding, mimetype ) {
 			}
 		} );
 	}
+
+	timer.stop();
+
+	this.dtp.fire( "compression", function () {
+		return [agent, timer.diff()];
+	} );
 
 	return result;
 };

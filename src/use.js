@@ -14,13 +14,13 @@ TurtleIO.prototype.use = function ( path, fn, host ) {
 		path = "/*";
 	}
 
-	host = host || "all";
+	host = host || ALL;
 
 	if ( typeof fn != "function" && ( fn && typeof fn.handle != "function" ) ) {
 		throw new Error( "Invalid middleware" );
 	}
 
-	if ( host !== "all" && !this.config.vhosts[host] ) {
+	if ( host !== ALL && !this.config.vhosts[host] ) {
 		throw new Error( "Invalid virtual host" );
 	}
 

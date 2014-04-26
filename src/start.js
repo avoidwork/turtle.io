@@ -61,6 +61,9 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	// Setting default routes
 	this.host( ALL );
 
+	// Registering DTrace probes
+	this.probes();
+
 	// Registering virtual hosts
 	array.each( array.cast( config.vhosts, true ), function ( i ) {
 		self.host( i );

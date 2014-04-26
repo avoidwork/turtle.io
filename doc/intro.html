@@ -2,6 +2,8 @@
 
 <span class="kd">var</span> <span class="nx">crypto</span>        <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;crypto&quot;</span> <span class="p">),</span>
     <span class="nx">defaultConfig</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s2">&quot;/../config.json&quot;</span> <span class="p">),</span>
+    <span class="nx">dtrace</span>        <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;dtrace-provider&quot;</span> <span class="p">),</span>
+    <span class="nx">precise</span>       <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;precise&quot;</span> <span class="p">),</span>
     <span class="nx">util</span>          <span class="o">=</span> <span class="nx">require</span><span class="p">(</span> <span class="s2">&quot;keigai&quot;</span> <span class="p">).</span><span class="nx">util</span><span class="p">,</span>
     <span class="nx">array</span>         <span class="o">=</span> <span class="nx">util</span><span class="p">.</span><span class="nx">array</span><span class="p">,</span>
     <span class="nx">clone</span>         <span class="o">=</span> <span class="nx">util</span><span class="p">.</span><span class="nx">clone</span><span class="p">,</span>

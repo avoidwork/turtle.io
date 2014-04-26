@@ -8,6 +8,7 @@
  */
 TurtleIO.prototype.allows = function ( uri, host ) {
 	var self   = this,
+	    timer  = precise().start(),
 	    verbs  = ["delete", "get", "post", "put", "patch"],
 	    result;
 
@@ -16,6 +17,12 @@ TurtleIO.prototype.allows = function ( uri, host ) {
 	} );
 
 	result = result.join( ", " ).toUpperCase().replace( "GET", "GET, HEAD, OPTIONS" );
+
+	timer.stop();
+
+	this.dtp.fire( "allows", function () {
+		return [host, uri, timer.diff()];
+	} );
 
 	return result;
 };

@@ -10,6 +10,7 @@
  */
 TurtleIO.prototype.request = function ( req, res, host ) {
 	var self    = this,
+		timer   = precise().start(),
 	    method  = req.method,
 	    handled = false,
 	    found   = false,
@@ -17,6 +18,12 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 
 	// If an expectation can't be met, don't try!
 	if ( req.headers.expect ) {
+		timer.stop();
+
+		this.dtp.fire( "request", function () {
+			return [req.parsed.href, timer.diff()];
+		});
+
 		return this.error( req, res, this.codes.EXPECTATION_FAILED );
 	}
 
@@ -75,6 +82,12 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 				} );
 			} );
 		}
+
+		timer.stop();
+
+		self.dtp.fire( "request", function () {
+			return [req.parsed.href, timer.diff()];
+		});
 	} );
 
 	return this;

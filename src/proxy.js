@@ -97,6 +97,9 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 					}
 					// Fixing root path of response
 					else if ( rewrite ) {
+						// Changing the size of the response body
+						delete resHeaders["content-length"];
+
 						if ( arg instanceof Array || arg instanceof Object ) {
 							arg = json.encode( arg ).replace( regexOrigin, rewriteOrigin );
 
@@ -158,7 +161,8 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	 * @return {Undefined}  undefined
 	 */
 	function wrapper ( req, res ) {
-		var url      = origin + ( route !== "/" ? req.url.replace( new RegExp( "^" + route ), "" ) : req.url ),
+		var timer    = precise().start(),
+		    url      = origin + ( route !== "/" ? req.url.replace( new RegExp( "^" + route ), "" ) : req.url ),
 		    method   = req.method.toLowerCase(),
 		    headerz  = clone( req.headers, true ),
 		    parsed   = parse( url ),
@@ -167,6 +171,12 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 
 		// Facade to handle()
 		fn = function ( arg, xhr ) {
+			timer.stop();
+
+			self.dtp.fire( "proxy", function () {
+				return [req.headers.host, req.method, route, origin, timer.diff()];
+			});
+
 			handle( req, res, arg, xhr );
 		};
 

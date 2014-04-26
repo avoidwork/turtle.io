@@ -6,9 +6,10 @@
  * @return {Object} Status
  */
 TurtleIO.prototype.status = function () {
-	var ram    = process.memoryUsage(),
-	    uptime = process.uptime(),
-	    state  = {config: {}, etags: {}, process: {}, server: {}},
+	var timer   = precise().start(),
+	    ram     = process.memoryUsage(),
+	    uptime  = process.uptime(),
+	    state   = {config: {}, etags: {}, process: {}, server: {}},
 	    invalid = /^(auth|session|ssl)$/;
 
 	// Startup parameters
@@ -35,6 +36,12 @@ TurtleIO.prototype.status = function () {
 		items   : this.etags.length,
 		bytes   : Buffer.byteLength( array.cast( this.etags.cache ).map( function ( i ){ return i.value; } ).join( "" ) )
 	};
+
+	timer.stop();
+
+	this.dtp.fire( "status", function () {
+		return [state.server.connections, uptime, ram.heapUsed, ram.heapTotal, timer.diff()];
+	} );
 
 	return state;
 };

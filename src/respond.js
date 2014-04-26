@@ -12,6 +12,7 @@
  */
 TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) {
 	var self     = this,
+		timer    = precise().start(),
 	    ua       = req.headers["user-agent"],
 	    encoding = req.headers["accept-encoding"],
 	    type, options;
@@ -21,7 +22,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	}
 
 	status  = status || this.codes.SUCCESS;
-	headers = this.headers( headers || {"content-type": "text/plain"}, status, req.method === "GET" );
+	headers = this.headers( headers || {"content-type": "text/plain"}, status, REGEX_GET.test( req.method ) );
 	file    = ( file === true );
 
 	if ( !file && body ) {
@@ -77,7 +78,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	}
 
 	// Fixing 'accept-ranges' for non-filesystem based responses
-	if ( !file ) {
+	if ( !file && req.method !== "HEAD" ) {
 		headers["accept-ranges"] = "none";
 	}
 
@@ -144,6 +145,12 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		res.writeHead( status, headers );
 		res.end( body );
 	}
+
+	timer.stop();
+
+	this.dtp.fire( "respond", function () {
+		return [req.headers.host, req.method, req.url, status, timer.diff()];
+	} );
 
 	return this.log( this.prep( req, res, headers ), "info" );
 };
