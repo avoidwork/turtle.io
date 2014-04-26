@@ -16,13 +16,12 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 	    write  = allow.indexOf( dir ? "POST" : "PUT" ) > -1,
 	    del    = allow.indexOf( "DELETE" ) > -1,
 	    method = req.method,
-	    cached, etag, headers, mimetype, modified, size;
+	    etag, headers, mimetype, modified, size;
 
 	// File request
 	if ( !dir ) {
 		if ( REGEX_GET.test( method ) ) {
 			mimetype = mime.lookup( path );
-			cached   = this.etags.cache[url];
 			size     = stat.size;
 			modified = stat.mtime.toUTCString();
 			etag     = "\"" + this.etag( url, size, stat.mtime ) + "\"";
@@ -34,7 +33,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 
 				// Client has current version
 				if ( ( req.headers["if-none-match"] === etag ) || ( !req.headers["if-none-match"] && Date.parse( req.headers["if-modified-since"] ) >= stat.mtime ) ) {
-					this.respond( req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, headers );
+					this.respond( req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, headers, true );
 				}
 				// Sending current version
 				else {
@@ -42,7 +41,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 				}
 			}
 			else {
-				this.respond( req, res, this.messages.NO_CONTENT, this.codes.SUCCESS, headers );
+				this.respond( req, res, this.messages.NO_CONTENT, this.codes.SUCCESS, headers, true );
 			}
 		}
 		else if ( method === "DELETE" && del ) {
