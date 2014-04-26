@@ -15,6 +15,7 @@
 
 <p><strong>Returns an Object</strong><br/>(TurtleIO instance)</p></div></div><div class="code"><div class="wrapper"><span class="nx">TurtleIO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">respond</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">body</span><span class="p">,</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">headers</span><span class="p">,</span> <span class="nx">file</span> <span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">self</span>     <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
+    <span class="nx">timer</span>    <span class="o">=</span> <span class="nx">precise</span><span class="p">().</span><span class="nx">start</span><span class="p">(),</span>
       <span class="nx">ua</span>       <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;user-agent&quot;</span><span class="p">],</span>
       <span class="nx">encoding</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;accept-encoding&quot;</span><span class="p">],</span>
       <span class="nx">type</span><span class="p">,</span> <span class="nx">options</span><span class="p">;</span>
@@ -62,7 +63,7 @@
       <span class="k">delete</span> <span class="nx">headers</span><span class="p">.</span><span class="nx">allow</span><span class="p">;</span>
       <span class="k">delete</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;access-control-allow-methods&quot;</span><span class="p">];</span>
     <span class="p">}</span>
-  <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Fixing 'accept-ranges' for non-filesystem based responses</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">file</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Fixing 'accept-ranges' for non-filesystem based responses</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">file</span> <span class="o">&amp;&amp;</span> <span class="nx">req</span><span class="p">.</span><span class="nx">method</span> <span class="o">!==</span> <span class="s2">&quot;HEAD&quot;</span> <span class="p">)</span> <span class="p">{</span>
     <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;accept-ranges&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span><span class="p">;</span>
   <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Removing header because it's ambiguous</p></div></div><div class="code"><div class="wrapper">  <span class="k">if</span> <span class="p">(</span> <span class="nx">status</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">codes</span><span class="p">.</span><span class="nx">NOT_MODIFIED</span> <span class="p">)</span> <span class="p">{</span>
     <span class="k">delete</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;accept-ranges&quot;</span><span class="p">];</span>
@@ -123,6 +124,12 @@
     <span class="nx">res</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">headers</span> <span class="p">);</span>
     <span class="nx">res</span><span class="p">.</span><span class="nx">end</span><span class="p">(</span> <span class="nx">body</span> <span class="p">);</span>
   <span class="p">}</span>
+
+  <span class="nx">timer</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;respond&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">host</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">method</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">timer</span><span class="p">.</span><span class="nx">diff</span><span class="p">()];</span>
+  <span class="p">}</span> <span class="p">);</span>
 
   <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">prep</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">headers</span> <span class="p">),</span> <span class="s2">&quot;info&quot;</span> <span class="p">);</span>
 <span class="p">};</span></div></div></div></div></body></html>

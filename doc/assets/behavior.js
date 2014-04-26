@@ -578,6 +578,24 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "ignorePrefix": "}",
           "name": "JavaScript"
         },
+        "sourcePath": "/Users/jason/Projects/turtle.io/src/probes.js",
+        "projectPath": "src/probes.js",
+        "targetPath": "probes",
+        "title": "probes"
+      },
+      "depth": 1,
+      "outline": []
+    }, {
+      "type": "file",
+      "data": {
+        "language": {
+          "nameMatchers": [".js"],
+          "pygmentsLexer": "javascript",
+          "singleLineComment": ["//"],
+          "multiLineComment": ["/*", "*", "*/"],
+          "ignorePrefix": "}",
+          "name": "JavaScript"
+        },
         "sourcePath": "/Users/jason/Projects/turtle.io/src/proxy.js",
         "projectPath": "src/proxy.js",
         "targetPath": "proxy",
