@@ -23,7 +23,8 @@
 		"format" : "%v %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"",
 		"level"  : "info",
 		"stdout" : true,
-		"syslog" : true
+		"syslog" : true,
+		"dtrace" : false
 	},
 	"port"    : 8000,
 	"root"    : "",
