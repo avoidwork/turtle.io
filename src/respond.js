@@ -17,15 +17,21 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	    encoding = req.headers["accept-encoding"],
 	    type, options;
 
-	if ( body === null ) {
-		body = undefined;
+	if ( body === null || body === undefined ) {
+		body = this.messages.NO_CONTENT;
 	}
 
 	status  = status || this.codes.SUCCESS;
 	headers = this.headers( headers || {"content-type": "text/plain"}, status, REGEX_GET.test( req.method ) );
-	file    = ( file === true );
+	file    = file === true;
 
-	if ( !file && body ) {
+	if ( REGEX_HEAD.test( req.method ) ) {
+		headers["content-length"] = 0;
+		delete headers.expires;
+		delete headers["transfer-encoding"];
+	}
+
+	if ( !file && body !== this.messages.NO_CONTENT ) {
 		body = this.encode( body );
 
 		// Ensuring JSON has proper mimetype
@@ -57,7 +63,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			if ( req.method === "GET" && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) ) {
 				// Ensuring an Etag
 				if ( !headers.etag ) {
-					headers.etag = "\"" + this.etag( req.parsed.href, body && body.length || 0, headers["last-modified"] || 0, body || 0 ) + "\"";
+					headers.etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers["last-modified"] || 0, body || 0 ) + "\"";
 				}
 
 				// Updating cache
@@ -129,17 +135,18 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		} ).pipe( res );
 	}
 	else {
-		if ( body === undefined ) {
-			body = this.messages.NO_CONTENT;
+		if ( body !== this.messages.NO_CONTENT ) {
+			if ( headers["content-length"] === undefined ) {
+				if ( body instanceof Buffer ) {
+					headers["content-length"] = Buffer.byteLength( body.toString() );
+				}
+				else if ( typeof body == "string" ) {
+					headers["content-length"] = Buffer.byteLength( body );
+				}
+			}
 		}
-
-		if ( headers["content-length"] === undefined ) {
-			if ( body instanceof Buffer ) {
-				headers["content-length"] = Buffer.byteLength( body.toString() );
-			}
-			else if ( typeof body == "string" ) {
-				headers["content-length"] = Buffer.byteLength( body );
-			}
+		else {
+			headers["content-length"] = 0;
 		}
 
 		res.writeHead( status, headers );
