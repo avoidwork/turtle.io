@@ -50,7 +50,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	if ( status === this.codes.NOT_MODIFIED || status < this.codes.MULTIPLE_CHOICE || status >= this.codes.BAD_REQUEST ) {
 		// req.parsed may not exist if coming from `error()`
 		if ( req.parsed ) {
-			if ( !headers.allow && status < 400 ) {
+			if ( !headers.allow && status !== this.codes.NOT_FOUND && status < this.codes.SERVER_ERROR ) {
 				headers["access-control-allow-methods"] = headers.allow = this.allows( req.parsed.pathname, req.parsed.hostname );
 			}
 
