@@ -24,7 +24,7 @@
 		"level"  : "info",
 		"stdout" : true,
 		"syslog" : true,
-		"dtrace" : false
+		"dtrace" : true
 	},
 	"port"    : 8000,
 	"root"    : "",
