@@ -151,6 +151,10 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			}
 		}
 
+		if ( req.method !== "OPTIONS" ) {
+			headers["content-length"] = headers["content-length"] || 0;
+		}
+
 		res.writeHead( status, headers );
 		res.end( body );
 	}
