@@ -17,7 +17,6 @@
 		"last-modified"                 : ""
 	},
 	"index"   : ["index.htm", "index.html"],
-	"lag"     : 50,
 	"logs"    : {
 		"time"   : "D/MMM/YYYY:HH:mm:ss ZZ",
 		"format" : "%v %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"",
