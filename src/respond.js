@@ -25,8 +25,13 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	headers = this.headers( headers || {"content-type": "text/plain"}, status, REGEX_GET.test( req.method ) );
 	file    = file === true;
 
-	if ( REGEX_HEAD.test( req.method ) ) {
-		headers["content-length"] = 0;
+	if ( req.method == "OPTIONS" ) {
+		delete headers["accept-ranges"];
+		delete headers["content-length"];
+		delete headers["cache-control"];
+		delete headers["content-type"];
+		delete headers.etag;
+		delete headers["last-modified"];
 		delete headers.expires;
 		delete headers["transfer-encoding"];
 	}
@@ -144,9 +149,6 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 					headers["content-length"] = Buffer.byteLength( body );
 				}
 			}
-		}
-		else {
-			headers["content-length"] = 0;
 		}
 
 		res.writeHead( status, headers );
