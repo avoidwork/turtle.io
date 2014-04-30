@@ -190,9 +190,13 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 
 		// Identifying proxy behavior
 		headerz["x-host"]             = parsed.host;
-		headerz["x-forwarded-for"]    = ( headerz["x-forwarded-for"] ? headerz["x-forwarded-for"] + ", " : "" ) + req.connection.remoteAddress;
+		headerz["x-forwarded-for"]    = ( headerz["x-forwarded-for"] || req.ip ) + ", " + req.connection.remoteAddress;
 		headerz["x-forwarded-proto"]  = parsed.protocol.replace( ":", "" );
-		headerz["x-forwarded-server"] = self.config.headers.Server;
+		headerz["x-forwarded-server"] = self.config.headers.server;
+
+		if ( !headerz["x-real-ip"] ) {
+			headerz["x-real-ip"] = req.ip;
+		}
 
 		// Streaming response to Client
 		if ( stream ) {
