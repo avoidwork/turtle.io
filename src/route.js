@@ -106,6 +106,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 	// Decorating parsed Object on request
 	req.parsed = parsed;
+	req.ip     = req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress;
 
 	// Finding a matching vhost
 	array.each( this.vhostsRegExp, function ( i, idx ) {
