@@ -4,7 +4,7 @@ turtle.io is a HTTP 1.1 web server with a focus on simplicity.
 
 All you need to do is install it, and tell it what directory holds your web sites, & which hostnames to answer for.
 
-[![build status](https://secure.travis-ci.org/avoidwork/turtle.io.png)](http://travis-ci.org/avoidwork/turtle.io)
+[![build status](https://secure.travis-ci.org/avoidwork/turtle.io.svg)](http://travis-ci.org/avoidwork/turtle.io)
 
 ## Getting Started
 
