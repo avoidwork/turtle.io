@@ -12,7 +12,7 @@ module.exports = function (grunt) {
 				         " * @link <%= pkg.homepage %>\n" +
 				         " * @module <%= pkg.name %>\n" +
 				         " * @version <%= pkg.version %>\n" +
-				         " */\n"
+				         " */\n\n"
 			},
 			dist : {
 				src : [

@@ -1,184 +1,261 @@
-$zeros: 0 0 0 0;
-$ten: 10px;
-$lightestgrey: #f2f2f2;
-$lightgrey: #7e7e7e;
-$darkgrey: #282828;
-$midgrey: #3D3D3D;
-$white: #fff;
+/**
+ * @author Jason Mulligan <jason.mulligan@avoidwork.com>
+ */
+
+@import url(https://fonts.googleapis.com/css?family=Lato:300italic,700italic,300,700);
 
 html,
 body {
-	padding: $zeros;
-	margin: $zeros;
 	min-height: 100%;
 }
 
 body {
-	background-color: #fff;
-	font-size: 12pt;
-	font-family: "Oxygen", arial, helvetica, sans-serif;
-	color: #000;	
+	background: #e5e5e5;
+	font: 16px Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	color: #000;
+	margin: 0 0 0 0;
+	padding: 0 0 0 0;
 }
 
-h2,
-h3,
-h4 {
-	margin: $zeros;
-	padding: $zeros;
+ul.pills li,
+a {
+	transition: all 0.5s ease;
 }
 
 header {
-	height: $ten * 10;
-	overflow: hidden;
+	background: #fff;
+	padding: 10px;
+	text-align: center;
 
 	h1 {
-		font-weight: normal;
-		font-size: 36pt;
-		margin: $zeros;
-		padding: $zeros;
-		padding-top: $ten * 4;
+		clear: both;
+		margin-top: 30px;
+		margin-bottom: 30px;
 	}
 }
 
-h2 {
-	font-size: 20pt;
+nav,
+section.copy,
+section.marketing {
+	background: #f5f5f5;
 }
 
-h3 {
-	font-size: 14pt;
-}
+nav {
+	clear: both;
+	text-align: center;
+	border-bottom: 1px solid #ccc;
 
-h2,
-h3 {
-	margin-bottom: $ten * 2;
-}
-
-ol {
-	li {
-		margin: 5px;
+	ul {
+		margin: 0 auto 0 auto;
+		display: inline-block;
 	}
 }
 
-article,
-footer,
-.gist {
-	margin-bottom: 50pt;
+header div.container,
+article {
+	margin: 0 auto 0 auto;
+	width: 1120px;
 }
 
-section:last-child {
-	margin: $zeros;
+footer {
+	position: absolute;
+	bottom: 20px;
+	text-align: center;
+	width: 100%;
 }
 
 a {
-	color: #6d6d6d;
+	text-decoration: none;
 }
 
-a img {
-	border: none;
+article {
+	padding: 10px;
 }
 
-p,
-ol {
-	margin: $zeros;
-	padding: 0 0 $ten 0;
+h1, h2, h3, h4 {
+	font-weight: normal;
+	margin: 0 0 0 0;
 }
 
-ol {
-	margin-left: $ten * 2;
+h1 {
+	font-size: 4em;
 }
 
-#rate,
-#tip,
-#middleware {
-	text-align: center;
+h2 {
+	font-size: 1.6em;
 }
 
-#intro {
-	background-color: $lightgrey;
-	color: $darkgrey;
-	text-align: center;
-
-	h2 {
-		padding-top: $ten * 5;
-		font-size: 24pt;
-	}
-
-	p {
-		padding-bottom: $ten * 5;
-	}
+h3 {
+	font-size: 1.3em;
 }
 
-#rate,
-#tip,
-#middleware {
-	height: $ten * 20;
+h4 {
+	font-size: 1.1em;
+}
 
-	> * {
-		padding-top: $ten * 8.3;
+ul.pills {
+	padding: 0 0 0 0;
+
+	li {
+		display: inline-block;
+		color: #fff;
+		padding: 10px;
+		cursor: pointer;
+		border-bottom: 2px solid #f5f5f5;
 	}
 }
 
-#rate {
-	background-color: $darkgrey;
-	color: $white;
-}
+ul.pills li {
+	display: inline-block;
+	color: #fff;
+	padding: 10px;
+	cursor: pointer;
+	border-bottom: 2px solid #f5f5f5;
 
-#middleware {
-	background-color: $midgrey;
-	color: $white;
-}
+	&.active {
+		border-bottom: 2px solid #ccc;
+	}
 
-#start,
-#documentation,
-#examples,
-#support {
-	background-color: $lightestgrey;
-	overflow: hidden;
-	padding-bottom: $ten * 5;
+	&:hover {
+		border-bottom: 2px solid #1BC322;
 
-	h2 {
-		padding-top: $ten * 5;
+		a {
+			color: #000;
+		}
+	}
+
+	a {
+		color: #9C9C9C;
 	}
 }
 
-.code {
-	border: 1px solid #dedede;
-	padding: 2px;
-	font-size: 10pt;
-	background: #f8f8ff;
+section.copy,
+section.marketing {
+	padding: 20px;
+	border: 1px solid #ccc;
+	background: #fff;
+	line-height: 1.6em;
+	overflow: auto;
 }
 
-.container {
-	width: $ten * 96;
-	margin: 0 auto 0 auto;
-	transition: width .2s ease-in-out;
+section.copy {
+	margin-bottom: 10px;
+	min-height: 150px;
 }
 
-.gist {
-	font-size: 10pt;
+section.copy a,
+section.marketing a {
+	color: #C51414;
+
+	&:hover {
+		color: #777;
+	}
+}
+
+#search img,
+#news img,
+#toolbar img,
+#groups img,
+#images img,
+#product-search img,
+#lucky img,
+#features img {
+	width: 400px;
+	margin-left: 20px;
+}
+
+.hidden {
+	display: none;
+}
+
+.pull-right {
+	float: right;
+}
+
+.pull-left {
+	float: left;
+}
+
+.border {
+	border: 1px solid #ccc;
 }
 
 .github {
 	position: absolute;
 	top: 0;
 	right: 0;
-	z-index: 100;
+	z-index: 2;
 }
 
-@media screen and (min-width: 900px) and (max-width: 960px) {
-	.container {
-		width: $ten * 89 !important;
+@media print, screen and (max-width: 1150px) {
+	header div.container,
+	article {
+		margin: 0 auto 0 auto;
+		width: 900px;
+	}
+
+	#search img,
+	#news img,
+	#toolbar img,
+	#groups img,
+	#images img,
+	#product-search img,
+	#lucky img,
+	#features img {
+		width: 300px;
 	}
 }
 
-@media screen and (min-width: 600px) and (max-width: 900px) {
-	.container {
-		width: $ten * 59 !important;
+@media print, screen and (max-width: 950px) {
+	header div.container,
+	article {
+		margin: 0 auto 0 auto;
+		width: 700px;
+	}
+
+	section.copy h2 {
+		margin-bottom: 20px;
 	}
 }
 
-@media screen and (min-width: 1px) and (max-width: 600px) {
-	.container {
-		width: $ten * 38 !important;
+@media print, screen and (max-width: 740px) {
+	header div.container,
+	article {
+		margin: 0 auto 0 auto;
+		width: 600px;
+	}
+
+	section.copy h2 {
+		margin-bottom: 20px;
+	}
+}
+
+@media print, screen and (max-width: 640px) {
+	header div.container,
+	article {
+		margin: 0 auto 0 auto;
+		width: 400px;
+	}
+
+	header img {
+		clear: both;
+		margin-bottom: 20px;
+	}
+
+	#search img,
+	#news img,
+	#toolbar img,
+	#groups img,
+	#images img,
+	#product-search img,
+	#lucky img,
+	#features img {
+		float: none;
+		margin: 30px 0 30px 0;
+	}
+
+	footer {
+		position: relative;
+		margin: 30px 0 30px 0;
 	}
 }
