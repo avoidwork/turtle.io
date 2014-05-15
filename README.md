@@ -65,5 +65,5 @@ If you're having problems, use the support forum at CodersClan.
 <a href="http://codersclan.net/forum/index.php?repo_id=12"><img src="http://www.codersclan.net/graphics/getSupport_blue_big.png" width="160"></a>
 
 ## License
-Copyright (c) 2013 Jason Mulligan  
+Copyright (c) 2014 Jason Mulligan  
 Licensed under the BSD-3 license.
