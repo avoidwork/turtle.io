@@ -38,8 +38,7 @@ header {
 
 	h1 {
 		clear: both;
-		margin-top: 30px;
-		margin-bottom: 30px;
+		margin: 1em 0 1em 0;
 	}
 }
 
@@ -222,6 +221,10 @@ article {
 		width: 900px;
 	}
 
+	article {
+		margin-top: 2em;
+	}
+
 	#search img,
 	#news img,
 	#toolbar img,
@@ -241,6 +244,10 @@ article {
 		width: 700px;
 	}
 
+	article {
+		margin-top: 2em;
+	}
+
 	section.copy h2 {
 		margin-bottom: 20px;
 	}
@@ -253,8 +260,19 @@ article {
 		width: 600px;
 	}
 
+	article {
+		margin-top: 2em;
+	}
+
 	section.copy h2 {
 		margin-bottom: 20px;
+	}
+
+	ul.thirds {
+		li {
+			width: 100%;
+			margin: 0 0 2em 0;
+		}
 	}
 }
 
@@ -263,6 +281,10 @@ article {
 	article {
 		margin: 0 auto 0 auto;
 		width: 400px;
+	}
+
+	article {
+		margin-top: 2em;
 	}
 
 	header img {
