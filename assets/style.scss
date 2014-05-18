@@ -22,6 +22,10 @@ p {
 	margin: 0 0 1em 0;
 }
 
+a {
+	text-decoration: none;
+}
+
 ul.pills li,
 a {
 	transition: all 0.5s ease;
@@ -73,19 +77,11 @@ footer {
 	text-align: center;
 	width: 100%;
 	clear: both;
-
-	a {
-		text-decoration: underline;
-	}
-}
-
-a {
-	color: #000;
-	text-decoration: none;
 }
 
 article {
 	padding: 10px;
+	margin-top: 2em;
 }
 
 h1, h2, h3, h4 {
@@ -167,12 +163,14 @@ section.copy {
 	min-height: 150px;
 }
 
-section.copy a,
-section.marketing a {
-	color: #C51414;
+footer,
+article {
+	a {
+		color: #1BC322;
 
-	&:hover {
-		color: #777;
+		&:hover {
+			color: #777;
+		}
 	}
 }
 
