@@ -43,8 +43,7 @@ header {
 }
 
 nav,
-section.copy,
-section.marketing {
+section.copy {
 	background: #f5f5f5;
 }
 
@@ -148,8 +147,7 @@ ul.thirds {
 	}
 }
 
-section.copy,
-section.marketing {
+section.copy {
 	padding: 20px;
 	border: 1px solid #ccc;
 	background: #fff;
@@ -171,18 +169,6 @@ article {
 			color: #777;
 		}
 	}
-}
-
-#search img,
-#news img,
-#toolbar img,
-#groups img,
-#images img,
-#product-search img,
-#lucky img,
-#features img {
-	width: 400px;
-	margin-left: 20px;
 }
 
 .hidden {
@@ -223,17 +209,6 @@ article {
 
 	article {
 		margin-top: 2em;
-	}
-
-	#search img,
-	#news img,
-	#toolbar img,
-	#groups img,
-	#images img,
-	#product-search img,
-	#lucky img,
-	#features img {
-		width: 300px;
 	}
 }
 
@@ -285,27 +260,5 @@ article {
 
 	article {
 		margin-top: 2em;
-	}
-
-	header img {
-		clear: both;
-		margin-bottom: 20px;
-	}
-
-	#search img,
-	#news img,
-	#toolbar img,
-	#groups img,
-	#images img,
-	#product-search img,
-	#lucky img,
-	#features img {
-		float: none;
-		margin: 30px 0 30px 0;
-	}
-
-	footer {
-		position: relative;
-		margin: 30px 0 30px 0;
 	}
 }
