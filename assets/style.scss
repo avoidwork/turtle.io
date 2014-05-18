@@ -171,6 +171,20 @@ article {
 	}
 }
 
+#config {
+	h3 {
+		margin-top: 2em;
+		padding-top: 2em;
+		border-top: 1px solid #ccc;
+
+		&:first-child {
+			margin-top: 0;
+			padding-top: 0;
+			border-top: 0px;
+		}
+	}
+}
+
 .hidden {
 	display: none;
 }
