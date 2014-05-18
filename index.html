@@ -7,6 +7,7 @@
 <meta name="description" content="asynchronous application / web server for node.js with virtual hosts" />
 <meta charset="utf-8">
 <link rel="stylesheet" type="text/css" href="assets/style.css" media="print,screen" />
+<link rel="stylesheet" type="text/css" href="assets/font-awesome/css/font-awesome.min.css" media="print,screen" />
 <!--[if lt IE 9]>
 	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
@@ -24,145 +25,143 @@
 		<li><a href="#features">Features</a></li>
 		<li><a href="#quickstart">Quick Start</a></li>
 		<li><a href="#tutorials">Tutorials</a></li>
-		<li><a href="#api">API</a></li>
+		<li><a href="#config">Configuration</a></li>
+		<li><a href="#faq">FAQ</a></li>
 	</ul>
 </nav>
 <article>
 	<section class="copy">
 		<div id="features" class="hidden">
-			<h2>Elastic node.js web/api server</h2>
-			<p>Out of the box turtle.io will host virtual sites, allow you to create custrom routes, and blah</p>
-			<p>turtle.io can be used to create complex applications with custom routes per HTTP verb, act as a reverse proxy to other services, and serve your static content with virtual hosts</p>
+			<h2>Elastic node.js web server / API server</h2>
+			<p>turtle.io was created to reduce resource requirements, and simplify creation &amp; deployment of modern web applications &amp; API facades. Unlike other web servers, turtle.io is extremely easy to configure.</p>
 			<ul class="thirds">
 				<li>
-					<h2>Middleware</h2>
-					<p>Your write custom apps quickly!</p>
+					<h3><i class="fa fa-cubes"></i> Middleware</h3>
+					<p>Connect middleware allows you to create custom applications easily.</p>
 				</li>
 				<li>
-					<h2>Virtual Hosts</h2>
-					<p>Super easy virtual host setup</p>
+					<h3><i class="fa fa-asterisk"></i> Virtual Hosts</h3>
+					<p>Designed to host many websites and APIs from a single server.</p>
 				</li>
 				<li>
-					<h2>Reverse Proxies</h2>
-					<p>One liner reverse proxy</p>
+					<h3><i class="fa fa-hand-o-right"></i> Simplify your stack</h3>
+					<p>turtle.io can replace Apache, NGINX, etc., in your application stack.</p>
 				</li>
 			</ul>
 		</div>
 		<div id="quickstart" class="hidden">
-			<h2>How to get a server up ASAP</h2>
-			<img class="pull-right border" src="images/search.jpg" />
-			<p>Work is hard and you need a break. A sun-soaked vaction is just the ticket, but where to begin? With Google there's a world of helpful, time-saving feetures right at your fingertips. To see how these free services can help you find what you're looking for faster, tag along as we plan a tropical vacation, or go straight to Google Services and Tools.</p>
+			<h2>Getting started with turtle.io</h2>
+			<p>turtle.io can be defined as a dependency for your node.js application, or run as a stand alone server. This quick start guide assumes you're setting up a production web server on port 80, and your account is part of the `www-data` group.</p>
+			<p>First, we need to install turtle.io:</p>
+			<script src="https://gist.github.com/avoidwork/a8c4097c2a596d260222.js"></script>
+			<p>Now we need to create a server script, lets call it "server.js". The "uid" property is the account that the server will run as. This is important to configure because to run on a "low port" such as 80, the server needs to start with elevated permissions, but we do not want it to continue to run with those permissions.</p>
+			<script src="https://gist.github.com/avoidwork/5350198.js"></script>
+			<p>To test our server, lets start is manually:</p>
+			<script src="https://gist.github.com/avoidwork/149256d408983591b94d.js"></script>
+			<p>Once you're statisfied with the server configuration, it's recommended to use "upstart" or a similar daemon to start &amp; respawn your turtle.io server.</p>
 		</div>
 		<div id="tutorials" class="hidden">
 			<h2>Get to know turtle.io</h2>
-			<img class="pull-right" src="images/news.jpg" />
-			<p>The destination determined, you decide to visit <a href="//google.com">Google News</a> to brush up on the very latest, so you'll be able to converse with the natives intelligently about the events of the day. Search and browse 4,000 leading news sources from around the world, with headlines and photos continuously updated automatically throughout the day. Click on a headline to be taken directly to the original source of the story you want to read.</p>
+			<h3>Coming soon!</h3>
 		</div>
-		<div id="api" class="hidden">
-			<h2>API</h2>
-			<p>Realizing you'll hit a lot of websites before you hit the beach, the first thing you pack is the Google Toolbar. Add it to your Internet Explorer and you can take Google with you anywhere on the web. It takes only seconds to install and enables you to easily use Google without having to return to the homepage. <a href="//google.com">Download the Google Toolbar</a></p>
+		<div id="config" class="hidden">
+			<h2>Configuration</h2>
+			<p>Configuration values can be set by passing an Object to <code>start()</code>.</p>
+
+			<h3>auth</h3>
+			<p><em>Object</em></p>
+			<p>[Optional] HTTP Authentication configuration, <code>key</code> is the hostname &amp; <code>value</code> is the parameters. The following are valid:</p>
+			<ul class="task-list">
+				<li>authRealm - Authentication realm.</li>
+				<li>authFile - File where user details are stored in format {user:pass} or {user:passHash} for basic access and {user:realm:passHash} for digest access.</li>
+				<li>authList - List where user details are stored in format {user:pass} or {user:passHash} for basic access and {user:realm:passHash} for digest access, ignored if authFile is specified.</li>
+				<li>authType - Type of authentication, may be basic or digest, optional, default is basic.</li>
+				<li>algorithm - Algorithm that will be used for authentication, may be MD5 or MD5-sess, optional, default is MD5. Only for digest authType.</li>
+			</ul>
+
+			<h3>cache</h3>
+			<p><em>Number (1000)</em></p>
+			<p>Size of LRU cache for Etag validation.</p>
+
+			<h3>default</h3>
+			<p><em>String</em></p>
+			<p><strong><em>[Required]</em></strong> Default hostname to handle requests which are not specified within <em>vhosts</em>; must be a valid entry within <em>vhosts</em>.</p>
+
+			<h3>headers</h3>
+			<p><em>Object</em></p>
+			<p>Response headers. CORS is enabled by default.</p>
+
+			<h3>index</h3>
+			<p><em>Array</em></p>
+			<p>Files to look for when accessing a directory resource.</p>
+
+			<h3>logs</h3>
+			<p><em>Object</em></p>
+			<p>Logging configuration.</p>
+			<ul>
+				<li>format - Common Log Format string of tokens, defaulting to standard Virtual Host format (%v %h %l %u %t \"%r\" %&gt;s %b \"%{Referer}i\" \"%{User-agent}i\")</li>
+				<li>level - Minimum Common Log Level which is emitted to <code>stdout</code> ("info")</li>
+				<li>stdout - Override &amp; disable <code>stdout</code> emitting by setting to <code>false</code> (true)</li>
+				<li>syslog - Override &amp; disable <code>syslog</code> emitting by setting to <code>false</code> (true)</li>
+				<li>time - Format for the date/time portion of a log message. (D/MMM/YYYY:HH:mm:ss ZZ)</li>
+			</ul>
+
+			<h3>pages</h3>
+			<p><em>String (null)</em></p>
+			<p>Directory relative to <code>root</code> which has files named for HTTP status codes, to be served upon error, e.g. <code>404.htm</code>.</p>
+
+			<h3>port</h3>
+			<p><em>Number (8000)</em></p>
+			<p>Port the server will listen on.</p>
+
+			<h3>proxy</h3>
+			<p><em>Object</em></p>
+			<p>Proxy configuration.</p>
+
+			<ul>
+				<li>rewrite - Content-Type header values to apply URL rewrites to. (Array)</li>
+				<li>maxConnections - Maximum number of outbound connections for reverse proxies. (1000)</li>
+			</ul>
+
+			<h3>root</h3>
+			<p><em>String (./sites)</em></p>
+			<p>Relative path to the web root directory.</p>
+
+			<h3>session</h3>
+			<p><em>Object</em></p>
+			<p>[Optional] Session configuration.</p>
+			<ul>
+				<li>id - Session cookie name (sid)</li>
+				<li>valid - Semantic representation of how long a session is valid ("15m")</li>
+				<li>gc - Milliseconds between garbage collection of expired sessions (60000)</li>
+			</ul>
+
+			<h3>ssl</h3>
+			<p><em>Object</em></p>
+			<p>[Optional] SSL configuration.</p>
+			<ul>
+				<li>cert - Path to certificate file</li>
+				<li>key - Path to key file</li>
+			</ul>
+
+			<h3>uid</h3>
+			<p><em>Number (null)</em></p>
+			<p>[Optional] UID the server runs as.</p>
+
+			<h3>vhosts</h3>
+			<p><em>Object</em></p>
+			<p><strong><em>[Required]</em></strong> Virtual hosts the server will respond for, <code>key</code> is the hostname &amp; <code>value</code> is the directory relative to <code>root</code>.</p>
 		</div>
-	</section>
-	<section class="marketing">
-		<h4>You've seen a few of the ways to use Google that take you beyond the homepage. Their are many more time-saving options Google has to offer, including:</h4>
-		<ul>
-			<li><a href="//google.com">Google Answers</a></li>
-			<li><a href="//google.com">Google Translate</a></li>
-			<li><a href="//google.com">Advanced Search</a></li>
-			<li><a href="//google.com">Google Book Search</a></li>
-			<li>and more.</li>
-		</ul>
-		<p>Visit the <a href="//google.com">More Google products</a> page to see the complete list.</p>
-		<h4>Bon Voyage!</h4>
+		<div id="faq" class="hidden">
+			<h2>Frequently Asked Questions</h2>
+			<p>Developer API documentation is available at <a href="http://api.turtle.io" title="turtle.io API documentation">api.turtle.io</a>. Configuring a turtle.io server can be </p>
+			<h3>Coming soon!</h3>
+		</div>
 	</section>
 </article>
 <footer>
 	<p>Copyright &copy; <span id="year"></span> <a href="http://avoidwork.com">Jason Mulligan</a> | <a href="https://raw.github.com/avoidwork/turtle.io/master/LICENSE">BSD 3 Licensed</a> | <span id="version"></span></p>
 </footer>
-
-<!--
-<header>
-	<div class="container">
-		<h1>turtle <strong>i/o</strong></h1>
-	</div>
-</header>
-<article>
-	<section id="intro">
-		<div class="container">
-			<h2>elastic node.js application / web server</h2>
-			<p>turtle.io can be used to create complex applications with custom routes per HTTP verb, act as a reverse proxy to other services, and serve your static content with virtual hosts</p>
-		</div>
-	</section>
-
-	<section id="rate">
-		<div class="container">
-			<h2>Faster than your hardware!</h2>
-		</div>
-	</section>
-
-	<section id="tip">
-		<div class="container">
-			<h2>Keep latency low, use an SSD</h2>
-		</div>
-	</section>
-
-	<section id="middleware">
-		<div class="container">
-			<h2>Supports Connect middlware</h2>
-		</div>
-	</section>
-
-	<section id="start">
-		<div class="container">
-			<h2>Getting Started</h2>
-			<ol>
-				<li>Install turtle.io from npm: "> npm install turtle.io"</li>
-				<li>Create a script to load &amp; start a server. You could use sample.js in the turtle.io directory (./node_modules/turtle.io) as a template, or see the examples below</li>
-				<li>[Optional] Edit config.json in the turtle.io directory to configure server defaults; you can override defaults by passing server.start() an Object</li>
-			</ol>
-		</div>
-	</section>
-
-	<section id="documentation">
-		<div class="container">
-			<h2>Documentation</h2>
-			<p>API documentation is available at <a href="http://api.turtle.io" title="API Documentation">api.turtle.io</a>, please visit the <a href="https://github.com/avoidwork/turtle.io/wiki" title="wiki">wiki</a> on GitHub for configuration settings &amp; examples.</p>
-		</div>
-	</section>
-
-	<section id="examples">
-		<div class="container">
-			<h2>Examples</h2>
-
-			<h3>Common Setup</h3>
-			<p>Virtual hosts; keys are hostname, and value is the directory relative to "root"</p>
-			<script src="https://gist.github.com/avoidwork/5350198.js"></script>
-
-			<h3>Proxy routes</h3>
-			<p>The /api route acts as a proxy to another service; this example also utilizes a <strong>config.json</strong> file local to the server script, for easy DevOps management</p>
-			<script src="https://gist.github.com/3886592.js"></script>
-
-			<h3>Server status route</h3>
-			<p>This is useful for SysOps / DevOps</p>
-			<script src="https://gist.github.com/3902527.js"></script>
-		</div>
-	</section>
-
-	<section id="support">
-		<div class="container">
-			<h2>Support</h2>
-			<p>If you're having problems, use the support forum at CodersClan.</p>
-			<p><a href="http://codersclan.net/forum/index.php?repo_id=12"><img src="http://www.codersclan.net/graphics/getSupport_blue_big.png" width="160"></a></p>
-		</div>
-	</section>
-</article>
-<footer>
-	<div class="container">
-		Copyright &copy <span id="year"></span> <a href="http://avoidwork.com">Jason Mulligan</a> | <a href="https://raw.github.com/avoidwork/turtle.io/master/LICENSE">BSD 3 Licensed</a> | <span id="version"></span>
-	</div>
-</footer>
--->
-
 <a href="https://github.com/avoidwork/turtle.io" class="github"><img src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub" /></a>
 <script type="text/javascript" src="assets/keigai.min.js"></script>
 <script type="text/javascript" src="assets/app.min.js"></script>
