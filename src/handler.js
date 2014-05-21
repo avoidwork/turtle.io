@@ -15,9 +15,14 @@ TurtleIO.prototype.handler = function ( method, route, fn, host ) {
 		this.host( host );
 	}
 
-	this.handlers[method].routes.push( route );
-	this.handlers[method].regex.push( new RegExp( "^" + route + "$" ) );
-	this.handlers[method].hosts[host][route] = fn;
+	if ( !array.contains( this.handlers[method].routes, route ) ) {
+		this.handlers[method].routes.push( route );
+		this.handlers[method].regex.push( new RegExp( "^" + route + "$" ) );
+	}
+
+	if ( this.handlers[method].hosts[host][route] === undefined ) {
+		this.handlers[method].hosts[host][route] = fn;
+	}
 
 	return this;
 };
