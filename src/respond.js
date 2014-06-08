@@ -97,6 +97,9 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		delete headers["accept-ranges"];
 	}
 
+	// Setting `x-response-time`
+	headers["x-response-time"]  = ( req.timer.stop().diff() / 1000000 ).toFixed( 2 ) + " ms";
+
 	// Determining if response should be compressed
 	if ( status === this.codes.SUCCESS && body && this.config.compress && ( type = this.compression( ua, encoding, headers["content-type"] ) ) && type !== null ) {
 		headers["content-encoding"]  = REGEX_GZIP.test( type ) ? "gzip" : "deflate";
