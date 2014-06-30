@@ -120,7 +120,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		res.writeHead( status, headers );
 		this.compress( req, res, body, type, headers.etag.replace( /"/g, "" ), file, options );
 	}
-	else if ( file && req.method === "GET" ) {
+	else if ( status === this.codes.SUCCESS && file && req.method === "GET" ) {
 		if ( req.headers.range ) {
 			status  = this.codes.PARTIAL_CONTENT;
 			options = {};
