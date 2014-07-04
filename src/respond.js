@@ -97,6 +97,12 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		delete headers["accept-ranges"];
 	}
 
+	// Clean up, in case it these are still hanging around
+	if ( status === this.codes.NOT_FOUND ) {
+		delete headers.allow;
+		delete headers["access-control-allow-methods"];
+	}
+
 	// Setting `x-response-time`
 	headers["x-response-time"]  = ( ( req.timer.stopped === null ? req.timer.stop() : req.timer ).diff() / 1000000 ).toFixed( 2 ) + " ms";
 
