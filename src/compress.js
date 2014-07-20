@@ -18,7 +18,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 	    sMethod = method.replace( "create", "" ).toLowerCase(),
 	    fp      = etag ? this.config.tmp + "/" + etag + "." + type : null;
 
-	function next () {
+	function next ( exist ) {
 		if ( !file ) {
 			// Pipe Stream through compression to Client & disk
 			if ( typeof body.pipe == "function" ) {
@@ -69,7 +69,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 			} ).pipe( zlib[method]() ).pipe( res );
 
 			// Pipe compressed asset to disk
-			if ( !exist ) {
+			if ( exist === false ) {
 				fs.createReadStream( body ).on( "error", function ( e ) {
 					self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
 				} ).pipe( zlib[method]() ).pipe( fs.createWriteStream( fp ) );
@@ -85,12 +85,13 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 
 	if ( fp ) {
 		fs.exists( fp, function ( exist ) {
-			if ( exist && !options ) {
-				// Pipe compressed asset to Client
-				fs.createReadStream( fp ).on( "error", function ( e ) {
+			// Pipe compressed asset to Client
+			if ( exist ) {
+				fs.createReadStream( fp, options ).on( "error", function ( e ) {
 					self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
+					self.unregister( req.parsed.href );
 					self.error( req, res, self.codes.SERVER_ERROR );
-				} ).pipe( res );
+				} ).pipe( zlib[method]() ).pipe( res );
 
 				timer.stop();
 
@@ -99,7 +100,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 				} );
 			}
 			else {
-				next();
+				next( exist );
 			}
 		} );
 	}

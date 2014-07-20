@@ -39,6 +39,19 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	if ( !file && body !== this.messages.NO_CONTENT ) {
 		body = this.encode( body );
 
+		if ( headers["content-length"] === undefined ) {
+			if ( body instanceof Buffer ) {
+				headers["content-length"] = Buffer.byteLength( body.toString() );
+			}
+			else if ( typeof body == "string" ) {
+				headers["content-length"] = Buffer.byteLength( body );
+			}
+		}
+
+		if ( req.method !== "OPTIONS" ) {
+			headers["content-length"] = headers["content-length"] || 0;
+		}
+
 		// Ensuring JSON has proper mimetype
 		if ( REGEX_JSONWRP.test( body ) ) {
 			headers["content-type"] = "application/json";
@@ -148,21 +161,6 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		} ).pipe( res );
 	}
 	else {
-		if ( body !== this.messages.NO_CONTENT ) {
-			if ( headers["content-length"] === undefined ) {
-				if ( body instanceof Buffer ) {
-					headers["content-length"] = Buffer.byteLength( body.toString() );
-				}
-				else if ( typeof body == "string" ) {
-					headers["content-length"] = Buffer.byteLength( body );
-				}
-			}
-		}
-
-		if ( req.method !== "OPTIONS" ) {
-			headers["content-length"] = headers["content-length"] || 0;
-		}
-
 		res.writeHead( status, headers );
 		res.end( body );
 	}
