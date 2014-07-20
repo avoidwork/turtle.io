@@ -35,10 +35,6 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		delete headers.expires;
 		delete headers["transfer-encoding"];
 	}
-	// Ensuring an Etag
-	else if ( body && !headers.etag ) {
-		headers.etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers["last-modified"] || 0, body || 0 ) + "\"";
-	}
 
 	if ( !file && body !== this.messages.NO_CONTENT ) {
 		body = this.encode( body );
@@ -72,6 +68,10 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			if ( req.method === "GET" && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) ) {
 				// Updating cache
 				if ( !REGEX_NOCACHE.test( headers["cache-control"] ) && !REGEX_PRIVATE.test( headers["cache-control"] ) ) {
+					if ( headers.etag === undefined ) {
+						headers.etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers["last-modified"] || 0, body || 0 ) + "\"";
+					}
+
 					this.register( req.parsed.href, {etag: headers.etag.replace( /"/g, "" ), headers: headers, mimetype: headers["content-type"], timestamp: parseInt( new Date().getTime() / 1000, 10 )}, true );
 				}
 
@@ -124,7 +124,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		}
 
 		res.writeHead( status, headers );
-		this.compress( req, res, body, type, headers.etag.replace( /"/g, "" ), file, options );
+		this.compress( req, res, body, type, headers.etag ? headers.etag.replace( /"/g, "" ) : undefined, file, options );
 	}
 	else if ( status === this.codes.SUCCESS && file && req.method === "GET" ) {
 		if ( req.headers.range ) {

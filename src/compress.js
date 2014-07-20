@@ -16,23 +16,10 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 	    timer   = precise().start(),
 	    method  = REGEX_GZIP.test( type ) ? "createGzip" : "createDeflate",
 	    sMethod = method.replace( "create", "" ).toLowerCase(),
-	    fp      = this.config.tmp + "/" + etag + "." + type;
+	    fp      = etag ? this.config.tmp + "/" + etag + "." + type : null;
 
-	fs.exists( fp, function ( exist ) {
-		if ( exist && !options ) {
-			// Pipe compressed asset to Client
-			fs.createReadStream( fp ).on( "error", function ( e ) {
-				self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
-				self.error( req, res, self.codes.SERVER_ERROR );
-			} ).pipe( res );
-
-			timer.stop();
-
-			self.dtp.fire( "compress", function () {
-				return [etag, fp, timer.diff()];
-			} );
-		}
-		else if ( !file ) {
+	function next () {
+		if ( !file ) {
 			// Pipe Stream through compression to Client & disk
 			if ( typeof body.pipe == "function" ) {
 				body.pipe( zlib[method]() ).pipe( res );
@@ -55,17 +42,19 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 					else {
 						res.end( data );
 
-						fs.writeFile( fp, data, "utf8", function ( e ) {
-							if ( e ) {
-								self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
-								self.unregister( req.parsed.href );
-							}
-						} );
+						if ( fp ) {
+							fs.writeFile( fp, data, "utf8", function ( e ) {
+								if ( e ) {
+									self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
+									self.unregister( req.parsed.href );
+								}
+							} );
+						}
 
 						timer.stop();
 
 						self.dtp.fire( "compress", function () {
-							return [etag, fp, timer.diff()];
+							return [etag, fp || "dynamic", timer.diff()];
 						} );
 					}
 				} );
@@ -92,7 +81,31 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 				return [etag, fp, timer.diff()];
 			} );
 		}
-	} );
+	}
+
+	if ( fp ) {
+		fs.exists( fp, function ( exist ) {
+			if ( exist && !options ) {
+				// Pipe compressed asset to Client
+				fs.createReadStream( fp ).on( "error", function ( e ) {
+					self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
+					self.error( req, res, self.codes.SERVER_ERROR );
+				} ).pipe( res );
+
+				timer.stop();
+
+				self.dtp.fire( "compress", function () {
+					return [etag, fp, timer.diff()];
+				} );
+			}
+			else {
+				next();
+			}
+		} );
+	}
+	else {
+		next();
+	}
 
 	return this;
 };

@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Easy to use web server with virtual hosts & reverse proxies",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "homepage": "http://turtle.io",
   "author": {
     "name": "Jason Mulligan",
@@ -28,9 +28,9 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "keigai": "0.5.1",
+    "keigai": "0.5.5",
     "mime": "1.2.11",
-    "moment": "2.5.1",
+    "moment": "2.7.0",
     "http-auth" : "1.2.9",
     "node-syslog": "1.1.7",
     "dtrace-provider": "0.2.8",

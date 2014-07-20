@@ -47,6 +47,7 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 		// Removing headers not wanted in the response
 		if ( !get || status >= this.codes.BAD_REQUEST ) {
 			delete headers["cache-control"];
+			delete headers.etag;
 			delete headers.expires;
 			delete headers["last-modified"];
 		}
