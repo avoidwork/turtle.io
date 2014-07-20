@@ -86,12 +86,12 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 	if ( fp ) {
 		fs.exists( fp, function ( exist ) {
 			// Pipe compressed asset to Client
-			if ( exist ) {
-				fs.createReadStream( fp, options ).on( "error", function ( e ) {
+			if ( exist && !options ) {
+				fs.createReadStream( fp ).on( "error", function ( e ) {
 					self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
 					self.unregister( req.parsed.href );
 					self.error( req, res, self.codes.SERVER_ERROR );
-				} ).pipe( zlib[method]() ).pipe( res );
+				} ).pipe( res );
 
 				timer.stop();
 
