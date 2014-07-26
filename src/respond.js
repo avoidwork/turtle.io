@@ -66,7 +66,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 					headers["content-disposition"] = "attachment; filename=\"" + req.parsed.pathname.replace( /.*\//g, "" ).replace(/\..*/, "_" ) + req.parsed.search.replace( "?", "" ).replace( /\&/, "_" ) + ".csv\"";
 				}
 
-				body = json.csv( body );
+				body = csv.encode( body );
 			}
 		}
 	}
