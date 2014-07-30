@@ -35,6 +35,7 @@
       <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;transfer-encoding&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;identity&quot;</span><span class="p">;</span>
     <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Removing headers not wanted in the response</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">get</span> <span class="o">||</span> <span class="nx">status</span> <span class="o">&gt;=</span> <span class="k">this</span><span class="p">.</span><span class="nx">codes</span><span class="p">.</span><span class="nx">BAD_REQUEST</span> <span class="p">)</span> <span class="p">{</span>
       <span class="k">delete</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;cache-control&quot;</span><span class="p">];</span>
+      <span class="k">delete</span> <span class="nx">headers</span><span class="p">.</span><span class="nx">etag</span><span class="p">;</span>
       <span class="k">delete</span> <span class="nx">headers</span><span class="p">.</span><span class="nx">expires</span><span class="p">;</span>
       <span class="k">delete</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;last-modified&quot;</span><span class="p">];</span>
     <span class="p">}</span>
@@ -43,9 +44,7 @@
     <span class="p">}</span>
 
     <span class="k">if</span> <span class="p">(</span> <span class="p">(</span> <span class="nx">status</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">codes</span><span class="p">.</span><span class="nx">NOT_FOUND</span> <span class="o">&amp;&amp;</span> <span class="nx">headers</span><span class="p">.</span><span class="nx">allow</span> <span class="p">)</span> <span class="o">||</span> <span class="nx">status</span> <span class="o">&gt;=</span> <span class="k">this</span><span class="p">.</span><span class="nx">codes</span><span class="p">.</span><span class="nx">SERVER_ERROR</span> <span class="p">)</span> <span class="p">{</span>
-      <span class="k">delete</span> <span class="nx">headers</span><span class="p">.</span><span class="nx">allow</span><span class="p">;</span>
       <span class="k">delete</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;accept-ranges&quot;</span><span class="p">];</span>
-      <span class="k">delete</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;access-control-allow-methods&quot;</span><span class="p">];</span>
     <span class="p">}</span>
 
     <span class="k">if</span> <span class="p">(</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;last-modified&quot;</span><span class="p">]</span> <span class="o">!==</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">string</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">(</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;last-modified&quot;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
