@@ -52,6 +52,8 @@
     <span class="p">}</span>
   <span class="p">}</span>
 
+  <span class="nx">headers</span><span class="p">.</span><span class="nx">status</span> <span class="o">=</span> <span class="nx">status</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nx">http</span><span class="p">.</span><span class="nx">STATUS_CODES</span><span class="p">[</span><span class="nx">status</span><span class="p">];</span>
+
   <span class="nx">timer</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
 
   <span class="k">this</span><span class="p">.</span><span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;headers&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>

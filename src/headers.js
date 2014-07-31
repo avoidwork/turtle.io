@@ -64,6 +64,8 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 		}
 	}
 
+	headers.status = status + " " + http.STATUS_CODES[status];
+
 	timer.stop();
 
 	this.dtp.fire( "headers", function () {

@@ -36,6 +36,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		    cached, resHeaders, rewrite;
 
 		resHeaders        = headers( xhr.getAllResponseHeaders() );
+		resHeaders.via    = ( resHeaders.via ? resHeaders.via + ", " : "" ) + resHeaders.server;
 		resHeaders.server = self.config.headers.server;
 
 		// Something went wrong
