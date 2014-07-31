@@ -14,7 +14,10 @@
 		"cache-control"                 : "max-age=60, must-revalidate, public",
 		"content-type"                  : "text/html; charset=utf-8",
 		"date"                          : "",
-		"last-modified"                 : ""
+		"last-modified"                 : "",
+		"x-content-type-options"        : "nosniff",
+		"x-frame-options"               : "sameorigin",
+		"x-ua-compatible"               : "IE=edge"
 	},
 	"index"   : ["index.htm", "index.html"],
 	"logs"    : {
