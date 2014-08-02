@@ -48,6 +48,7 @@
 		"key"  : null,
 		"cert" : null
 	},
+	"json"    : 2,
 	"tmp"     : "/tmp",
 	"vhosts"  : {}
 }
