@@ -32,7 +32,7 @@ TurtleIO.prototype.run = function ( req, res, host ) {
 					self.respond( req, res );
 				}
 				else {
-					self.error( req, res, self.codes.SERVER_ERROR );
+					self.error( req, res, self.codes.SERVER_ERROR, arg.stack || arg.message );
 				}
 			}
 		}

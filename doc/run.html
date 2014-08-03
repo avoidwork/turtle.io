@@ -29,7 +29,7 @@
           <span class="nx">self</span><span class="p">.</span><span class="nx">respond</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">);</span>
         <span class="p">}</span>
         <span class="k">else</span> <span class="p">{</span>
-          <span class="nx">self</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">self</span><span class="p">.</span><span class="nx">codes</span><span class="p">.</span><span class="nx">SERVER_ERROR</span> <span class="p">);</span>
+          <span class="nx">self</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">self</span><span class="p">.</span><span class="nx">codes</span><span class="p">.</span><span class="nx">SERVER_ERROR</span><span class="p">,</span> <span class="nx">arg</span><span class="p">.</span><span class="nx">stack</span> <span class="o">||</span> <span class="nx">arg</span><span class="p">.</span><span class="nx">message</span> <span class="p">);</span>
         <span class="p">}</span>
       <span class="p">}</span>
     <span class="p">}</span>
