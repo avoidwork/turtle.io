@@ -6,7 +6,7 @@
 	"cache"   : 1000,
 	"headers" : {
 		"access-control-allow-origin"   : "*",
-		"access-control-allow-headers"  : "*",
+		"access-control-allow-headers"  : "allow, authorization, cache-control, content-length, content-type, etag, expires, last-modified",
 		"access-control-allow-methods"  : "",
 		"access-control-expose-headers" : "allow, content-length",
 		"accept-ranges"                 : "bytes",
