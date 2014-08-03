@@ -70,7 +70,7 @@ TurtleIO.prototype.run = function ( req, res, host ) {
 					return middleware[idx]( err, req, res, next );
 				}
 				else {
-					self.error( req, res, self.codes.SERVER_ERROR );
+					self.error( req, res, self.codes.SERVER_ERROR, err );
 					return false;
 				}
 			}
