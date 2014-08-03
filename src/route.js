@@ -92,7 +92,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 			}
 		}
 		else {
-			self.error( req, res );
+			self.error( req, res, self.codes.NOT_ALLOWED );
 		}
 	}
 
