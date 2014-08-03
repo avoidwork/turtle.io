@@ -23,7 +23,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 		var cached, headers;
 
 		// Running middleware
-		if ( !self.run( req, res, host ) ) {
+		if ( !self.run( req, res, host ) || res.finished ) {
 			return void 0;
 		}
 

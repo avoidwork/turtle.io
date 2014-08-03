@@ -27,13 +27,8 @@ TurtleIO.prototype.run = function ( req, res, host ) {
 			if ( middleware[i] ) {
 				return chain( i, arg );
 			}
-			else if ( !res.finished ) {
-				if ( !( arg instanceof Error ) ) {
-					self.respond( req, res );
-				}
-				else {
-					self.error( req, res, self.codes.SERVER_ERROR, arg.stack || arg.message );
-				}
+			else if ( !res.finished && arg instanceof Error ) {
+				self.error( req, res, self.codes.SERVER_ERROR, arg.stack || arg.message );
 			}
 		}
 
