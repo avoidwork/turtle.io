@@ -25,7 +25,7 @@ TurtleIO.prototype.run = function ( req, res, host ) {
 		// Chain passed to middleware
 		function next ( arg ) {
 			if ( middleware[i] ) {
-				chain( i, arg );
+				return chain( i, arg );
 			}
 			else if ( !res.finished ) {
 				if ( !( arg instanceof Error ) ) {
@@ -57,7 +57,9 @@ TurtleIO.prototype.run = function ( req, res, host ) {
 				}
 			}
 
-			timer.stop();
+			if ( timer.stopped === null ) {
+				timer.stop();
+			}
 
 			self.dtp.fire( "middleware", function () {
 				return [host, req.url, timer.diff()];
@@ -65,25 +67,24 @@ TurtleIO.prototype.run = function ( req, res, host ) {
 
 			if ( find ) {
 				if ( found ) {
-					middleware[idx]( err, req, res, next );
+					return middleware[idx]( err, req, res, next );
 				}
 				else {
 					self.error( req, res, self.codes.SERVER_ERROR );
+					return false;
 				}
 			}
 			else {
-				middleware[idx]( req, res, next );
+				return middleware[idx]( req, res, next );
 			}
 		}
 		catch ( e ) {
-			next( e );
+			return next( e );
 		}
 	}
 
 	if ( nth > 0 ) {
-		chain( 0 );
-
-		return false;
+		return !!chain( 0 );
 	}
 
 	return true;
