@@ -10,8 +10,6 @@ function TurtleIO () {
 	this.handlers       = {all: {regex: [], routes: [], hosts: {}}, "delete": {regex: [], routes: [], hosts: {}}, get: {regex: [], routes: [], hosts: {}}, patch: {regex: [], routes: [], hosts: {}}, post: {regex: [], routes: [], hosts: {}}, put: {regex: [], routes: [], hosts: {}}};
 	this.middleware     = {all: []};
 	this.pages          = {all: {}};
-	this.session.server = this;
-	this.sessions       = {};
 	this.server         = null;
 	this.vhosts         = [];
 	this.vhostsRegExp   = [];

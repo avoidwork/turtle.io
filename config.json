@@ -30,11 +30,6 @@
 	},
 	"port"    : 8000,
 	"root"    : "",
-	"session" : {
-		"id"    : "sid",
-		"valid" : "15m",
-		"gc"    : 60000
-	},
 	"pages"   : null,
 	"proxy"   : {
 		"rewrite" : [

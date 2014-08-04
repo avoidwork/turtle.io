@@ -42,15 +42,6 @@ TurtleIO.prototype.route = function ( req, res ) {
 						req.cookies[i[0]] = i[1];
 					} );
 				}
-
-				if ( !req.session ) {
-					req.session = null;
-
-					// Decorates a session
-					if ( req.cookies[self.config.session.id] ) {
-						req.session = self.session.get( req, res );
-					}
-				}
 			}
 
 			// Setting listeners if expecting a body

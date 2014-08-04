@@ -38,9 +38,6 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 		process.exit( 1 );
 	}
 
-	// Setting session.expires
-	this.session.valid = this.config.session.valid;
-
 	// Lowercasing default headers
 	delete this.config.headers;
 	this.config.headers = {};

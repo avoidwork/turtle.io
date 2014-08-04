@@ -274,24 +274,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "ignorePrefix": "}",
           "name": "JavaScript"
         },
-        "sourcePath": "/Users/jason/Projects/turtle.io/src/cookie.js",
-        "projectPath": "src/cookie.js",
-        "targetPath": "cookie",
-        "title": "cookie"
-      },
-      "depth": 1,
-      "outline": []
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
-          "nameMatchers": [".js"],
-          "pygmentsLexer": "javascript",
-          "singleLineComment": ["//"],
-          "multiLineComment": ["/*", "*", "*/"],
-          "ignorePrefix": "}",
-          "name": "JavaScript"
-        },
         "sourcePath": "/Users/jason/Projects/turtle.io/src/encode.js",
         "projectPath": "src/encode.js",
         "targetPath": "encode",
@@ -710,24 +692,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
         "projectPath": "src/run.js",
         "targetPath": "run",
         "title": "run"
-      },
-      "depth": 1,
-      "outline": []
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
-          "nameMatchers": [".js"],
-          "pygmentsLexer": "javascript",
-          "singleLineComment": ["//"],
-          "multiLineComment": ["/*", "*", "*/"],
-          "ignorePrefix": "}",
-          "name": "JavaScript"
-        },
-        "sourcePath": "/Users/jason/Projects/turtle.io/src/session.js",
-        "projectPath": "src/session.js",
-        "targetPath": "session",
-        "title": "session"
       },
       "depth": 1,
       "outline": []
