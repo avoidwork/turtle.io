@@ -138,7 +138,10 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 				headers["content-length"] = number.diff( options.end, options.start ) + 1;
 			}
 
-			res.writeHead( status, headers );
+			if ( !res._headerSent ) {
+				res.writeHead( status, headers );
+			}
+
 			this.compress( req, res, body, type, headers.etag ? headers.etag.replace( /"/g, "" ) : undefined, file, options );
 		}
 		else if ( status === this.codes.SUCCESS && file && req.method === "GET" ) {
@@ -155,7 +158,10 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			}
 
 			headers["transfer-encoding"] = "chunked";
-			res.writeHead( status, headers );
+
+			if ( !res._headerSent ) {
+				res.writeHead( status, headers );
+			}
 
 			fs.createReadStream( body, options ).on( "error", function ( e ) {
 				self.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
@@ -163,7 +169,10 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			} ).pipe( res );
 		}
 		else {
-			res.writeHead( status, headers );
+			if ( !res._headerSent ) {
+				res.writeHead( status, headers );
+			}
+
 			res.end( body );
 		}
 

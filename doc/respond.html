@@ -114,7 +114,10 @@
         <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;content-length&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">number</span><span class="p">.</span><span class="nx">diff</span><span class="p">(</span> <span class="nx">options</span><span class="p">.</span><span class="nx">end</span><span class="p">,</span> <span class="nx">options</span><span class="p">.</span><span class="nx">start</span> <span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
       <span class="p">}</span>
 
-      <span class="nx">res</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">headers</span> <span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">res</span><span class="p">.</span><span class="nx">_headerSent</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="nx">res</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">headers</span> <span class="p">);</span>
+      <span class="p">}</span>
+
       <span class="k">this</span><span class="p">.</span><span class="nx">compress</span><span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">body</span><span class="p">,</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">headers</span><span class="p">.</span><span class="nx">etag</span> <span class="o">?</span> <span class="nx">headers</span><span class="p">.</span><span class="nx">etag</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span> <span class="sr">/&quot;/g</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span> <span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span> <span class="nx">file</span><span class="p">,</span> <span class="nx">options</span> <span class="p">);</span>
     <span class="p">}</span>
     <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="nx">status</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">codes</span><span class="p">.</span><span class="nx">SUCCESS</span> <span class="o">&amp;&amp;</span> <span class="nx">file</span> <span class="o">&amp;&amp;</span> <span class="nx">req</span><span class="p">.</span><span class="nx">method</span> <span class="o">===</span> <span class="s2">&quot;GET&quot;</span> <span class="p">)</span> <span class="p">{</span>
@@ -131,7 +134,10 @@
       <span class="p">}</span>
 
       <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;transfer-encoding&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;chunked&quot;</span><span class="p">;</span>
-      <span class="nx">res</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">headers</span> <span class="p">);</span>
+
+      <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">res</span><span class="p">.</span><span class="nx">_headerSent</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="nx">res</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">headers</span> <span class="p">);</span>
+      <span class="p">}</span>
 
       <span class="nx">fs</span><span class="p">.</span><span class="nx">createReadStream</span><span class="p">(</span> <span class="nx">body</span><span class="p">,</span> <span class="nx">options</span> <span class="p">).</span><span class="nx">on</span><span class="p">(</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">e</span> <span class="p">)</span> <span class="p">{</span>
         <span class="nx">self</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span> <span class="s2">&quot;[client &quot;</span> <span class="o">+</span> <span class="p">(</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;x-forwarded-for&quot;</span><span class="p">]</span> <span class="o">?</span> <span class="nx">array</span><span class="p">.</span><span class="nx">last</span><span class="p">(</span> <span class="nx">string</span><span class="p">.</span><span class="nx">explode</span><span class="p">(</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;x-forwarded-for&quot;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="o">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">connection</span><span class="p">.</span><span class="nx">remoteAddress</span> <span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;] &quot;</span> <span class="o">+</span> <span class="nx">e</span><span class="p">.</span><span class="nx">message</span> <span class="p">),</span> <span class="s2">&quot;error&quot;</span> <span class="p">);</span>
@@ -139,7 +145,10 @@
       <span class="p">}</span> <span class="p">).</span><span class="nx">pipe</span><span class="p">(</span> <span class="nx">res</span> <span class="p">);</span>
     <span class="p">}</span>
     <span class="k">else</span> <span class="p">{</span>
-      <span class="nx">res</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">headers</span> <span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">res</span><span class="p">.</span><span class="nx">_headerSent</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="nx">res</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">headers</span> <span class="p">);</span>
+      <span class="p">}</span>
+
       <span class="nx">res</span><span class="p">.</span><span class="nx">end</span><span class="p">(</span> <span class="nx">body</span> <span class="p">);</span>
     <span class="p">}</span>
 
