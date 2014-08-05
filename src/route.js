@@ -102,6 +102,15 @@ TurtleIO.prototype.route = function ( req, res ) {
 	req.ip     = req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress;
 	req.timer  = precise().start();
 
+	// Decorating response
+	res.redirect = function ( uri ) {
+		self.respond( req, res, self.messages.NO_CONTENT, self.codes.FOUND, {location: uri} );
+	};
+
+	res.error = function ( arg, status ) {
+		self.error( req, res, status, arg );
+	};
+
 	// Finding a matching vhost
 	array.each( this.vhostsRegExp, function ( i, idx ) {
 		if ( i.test( parsed.hostname ) ) {

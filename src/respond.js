@@ -13,7 +13,7 @@
 TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) {
 	var self, timer, ua, encoding, type, options;
 
-	if ( !res.finished ) {
+	if ( !res._header ) {
 		self     = this;
 		timer    = precise().start();
 		ua       = req.headers["user-agent"];
@@ -138,7 +138,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 				headers["content-length"] = number.diff( options.end, options.start ) + 1;
 			}
 
-			if ( !res._headerSent ) {
+			if ( !res._header && !res._headerSent ) {
 				res.writeHead( status, headers );
 			}
 
@@ -159,7 +159,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 
 			headers["transfer-encoding"] = "chunked";
 
-			if ( !res._headerSent ) {
+			if ( !res._header && !res._headerSent ) {
 				res.writeHead( status, headers );
 			}
 
@@ -169,7 +169,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			} ).pipe( res );
 		}
 		else {
-			if ( !res._headerSent ) {
+			if ( !res._header && !res._headerSent ) {
 				res.writeHead( status, headers );
 			}
 
