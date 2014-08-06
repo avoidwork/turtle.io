@@ -28,8 +28,8 @@
 		"syslog" : true,
 		"dtrace" : true
 	},
+	"maxBytes": 0,
 	"port"    : 8000,
-	"root"    : "",
 	"pages"   : null,
 	"proxy"   : {
 		"rewrite" : [
@@ -39,6 +39,7 @@
 		],
 		"maxConnections" : 1000
 	},
+	"root"    : "",
 	"ssl"     : {
 		"key"  : null,
 		"cert" : null

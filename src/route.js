@@ -50,6 +50,10 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 				req.on( "data", function ( data ) {
 					payload = payload === undefined ? data : payload + data;
+
+					if ( self.config.maxBytes > 0 && Buffer.byteLength( payload ) > self.config.maxBytes ) {
+						self.error( req, res, self.codes.REQ_TOO_LARGE );
+					}
 				} );
 
 				req.on( "end", function () {

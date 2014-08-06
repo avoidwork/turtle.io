@@ -11,6 +11,7 @@ config = {
 			authList  : ["admin:admin"]
 		}
 	},
+	maxBytes: 2,
 	default : "test",
 	root    : "./sites",
 	vhosts  : {
@@ -21,6 +22,11 @@ config = {
 
 server.get("/status", function (req, res) {
 	this.respond(req, res, this.status());
+}, "test");
+
+server.post("/test", function (req, res) {
+	console.log(req.body);
+	this.respond(req, res, "ok!");
 }, "test");
 
 server.start(config);

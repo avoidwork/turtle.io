@@ -5,14 +5,15 @@
  * @param  {Object} req    Request Object
  * @param  {Object} res    Response Object
  * @param  {Number} status [Optional] HTTP status code
+ * @param  {String} msg    [Optional] Response body
  * @return {Object}        TurtleIO instance
  */
-TurtleIO.prototype.error = function ( req, res, status ) {
+TurtleIO.prototype.error = function ( req, res, status, msg ) {
 	var timer  = precise().start(),
 	    method = req.method.toLowerCase(),
 	    host   = req.parsed ? req.parsed.hostname : ALL,
 	    kdx    = -1,
-		body, msg;
+		body;
 
 	if ( isNaN( status ) ) {
 		status = this.codes.NOT_FOUND;
@@ -37,7 +38,9 @@ TurtleIO.prototype.error = function ( req, res, status ) {
 		}
 	} );
 
-	msg = kdx ? array.cast( this.messages )[kdx] : "Unknown error";
+	if ( msg === undefined ) {
+		msg = kdx ? array.cast( this.messages )[kdx] : "Unknown error";
+	}
 
 	this.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + msg ), "debug" );
 

@@ -181,7 +181,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		this.dtp.fire( "respond", function () {
 			return [req.headers.host, req.method, req.url, status, timer.diff()];
 		} );
-	}
 
-	return this.log( this.prep( req, res, headers ), "info" );
+		return this.log( this.prep( req, res, headers ), "info" );
+	}
 };
