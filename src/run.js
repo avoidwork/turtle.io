@@ -27,7 +27,7 @@ TurtleIO.prototype.run = function ( req, res, host ) {
 			if ( middleware[i] ) {
 				chain( i, arg );
 			}
-			else if ( !res.finished && arg instanceof Error ) {
+			else if ( !res._headerSent && arg instanceof Error ) {
 				self.error( req, res, self.codes[arg.message.toUpperCase()] || self.codes.SERVER_ERROR, arg.stack || arg.message );
 			}
 		}
