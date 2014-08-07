@@ -38,7 +38,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	}
 
 	if ( !file && body !== this.messages.NO_CONTENT ) {
-		body = this.encode( body );
+		body = this.encode( body, req.headers.accept );
 
 		if ( headers["content-length"] === undefined ) {
 			if ( body instanceof Buffer ) {

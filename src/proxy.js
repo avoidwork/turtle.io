@@ -102,7 +102,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 						delete resHeaders["content-length"];
 
 						if ( arg instanceof Array || arg instanceof Object ) {
-							arg = json.encode( arg ).replace( regexOrigin, rewriteOrigin );
+							arg = json.encode( arg, req.headers.accept ).replace( regexOrigin, rewriteOrigin );
 
 							if ( route !== "/" ) {
 								arg = arg.replace( /"(\/[^?\/]\w+)\//g, "\"" + route + "$1/" );

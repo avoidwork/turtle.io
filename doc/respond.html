@@ -41,7 +41,7 @@
   <span class="p">}</span>
 
   <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">file</span> <span class="o">&amp;&amp;</span> <span class="nx">body</span> <span class="o">!==</span> <span class="k">this</span><span class="p">.</span><span class="nx">messages</span><span class="p">.</span><span class="nx">NO_CONTENT</span> <span class="p">)</span> <span class="p">{</span>
-    <span class="nx">body</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span> <span class="nx">body</span> <span class="p">);</span>
+    <span class="nx">body</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span> <span class="nx">body</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">accept</span> <span class="p">);</span>
 
     <span class="k">if</span> <span class="p">(</span> <span class="nx">headers</span><span class="p">[</span><span class="s2">&quot;content-length&quot;</span><span class="p">]</span> <span class="o">===</span> <span class="kc">undefined</span> <span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span> <span class="nx">body</span> <span class="k">instanceof</span> <span class="nx">Buffer</span> <span class="p">)</span> <span class="p">{</span>
