@@ -69,17 +69,6 @@
 			<h2>Configuration</h2>
 			<p>Configuration values can be set by passing an Object to <code>start()</code>.</p>
 
-			<h3>auth</h3>
-			<p><em>Object</em></p>
-			<p>[Optional] HTTP Authentication configuration, <code>key</code> is the hostname &amp; <code>value</code> is the parameters. The following are valid:</p>
-			<ul class="task-list">
-				<li>authRealm - Authentication realm.</li>
-				<li>authFile - File where user details are stored in format {user:pass} or {user:passHash} for basic access and {user:realm:passHash} for digest access.</li>
-				<li>authList - List where user details are stored in format {user:pass} or {user:passHash} for basic access and {user:realm:passHash} for digest access, ignored if authFile is specified.</li>
-				<li>authType - Type of authentication, may be basic or digest, optional, default is basic.</li>
-				<li>algorithm - Algorithm that will be used for authentication, may be MD5 or MD5-sess, optional, default is MD5. Only for digest authType.</li>
-			</ul>
-
 			<h3>cache</h3>
 			<p><em>Number (1000)</em></p>
 			<p>Size of LRU cache for Etag validation.</p>
