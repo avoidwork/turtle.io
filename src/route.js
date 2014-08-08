@@ -10,89 +10,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 	var self   = this,
 	    url    = this.url( req ),
 	    method = req.method.toLowerCase(),
-	    handler, host, parsed, payload, route;
-
-	/**
-	 * Operation
-	 *
-	 * @method op
-	 * @private
-	 * @return {Undefined} undefined
-	 */
-	function op () {
-		var cached, headers;
-
-		// Running middleware
-		self.run( req, res, host );
-
-		if ( !res._headerSent ) {
-			if ( handler ) {
-				// Adding custom properties, if there's no collision
-				if ( !req.cookies ) {
-					req.cookies = {};
-
-					// Decorating valid cookies
-					if ( req.headers.cookie !== undefined ) {
-						array.each( string.explode( req.headers.cookie, ";" ).map( function ( i ) {
-							return i.split( "=" );
-						} ), function ( i ) {
-							req.cookies[i[0]] = i[1];
-						} );
-					}
-				}
-
-				// Setting listeners if expecting a body
-				if ( REGEX_BODY.test( method ) ) {
-					req.setEncoding( "utf-8" );
-
-					req.on( "data", function ( data ) {
-						payload = payload === undefined ? data : payload + data;
-
-						if ( self.config.maxBytes > 0 && Buffer.byteLength( payload ) > self.config.maxBytes ) {
-							req.invalid = true;
-							self.error( req, res, self.codes.REQ_TOO_LARGE );
-						}
-					} );
-
-					req.on( "end", function () {
-						if ( !req.invalid ) {
-							req.body = payload;
-							handler.call( self, req, res, host );
-						}
-					} );
-				}
-				// Looking in LRU cache for Etag
-				else if ( REGEX_GET.test( method ) ) {
-					if ( !req.headers.range ) {
-						cached = self.etags.get( url );
-
-						// Sending a 304 if Client is making a GET & has current representation
-						if ( cached && !REGEX_HEAD.test( method ) && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === cached.etag ) {
-							headers = cached.headers;
-							headers.age = parseInt( new Date().getTime() / 1000 - cached.timestamp, 10 );
-
-							delete headers["content-encoding"];
-							delete headers["transfer-encoding"];
-
-							self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, headers );
-						}
-						else {
-							handler.call( self, req, res, host );
-						}
-					}
-					else {
-						handler.call( self, req, res, host );
-					}
-				}
-				else {
-					handler.call( self, req, res, host );
-				}
-			}
-			else {
-				self.error( req, res, self.codes.NOT_ALLOWED );
-			}
-		}
-	}
+	    handler, host, parsed, payload, route, cached, headers;
 
 	// If the URL can't be parsed, respond with a 500
 	try {
@@ -155,9 +73,76 @@ TurtleIO.prototype.route = function ( req, res ) {
 		} );
 	}
 
-	// Handling authentication
-	// @todo deprecate this when possible
-	this.auth( req, res, host, op );
+	// Running middleware
+	self.run( req, res, host );
+
+	if ( !res._headerSent ) {
+		if ( handler ) {
+			// Adding custom properties, if there's no collision
+			if ( !req.cookies ) {
+				req.cookies = {};
+
+				// Decorating valid cookies
+				if ( req.headers.cookie !== undefined ) {
+					array.each( string.explode( req.headers.cookie, ";" ).map( function ( i ) {
+						return i.split( "=" );
+					} ), function ( i ) {
+						req.cookies[i[0]] = i[1];
+					} );
+				}
+			}
+
+			// Setting listeners if expecting a body
+			if ( REGEX_BODY.test( method ) ) {
+				req.setEncoding( "utf-8" );
+
+				req.on( "data", function ( data ) {
+					payload = payload === undefined ? data : payload + data;
+
+					if ( self.config.maxBytes > 0 && Buffer.byteLength( payload ) > self.config.maxBytes ) {
+						req.invalid = true;
+						self.error( req, res, self.codes.REQ_TOO_LARGE );
+					}
+				} );
+
+				req.on( "end", function () {
+					if ( !req.invalid ) {
+						req.body = payload;
+						handler.call( self, req, res, host );
+					}
+				} );
+			}
+			// Looking in LRU cache for Etag
+			else if ( REGEX_GET.test( method ) ) {
+				if ( !req.headers.range ) {
+					cached = self.etags.get( url );
+
+					// Sending a 304 if Client is making a GET & has current representation
+					if ( cached && !REGEX_HEAD.test( method ) && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === cached.etag ) {
+						headers = cached.headers;
+						headers.age = parseInt( new Date().getTime() / 1000 - cached.timestamp, 10 );
+
+						delete headers["content-encoding"];
+						delete headers["transfer-encoding"];
+
+						self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, headers );
+					}
+					else {
+						handler.call( self, req, res, host );
+					}
+				}
+				else {
+					handler.call( self, req, res, host );
+				}
+			}
+			else {
+				handler.call( self, req, res, host );
+			}
+		}
+		else {
+			self.error( req, res, self.codes.NOT_ALLOWED );
+		}
+	}
 
 	return this;
 };
