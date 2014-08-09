@@ -39,10 +39,10 @@ TurtleIO.prototype.run = function ( req, res, host ) {
 
 		// Chain passed to middleware
 		function next ( arg ) {
-			if ( middleware[i] ) {
+			if ( !res._header && middleware[i] ) {
 				chain( i, arg );
 			}
-			else if ( !res._headerSent && arg instanceof Error ) {
+			else if ( !res._header && arg instanceof Error ) {
 				self.error( req, res, self.codes[arg.message.toUpperCase()] || self.codes.SERVER_ERROR, arg.stack || arg.message );
 			}
 		}
