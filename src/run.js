@@ -11,8 +11,23 @@ TurtleIO.prototype.run = function ( req, res, host ) {
 	var self       = this,
 	    all        = this.middleware.all   || {},
 	    h          = this.middleware[host] || {},
-	    middleware = ( all["/*"] || [] ).concat( all[req.parsed.pathname] || [] ).concat( h["/*"] || [] ).concat( h[req.parsed.pathname] || [] ),
-	    nth        = middleware.length;
+	    path       = req.parsed.pathname,
+	    middleware = [],
+	    nth;
+
+	array.keys( all ).filter( function ( i ) {
+		return new RegExp( "^" + i, "i" ).test( path );
+	} ).map( function ( i ) {
+		middleware = middleware.concat( all[i] );
+	} );
+
+	array.keys( h ).filter( function ( i ) {
+		return new RegExp( "^" + i, "i" ).test( path );
+	} ).map( function ( i ) {
+		middleware = middleware.concat( h[i] );
+	} );
+
+	nth = middleware.length;
 
 	// Chains middleware execution
 	function chain ( idx, err ) {
