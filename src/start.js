@@ -66,11 +66,6 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 		self.host( i );
 	} );
 
-	// Setting a default GET route
-	this.get( "/.*", function ( req, res, host ) {
-		this.request( req, res, host );
-	}, ALL );
-
 	// Loading default error pages
 	fs.readdir( pages, function ( e, files ) {
 		if ( e ) {

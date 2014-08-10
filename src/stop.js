@@ -11,8 +11,8 @@ TurtleIO.prototype.stop = function () {
 
 	this.config       = {};
 	this.etags        = lru( 1000 );
-	this.handlers     = {all: {regex: [], routes: [], hosts: {}}, "delete": {regex: [], routes: [], hosts: {}}, get: {regex: [], routes: [], hosts: {}}, patch: {regex: [], routes: [], hosts: {}}, post: {regex: [], routes: [], hosts: {}}, put: {regex: [], routes: [], hosts: {}}};
 	this.pages        = {all: {}};
+	this.routeCache   = lru( 5000 ); // verbs * etags
 	this.vhosts       = [];
 	this.vhostsRegExp = [];
 	this.watching     = {};

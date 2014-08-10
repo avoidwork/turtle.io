@@ -8,47 +8,23 @@
 <li><p><strong>method must be a String.</strong><br/>(HTTP verb)</p></li>
 <li><p><strong>uri must be a String.</strong><br/>(URI to query)</p></li>
 <li><p><strong>host must be a String.</strong><br/>(Hostname)</p></li>
+<li><p><strong>override must be a Boolean.</strong><br/>(Overrides cached version)</p></li>
 </ul>
 
-<p><strong>Returns a Boolean</strong><br/>(Boolean indicating if method is allowed)</p></div></div><div class="code"><div class="wrapper"><span class="nx">TurtleIO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">allowed</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">method</span><span class="p">,</span> <span class="nx">uri</span><span class="p">,</span> <span class="nx">host</span> <span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">self</span>   <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
-    <span class="nx">timer</span>  <span class="o">=</span> <span class="nx">precise</span><span class="p">().</span><span class="nx">start</span><span class="p">(),</span>
-      <span class="nx">result</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
-      <span class="nx">exist</span>  <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
-      <span class="nx">d</span><span class="p">,</span> <span class="nx">hosts</span><span class="p">;</span>
-
-  <span class="nx">host</span>  <span class="o">=</span> <span class="nx">host</span> <span class="o">||</span> <span class="nx">ALL</span><span class="p">;</span>
-  <span class="nx">hosts</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span><span class="p">[</span><span class="nx">method</span><span class="p">].</span><span class="nx">hosts</span><span class="p">;</span>
-  <span class="nx">d</span>     <span class="o">=</span> <span class="nx">hosts</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]];</span>
-  <span class="nx">exist</span> <span class="o">=</span> <span class="p">(</span> <span class="nx">hosts</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="p">);</span>
-
-  <span class="nx">array</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span><span class="p">[</span><span class="nx">method</span><span class="p">].</span><span class="nx">regex</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">idx</span> <span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">route</span> <span class="o">=</span> <span class="nx">self</span><span class="p">.</span><span class="nx">handlers</span><span class="p">[</span><span class="nx">method</span><span class="p">].</span><span class="nx">routes</span><span class="p">[</span><span class="nx">idx</span><span class="p">];</span>
-
-    <span class="k">if</span> <span class="p">(</span> <span class="nx">i</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span> <span class="nx">uri</span> <span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span> <span class="p">(</span> <span class="nx">exist</span> <span class="o">&amp;&amp;</span> <span class="nx">route</span> <span class="k">in</span> <span class="nx">hosts</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="p">)</span> <span class="o">||</span> <span class="nx">route</span> <span class="k">in</span> <span class="nx">d</span> <span class="o">||</span> <span class="nx">route</span> <span class="k">in</span> <span class="nx">hosts</span><span class="p">.</span><span class="nx">all</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="o">!</span><span class="p">(</span> <span class="nx">result</span> <span class="o">=</span> <span class="kc">true</span> <span class="p">);</span>
-    <span class="p">}</span>
-  <span class="p">}</span> <span class="p">);</span>
-
-  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">result</span> <span class="p">)</span> <span class="p">{</span>
-    <span class="nx">hosts</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span><span class="p">.</span><span class="nx">all</span><span class="p">.</span><span class="nx">hosts</span><span class="p">;</span>
-    <span class="nx">d</span>     <span class="o">=</span> <span class="nx">hosts</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]];</span>
-    <span class="nx">exist</span> <span class="o">=</span> <span class="p">(</span> <span class="nx">hosts</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="p">);</span>
-
-    <span class="nx">array</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span><span class="p">.</span><span class="nx">all</span><span class="p">.</span><span class="nx">regex</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">idx</span> <span class="p">)</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">route</span> <span class="o">=</span> <span class="nx">self</span><span class="p">.</span><span class="nx">handlers</span><span class="p">.</span><span class="nx">all</span><span class="p">.</span><span class="nx">routes</span><span class="p">[</span><span class="nx">idx</span><span class="p">];</span>
-
-      <span class="k">if</span> <span class="p">(</span> <span class="nx">i</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span> <span class="nx">uri</span> <span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span> <span class="p">(</span> <span class="nx">exist</span> <span class="o">&amp;&amp;</span> <span class="nx">route</span> <span class="k">in</span> <span class="nx">hosts</span><span class="p">[</span><span class="nx">host</span><span class="p">]</span> <span class="p">)</span> <span class="o">||</span> <span class="nx">route</span> <span class="k">in</span> <span class="nx">d</span> <span class="o">||</span> <span class="nx">route</span> <span class="k">in</span> <span class="nx">hosts</span><span class="p">.</span><span class="nx">all</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="o">!</span><span class="p">(</span> <span class="nx">result</span> <span class="o">=</span> <span class="kc">true</span> <span class="p">);</span>
-      <span class="p">}</span>
-    <span class="p">}</span> <span class="p">);</span>
-  <span class="p">}</span>
+<p><strong>Returns a Boolean</strong><br/>(Boolean indicating if method is allowed)</p></div></div><div class="code"><div class="wrapper"><span class="nx">TurtleIO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">allowed</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">method</span><span class="p">,</span> <span class="nx">uri</span><span class="p">,</span> <span class="nx">host</span><span class="p">,</span> <span class="nx">override</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">timer</span>  <span class="o">=</span> <span class="nx">precise</span><span class="p">().</span><span class="nx">start</span><span class="p">(),</span>
+      <span class="nx">result</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">routes</span><span class="p">(</span> <span class="nx">uri</span><span class="p">,</span> <span class="nx">host</span><span class="p">,</span> <span class="nx">method</span><span class="p">,</span> <span class="nx">override</span> <span class="p">),</span>
+      <span class="nx">nth</span>    <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
 
   <span class="nx">timer</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="nx">REGEX_GET</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span> <span class="nx">method</span> <span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">nth</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="o">--</span><span class="nx">nth</span><span class="p">;</span>
+  <span class="p">}</span>
 
   <span class="k">this</span><span class="p">.</span><span class="nx">dtp</span><span class="p">.</span><span class="nx">fire</span><span class="p">(</span> <span class="s2">&quot;allowed&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">[</span><span class="nx">host</span><span class="p">,</span> <span class="nx">uri</span><span class="p">,</span> <span class="nx">method</span><span class="p">.</span><span class="nx">toUpperCase</span><span class="p">(),</span> <span class="nx">timer</span><span class="p">.</span><span class="nx">diff</span><span class="p">()];</span>
   <span class="p">}</span> <span class="p">);</span>
 
-  <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+  <span class="k">return</span> <span class="nx">nth</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">};</span></div></div></div></div></body></html>

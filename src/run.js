@@ -2,99 +2,70 @@
  * Runs middleware in a chain
  *
  * @method run
- * @param  {Object} req  Request Object
- * @param  {Object} res  Response Object
- * @param  {String} host [Optional] Host
- * @return {Object}      TurtleIO instance
+ * @param  {Object} req    Request Object
+ * @param  {Object} res    Response Object
+ * @param  {String} host   [Optional] Host
+ * @param  {String} method HTTP method
+ * @return {Object}        TurtleIO instance
  */
-TurtleIO.prototype.run = function ( req, res, host ) {
+TurtleIO.prototype.run = function ( req, res, host, method ) {
 	var self       = this,
-	    all        = this.middleware.all   || {},
-	    h          = this.middleware[host] || {},
-	    path       = req.parsed.pathname,
-	    middleware = [],
-	    nth;
+	    middleware = this.routes( req.parsed.pathname, host, method ),
+	    nth        = middleware.length,
+	    i          = -1;
 
-	array.keys( all ).filter( function ( i ) {
-		return new RegExp( "^" + i, "i" ).test( path );
-	} ).map( function ( i ) {
-		middleware = middleware.concat( all[i] );
-	} );
-
-	array.keys( h ).filter( function ( i ) {
-		return new RegExp( "^" + i, "i" ).test( path );
-	} ).map( function ( i ) {
-		middleware = middleware.concat( h[i] );
-	} );
-
-	nth = middleware.length;
-
-	// Chains middleware execution
-	function chain ( idx, err ) {
+	function next ( err ) {
 		var timer = precise().start(),
-		    i     = idx + 1,
-		    find  = err !== undefined,
-		    found = false,
-		    arity;
+		    arity = 3;
 
-		// Chain passed to middleware
-		function next ( arg ) {
-			if ( !res._header && middleware[i] ) {
-				chain( i, arg );
+		if ( err ) {
+			// Finding the next error handling middleware
+			arity = middleware[++i].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
+
+			if ( arity < 4 ) {
+				while ( arity < 4 && ++i < nth ) {
+					arity = middleware[i].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
+				}
 			}
-			else if ( !res._header && arg instanceof Error ) {
-				self.error( req, res, self.codes[arg.message.toUpperCase()] || self.codes.SERVER_ERROR, arg.stack || arg.message );
-			}
+
+			--i;
 		}
 
-		try {
-			arity = middleware[idx].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
+		if ( timer.stopped === null ) {
+			timer.stop();
+		}
 
-			if ( find ) {
-				if ( arity < 4 ) {
-					while ( ++idx < nth ) {
-						arity = middleware[idx].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
+		self.dtp.fire( "middleware", function () {
+			return [host, req.url, timer.diff()];
+		} );
 
-						if ( arity === 4 ) {
-							found = true;
-							i     = idx + 1;
-							break;
-						}
-					}
+		if ( ++i < nth ) {
+			try {
+				arity === 3 ? middleware[i]( req, res, next ) : middleware[i]( err, req, res, next );
+			}
+			catch ( e ) {
+				next( e );
+			}
+		}
+		else if ( !res._header && self.config.catchAll ) {
+			if ( !err ) {
+				if ( REGEX_GET.test( method ) ) {
+					self.request( req, res );
+				}
+				else if ( self.allowed( "get", req.parsed.pathname, req.vhost ) ) {
+					self.error( req, res, self.codes.NOT_ALLOWED );
 				}
 				else {
-					found = true;
-				}
-			}
-
-			if ( timer.stopped === null ) {
-				timer.stop();
-			}
-
-			self.dtp.fire( "middleware", function () {
-				return [host, req.url, timer.diff()];
-			} );
-
-			if ( find ) {
-				if ( found ) {
-					middleware[idx]( err, req, res, next );
-				}
-				else {
-					self.error( req, res, self.codes.SERVER_ERROR, err );
+					self.error( req, res, self.codes.NOT_FOUND );
 				}
 			}
 			else {
-				middleware[idx]( req, res, next );
+				self.error( req, res, ( self.codes[( err.message || err ).toUpperCase()] || self.codes.SERVER_ERROR ), ( err.stack || err.message || err ) );
 			}
-		}
-		catch ( e ) {
-			next( e );
 		}
 	}
 
-	if ( nth > 0 ) {
-		chain( 0 );
-	}
+	next();
 
 	return this;
 };

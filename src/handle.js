@@ -12,11 +12,22 @@
  */
 TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 	var self   = this,
-	    allow  = this.allows( req.parsed.pathname, req.parsed.hostname ),
-	    write  = allow.indexOf( dir ? "POST" : "PUT" ) > -1,
-	    del    = allow.indexOf( "DELETE" ) > -1,
-	    method = req.method,
-	    etag, headers, mimetype, modified, size;
+	    update = false,
+	    allow, del, etag, headers, method, mimetype, modified, size, write;
+
+	// Adding middleware to avoid the round trip next time
+	if ( !this.allowed( "get", req.parsed.pathname, req.vhost ) ) {
+		this.get( req.parsed.pathname, function ( req, res ) {
+			self.request( req, res );
+		}, req.vhost );
+
+		update = true;
+	}
+
+	allow  = this.allows( req.parsed.pathname, req.vhost, update );
+	write  = allow.indexOf( dir ? "POST" : "PUT" ) > -1;
+	del    = allow.indexOf( "DELETE" ) > -1;
+	method = req.method;
 
 	// File request
 	if ( !dir ) {

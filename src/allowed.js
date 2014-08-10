@@ -2,50 +2,26 @@
  * Verifies a method is allowed on a URI
  *
  * @method allowed
- * @param  {String} method HTTP verb
- * @param  {String} uri    URI to query
- * @param  {String} host   Hostname
- * @return {Boolean}       Boolean indicating if method is allowed
+ * @param  {String}  method   HTTP verb
+ * @param  {String}  uri      URI to query
+ * @param  {String}  host     Hostname
+ * @param  {Boolean} override Overrides cached version
+ * @return {Boolean}          Boolean indicating if method is allowed
  */
-TurtleIO.prototype.allowed = function ( method, uri, host ) {
-	var self   = this,
-		timer  = precise().start(),
-	    result = false,
-	    exist  = false,
-	    d, hosts;
-
-	host  = host || ALL;
-	hosts = this.handlers[method].hosts;
-	d     = hosts[this.config["default"]];
-	exist = ( hosts[host] );
-
-	array.each( this.handlers[method].regex, function ( i, idx ) {
-		var route = self.handlers[method].routes[idx];
-
-		if ( i.test( uri ) && ( ( exist && route in hosts[host] ) || route in d || route in hosts.all ) ) {
-			return !( result = true );
-		}
-	} );
-
-	if ( !result ) {
-		hosts = this.handlers.all.hosts;
-		d     = hosts[this.config["default"]];
-		exist = ( hosts[host] );
-
-		array.each( this.handlers.all.regex, function ( i, idx ) {
-			var route = self.handlers.all.routes[idx];
-
-			if ( i.test( uri ) && ( ( exist && route in hosts[host] ) || route in d || route in hosts.all ) ) {
-				return !( result = true );
-			}
-		} );
-	}
+TurtleIO.prototype.allowed = function ( method, uri, host, override ) {
+	var timer  = precise().start(),
+	    result = this.routes( uri, host, method, override ),
+	    nth    = result.length;
 
 	timer.stop();
+
+	if ( REGEX_GET.test( method ) && nth > 0 ) {
+		--nth;
+	}
 
 	this.dtp.fire( "allowed", function () {
 		return [host, uri, method.toUpperCase(), timer.diff()];
 	} );
 
-	return result;
+	return nth > 0;
 };
