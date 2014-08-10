@@ -2,14 +2,15 @@
  * Verifies a method is allowed on a URI
  *
  * @method allowed
- * @param  {String} method HTTP verb
- * @param  {String} uri    URI to query
- * @param  {String} host   Hostname
- * @return {Boolean}       Boolean indicating if method is allowed
+ * @param  {String}  method   HTTP verb
+ * @param  {String}  uri      URI to query
+ * @param  {String}  host     Hostname
+ * @param  {Boolean} override Overrides cached version
+ * @return {Boolean}          Boolean indicating if method is allowed
  */
-TurtleIO.prototype.allowed = function ( method, uri, host ) {
+TurtleIO.prototype.allowed = function ( method, uri, host, override ) {
 	var timer  = precise().start(),
-	    result = this.routes( uri, host, method ),
+	    result = this.routes( uri, host, method, override ),
 	    nth    = result.length;
 
 	timer.stop();

@@ -8,6 +8,7 @@ function TurtleIO () {
 	this.dtp          = dtrace.createDTraceProvider( "turtle-io" );
 	this.etags        = lru( 1000 );
 	this.middleware   = {all: {}};
+	this.routeCache   = lru( 5000 ); // verbs * etags
 	this.pages        = {all: {}};
 	this.server       = null;
 	this.vhosts       = [];

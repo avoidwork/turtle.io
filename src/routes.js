@@ -2,15 +2,24 @@
  * Returns middleware for the uri
  *
  * @method result
- * @param  {String} uri    URI
- * @param  {String} host   Host
- * @param  {String} method HTTP method
+ * @param  {String}  uri      URI to query
+ * @param  {String}  host     Hostname
+ * @param  {String}  method   HTTP verb
+ * @param  {Boolean} override Overrides cached version
  * @return {Array}
  */
-TurtleIO.prototype.routes = function ( uri, host, method ) {
-	var all    = this.middleware.all   || {},
-	    h      = this.middleware[host] || {},
-	    result = [];
+TurtleIO.prototype.routes = function ( uri, host, method, override ) {
+	var id     = method + ":" + host + ":" + uri,
+		cached = override !== true && this.routeCache.get( id ),
+		all, h, result;
+
+	if ( cached ) {
+		return cached;
+	}
+
+	all    = this.middleware.all   || {};
+	h      = this.middleware[host] || {};
+	result = [];
 
 	if ( all.all ) {
 		array.each( array.keys( all.all ).filter( function ( i ) {
@@ -43,6 +52,8 @@ TurtleIO.prototype.routes = function ( uri, host, method ) {
 			result = result.concat( h[method][i] );
 		} );
 	}
+
+	this.routeCache.set( id, result );
 
 	return result;
 };

@@ -36,13 +36,6 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		delete headers.expires;
 		delete headers["transfer-encoding"];
 	}
-	else {
-		delete headers["access-control-allow-origin"];
-		delete headers["access-control-allow-headers"];
-		delete headers["access-control-allow-methods"];
-		delete headers["access-control-allow-headers"];
-		delete headers["access-control-expose-headers"];
-	}
 
 	if ( !file && body !== this.messages.NO_CONTENT ) {
 		body = this.encode( body, req.headers.accept );
