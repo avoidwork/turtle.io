@@ -3,17 +3,16 @@
  *
  * @method request
  * @public
- * @param  {Object} req  HTTP(S) request Object
- * @param  {Object} res  HTTP(S) response Object
- * @param  {String} host [Optional] Virtual host
- * @return {Object}      TurtleIO instance
+ * @param  {Object} req HTTP(S) request Object
+ * @param  {Object} res HTTP(S) response Object
+ * @return {Object}     TurtleIO instance
  */
-TurtleIO.prototype.request = function ( req, res, host ) {
+TurtleIO.prototype.request = function ( req, res ) {
 	var self    = this,
 		timer   = precise().start(),
 	    method  = req.method,
 	    handled = false,
-	    found   = false,
+	    host    = req.vhost,
 	    count, path, nth, root;
 
 	// If an expectation can't be met, don't try!
@@ -25,26 +24,6 @@ TurtleIO.prototype.request = function ( req, res, host ) {
 		});
 
 		return this.error( req, res, this.codes.EXPECTATION_FAILED );
-	}
-
-	// Can't find the hostname in vhosts, try the default (if set) or send a 500
-	if ( !host || !( host in this.config.vhosts ) ) {
-		array.each( this.vhostsRegExp, function ( i, idx ) {
-			if ( i.test( req.host ) ) {
-				found = true;
-				host  = self.vhosts[idx];
-				return false;
-			}
-		} );
-
-		if ( !found ) {
-			if ( this.config["default"] !== null ) {
-				host = this.config["default"];
-			}
-			else {
-				this.error( req, res, self.codes.SERVER_ERROR );
-			}
-		}
 	}
 
 	// Preparing file path

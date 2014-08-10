@@ -1,4 +1,5 @@
 {
+	"catchAll": true,
 	"compress": true,
 	"default" : null,
 	"uid"     : null,

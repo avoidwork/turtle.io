@@ -1,1 +1,1 @@
-module.exports = TurtleIO;
+module.exports = factory;
