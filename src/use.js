@@ -12,7 +12,7 @@ TurtleIO.prototype.use = function ( path, fn, host, method ) {
 	if ( typeof path != "string" ) {
 		host = fn;
 		fn   = path;
-		path = "/*";
+		path = "/.*";
 	}
 
 	host   = host   || ALL;

@@ -14,7 +14,7 @@ TurtleIO.prototype.routes = function ( uri, host, method ) {
 
 	if ( all.all ) {
 		array.each( array.keys( all.all ).filter( function ( i ) {
-			return new RegExp( "^" + i, "i" ).test( uri );
+			return new RegExp( "^" + i + "$", "i" ).test( uri );
 		} ), function ( i ) {
 			result = result.concat( all.all[i] );
 		} );
@@ -22,7 +22,7 @@ TurtleIO.prototype.routes = function ( uri, host, method ) {
 
 	if ( all[method] ) {
 		array.each( array.keys( all[method] ).filter( function ( i ) {
-			return new RegExp( "^" + i, "i" ).test( uri );
+			return new RegExp( "^" + i + "$", "i" ).test( uri );
 		} ), function ( i ) {
 			result = result.concat( all[method][i] );
 		} );
@@ -30,7 +30,7 @@ TurtleIO.prototype.routes = function ( uri, host, method ) {
 
 	if ( h.all ) {
 		array.each( array.keys( h.all ).filter( function ( i ) {
-			return new RegExp( "^" + i, "i" ).test( uri );
+			return new RegExp( "^" + i + "$", "i" ).test( uri );
 		} ), function ( i ) {
 			result = result.concat( h.all[i] );
 		} );
@@ -38,7 +38,7 @@ TurtleIO.prototype.routes = function ( uri, host, method ) {
 
 	if ( h[method] ) {
 		array.each( array.keys( h[method] ).filter( function ( i ) {
-			return new RegExp( "^" + i, "i" ).test( uri );
+			return new RegExp( "^" + i + "$", "i" ).test( uri );
 		} ), function ( i ) {
 			result = result.concat( h[method][i] );
 		} );

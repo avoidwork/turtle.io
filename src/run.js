@@ -49,7 +49,15 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 		}
 		else if ( !res._header && self.config.catchAll ) {
 			if ( !err ) {
-				self.request( req, res );
+				if ( REGEX_GET.test( method ) ) {
+					self.request( req, res );
+				}
+				else if ( self.allowed( "get", req.parsed.pathname, req.vhost ) ) {
+					self.error( req, res, self.codes.NOT_ALLOWED );
+				}
+				else {
+					self.error( req, res, self.codes.NOT_FOUND );
+				}
 			}
 			else {
 				self.error( req, res, ( self.codes[( err.message || err ).toUpperCase()] || self.codes.SERVER_ERROR ), ( err.stack || err.message || err ) );

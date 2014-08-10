@@ -9,13 +9,18 @@
  */
 TurtleIO.prototype.allowed = function ( method, uri, host ) {
 	var timer  = precise().start(),
-	    result = this.routes( uri, host, method );
+	    result = this.routes( uri, host, method ),
+	    nth    = result.length;
 
 	timer.stop();
+
+	if ( REGEX_GET.test( method ) && nth > 0 ) {
+		--nth;
+	}
 
 	this.dtp.fire( "allowed", function () {
 		return [host, uri, method.toUpperCase(), timer.diff()];
 	} );
 
-	return result.length > 0;
+	return nth > 0;
 };

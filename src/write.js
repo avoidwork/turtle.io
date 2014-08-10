@@ -12,8 +12,8 @@ TurtleIO.prototype.write = function ( req, res, path ) {
 	    timer = precise().start(),
 	    put   = ( req.method === "PUT" ),
 	    body  = req.body,
-	    allow = this.allows( req.url ),
-	    del   = this.allowed( "DELETE", req.url ),
+	    allow = this.allows( req.parsed.pathname, req.vhost ),
+	    del   = this.allowed( "DELETE", req.parsed.pathname, req.vhost ),
 	    status;
 
 	if ( !put && REGEX_ENDSLSH.test( req.url ) ) {

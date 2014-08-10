@@ -20,7 +20,7 @@ TurtleIO.prototype.error = function ( req, res, status, msg ) {
 
 		// If valid, determine what kind of error to respond with
 		if ( !REGEX_GET.test( method ) && !REGEX_HEAD.test( method ) ) {
-			if ( this.allowed( method, req.url, host ) ) {
+			if ( this.allowed( method, req.parsed.pathname, req.vhost ) ) {
 				status = this.codes.SERVER_ERROR;
 			}
 			else {

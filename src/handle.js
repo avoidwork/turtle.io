@@ -12,7 +12,7 @@
  */
 TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 	var self   = this,
-	    allow  = this.allows( req.parsed.pathname, req.parsed.hostname ),
+	    allow  = this.allows( req.parsed.pathname, req.vhost ),
 	    write  = allow.indexOf( dir ? "POST" : "PUT" ) > -1,
 	    del    = allow.indexOf( "DELETE" ) > -1,
 	    method = req.method,
