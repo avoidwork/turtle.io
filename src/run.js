@@ -10,12 +10,9 @@
  */
 TurtleIO.prototype.run = function ( req, res, host, method ) {
 	var self       = this,
-	    all        = this.middleware.all   || {},
-	    h          = this.middleware[host] || {},
-	    path       = req.parsed.pathname,
-	    middleware = [],
-	    i          = -1,
-	    nth;
+	    middleware = this.routes( req.parsed.pathname, host, method ),
+	    nth        = middleware.length,
+	    i          = -1;
 
 	function next ( err ) {
 		var timer = precise().start(),
@@ -60,39 +57,6 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 		}
 	}
 
-	if ( all.all ) {
-		array.each( array.keys( all.all ).filter( function ( i ) {
-			return new RegExp( "^" + i, "i" ).test( path );
-		} ), function ( i ) {
-			middleware = middleware.concat( all.all[i] );
-		} );
-	}
-
-	if ( all[method] ) {
-		array.each( array.keys( all[method] ).filter( function ( i ) {
-			return new RegExp( "^" + i, "i" ).test( path );
-		} ), function ( i ) {
-			middleware = middleware.concat( all[method][i] );
-		} );
-	}
-
-	if ( h.all ) {
-		array.each( array.keys( h.all ).filter( function ( i ) {
-			return new RegExp( "^" + i, "i" ).test( path );
-		} ), function ( i ) {
-			middleware = middleware.concat( h.all[i] );
-		} );
-	}
-
-	if ( h[method] ) {
-		array.each( array.keys( h[method] ).filter( function ( i ) {
-			return new RegExp( "^" + i, "i" ).test( path );
-		} ), function ( i ) {
-			middleware = middleware.concat( h[method][i] );
-		} );
-	}
-
-	nth = middleware.length;
 	next();
 
 	return this;

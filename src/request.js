@@ -9,7 +9,7 @@
  */
 TurtleIO.prototype.request = function ( req, res ) {
 	var self    = this,
-		timer   = precise().start(),
+	    timer   = precise().start(),
 	    method  = req.method,
 	    handled = false,
 	    host    = req.vhost,

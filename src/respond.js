@@ -36,6 +36,13 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		delete headers.expires;
 		delete headers["transfer-encoding"];
 	}
+	else {
+		delete headers["access-control-allow-origin"];
+		delete headers["access-control-allow-headers"];
+		delete headers["access-control-allow-methods"];
+		delete headers["access-control-allow-headers"];
+		delete headers["access-control-expose-headers"];
+	}
 
 	if ( !file && body !== this.messages.NO_CONTENT ) {
 		body = this.encode( body, req.headers.accept );
@@ -76,7 +83,11 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		// req.parsed may not exist if coming from `error()`
 		if ( req.parsed ) {
 			if ( !headers.allow && status !== this.codes.NOT_FOUND && status < this.codes.SERVER_ERROR ) {
-				headers["access-control-allow-methods"] = headers.allow = this.allows( req.parsed.pathname, req.parsed.hostname );
+				headers.allow = this.allows( req.parsed.pathname, req.parsed.hostname );
+
+				if ( headers["access-control-allow-methods"] ) {
+					headers["access-control-allow-methods"] = headers.allow;
+				}
 			}
 
 			if ( req.method === "GET" && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) ) {
