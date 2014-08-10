@@ -10,8 +10,8 @@
  */
 TurtleIO.prototype.routes = function ( uri, host, method, override ) {
 	var id     = method + ":" + host + ":" + uri,
-		cached = override !== true && this.routeCache.get( id ),
-		all, h, result;
+	    cached = override !== true && this.routeCache.get( id ),
+	    all, h, result;
 
 	if ( cached ) {
 		return cached;
