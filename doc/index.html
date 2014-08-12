@@ -26,8 +26,8 @@
 
 <p>Virtual host keys are the hostname, and the value is the directory relative to "root".</p>
 
-<pre><code class="javascript">var TurtleIO = require("turtle.io"),
-    server   = new TurtleIO(),
+<pre><code class="javascript">var turtleio = require("turtle.io"),
+    server   = turtleio(),
     params;
 
 params = {
@@ -50,8 +50,8 @@ server.start(params);
 <p>This example has <code>/api</code> act as a reverse proxy to another service.</p>
 
 <pre><code class="javascript">var config   = require("./config.json"),
-    TurtleIO = require("turtle.io"),
-    server   = new TurtleIO();
+    turtleio = require("turtle.io"),
+    server   = turtleio();
 
 server.proxy("/api", "https://api.github.com");
 
