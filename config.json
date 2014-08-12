@@ -15,8 +15,6 @@
 		"content-type"                  : "text/html; charset=utf-8",
 		"date"                          : "",
 		"last-modified"                 : "",
-		"x-content-type-options"        : "nosniff",
-		"x-frame-options"               : "sameorigin",
 		"x-ua-compatible"               : "IE=edge"
 	},
 	"index"   : ["index.htm", "index.html"],
