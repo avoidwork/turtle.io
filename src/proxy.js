@@ -115,6 +115,8 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 									.replace( new RegExp( route + "//", "g" ), route + "/" );
 							}
 						}
+
+						// Updating cache
 					}
 
 					self.respond( req, res, arg, xhr.status, resHeaders );
@@ -165,7 +167,9 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		    method   = req.method.toLowerCase(),
 		    headerz  = clone( req.headers, true ),
 		    parsed   = parse( url ),
-		    mimetype = mime.lookup( parsed.pathname ),
+			cached   = self.etags.get( url ),
+			streamd  = ( stream === true ),
+			mimetype = cached ? cached.mimetype : mime.lookup( !REGEX_EXT.test( parsed.pathname ) ? "index.htm" : parsed.pathname ),
 		    fn, options, proxyReq;
 
 		// Facade to handle()
@@ -180,8 +184,8 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		};
 
 		// Streaming formats that do not need to be rewritten
-		if ( !stream && ( REGEX_EXT.test( parsed.pathname ) && !REGEX_JSON.test( mimetype ) ) && REGEX_STREAM.test( mimetype ) ) {
-			stream = true;
+		if ( !streamd && ( REGEX_EXT.test( parsed.pathname ) && !REGEX_JSON.test( mimetype ) ) && REGEX_STREAM.test( mimetype ) ) {
+			streamd = true;
 		}
 
 		// Stripping existing authorization header because it's not relevant for the remote system
@@ -198,7 +202,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		}
 
 		// Streaming response to Client
-		if ( stream ) {
+		if ( streamd ) {
 			headerz.host = req.headers.host;
 
 			options = {

@@ -34,5 +34,15 @@ function factory () {
 		}
 	} );
 
+	// CORS detection middleware
+	self.use( function () {
+		var req  = arguments[0],
+			next = arguments[2],
+			ref  = req.headers.referer;
+
+		req.cors = ref !== undefined && ref !== req.parsed.protocol + "//" + req.parsed.host;
+		next();
+	} );
+
 	return self;
 }
