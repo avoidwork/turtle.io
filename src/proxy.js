@@ -25,7 +25,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	 */
 	function handle ( req, res, arg, xhr ) {
 		var etag          = "",
-		    regexOrigin   = new RegExp( route == "/" ? origin.replace( REGEX_ENDSLSH, "" ) : origin, "g" ),
+		    regexOrigin   = new RegExp( origin.replace( REGEX_ENDSLSH, "" ), "g" ),
 		    url           = req.parsed.href,
 		    stale         = STALE,
 		    get           = req.method === "GET",
@@ -111,7 +111,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 							arg = arg.replace( regexOrigin, rewriteOrigin );
 
 							if ( route !== "/" ) {
-								arg = arg.replace( /(href|src)=("|')([^http|mailto|<|_|\s].*?)("|')/g, ( "$1=$2" + route + "/$3$4" ) )
+								arg = arg.replace( /(href|src)=("|')([^http|mailto|<|_|\s|\/\/].*?)("|')/g, ( "$1=$2" + route + "/$3$4" ) )
 									.replace( new RegExp( route + "//", "g" ), route + "/" );
 							}
 						}
