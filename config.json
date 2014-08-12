@@ -11,7 +11,7 @@
 		"access-control-expose-headers" : "allow, content-length",
 		"accept-ranges"                 : "bytes",
 		"allow"                         : "",
-		"cache-control"                 : "max-age=60, must-revalidate, public",
+		"cache-control"                 : "max-age=300",
 		"content-type"                  : "text/html; charset=utf-8",
 		"date"                          : "",
 		"last-modified"                 : "",
