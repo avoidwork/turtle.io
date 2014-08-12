@@ -18,29 +18,29 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 		var timer = precise().start(),
 		    arity = 3;
 
-		if ( err ) {
-			// Finding the next error handling middleware
-			arity = middleware[++i].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
-
-			if ( arity < 4 ) {
-				while ( arity < 4 && ++i < nth ) {
-					arity = middleware[i].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
-				}
-			}
-
-			--i;
-		}
-
-		if ( timer.stopped === null ) {
-			timer.stop();
-		}
-
-		self.dtp.fire( "middleware", function () {
-			return [host, req.url, timer.diff()];
-		} );
-
 		if ( ++i < nth ) {
 			try {
+				if ( err ) {
+					// Finding the next error handling middleware
+					arity = middleware[++i].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
+
+					if ( arity < 4 ) {
+						while ( arity < 4 && ++i < nth ) {
+							arity = middleware[i].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
+						}
+					}
+
+					--i;
+				}
+
+				if ( timer.stopped === null ) {
+					timer.stop();
+				}
+
+				self.dtp.fire( "middleware", function () {
+					return [host, req.url, timer.diff()];
+				} );
+
 				arity === 3 ? middleware[i]( req, res, next ) : middleware[i]( err, req, res, next );
 			}
 			catch ( e ) {
@@ -48,6 +48,14 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 			}
 		}
 		else if ( !res._header && self.config.catchAll ) {
+			if ( timer.stopped === null ) {
+				timer.stop();
+			}
+
+			self.dtp.fire( "middleware", function () {
+				return [host, req.url, timer.diff()];
+			} );
+
 			if ( !err ) {
 				if ( REGEX_GET.test( method ) ) {
 					self.request( req, res );
