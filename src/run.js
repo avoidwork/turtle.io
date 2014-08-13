@@ -14,6 +14,31 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 	    nth        = middleware.length,
 	    i          = -1;
 
+	function last ( timer, err ) {
+		if ( timer.stopped === null ) {
+			timer.stop();
+		}
+
+		self.dtp.fire( "middleware", function () {
+			return [host, req.url, timer.diff()];
+		} );
+
+		if ( !err ) {
+			if ( REGEX_GET.test( method ) ) {
+				self.request( req, res );
+			}
+			else if ( self.allowed( "get", req.parsed.pathname, req.vhost ) ) {
+				self.error( req, res, self.codes.NOT_ALLOWED );
+			}
+			else {
+				self.error( req, res, self.codes.NOT_FOUND );
+			}
+		}
+		else {
+			self.error( req, res, ( self.codes[( err.message || err ).toUpperCase()] || self.codes.SERVER_ERROR ), ( err.stack || err.message || err ) );
+		}
+	}
+
 	function next ( err ) {
 		var timer = precise().start(),
 		    arity = 3;
@@ -22,15 +47,13 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 			try {
 				if ( err ) {
 					// Finding the next error handling middleware
-					arity = middleware[++i].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
+					arity = middleware[i].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
 
 					if ( arity < 4 ) {
-						while ( arity < 4 && ++i < nth ) {
+						while ( arity < 4 && ++i < nth && middleware[i] == "function" ) {
 							arity = middleware[i].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
 						}
 					}
-
-					--i;
 				}
 
 				if ( timer.stopped === null ) {
@@ -41,35 +64,19 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 					return [host, req.url, timer.diff()];
 				} );
 
-				arity === 3 ? middleware[i]( req, res, next ) : middleware[i]( err, req, res, next );
+				if ( i < nth ) {
+					arity === 3 ? middleware[i]( req, res, next ) : middleware[i]( err, req, res, next );
+				}
+				else {
+					last( timer, err );
+				}
 			}
 			catch ( e ) {
 				next( e );
 			}
 		}
 		else if ( !res._header && self.config.catchAll ) {
-			if ( timer.stopped === null ) {
-				timer.stop();
-			}
-
-			self.dtp.fire( "middleware", function () {
-				return [host, req.url, timer.diff()];
-			} );
-
-			if ( !err ) {
-				if ( REGEX_GET.test( method ) ) {
-					self.request( req, res );
-				}
-				else if ( self.allowed( "get", req.parsed.pathname, req.vhost ) ) {
-					self.error( req, res, self.codes.NOT_ALLOWED );
-				}
-				else {
-					self.error( req, res, self.codes.NOT_FOUND );
-				}
-			}
-			else {
-				self.error( req, res, ( self.codes[( err.message || err ).toUpperCase()] || self.codes.SERVER_ERROR ), ( err.stack || err.message || err ) );
-			}
+			last( timer, err );
 		}
 	}
 
