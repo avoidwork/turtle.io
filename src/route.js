@@ -20,20 +20,6 @@ TurtleIO.prototype.route = function ( req, res ) {
 	req.server = this;
 	req.timer  = precise().start();
 
-	// Adding custom properties, if there's no collision
-	if ( !req.cookies ) {
-		req.cookies = {};
-
-		// Decorating valid cookies
-		if ( req.headers.cookie !== undefined ) {
-			array.each( string.explode( req.headers.cookie, ";" ).map( function ( i ) {
-				return i.split( "=" );
-			} ), function ( i ) {
-				req.cookies[i[0]] = i[1];
-			} );
-		}
-	}
-
 	// Finding a matching vhost
 	array.each( this.vhostsRegExp, function ( i, idx ) {
 		if ( i.test( parsed.hostname ) ) {
