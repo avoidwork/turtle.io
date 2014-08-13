@@ -18,7 +18,7 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 		var timer = precise().start(),
 		    arity = 3;
 
-		if ( ++i < nth ) {
+		if ( ++i < nth && typeof middleware[i] == "function" ) {
 			try {
 				if ( err ) {
 					// Finding the next error handling middleware
