@@ -7,8 +7,7 @@
 function factory () {
 	var self = new TurtleIO();
 
-	// Etag middleware
-	self.get( function ( req, res, next ) {
+	self.get( function etag ( req, res, next ) {
 		var method = req.method.toLowerCase(),
 		    cached, headers;
 
@@ -34,14 +33,12 @@ function factory () {
 		}
 	} );
 
-	// CORS detection middleware
-	self.use( function () {
-		var req  = arguments[0],
-			next = arguments[2],
-			ref  = req.headers.referer;
+	self.use( function cors () {
+		var req = arguments[0],
+			ref = req.headers.referer;
 
 		req.cors = ref !== undefined && ref !== req.parsed.protocol + "//" + req.parsed.host;
-		next();
+		arguments[2]();
 	} );
 
 	return self;
