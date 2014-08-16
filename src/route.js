@@ -44,6 +44,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 	// Mimic express for middleware interoperability
 	res.locals = {};
+	res.header = res.setHeader;
 
 	// Setting listeners if expecting a body
 	if ( REGEX_BODY.test( method ) ) {
