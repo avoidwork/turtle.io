@@ -42,6 +42,9 @@ TurtleIO.prototype.route = function ( req, res ) {
 		self.error( req, res, status, arg );
 	};
 
+	// Mimic express for middleware interoperability
+	res.locals = {};
+
 	// Setting listeners if expecting a body
 	if ( REGEX_BODY.test( method ) ) {
 		req.setEncoding( "utf-8" );
