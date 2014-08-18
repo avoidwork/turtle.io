@@ -7,7 +7,15 @@
 function factory () {
 	var self = new TurtleIO();
 
-	self.get( function etag ( req, res, next ) {
+	function cors () {
+		var req = arguments[0],
+		    ref = req.headers.referer;
+
+		req.cors = ref !== undefined && ref !== req.parsed.protocol + "//" + req.parsed.host;
+		arguments[2]();
+	}
+
+	function etag ( req, res, next ) {
 		var method = req.method.toLowerCase(),
 		    cached, headers;
 
@@ -31,15 +39,10 @@ function factory () {
 		else {
 			next();
 		}
-	} );
+	}
 
-	self.use( function cors () {
-		var req = arguments[0],
-			ref = req.headers.referer;
-
-		req.cors = ref !== undefined && ref !== req.parsed.protocol + "//" + req.parsed.host;
-		arguments[2]();
-	} );
+	self.use( cors ).blacklist( cors );
+	self.get( etag ).blacklist( etag );
 
 	return self;
 }

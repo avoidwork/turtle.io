@@ -34,7 +34,14 @@ TurtleIO.prototype.use = function ( path, fn, host, method ) {
 		this.middleware[host][method][path] = [];
 	}
 
-	this.middleware[host][method][path].push( fn.handle || fn );
+	if ( fn.handle ) {
+		fn = fn.handle;
+	}
+
+	// Base64 encoding for permission checks
+	fn.base64 = new Buffer( fn.toString() ).toString( "base64" );
+
+	this.middleware[host][method][path].push( fn );
 
 	return this;
 };

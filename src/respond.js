@@ -76,7 +76,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		// req.parsed may not exist if coming from `error()`
 		if ( req.parsed ) {
 			if ( !headers.allow && status !== this.codes.NOT_FOUND && status < this.codes.SERVER_ERROR ) {
-				headers.allow = req.allows || this.allows( req.parsed.pathname, req.vhost );
+				headers.allow = req.allow || this.allows( req.parsed.pathname, req.vhost );
 			}
 
 			if ( req.method === "GET" && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) ) {

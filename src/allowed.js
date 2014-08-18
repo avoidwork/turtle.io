@@ -9,19 +9,31 @@
  * @return {Boolean}          Boolean indicating if method is allowed
  */
 TurtleIO.prototype.allowed = function ( method, uri, host, override ) {
-	var timer  = precise().start(),
-	    result = this.routes( uri, host, method, override ),
-	    nth    = result.length;
+	var self   = this,
+	    timer  = precise().start(),
+	    result = this.routes( uri, host, method, override );
+
+	/**
+	 * Base64 encodes the argument
+	 *
+	 * @method base64
+	 * @private
+	 * @param {Function} fn Function to encode
+	 * @return {String}     Base 64 encoded argument
+ 	 */
+	function base64 ( fn ) {
+		return new Buffer( fn.toString() ).toString( "base64" );
+	}
+
+	result = result.filter( function ( i ) {
+		return self.config.noaction[i.base64 || base64( i )] === undefined;
+	} );
 
 	timer.stop();
-
-	if ( REGEX_GET.test( method ) && nth > 0 ) {
-		--nth;
-	}
 
 	this.dtp.fire( "allowed", function () {
 		return [host, uri, method.toUpperCase(), timer.diff()];
 	} );
 
-	return nth > 0;
+	return result.length > 0;
 };

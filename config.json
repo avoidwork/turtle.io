@@ -1,4 +1,5 @@
 {
+	"noaction": {},
 	"catchAll": true,
 	"compress": true,
 	"default" : null,

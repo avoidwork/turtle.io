@@ -22,6 +22,7 @@ module.exports = function (grunt) {
 					"src/constructor.js",
 					"src/allowed.js",
 					"src/allows.js",
+					"src/blacklist.js",
 					"src/codes.js",
 					"src/compress.js",
 					"src/compression.js",

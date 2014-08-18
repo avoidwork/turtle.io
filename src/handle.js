@@ -30,7 +30,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 	method = req.method;
 
 	// Decorating what's allowed
-	req.allows = allow;
+	req.allow = allow;
 
 	// File request
 	if ( !dir ) {

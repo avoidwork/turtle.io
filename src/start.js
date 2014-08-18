@@ -28,8 +28,9 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 		config.port = 8000;
 	}
 
-	this.config = config;
-	pages       = this.config.pages ? ( this.config.root + this.config.pages ) : ( __dirname + "/../pages" );
+	merge( this.config, config );
+
+	pages = this.config.pages ? ( this.config.root + this.config.pages ) : ( __dirname + "/../pages" );
 
 	// Looking for required setting
 	if ( !this.config["default"] ) {

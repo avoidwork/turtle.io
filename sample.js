@@ -1,6 +1,7 @@
 "use strict";
 
-var turtleio = require("./lib/turtle.io"),
+var dir      = __dirname,
+    turtleio = require(dir + "/lib/turtle.io"),
     server   = turtleio();
 
 server.get("/status", function (req, res) {
@@ -9,8 +10,8 @@ server.get("/status", function (req, res) {
 
 server.start( {
 	default : "test",
-	root    : "./sites",
+	root    : dir + "/sites",
 	vhosts  : {
-		"test"  : "test"
+		"test" : "test"
 	}
 } );
