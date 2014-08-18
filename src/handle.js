@@ -29,6 +29,9 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 	del    = allow.indexOf( "DELETE" ) > -1;
 	method = req.method;
 
+	// Decorating what's allowed
+	req.allows = allow;
+
 	// File request
 	if ( !dir ) {
 		if ( REGEX_GET.test( method ) ) {
