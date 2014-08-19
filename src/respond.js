@@ -11,7 +11,8 @@
  * @return {Object}          TurtleIO instance
  */
 TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) {
-	var self, timer, ua, encoding, type, options;
+	var head = REGEX_HEAD.test( req.method ),
+	    self, timer, ua, encoding, type, options;
 
 	self     = this;
 	timer    = precise().start();
@@ -26,15 +27,10 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	headers = this.headers( headers || {"content-type": "text/plain"}, status, REGEX_GET.test( req.method ) );
 	file    = file === true;
 
-	if ( req.method == "OPTIONS" ) {
-		delete headers["accept-ranges"];
-		delete headers["content-length"];
-		delete headers["cache-control"];
-		delete headers["content-type"];
+	if ( head ) {
 		delete headers.etag;
 		delete headers["last-modified"];
 		delete headers.expires;
-		delete headers["transfer-encoding"];
 	}
 
 	if ( !file && body !== this.messages.NO_CONTENT ) {
@@ -49,8 +45,15 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			}
 		}
 
-		if ( req.method !== "OPTIONS" ) {
-			headers["content-length"] = headers["content-length"] || 0;
+		headers["content-length"] = headers["content-length"] || 0;
+
+		if ( head ) {
+			body = this.messages.NO_CONTENT;
+
+			if ( req.method === "OPTIONS" ) {
+				headers["content-length"] = 0;
+				delete headers["content-type"];
+			}
 		}
 
 		// Ensuring JSON has proper mimetype

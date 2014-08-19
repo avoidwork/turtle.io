@@ -13,6 +13,10 @@ TurtleIO.prototype.route = function ( req, res ) {
 	    parsed = parse( url ),
 	    payload;
 
+	if ( REGEX_HEAD.test( method ) ) {
+		method = "get";
+	}
+
 	// Decorating parsed Object on request
 	req.parsed = parsed;
 	req.query  = parsed.query;
