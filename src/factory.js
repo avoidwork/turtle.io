@@ -16,10 +16,9 @@ function factory () {
 	}
 
 	function etag ( req, res, next ) {
-		var method = req.method.toLowerCase(),
-		    cached, headers;
+		var cached, headers;
 
-		if ( !REGEX_HEAD.test( method ) && !req.headers.range ) {
+		if ( REGEX_GETONLY.test( req.method ) && !req.headers.range ) {
 			cached = self.etags.get( req.parsed.href );
 
 			// Sending a 304 if Client is making a GET & has current representation
@@ -42,7 +41,7 @@ function factory () {
 	}
 
 	self.use( cors ).blacklist( cors );
-	self.get( etag ).blacklist( etag );
+	self.use( etag ).blacklist( etag );
 
 	return self;
 }
