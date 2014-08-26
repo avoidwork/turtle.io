@@ -13,20 +13,8 @@ TurtleIO.prototype.allowed = function ( method, uri, host, override ) {
 	    timer  = precise().start(),
 	    result = this.routes( uri, host, method, override );
 
-	/**
-	 * Base64 encodes the argument
-	 *
-	 * @method base64
-	 * @private
-	 * @param {Function} fn Function to encode
-	 * @return {String}     Base 64 encoded argument
- 	 */
-	function base64 ( fn ) {
-		return new Buffer( fn.toString() ).toString( "base64" );
-	}
-
 	result = result.filter( function ( i ) {
-		return self.config.noaction[i.base64 || base64( i )] === undefined;
+		return self.config.noaction[i.hash || self.hash( i )] === undefined;
 	} );
 
 	timer.stop();

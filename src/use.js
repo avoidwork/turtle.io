@@ -38,8 +38,8 @@ TurtleIO.prototype.use = function ( path, fn, host, method ) {
 		fn = fn.handle;
 	}
 
-	// Base64 encoding for permission checks
-	fn.base64 = new Buffer( fn.toString() ).toString( "base64" );
+	// hash for permission checks
+	fn.hash = this.hash( fn.toString() );
 
 	this.middleware[host][method][path].push( fn );
 

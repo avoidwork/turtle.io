@@ -6,7 +6,7 @@
  * @return {Object}      TurtleIO instance
  */
 TurtleIO.prototype.blacklist = function ( fn ) {
-	var hfn = fn.base64 || new Buffer( fn.toString() ).toString( "base64" );
+	var hfn = fn.hash || this.hash( fn.toString() );
 
 	if ( this.config.noaction === undefined ) {
 		this.config.noaction = {};
