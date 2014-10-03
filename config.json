@@ -7,7 +7,7 @@
 	"cache"   : 1000,
 	"headers" : {
 		"access-control-allow-origin"   : "*",
-		"access-control-allow-headers"  : "x-requested-with",
+		"access-control-allow-headers"  : "content-type, etag, last-modified, x-requested-with",
 		"access-control-allow-methods"  : "",
 		"accept-ranges"                 : "bytes",
 		"allow"                         : "",
