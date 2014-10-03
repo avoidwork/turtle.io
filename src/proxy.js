@@ -9,6 +9,7 @@
  * @return {Object}         TurtleIO instance
  */
 TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
+	stream    = ( stream === true );
 	var self  = this,
 	    verbs = ["delete", "get", "post", "put", "patch"];
 
@@ -115,8 +116,6 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 									.replace( new RegExp( route + "//", "g" ), route + "/" );
 							}
 						}
-
-						// Updating cache
 					}
 
 					self.respond( req, res, arg, xhr.status, resHeaders );
@@ -167,13 +166,13 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		    method   = req.method.toLowerCase(),
 		    headerz  = clone( req.headers, true ),
 		    parsed   = parse( url ),
-			cached   = self.etags.get( url ),
-			streamd  = ( stream === true ),
-			mimetype = cached ? cached.mimetype : mime.lookup( !REGEX_EXT.test( parsed.pathname ) ? "index.htm" : parsed.pathname ),
-		    fn, options, proxyReq;
+		    cached   = self.etags.get( url ),
+		    streamd  = ( stream === true ),
+		    mimetype = cached ? cached.mimetype : mime.lookup( !REGEX_EXT.test( parsed.pathname ) ? "index.htm" : parsed.pathname ),
+		    defer, fn, options, proxyReq, xhr;
 
 		// Facade to handle()
-		fn = function ( arg, xhr ) {
+		fn = function ( arg ) {
 			timer.stop();
 
 			self.dtp.fire( "proxy", function () {
@@ -237,26 +236,12 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 			// Removing support for compression so the response can be rewritten (if textual)
 			delete headerz["accept-encoding"];
 
-			if ( REGEX_BODY.test( req.method ) ) {
-				request( url, method, fn, fn, req.body, headerz );
-			}
-			else if ( REGEX_DEL.test( method ) ) {
-				request( url, "delete", fn, fn, null, headerz );
-			}
-			else if ( REGEX_HEAD.test( method ) ) {
-				if ( method === "head" ) {
-					method = "headers";
-				}
+			defer = request( url, method, req.body, headerz );
+			xhr   = defer.xhr;
 
-				request( url, method, fn, fn );
-			}
-			else {
-				request( url, "get", fn, fn, headerz );
-			}
+			defer.then( fn, fn );
 		}
 	}
-
-	stream = ( stream === true );
 
 	// Setting route
 	array.each( verbs, function ( i ) {
