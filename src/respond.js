@@ -24,7 +24,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	}
 
 	status  = status || this.codes.SUCCESS;
-	headers = this.headers( headers || {"content-type": "text/plain"}, status, REGEX_GET.test( req.method ) );
+	headers = this.headers( req, headers || {"content-type": "text/plain"}, status );
 	file    = file === true;
 
 	if ( head ) {

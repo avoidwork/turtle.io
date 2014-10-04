@@ -2,13 +2,14 @@
  * Sets response headers
  *
  * @method headers
+ * @param  {Object}  req      Request Object
  * @param  {Object}  rHeaders Response headers
  * @param  {Number}  status   HTTP status code, default is 200
- * @param  {Boolean} get      Indicates if responding to a GET
  * @return {Object}           Response headers
  */
-TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
+TurtleIO.prototype.headers = function ( req, rHeaders, status ) {
 	var timer = precise().start(),
+	    get   = REGEX_GET.test( req.method ),
 	    headers;
 
 	// Decorating response headers
@@ -28,6 +29,11 @@ TurtleIO.prototype.headers = function ( rHeaders, status, get ) {
 
 		if ( !headers.date ) {
 			headers.date = new Date().toUTCString();
+		}
+
+		if ( req.cors && ( req.method == "OPTIONS" || req.headers["x-requested-with"] )  && headers["access-control-allow-origin"] === "*" ) {
+			headers["access-control-allow-origin"] = req.headers.origin || req.headers.referer.replace( /\/$/, "" );
+			headers["access-control-allow-credentials"] = "true";
 		}
 
 		if ( headers["access-control-allow-methods"] !== headers.allow ) {
