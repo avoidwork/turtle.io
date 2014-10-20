@@ -6,17 +6,25 @@
 
 <ul>
 <li><p><strong>arg can be of any type.</strong><br/>(String or Buffer)</p></li>
-<li><p><strong>encrypt must be a String.</strong><br/>([Optional] Type of encryption)</p></li>
-<li><p><strong>digest must be a String.</strong><br/>([Optional] Type of digest)</p></li>
+<li><p><strong>cb must be a Function.</strong><br/>([Optional] Callback function, triggers async behavior)</p></li>
 </ul>
 
-<p><strong>Returns a String</strong><br/>(Hash of arg)</p></div></div><div class="code"><div class="wrapper"><span class="nx">TurtleIO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">hash</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">arg</span><span class="p">,</span> <span class="nx">encrypt</span><span class="p">,</span> <span class="nx">digest</span> <span class="p">)</span> <span class="p">{</span>
-  <span class="nx">encrypt</span> <span class="o">=</span> <span class="nx">encrypt</span> <span class="o">||</span> <span class="s2">&quot;md5&quot;</span><span class="p">;</span>
-  <span class="nx">digest</span>  <span class="o">=</span> <span class="nx">digest</span>  <span class="o">||</span> <span class="s2">&quot;hex&quot;</span><span class="p">;</span>
-
+<p><strong>Returns a String</strong><br/>(Hash of arg)</p></div></div><div class="code"><div class="wrapper"><span class="nx">TurtleIO</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">hash</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">arg</span><span class="p">,</span> <span class="nx">cb</span> <span class="p">)</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span> <span class="k">typeof</span> <span class="nx">arg</span> <span class="o">!=</span> <span class="s2">&quot;string&quot;</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span> <span class="nx">arg</span> <span class="k">instanceof</span> <span class="nx">Buffer</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
     <span class="nx">arg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
   <span class="p">}</span>
 
-  <span class="k">return</span> <span class="nx">crypto</span><span class="p">.</span><span class="nx">createHash</span><span class="p">(</span> <span class="nx">encrypt</span> <span class="p">).</span><span class="nx">update</span><span class="p">(</span> <span class="nx">arg</span> <span class="p">).</span><span class="nx">digest</span><span class="p">(</span> <span class="nx">digest</span> <span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="nx">cb</span> <span class="o">===</span> <span class="kc">undefined</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">mmh3</span><span class="p">.</span><span class="nx">murmur32HexSync</span><span class="p">(</span> <span class="nx">arg</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">seed</span> <span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="p">{</span>
+    <span class="nx">mmh3</span><span class="p">.</span><span class="nx">murmur32Hex</span><span class="p">(</span> <span class="nx">arg</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">seed</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">e</span><span class="p">,</span> <span class="nx">value</span> <span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span> <span class="nx">e</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="nx">cb</span><span class="p">(</span> <span class="nx">e</span><span class="p">,</span> <span class="kc">null</span> <span class="p">);</span>
+      <span class="p">}</span>
+      <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">cb</span><span class="p">(</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">value</span> <span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="p">);</span>
+  <span class="p">}</span>
 <span class="p">};</span></div></div></div></div></body></html>
