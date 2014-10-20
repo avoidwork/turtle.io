@@ -14,7 +14,7 @@ TurtleIO.prototype.log = function ( arg, level ) {
 
 	level = level || "notice";
 
-	if ( this.config.logs.stdout && this.levels.indexOf( level ) <= this.levels.indexOf( this.config.logs.level ) ) {
+	if ( this.config.logs.stdout && this.levels.indexOf( level ) <= LOGLEVEL ) {
 		if ( e ) {
 			console.error( "[" + moment().format( this.config.logs.time ) + "] [" + level + "] " + ( arg.stack || arg.message || arg ) );
 		}

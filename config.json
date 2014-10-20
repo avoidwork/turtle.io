@@ -5,6 +5,7 @@
 	"default" : null,
 	"uid"     : null,
 	"cache"   : 1000,
+	"seed"    : 20110625,
 	"headers" : {
 		"access-control-allow-origin"   : "*",
 		"access-control-allow-headers"  : "content-type, etag, last-modified, x-requested-with",
@@ -23,8 +24,8 @@
 		"format" : "%v %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"",
 		"level"  : "info",
 		"stdout" : true,
-		"syslog" : true,
-		"dtrace" : true
+		"syslog" : false,
+		"dtrace" : false
 	},
 	"maxBytes": 0,
 	"port"    : 8000,
