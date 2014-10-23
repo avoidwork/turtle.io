@@ -90,12 +90,16 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 				}
 
 				if ( self.config.ssl.cert !== null && self.config.ssl.key !== null ) {
+					// POODLE
+					self.config.secureProtocol = "SSLv23_method";
+					self.config.secureOptions  = constants.SSL_OP_NO_SSLv3;
+
 					// Reading files
 					self.config.ssl.cert = fs.readFileSync( self.config.ssl.cert );
 					self.config.ssl.key  = fs.readFileSync( self.config.ssl.key );
 
 					// Starting server
-					self.server = https.createServer( merge( self.config.ssl, {port: self.config.port, host: self.config.address} ), function ( req, res ) {
+					self.server = https.createServer( merge( self.config.ssl, {port: self.config.port, host: self.config.address, secureProtocol: self.config.secureProtocol, secureOptions: self.config.secureOptions} ), function ( req, res ) {
 						self.route( req, res );
 					} ).listen( self.config.port, self.config.address );
 				}
