@@ -8,15 +8,14 @@
 	"seed"    : 20110625,
 	"headers" : {
 		"access-control-allow-origin"   : "*",
-		"access-control-allow-headers"  : "content-type, etag, last-modified, x-requested-with",
+		"access-control-allow-headers"  : "allow, content-type, etag, last-modified, x-requested-with, x-csrftoken",
 		"access-control-allow-methods"  : "",
 		"accept-ranges"                 : "bytes",
 		"allow"                         : "",
 		"cache-control"                 : "max-age=300",
 		"content-type"                  : "text/html; charset=utf-8",
 		"date"                          : "",
-		"last-modified"                 : "",
-		"x-ua-compatible"               : "IE=edge"
+		"last-modified"                 : ""
 	},
 	"index"   : ["index.htm", "index.html"],
 	"logs"    : {
