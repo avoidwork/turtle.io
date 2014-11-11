@@ -143,9 +143,15 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			status  = this.codes.PARTIAL_CONTENT;
 			options = {};
 
-			array.each( req.headers.range.match( /\d+/g ), function ( i, idx ) {
+			array.each( req.headers.range.match( /\d+/g ) || [], function ( i, idx ) {
 				options[idx === 0 ? "start" : "end"] = parseInt( i, 10 );
 			} );
+
+			options.end = options.end || headers["content-length"];
+
+			if ( isNaN( options.start ) || isNaN( options.end ) || options.start >= options.end ) {
+				return this.error( req, res, this.codes.NOT_SATISFIABLE );
+			}
 
 			headers["content-range"]  = "bytes " + options.start + "-" + options.end + "/" + headers["content-length"];
 			headers["content-length"] = number.diff( options.end, options.start ) + 1;
@@ -162,9 +168,15 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			status  = this.codes.PARTIAL_CONTENT;
 			options = {};
 
-			array.each( req.headers.range.match( /\d+/g ), function ( i, idx ) {
+			array.each( req.headers.range.match( /\d+/g ) || [], function ( i, idx ) {
 				options[idx === 0 ? "start" : "end"] = parseInt( i, 10 );
 			} );
+
+			options.end = options.end || headers["content-length"];
+
+			if ( isNaN( options.start ) || isNaN( options.end ) || options.start >= options.end ) {
+				return this.error( req, res, this.codes.NOT_SATISFIABLE );
+			}
 
 			headers["content-range"]  = "bytes " + options.start + "-" + options.end + "/" + headers["content-length"];
 			headers["content-length"] = number.diff( options.end, options.start ) + 1;
