@@ -15,6 +15,14 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	// Merging custom with default config
 	merge( config, cfg || {} );
 
+	// Hooking syslog output
+	if ( !BOOTSTRAPPED ) {
+		BOOTSTRAPPED = true;
+		syslog.init( config.id || "turtle_io", syslog.LOG_PID | syslog.LOG_ODELAY, syslog.LOG_LOCAL0 );
+	}
+
+	this.dtp = dtrace.createDTraceProvider( config.id || "turtle-io" );
+
 	// Duplicating headers for re-decoration
 	headers = clone( config.headers, true );
 
@@ -118,7 +126,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 				process.setuid( self.config.uid );
 			}
 
-			self.log( "Started turtle.io on port " + self.config.port, "debug" );
+			self.log( "Started " + self.config.id + " on port " + self.config.port, "debug" );
 		}
 	} );
 

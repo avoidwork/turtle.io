@@ -8,8 +8,8 @@
  */
 TurtleIO.prototype.log = function ( arg, level ) {
 	var self  = this,
-		timer = precise().start(),
-		e     = arg instanceof Error,
+	    timer = precise().start(),
+	    e     = arg instanceof Error,
 	    syslogMethod;
 
 	level = level || "notice";
@@ -39,7 +39,7 @@ TurtleIO.prototype.log = function ( arg, level ) {
 
 	timer.stop();
 
-	this.dtp.fire( "log", function () {
+	this.signal( "log", function () {
 		return [level, self.config.logs.stdout, self.config.logs.syslog, timer.diff()];
 	} );
 

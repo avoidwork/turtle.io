@@ -5,7 +5,7 @@
  */
 function TurtleIO () {
 	this.config       = {};
-	this.dtp          = dtrace.createDTraceProvider( "turtle-io" );
+	this.dtp          = null;
 	this.etags        = lru( 1000 );
 	this.middleware   = {all: {}};
 	this.routeCache   = lru( 5000 ); // verbs * etags

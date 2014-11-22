@@ -46,7 +46,7 @@ TurtleIO.prototype.error = function ( req, res, status, msg ) {
 
 	timer.stop();
 
-	this.dtp.fire( "error", function () {
+	this.signal( "error", function () {
 		return [req.headers.host, req.parsed.path, status, msg, timer.diff()];
 	} );
 

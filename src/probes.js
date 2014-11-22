@@ -19,7 +19,5 @@ TurtleIO.prototype.probes = function () {
 	this.dtp.addProbe("status",         "int", "int", "int", "int", "int");
 	this.dtp.addProbe("write",          "char *", "char *", "char *", "char *", "int");
 
-	if ( this.config.logs.dtrace ) {
-		this.dtp.enable();
-	}
+	this.dtp.enable();
 };

@@ -19,7 +19,7 @@ TurtleIO.prototype.request = function ( req, res ) {
 	if ( req.headers.expect ) {
 		timer.stop();
 
-		this.dtp.fire( "request", function () {
+		this.signal( "request", function () {
 			return [req.parsed.href, timer.diff()];
 		});
 
@@ -64,7 +64,7 @@ TurtleIO.prototype.request = function ( req, res ) {
 
 		timer.stop();
 
-		self.dtp.fire( "request", function () {
+		self.signal( "request", function () {
 			return [req.parsed.href, timer.diff()];
 		});
 	} );

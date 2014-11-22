@@ -33,7 +33,7 @@ TurtleIO.prototype.compression = function ( agent, encoding, mimetype ) {
 
 	timer.stop();
 
-	this.dtp.fire( "compression", function () {
+	this.signal( "compression", function () {
 		return [agent, timer.diff()];
 	} );
 

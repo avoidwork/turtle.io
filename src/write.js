@@ -21,7 +21,7 @@ TurtleIO.prototype.write = function ( req, res, path ) {
 
 		timer.stop();
 
-		this.dtp.fire( "write", function () {
+		this.signal( "write", function () {
 			return [req.headers.host, req.url, req.method, path, timer.diff()];
 		});
 
@@ -56,7 +56,7 @@ TurtleIO.prototype.write = function ( req, res, path ) {
 
 		timer.stop();
 
-		this.dtp.fire( "write", function () {
+		this.signal( "write", function () {
 			return [req.headers.host, req.url, req.method, path, timer.diff()];
 		});
 	}

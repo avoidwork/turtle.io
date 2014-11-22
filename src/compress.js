@@ -27,7 +27,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 
 				timer.stop();
 
-				self.dtp.fire( "compress", function () {
+				self.signal( "compress", function () {
 					return [etag, fp, timer.diff()];
 				} );
 			}
@@ -53,7 +53,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 
 						timer.stop();
 
-						self.dtp.fire( "compress", function () {
+						self.signal( "compress", function () {
 							return [etag, fp || "dynamic", timer.diff()];
 						} );
 					}
@@ -77,7 +77,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 
 			timer.stop();
 
-			self.dtp.fire( "compress", function () {
+			self.signal( "compress", function () {
 				return [etag, fp, timer.diff()];
 			} );
 		}
@@ -95,7 +95,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 
 				timer.stop();
 
-				self.dtp.fire( "compress", function () {
+				self.signal( "compress", function () {
 					return [etag, fp, timer.diff()];
 				} );
 			}

@@ -39,7 +39,7 @@ TurtleIO.prototype.status = function () {
 
 	timer.stop();
 
-	this.dtp.fire( "status", function () {
+	this.signal( "status", function () {
 		return [state.server.connections, uptime, ram.heapUsed, ram.heapTotal, timer.diff()];
 	} );
 

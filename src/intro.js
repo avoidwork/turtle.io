@@ -25,6 +25,7 @@ var constants     = require( "constants" ),
     syslog        = require( "node-syslog" ),
     zlib          = require( "zlib" ),
     ALL           = "all",
+    BOOTSTRAPPED  = false,
     STALE         = 60000,
     REGEX_BODY    = /^(put|post|patch)$/i,
     REGEX_COMP    = /javascript|json|text|xml/,
@@ -57,6 +58,3 @@ var constants     = require( "constants" ),
     REGEX_SPACE   = /\s+/,
     REGEX_STREAM  = /application|audio|chemical|conference|font|image|message|model|xml|video/,
     REGEX_REWRITE, LOGLEVEL;
-
-// Hooking syslog output
-syslog.init( "turtle_io", syslog.LOG_PID | syslog.LOG_ODELAY, syslog.LOG_LOCAL0 );

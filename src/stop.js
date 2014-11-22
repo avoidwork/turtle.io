@@ -7,9 +7,10 @@
 TurtleIO.prototype.stop = function () {
 	var port = this.config.port;
 
-	this.log( "Stopping turtle.io on port " + port, "debug" );
+	this.log( "Stopping " + this.config.id + " on port " + port, "debug" );
 
 	this.config       = {};
+	this.dtp          = null;
 	this.etags        = lru( 1000 );
 	this.pages        = {all: {}};
 	this.routeCache   = lru( 5000 ); // verbs * etags

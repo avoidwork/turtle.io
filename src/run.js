@@ -19,7 +19,7 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 			timer.stop();
 		}
 
-		self.dtp.fire( "middleware", function () {
+		self.signal( "middleware", function () {
 			return [host, req.url, timer.diff()];
 		} );
 
@@ -60,7 +60,7 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 					timer.stop();
 				}
 
-				self.dtp.fire( "middleware", function () {
+				self.signal( "middleware", function () {
 					return [host, req.url, timer.diff()];
 				} );
 

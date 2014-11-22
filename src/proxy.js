@@ -175,7 +175,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		fn = function ( arg ) {
 			timer.stop();
 
-			self.dtp.fire( "proxy", function () {
+			self.signal( "proxy", function () {
 				return [req.headers.host, req.method, route, origin, timer.diff()];
 			});
 

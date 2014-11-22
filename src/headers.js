@@ -74,7 +74,7 @@ TurtleIO.prototype.headers = function ( req, rHeaders, status ) {
 
 	timer.stop();
 
-	this.dtp.fire( "headers", function () {
+	this.signal( "headers", function () {
 		return [status, timer.diff()];
 	} );
 

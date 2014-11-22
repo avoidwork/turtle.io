@@ -19,7 +19,7 @@ TurtleIO.prototype.allowed = function ( method, uri, host, override ) {
 
 	timer.stop();
 
-	this.dtp.fire( "allowed", function () {
+	this.signal( "allowed", function () {
 		return [host, uri, method.toUpperCase(), timer.diff()];
 	} );
 

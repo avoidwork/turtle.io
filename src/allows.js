@@ -21,7 +21,7 @@ TurtleIO.prototype.allows = function ( uri, host, override ) {
 
 	timer.stop();
 
-	this.dtp.fire( "allows", function () {
+	this.signal( "allows", function () {
 		return [host, uri, timer.diff()];
 	} );
 

@@ -3,6 +3,7 @@
 	"catchAll": true,
 	"compress": true,
 	"default" : null,
+	"id"      : "turtle_io",
 	"uid"     : null,
 	"cache"   : 1000,
 	"seed"    : 20110625,

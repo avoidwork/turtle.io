@@ -203,7 +203,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 
 	timer.stop();
 
-	this.dtp.fire( "respond", function () {
+	this.signal( "respond", function () {
 		return [req.headers.host, req.method, req.url, status, timer.diff()];
 	} );
 
