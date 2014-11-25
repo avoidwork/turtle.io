@@ -42,7 +42,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 		self.respond( req, res, arg, status, headers );
 	};
 
-	res.error = function ( arg, status ) {
+	res.error = function ( status, arg ) {
 		self.error( req, res, status, arg );
 	};
 

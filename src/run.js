@@ -17,11 +17,10 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 	function last ( timer, err ) {
 		if ( timer.stopped === null ) {
 			timer.stop();
+			self.signal( "middleware", function () {
+				return [host, req.url, timer.diff()];
+			} );
 		}
-
-		self.signal( "middleware", function () {
-			return [host, req.url, timer.diff()];
-		} );
 
 		if ( !err ) {
 			if ( REGEX_GET.test( method ) ) {
@@ -58,11 +57,10 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 
 				if ( timer.stopped === null ) {
 					timer.stop();
+					self.signal( "middleware", function () {
+						return [host, req.url, timer.diff()];
+					} );
 				}
-
-				self.signal( "middleware", function () {
-					return [host, req.url, timer.diff()];
-				} );
 
 				if ( i < nth ) {
 					arity === 3 ? middleware[i]( req, res, next ) : middleware[i]( err, req, res, next );

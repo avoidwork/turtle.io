@@ -11,13 +11,12 @@
  * @return {Object}          TurtleIO instance
  */
 TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) {
-	var head = REGEX_HEAD.test( req.method ),
-	    self, timer, ua, encoding, type, options;
-
-	self     = this;
-	timer    = precise().start();
-	ua       = req.headers["user-agent"];
-	encoding = req.headers["accept-encoding"];
+	var head     = REGEX_HEAD.test( req.method ),
+	    self     = this,
+	    timer    = precise().start(),
+	    ua       = req.headers["user-agent"],
+	    encoding = req.headers["accept-encoding"],
+	    type, options;
 
 	if ( body === null || body === undefined ) {
 		body = this.messages.NO_CONTENT;
@@ -30,7 +29,6 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	if ( head ) {
 		delete headers.etag;
 		delete headers["last-modified"];
-		delete headers.expires;
 	}
 
 	if ( !file && body !== this.messages.NO_CONTENT ) {

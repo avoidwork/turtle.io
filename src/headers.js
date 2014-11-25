@@ -31,18 +31,15 @@ TurtleIO.prototype.headers = function ( req, rHeaders, status ) {
 			headers.date = new Date().toUTCString();
 		}
 
-		if ( req.cors && ( req.method == "OPTIONS" || req.headers["x-requested-with"] )  && headers["access-control-allow-origin"] === "*" ) {
-			headers["access-control-allow-origin"] = req.headers.origin || req.headers.referer.replace( /\/$/, "" );
-			headers["access-control-allow-credentials"] = "true";
-		}
+		if ( req.cors ) {
+			if ( ( req.method == "OPTIONS" || req.headers[ "x-requested-with" ] ) && headers[ "access-control-allow-origin" ] === "*" ) {
+				headers[ "access-control-allow-origin" ] = req.headers.origin || req.headers.referer.replace( /\/$/, "" );
+				headers[ "access-control-allow-credentials" ] = "true";
+			}
 
-		if ( headers["access-control-allow-methods"] !== headers.allow ) {
-			headers["access-control-allow-methods"] = headers.allow;
-		}
-
-		// Decorating "Expires" header
-		if ( headers.expires === undefined && headers["cache-control"] && REGEX_NUMBER.test( headers["cache-control"] ) ) {
-			headers.expires = new Date( new Date( new Date().getTime() + number.parse( REGEX_NUMBER.exec( headers["cache-control"] )[0], 10 ) * 1000 ) ).toUTCString();
+			if ( headers[ "access-control-allow-methods" ] !== headers.allow ) {
+				headers[ "access-control-allow-methods" ] = headers.allow;
+			}
 		}
 
 		// Decorating "Transfer-Encoding" header
@@ -54,10 +51,10 @@ TurtleIO.prototype.headers = function ( req, rHeaders, status ) {
 		if ( !get || status >= this.codes.BAD_REQUEST ) {
 			delete headers["cache-control"];
 			delete headers.etag;
-			delete headers.expires;
 			delete headers["last-modified"];
 		}
-		else if ( status === this.codes.NOT_MODIFIED ) {
+
+		if ( status === this.codes.NOT_MODIFIED ) {
 			delete headers["last-modified"];
 		}
 
@@ -65,7 +62,7 @@ TurtleIO.prototype.headers = function ( req, rHeaders, status ) {
 			delete headers["accept-ranges"];
 		}
 
-		if ( headers["last-modified"] !== undefined && string.isEmpty( headers["last-modified"] ) ) {
+		if ( !headers["last-modified"] ) {
 			delete headers["last-modified"];
 		}
 	}
