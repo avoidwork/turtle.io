@@ -11,6 +11,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 	    url    = this.url( req ),
 	    method = req.method.toLowerCase(),
 	    parsed = parse( url ),
+	    update = false,
 	    payload;
 
 	if ( REGEX_HEAD.test( method ) ) {
@@ -32,6 +33,17 @@ TurtleIO.prototype.route = function ( req, res ) {
 	} );
 
 	req.vhost = req.vhost || this.config["default"];
+
+	// Adding middleware to avoid the round trip next time
+	if ( !this.allowed( "get", req.parsed.pathname, req.vhost ) ) {
+		this.get( req.parsed.pathname, function ( req, res ) {
+			self.request( req, res );
+		}, req.vhost );
+
+		update = true;
+	}
+
+	req.allow = this.allows( req.parsed.pathname, req.vhost, update );
 
 	// Decorating response
 	res.redirect = function ( uri ) {

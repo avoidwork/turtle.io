@@ -76,10 +76,6 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	if ( status === this.codes.NOT_MODIFIED || status < this.codes.MULTIPLE_CHOICE || status >= this.codes.BAD_REQUEST ) {
 		// req.parsed may not exist if coming from `error()`
 		if ( req.parsed ) {
-			if ( !headers.allow && status !== this.codes.NOT_FOUND && status < this.codes.SERVER_ERROR ) {
-				headers.allow = req.allow || this.allows( req.parsed.pathname, req.vhost );
-			}
-
 			if ( req.method === "GET" && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) ) {
 				// Updating cache
 				if ( !REGEX_NOCACHE.test( headers["cache-control"] ) && !REGEX_PRIVATE.test( headers["cache-control"] ) ) {
@@ -100,17 +96,6 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			delete headers.allow;
 			delete headers["access-control-allow-methods"];
 		}
-	}
-
-	// CORS headers cleanup
-	if ( req.cors ) {
-		headers["access-control-allow-methods"] = headers.allow;
-	}
-	else {
-		delete headers["access-control-allow-headers"];
-		delete headers["access-control-allow-methods"];
-		delete headers["access-control-allow-origin"];
-		delete headers["access-control-expose-headers"];
 	}
 
 	// Fixing 'accept-ranges' for non-filesystem based responses

@@ -7,41 +7,43 @@
  * @return {Object}       TurtleIO instance
  */
 TurtleIO.prototype.log = function ( arg, level ) {
-	var self  = this,
-	    timer = precise().start(),
-	    e     = arg instanceof Error,
-	    syslogMethod;
+	var self, timer, e, syslogMethod;
 
-	level = level || "notice";
+	if ( LOGGING ) {
+		self = this;
+		timer = precise().start();
+		e = arg instanceof Error;
+		level = level || "notice";
 
-	if ( this.config.logs.stdout && this.levels.indexOf( level ) <= LOGLEVEL ) {
-		if ( e ) {
-			console.error( "[" + moment().format( this.config.logs.time ) + "] [" + level + "] " + ( arg.stack || arg.message || arg ) );
+		if ( this.config.logs.stdout && this.levels.indexOf( level ) <= LOGLEVEL ) {
+			if ( e ) {
+				console.error( "[" + moment().format( this.config.logs.time ) + "] [" + level + "] " + ( arg.stack || arg.message || arg ) );
+			}
+			else {
+				console.log( arg );
+			}
 		}
-		else {
-			console.log( arg );
+
+		if ( this.config.logs.syslog ) {
+			if ( level === "error" ) {
+				syslogMethod = "LOG_ERR";
+			}
+			else if ( level === "warn" ) {
+				syslogMethod = "LOG_WARNING";
+			}
+			else {
+				syslogMethod = "LOG_" + level.toUpperCase();
+			}
+
+			syslog.log( syslog[ syslogMethod ], arg.stack || arg.message || arg );
 		}
+
+		timer.stop();
+
+		this.signal( "log", function () {
+			return [ level, self.config.logs.stdout, self.config.logs.syslog, timer.diff() ];
+		} );
 	}
-
-	if ( this.config.logs.syslog ) {
-		if ( level === "error" ) {
-			syslogMethod = "LOG_ERR";
-		}
-		else if ( level === "warn" ) {
-			syslogMethod = "LOG_WARNING";
-		}
-		else {
-			syslogMethod = "LOG_" + level.toUpperCase();
-		}
-
-		syslog.log( syslog[syslogMethod], arg.stack || arg.message || arg );
-	}
-
-	timer.stop();
-
-	this.signal( "log", function () {
-		return [level, self.config.logs.stdout, self.config.logs.syslog, timer.diff()];
-	} );
 
 	return this;
 };

@@ -40,6 +40,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 
 	pages    = this.config.pages ? ( this.config.root + this.config.pages ) : ( __dirname + "/../pages" );
 	LOGLEVEL = this.levels.indexOf( this.config.logs.level );
+	LOGGING  = this.config.logs.dtrace || this.config.logs.stdout || this.config.logs.syslog;
 
 	// Looking for required setting
 	if ( !this.config["default"] ) {

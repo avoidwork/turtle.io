@@ -25,11 +25,8 @@ turtle.io requires a ***default*** virtual host to be specified, because it is t
 Virtual host keys are the hostname, and the value is the directory relative to "root".
 
 ```javascript
-var turtleio = require("turtle.io"),
-    server   = turtleio(),
-    params;
-
-params = {
+var server = require("turtle.io")();
+server.start({
 	default : "mysite.com",
 	port    : 80,
 	uid     : 100,
@@ -39,9 +36,7 @@ params = {
 		"mysite.com"         : "mysite.com",
 		"another-domain.com" : "another-domain.com"
 	}
-};
-
-server.start(params);
+});
 ```
 
 ### Proxy routes
@@ -49,13 +44,9 @@ server.start(params);
 This example has `/api` act as a reverse proxy to another service.
 
 ```javascript
-var config   = require("./config.json"),
-    turtleio = require("turtle.io"),
-    server   = turtleio();
-
+var server = require("turtle.io")();
 server.proxy("/api", "https://api.github.com");
-
-server.start(config);
+server.start(require(__dirname + "/config.json"));
 ```
 
 ## License

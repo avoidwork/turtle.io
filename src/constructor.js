@@ -8,6 +8,7 @@ function TurtleIO () {
 	this.dtp          = null;
 	this.etags        = lru( 1000 );
 	this.middleware   = {all: {}};
+	this.permissions  = lru( 1000 );
 	this.routeCache   = lru( 5000 ); // verbs * etags
 	this.pages        = {all: {}};
 	this.server       = null;

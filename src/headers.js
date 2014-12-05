@@ -19,13 +19,7 @@ TurtleIO.prototype.headers = function ( req, rHeaders, status ) {
 	else if ( rHeaders instanceof Object  ) {
 		headers = clone( this.config.headers, true );
 		merge( headers, rHeaders );
-
-		// Fixing `Allow` header
-		if ( headers.allow && !REGEX_HEAD2.test( headers.allow ) ) {
-			headers.allow = string.explode( headers.allow.toUpperCase() ).filter( function ( i ) {
-				return !REGEX_HEAD.test( i );
-			} ).join( ", " ).replace( "GET", "GET, HEAD, OPTIONS" );
-		}
+		headers.allow = req.allow;
 
 		if ( !headers.date ) {
 			headers.date = new Date().toUTCString();
@@ -37,9 +31,13 @@ TurtleIO.prototype.headers = function ( req, rHeaders, status ) {
 				headers[ "access-control-allow-credentials" ] = "true";
 			}
 
-			if ( headers[ "access-control-allow-methods" ] !== headers.allow ) {
-				headers[ "access-control-allow-methods" ] = headers.allow;
-			}
+			headers[ "access-control-allow-methods" ] = headers.allow;
+		}
+		else {
+			delete headers["access-control-allow-headers"];
+			delete headers["access-control-allow-methods"];
+			delete headers["access-control-allow-origin"];
+			delete headers["access-control-expose-headers"];
 		}
 
 		// Decorating "Transfer-Encoding" header

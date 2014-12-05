@@ -13,6 +13,7 @@ TurtleIO.prototype.stop = function () {
 	this.dtp          = null;
 	this.etags        = lru( 1000 );
 	this.pages        = {all: {}};
+	this.permissions  = lru( 1000 );
 	this.routeCache   = lru( 5000 ); // verbs * etags
 	this.vhosts       = [];
 	this.vhostsRegExp = [];

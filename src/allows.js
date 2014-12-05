@@ -10,14 +10,16 @@
 TurtleIO.prototype.allows = function ( uri, host, override ) {
 	var self   = this,
 	    timer  = precise().start(),
-	    verbs  = ["delete", "get", "post", "put", "patch"],
-	    result;
+	    result = !override ? this.permissions.get( host + "_" + uri ) : undefined;
 
-	result = verbs.filter( function ( i ) {
-		return self.allowed( i, uri, host, override );
-	} );
+	if ( override || !result ) {
+		result = VERBS.filter( function ( i ) {
+			return self.allowed( i, uri, host, override );
+		} );
 
-	result = result.join( ", " ).toUpperCase().replace( "GET", "GET, HEAD, OPTIONS" );
+		result = result.join( ", " ).toUpperCase().replace( "GET", "GET, HEAD, OPTIONS" );
+		this.permissions.set( host + "_" + uri, result );
+	}
 
 	timer.stop();
 
