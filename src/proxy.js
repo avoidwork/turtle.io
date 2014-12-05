@@ -9,9 +9,8 @@
  * @return {Object}         TurtleIO instance
  */
 TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
-	stream    = ( stream === true );
-	var self  = this,
-	    verbs = ["delete", "get", "post", "put", "patch"];
+	stream   = ( stream === true );
+	var self = this;
 
 	/**
 	 * Response handler
@@ -241,7 +240,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	}
 
 	// Setting route
-	array.each( verbs, function ( i ) {
+	array.each( VERBS, function ( i ) {
 		if ( route === "/" ) {
 			self[i]( "/.*", wrapper, host );
 		}

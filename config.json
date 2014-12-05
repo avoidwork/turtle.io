@@ -13,7 +13,6 @@
 		"access-control-allow-methods"  : "",
 		"accept-ranges"                 : "bytes",
 		"allow"                         : "",
-		"cache-control"                 : "max-age=300",
 		"content-type"                  : "text/html; charset=utf-8",
 		"date"                          : "",
 		"last-modified"                 : ""

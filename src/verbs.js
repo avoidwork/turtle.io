@@ -8,11 +8,11 @@
  * @return {Object}         TurtleIO instance
  */
 TurtleIO.prototype.all = function ( route, fn, host ) {
-	this.use( route, fn, host, "delete" );
-	this.use( route, fn, host, "get" );
-	this.use( route, fn, host, "patch" );
-	this.use( route, fn, host, "post" );
-	this.use( route, fn, host, "put" );
+	var self = this;
+
+	array.each( VERBS, function ( i ) {
+		self.use( route, fn, host, i );
+	} );
 
 	return this;
 };
