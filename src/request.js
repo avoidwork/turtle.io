@@ -33,7 +33,7 @@ TurtleIO.prototype.request = function ( req, res ) {
 	}
 
 	// Are we still in the virtual host root?
-	if ( invalid || ( ( out_dir || in_dir ) && ( out_dir >= REGEX_DIR.test( req.parsed.pathname ) ? in_dir : ( in_dir - 1 ) ) ) ) {
+	if ( invalid || ( out_dir > 0 && out_dir >= in_dir ) ) {
 		end();
 		return this.error( req, res, this.codes.NOT_FOUND );
 	}
