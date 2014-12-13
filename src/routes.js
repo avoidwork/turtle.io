@@ -21,36 +21,19 @@ TurtleIO.prototype.routes = function ( uri, host, method, override ) {
 	h      = this.middleware[host] || {};
 	result = [];
 
-	if ( all.all ) {
-		array.each( array.keys( all.all ).filter( function ( i ) {
-			return new RegExp( "^" + i + "$", "i" ).test( uri );
-		} ), function ( i ) {
-			result = result.concat( all.all[i] );
+	try {
+		array.each( [ all.all, all[method], h.all, h[method] ], function ( c ) {
+			if ( c ) {
+				array.each( array.keys( c ).filter( function ( i ) {
+					return new RegExp( "^" + i + "$", "i" ).test( uri );
+				} ), function ( i ) {
+					result = result.concat( c[ i ] );
+				} );
+			}
 		} );
 	}
-
-	if ( all[method] ) {
-		array.each( array.keys( all[method] ).filter( function ( i ) {
-			return new RegExp( "^" + i + "$", "i" ).test( uri );
-		} ), function ( i ) {
-			result = result.concat( all[method][i] );
-		} );
-	}
-
-	if ( h.all ) {
-		array.each( array.keys( h.all ).filter( function ( i ) {
-			return new RegExp( "^" + i + "$", "i" ).test( uri );
-		} ), function ( i ) {
-			result = result.concat( h.all[i] );
-		} );
-	}
-
-	if ( h[method] ) {
-		array.each( array.keys( h[method] ).filter( function ( i ) {
-			return new RegExp( "^" + i + "$", "i" ).test( uri );
-		} ), function ( i ) {
-			result = result.concat( h[method][i] );
-		} );
+	catch ( e ) {
+		result = [];
 	}
 
 	this.routeCache.set( id, result );
