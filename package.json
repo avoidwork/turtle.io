@@ -42,8 +42,11 @@
     "grunt-sed": "~0.1.1",
     "grunt-contrib-concat": "~0.5.0",
     "grunt-contrib-jshint": "~0.10.0",
-    "grunt-contrib-nodeunit": "~0.4.1",
-    "grunt-contrib-watch": "~0.6.1"
+    "grunt-contrib-watch": "~0.6.1",
+    "hippie": "~0.3.0",
+    "chai": "^1.9.1",
+    "grunt-mocha-test": "^0.11.0",
+    "grunt-nsp-package": "^0.0.5"
   },
   "keywords": ["web server", "http", "https", "web", "server", "virtual", "virtual hosts", "proxy", "reverse proxy", "api", "cache", "application", "static"]
 }
