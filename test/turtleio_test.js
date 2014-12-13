@@ -1,16 +1,15 @@
 var hippie = require( "hippie" ),
 	turtleio = require( "../lib/turtle.io" ),
-	port = 8001,
 	etag = "";
 
-function request ( port ) {
-	return hippie().base( "http://localhost:" + port );
+function request () {
+	return hippie().base( "http://localhost:8001" );
 }
 
 turtleio().start( {
 	default: "test",
 	root: __dirname + "/../sites",
-	port: port,
+	port: 8001,
 	logs: {
 		stdout: false,
 		dtrace: true,
@@ -23,7 +22,7 @@ turtleio().start( {
 
 describe( "Status messages & response bodies", function () {
 	it( "GET / (200 / 'Hello World!')", function ( done ) {
-		request( port )
+		request()
 			.get( "/" )
 			.expectStatus( 200 )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
@@ -36,7 +35,7 @@ describe( "Status messages & response bodies", function () {
 	} );
 
 	it( "GET / (304 / empty)", function ( done ) {
-		request( port )
+		request()
 			.header( "If-None-Match", etag )
 			.get( "/" )
 			.expectStatus( 304 )
@@ -48,7 +47,7 @@ describe( "Status messages & response bodies", function () {
 	} );
 
 	it( "GET / (304 / empty / validation)", function ( done ) {
-		request( port )
+		request()
 			.header( "If-None-Match", etag )
 			.get( "/" )
 			.expectStatus( 304 )
@@ -60,7 +59,7 @@ describe( "Status messages & response bodies", function () {
 	} );
 
 	it( "GET /nothere.html (404 / 'File not found')", function ( done ) {
-		request( port )
+		request()
 			.get( "/nothere.html" )
 			.expectStatus( 404 )
 			.expectBody(/File not found/)
@@ -71,7 +70,7 @@ describe( "Status messages & response bodies", function () {
 	} );
 
 	it( "GET /../README (404 / 'File not found')", function ( done ) {
-		request( port )
+		request()
 			.get( "/../README" )
 			.expectStatus( 404 )
 			.expectBody(/File not found/)
@@ -82,7 +81,7 @@ describe( "Status messages & response bodies", function () {
 	} );
 
 	it( "GET /././../README (404 / 'File not found')", function ( done ) {
-		request( port )
+		request()
 			.get( "/././../README" )
 			.expectStatus( 404 )
 			.expectBody(/File not found/)
@@ -93,7 +92,7 @@ describe( "Status messages & response bodies", function () {
 	} );
 
 	it( "POST / (405 / 'Method not allowed')", function ( done ) {
-		request( port )
+		request()
 			.post( "/" )
 			.expectStatus( 405 )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
@@ -105,7 +104,7 @@ describe( "Status messages & response bodies", function () {
 	} );
 
 	it( "PUT / (405 / 'Method not allowed')", function ( done ) {
-		request( port )
+		request()
 			.put( "/" )
 			.expectStatus( 405 )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
@@ -117,7 +116,7 @@ describe( "Status messages & response bodies", function () {
 	} );
 
 	it( "PATCH / (405 / 'Method not allowed')", function ( done ) {
-		request( port )
+		request()
 			.patch( "/" )
 			.expectStatus( 405 )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
@@ -129,7 +128,7 @@ describe( "Status messages & response bodies", function () {
 	} );
 
 	it( "DELETE / (405 / 'Method not allowed')", function ( done ) {
-		request( port )
+		request()
 			.del( "/" )
 			.expectStatus( 405 )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
