@@ -56,6 +56,7 @@ var constants     = require( "constants" ),
     REGEX_PRIVATE = /private/,
     REGEX_REFUSED = /ECONNREFUSED/,
     REGEX_RENAME  = /^rename$/,
+    REGEX_ROOT    = /^\//,
     REGEX_SPACE   = /\s+/,
     REGEX_STREAM  = /application|audio|chemical|conference|font|image|message|model|xml|video/,
     REGEX_REWRITE, LOGLEVEL;
