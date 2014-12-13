@@ -46,7 +46,7 @@ TurtleIO.prototype.request = function ( req, res ) {
 		}
 	} );
 
-	if ( invalid || out_dir >= REGEX_ROOT.test( req.parsed.pathname ) ? in_dir : ( in_dir - 1 ) ) {
+	if ( invalid || out_dir >= REGEX_DIR.test( req.parsed.pathname ) ? in_dir : ( in_dir - 1 ) ) {
 		end();
 		return this.error( req, res, this.codes.NOT_FOUND );
 	}
