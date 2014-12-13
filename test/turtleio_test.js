@@ -1,12 +1,16 @@
 var hippie = require( "hippie" ),
-	TurtleIO = require( "../lib/turtle.io" ),
-	merge = require( "keigai" ).util.merge,
+	turtleio = require( "../lib/turtle.io" ),
+	util = require( "keigai" ).util,
+	iterate = util.iterate,
+	merge = util.merge,
+	PORT = 8000,
+	etag = "",
 	opts = {
 		default: "test",
 		root: __dirname + "/../sites",
 		logs: {
 			stdout: false,
-			dtrace: false,
+			dtrace: true,
 			syslog: false
 		},
 		vhosts: {
@@ -19,17 +23,55 @@ function request ( port ) {
 }
 
 describe( "GET (discovery)", function () {
-	var port = 8001;
+	var port = ++PORT;
 
-	new TurtleIO().start( merge( { port: port }, opts ) );
-
+	turtleio().start( merge( { port: port }, opts ) );
 	describe( "GET /", function () {
 		it( "returns a 'Hello World!' message", function ( done ) {
 			request( port )
 				.get( "/" )
 				.expectStatus( 200 )
 				.expectHeader( "allow", "GET, HEAD, OPTIONS" )
-				.expectBody("<html>\n<body>\n\t<h1>Hello world!</h1>\n</body>\n</html>\n")
+				.expectBody(/Hello world!/)
+				.end( function ( err, res ) {
+					if ( err ) throw err;
+					etag = res.headers.etag;
+					done();
+				} );
+		} );
+	} );
+} );
+
+describe( "GET (ETag)", function () {
+	var port = ++PORT;
+
+	turtleio().start( merge( { port: port }, opts ) );
+	describe( "GET /", function () {
+		it( "returns an empty response with a 304", function ( done ) {
+			request( port )
+				.header( "If-None-Match", etag )
+				.get( "/" )
+				.expectStatus( 304 )
+				.expectHeader( "etag", etag )
+				.end( function ( err ) {
+					if ( err ) throw err;
+					done();
+				} );
+		} );
+	} );
+} );
+
+describe( "GET (ETag - validation)", function () {
+	var port = ++PORT;
+
+	turtleio().start( merge( { port: port }, opts ) );
+	describe( "GET /", function () {
+		it( "returns an empty response with a 304", function ( done ) {
+			request( port )
+				.header( "If-None-Match", etag )
+				.get( "/" )
+				.expectStatus( 304 )
+				.expectHeader( "etag", etag )
 				.end( function ( err ) {
 					if ( err ) throw err;
 					done();
@@ -39,16 +81,15 @@ describe( "GET (discovery)", function () {
 } );
 
 describe( "GET (invalid - external file)", function () {
-	var port = 8002;
+	var port = ++PORT;
 
-	new TurtleIO().start( merge( { port: port }, opts ) );
-
+	turtleio().start( merge( { port: port }, opts ) );
 	describe( "GET /../README", function () {
 		it( "returns a 'File not found' message", function ( done ) {
 			request( port )
 				.get( "/../README" )
 				.expectStatus( 404 )
-				.expectBody("<html>\n<head>\n\t<title>File not found</title>\n</head>\n<body>\n\t<h1>File not found</h1>\n\t<p>Please verify the URL and try again</p>\n</body>\n</html>\n")
+				.expectBody(/File not found/)
 				.end( function ( err ) {
 					if ( err ) throw err;
 					done();
@@ -58,16 +99,15 @@ describe( "GET (invalid - external file)", function () {
 } );
 
 describe( "GET (invalid - relative / external file)", function () {
-	var port = 8003;
+	var port = ++PORT;
 
-	new TurtleIO().start( merge( { port: port }, opts ) );
-
-	describe( "GET /../README", function () {
+	turtleio().start( merge( { port: port }, opts ) );
+	describe( "GET /././././../README", function () {
 		it( "returns a 'File not found' message", function ( done ) {
 			request( port )
 				.get( "/././././../README" )
 				.expectStatus( 404 )
-				.expectBody("<html>\n<head>\n\t<title>File not found</title>\n</head>\n<body>\n\t<h1>File not found</h1>\n\t<p>Please verify the URL and try again</p>\n</body>\n</html>\n")
+				.expectBody(/File not found/)
 				.end( function ( err ) {
 					if ( err ) throw err;
 					done();
@@ -77,17 +117,16 @@ describe( "GET (invalid - relative / external file)", function () {
 } );
 
 describe( "POST (invalid)", function () {
-	var port = 8004;
+	var port = ++PORT;
 
-	new TurtleIO().start( merge( { port: port }, opts ) );
-
+	turtleio().start( merge( { port: port }, opts ) );
 	describe( "POST /", function () {
 		it( "returns a 'Method not allowed' message", function ( done ) {
 			request( port )
 				.post( "/" )
 				.expectStatus( 405 )
 				.expectHeader( "allow", "GET, HEAD, OPTIONS" )
-				.expectBody("<html>\n<head>\n\t<title>Method not allowed</title>\n</head>\n<body>\n\t<h1>Method not allowed</h1>\n\t<p>Please verify the `Allow` header and try again</p>\n</body>\n</html>\n")
+				.expectBody(/Method not allowed/)
 				.end( function ( err ) {
 					if ( err ) throw err;
 					done();
@@ -97,17 +136,16 @@ describe( "POST (invalid)", function () {
 } );
 
 describe( "PUT (invalid)", function () {
-	var port = 8005;
+	var port = ++PORT;
 
-	new TurtleIO().start( merge( { port: port }, opts ) );
-
+	turtleio().start( merge( { port: port }, opts ) );
 	describe( "PUT /", function () {
 		it( "returns a 'Method not allowed' message", function ( done ) {
 			request( port )
 				.put( "/" )
 				.expectStatus( 405 )
 				.expectHeader( "allow", "GET, HEAD, OPTIONS" )
-				.expectBody("<html>\n<head>\n\t<title>Method not allowed</title>\n</head>\n<body>\n\t<h1>Method not allowed</h1>\n\t<p>Please verify the `Allow` header and try again</p>\n</body>\n</html>\n")
+				.expectBody(/Method not allowed/)
 				.end( function ( err ) {
 					if ( err ) throw err;
 					done();
@@ -117,17 +155,16 @@ describe( "PUT (invalid)", function () {
 } );
 
 describe( "PATCH (invalid)", function () {
-	var port = 8006;
+	var port = ++PORT;
 
-	new TurtleIO().start( merge( { port: port }, opts ) );
-
+	turtleio().start( merge( { port: port }, opts ) );
 	describe( "PATCH /", function () {
 		it( "returns a 'Method not allowed' message", function ( done ) {
 			request( port )
 				.patch( "/" )
 				.expectStatus( 405 )
 				.expectHeader( "allow", "GET, HEAD, OPTIONS" )
-				.expectBody("<html>\n<head>\n\t<title>Method not allowed</title>\n</head>\n<body>\n\t<h1>Method not allowed</h1>\n\t<p>Please verify the `Allow` header and try again</p>\n</body>\n</html>\n")
+				.expectBody(/Method not allowed/)
 				.end( function ( err ) {
 					if ( err ) throw err;
 					done();
@@ -137,17 +174,16 @@ describe( "PATCH (invalid)", function () {
 } );
 
 describe( "DELETE (invalid)", function () {
-	var port = 8007;
+	var port = ++PORT;
 
-	new TurtleIO().start( merge( { port: port }, opts ) );
-
-	describe( "PATCH /", function () {
+	turtleio().start( merge( { port: port }, opts ) );
+	describe( "DELETE /", function () {
 		it( "returns a 'Method not allowed' message", function ( done ) {
 			request( port )
 				.del( "/" )
 				.expectStatus( 405 )
 				.expectHeader( "allow", "GET, HEAD, OPTIONS" )
-				.expectBody("<html>\n<head>\n\t<title>Method not allowed</title>\n</head>\n<body>\n\t<h1>Method not allowed</h1>\n\t<p>Please verify the `Allow` header and try again</p>\n</body>\n</html>\n")
+				.expectBody(/Method not allowed/)
 				.end( function ( err ) {
 					if ( err ) throw err;
 					done();

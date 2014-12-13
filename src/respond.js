@@ -103,9 +103,12 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		delete headers["accept-ranges"];
 	}
 
-	// Removing header because it's ambiguous
 	if ( status === this.codes.NOT_MODIFIED ) {
 		delete headers["accept-ranges"];
+		delete headers["content-length"];
+		delete headers["content-type"];
+		delete headers.date;
+		delete headers["transfer-encoding"];
 	}
 
 	// Clean up, in case it these are still hanging around
@@ -118,7 +121,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	headers["x-response-time"]  = ( ( req.timer.stopped === null ? req.timer.stop() : req.timer ).diff() / 1000000 ).toFixed( 2 ) + " ms";
 
 	// Determining if response should be compressed
-	if ( status === this.codes.SUCCESS && body && this.config.compress && ( type = this.compression( ua, encoding, headers["content-type"] ) ) && type !== null ) {
+	if ( ua && status === this.codes.SUCCESS && body && this.config.compress && ( type = this.compression( ua, encoding, headers["content-type"] ) ) && type !== null ) {
 		headers["content-encoding"]  = REGEX_GZIP.test( type ) ? "gzip" : "deflate";
 		headers["transfer-encoding"] = "chunked";
 
