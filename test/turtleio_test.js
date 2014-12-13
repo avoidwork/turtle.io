@@ -20,13 +20,28 @@ turtleio().start( {
 	}
 } );
 
-describe( "Status messages & response bodies", function () {
+describe( "Requests", function () {
 	it( "GET / (200 / 'Hello World!')", function ( done ) {
 		request()
 			.get( "/" )
 			.expectStatus( 200 )
+			.expectHeader( "status", "200 OK" )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
 			.expectBody(/Hello world!/)
+			.end( function ( err, res ) {
+				if ( err ) throw err;
+				etag = res.headers.etag;
+				done();
+			} );
+	} );
+
+	it( "GET / (206 / 'Partial response')", function ( done ) {
+		request()
+			.get( "/" )
+			.header( "range", "0-5" )
+			.expectStatus( 206 )
+			.expectHeader( "status", "206 Partial Content" )
+			.expectBody(/^\<html\>$/)
 			.end( function ( err, res ) {
 				if ( err ) throw err;
 				etag = res.headers.etag;
@@ -39,6 +54,7 @@ describe( "Status messages & response bodies", function () {
 			.header( "If-None-Match", etag )
 			.get( "/" )
 			.expectStatus( 304 )
+			.expectHeader( "status", "304 Not Modified" )
 			.expectHeader( "etag", etag )
 			.end( function ( err ) {
 				if ( err ) throw err;
@@ -51,6 +67,7 @@ describe( "Status messages & response bodies", function () {
 			.header( "If-None-Match", etag )
 			.get( "/" )
 			.expectStatus( 304 )
+			.expectHeader( "status", "304 Not Modified" )
 			.expectHeader( "etag", etag )
 			.end( function ( err ) {
 				if ( err ) throw err;
@@ -62,6 +79,7 @@ describe( "Status messages & response bodies", function () {
 		request()
 			.get( "/nothere.html" )
 			.expectStatus( 404 )
+			.expectHeader( "status", "404 Not Found" )
 			.expectBody(/File not found/)
 			.end( function ( err ) {
 				if ( err ) throw err;
@@ -73,6 +91,7 @@ describe( "Status messages & response bodies", function () {
 		request()
 			.get( "/../README" )
 			.expectStatus( 404 )
+			.expectHeader( "status", "404 Not Found" )
 			.expectBody(/File not found/)
 			.end( function ( err ) {
 				if ( err ) throw err;
@@ -84,6 +103,7 @@ describe( "Status messages & response bodies", function () {
 		request()
 			.get( "/././../README" )
 			.expectStatus( 404 )
+			.expectHeader( "status", "404 Not Found" )
 			.expectBody(/File not found/)
 			.end( function ( err ) {
 				if ( err ) throw err;
@@ -95,6 +115,7 @@ describe( "Status messages & response bodies", function () {
 		request()
 			.post( "/" )
 			.expectStatus( 405 )
+			.expectHeader( "status", "405 Method Not Allowed" )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
 			.expectBody(/Method not allowed/)
 			.end( function ( err ) {
@@ -107,6 +128,7 @@ describe( "Status messages & response bodies", function () {
 		request()
 			.put( "/" )
 			.expectStatus( 405 )
+			.expectHeader( "status", "405 Method Not Allowed" )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
 			.expectBody(/Method not allowed/)
 			.end( function ( err ) {
@@ -119,6 +141,7 @@ describe( "Status messages & response bodies", function () {
 		request()
 			.patch( "/" )
 			.expectStatus( 405 )
+			.expectHeader( "status", "405 Method Not Allowed" )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
 			.expectBody(/Method not allowed/)
 			.end( function ( err ) {
@@ -131,6 +154,7 @@ describe( "Status messages & response bodies", function () {
 		request()
 			.del( "/" )
 			.expectStatus( 405 )
+			.expectHeader( "status", "405 Method Not Allowed" )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
 			.expectBody(/Method not allowed/)
 			.end( function ( err ) {

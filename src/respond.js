@@ -140,6 +140,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 				return this.error( req, res, this.codes.NOT_SATISFIABLE );
 			}
 
+			headers.status = status + " " + http.STATUS_CODES[status];
 			headers["content-range"]  = "bytes " + options.start + "-" + options.end + "/" + headers["content-length"];
 			headers["content-length"] = number.diff( options.end, options.start ) + 1;
 		}
@@ -165,6 +166,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 				return this.error( req, res, this.codes.NOT_SATISFIABLE );
 			}
 
+			headers.status = status + " " + http.STATUS_CODES[status];
 			headers["content-range"]  = "bytes " + options.start + "-" + options.end + "/" + headers["content-length"];
 			headers["content-length"] = number.diff( options.end, options.start ) + 1;
 		}

@@ -21,6 +21,10 @@ TurtleIO.prototype.headers = function ( req, rHeaders, status ) {
 		merge( headers, rHeaders );
 		headers.allow = req.allow;
 
+		if ( !headers.date ) {
+			headers.date = new Date().toUTCString();
+		}
+
 		if ( req.cors ) {
 			if ( ( req.method == "OPTIONS" || req.headers[ "x-requested-with" ] ) && headers[ "access-control-allow-origin" ] === "*" ) {
 				headers[ "access-control-allow-origin" ] = req.headers.origin || req.headers.referer.replace( /\/$/, "" );
