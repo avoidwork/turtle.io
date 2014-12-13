@@ -13,14 +13,14 @@ TurtleIO.prototype.request = function ( req, res ) {
 	    method  = req.method,
 	    handled = false,
 	    host    = req.vhost,
-	    in_dir  = 0,
-	    out_dir = 0,
-	    invalid = false,
+	    pathname= req.parsed.pathname.replace( REGEX_ROOT, "" ),
+	    invalid = ( pathname.replace( REGEX_DIR, "" ).split( "/" ).filter( function ( i ) { return i != "."; } )[0] || "" ) == "..",
+	    out_dir = !invalid ? ( pathname.match( /\.{2}\//g ) || [] ).length : 0,
+	    in_dir  = !invalid ? ( pathname.match( /\w+?(\.\w+|\/)+/g ) || [] ).length : 0,
 	    count, path, nth, root;
 
 	function end () {
 		timer.stop();
-
 		self.signal( "request", function () {
 			return [req.parsed.href, timer.diff()];
 		});
@@ -33,22 +33,7 @@ TurtleIO.prototype.request = function ( req, res ) {
 	}
 
 	// Are we still in the virtual host root?
-	array.each( req.parsed.pathname.replace( REGEX_ROOT, "" ).replace( REGEX_DIR, "" ).split( "/" ).filter( function ( i ) {
-		return i != ".";
-	} ), function ( i, idx ) {
-		if ( i == ".." ) {
-			if ( idx === 0 ) {
-				invalid = true;
-				return false;
-			}
-			out_dir++;
-		}
-		else {
-			in_dir++;
-		}
-	} );
-
-	if ( invalid || out_dir >= REGEX_DIR.test( req.parsed.pathname ) ? in_dir : ( in_dir - 1 ) ) {
+	if ( invalid || ( ( out_dir || in_dir ) && ( out_dir >= REGEX_DIR.test( req.parsed.pathname ) ? in_dir : ( in_dir - 1 ) ) ) ) {
 		end();
 		return this.error( req, res, this.codes.NOT_FOUND );
 	}
