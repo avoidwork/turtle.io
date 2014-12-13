@@ -25,10 +25,6 @@ function factory () {
 			if ( cached && req.headers["if-none-match"] && req.headers["if-none-match"].replace( /\"/g, "" ) === cached.etag ) {
 				headers     = clone( cached.headers, true );
 				headers.age = parseInt( new Date().getTime() / 1000 - cached.timestamp, 10 );
-
-				delete headers["content-encoding"];
-				delete headers["transfer-encoding"];
-
 				return self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, headers );
 			}
 			else {

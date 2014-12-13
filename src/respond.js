@@ -105,6 +105,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 
 	if ( status === this.codes.NOT_MODIFIED ) {
 		delete headers["accept-ranges"];
+		delete headers["content-encoding"];
 		delete headers["content-length"];
 		delete headers["content-type"];
 		delete headers.date;
