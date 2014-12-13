@@ -33,7 +33,9 @@ TurtleIO.prototype.request = function ( req, res ) {
 	}
 
 	// Are we still in the virtual host root?
-	array.each( req.parsed.pathname.replace( REGEX_ROOT, "" ).replace( REGEX_DIR, "" ).split( "/" ), function ( i, idx ) {
+	array.each( req.parsed.pathname.replace( REGEX_ROOT, "" ).replace( REGEX_DIR, "" ).split( "/" ).filter( function ( i ) {
+		return i != ".";
+	} ), function ( i, idx ) {
 		if ( i == ".." ) {
 			if ( idx === 0 ) {
 				invalid = true;
