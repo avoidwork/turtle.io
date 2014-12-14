@@ -35,20 +35,6 @@ describe( "Requests", function () {
 			} );
 	} );
 
-	it( "GET / (206 / 'Partial response')", function ( done ) {
-		request()
-			.get( "/" )
-			.header( "range", "0-5" )
-			.expectStatus( 206 )
-			.expectHeader( "status", "206 Partial Content" )
-			.expectBody(/^\<html\>$/)
-			.end( function ( err, res ) {
-				if ( err ) throw err;
-				etag = res.headers.etag;
-				done();
-			} );
-	} );
-
 	it( "GET / (304 / empty)", function ( done ) {
 		request()
 			.header( "If-None-Match", etag )
@@ -75,38 +61,58 @@ describe( "Requests", function () {
 			} );
 	} );
 
-	it( "GET /nothere.html (404 / 'File not found')", function ( done ) {
+	it( "GET / (206 / 'Partial response - 0 offset')", function ( done ) {
 		request()
-			.get( "/nothere.html" )
-			.expectStatus( 404 )
-			.expectHeader( "status", "404 Not Found" )
-			.expectBody(/File not found/)
-			.end( function ( err ) {
+			.get( "/" )
+			.header( "range", "0-5" )
+			.expectStatus( 206 )
+			.expectHeader( "status", "206 Partial Content" )
+			.expectBody(/^\<html\>$/)
+			.end( function ( err, res ) {
 				if ( err ) throw err;
+				etag = res.headers.etag;
 				done();
 			} );
 	} );
 
-	it( "GET /../README (404 / 'File not found')", function ( done ) {
+	it( "GET / (206 / 'Partial response - offset')", function ( done ) {
 		request()
-			.get( "/../README" )
-			.expectStatus( 404 )
-			.expectHeader( "status", "404 Not Found" )
-			.expectBody(/File not found/)
-			.end( function ( err ) {
+			.get( "/" )
+			.header( "range", "1-4" )
+			.expectStatus( 206 )
+			.expectHeader( "status", "206 Partial Content" )
+			.expectBody(/^html$/)
+			.end( function ( err, res ) {
 				if ( err ) throw err;
+				etag = res.headers.etag;
 				done();
 			} );
 	} );
 
-	it( "GET /././../README (404 / 'File not found')", function ( done ) {
+	it( "GET / (416 / 'Partial response - invalid')", function ( done ) {
 		request()
-			.get( "/././../README" )
-			.expectStatus( 404 )
-			.expectHeader( "status", "404 Not Found" )
-			.expectBody(/File not found/)
-			.end( function ( err ) {
+			.get( "/" )
+			.header( "range", "a-b" )
+			.expectStatus( 416 )
+			.expectHeader( "status", "416 Requested Range Not Satisfiable" )
+			.expectBody(/Requested Range not Satisfiable/)
+			.end( function ( err, res ) {
 				if ( err ) throw err;
+				etag = res.headers.etag;
+				done();
+			} );
+	} );
+
+	it( "GET / (416 / 'Partial response - invalid #2')", function ( done ) {
+		request()
+			.get( "/" )
+			.header( "range", "5-0" )
+			.expectStatus( 416 )
+			.expectHeader( "status", "416 Requested Range Not Satisfiable" )
+			.expectBody(/Requested Range not Satisfiable/)
+			.end( function ( err, res ) {
+				if ( err ) throw err;
+				etag = res.headers.etag;
 				done();
 			} );
 	} );
@@ -157,6 +163,95 @@ describe( "Requests", function () {
 			.expectHeader( "status", "405 Method Not Allowed" )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
 			.expectBody(/Method not allowed/)
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
+	it( "GET /nothere.html (404 / 'File not found')", function ( done ) {
+		request()
+			.get( "/nothere.html" )
+			.expectStatus( 404 )
+			.expectHeader( "status", "404 Not Found" )
+			.expectBody(/File not found/)
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
+	// 405 is a result of a cached route that leads to a file system based 404 on GET
+	it( "POST /nothere.html (405 / 'Method not allowed')", function ( done ) {
+		request()
+			.post( "/nothere.html" )
+			.expectStatus( 405 )
+			.expectHeader( "status", "405 Method Not Allowed" )
+			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
+			.expectBody(/Method not allowed/)
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
+	it( "PUT /nothere.html (405 / 'Method not allowed')", function ( done ) {
+		request()
+			.put( "/nothere.html" )
+			.expectStatus( 405 )
+			.expectHeader( "status", "405 Method Not Allowed" )
+			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
+			.expectBody(/Method not allowed/)
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
+	it( "PATCH /nothere.html (405 / 'Method not allowed')", function ( done ) {
+		request()
+			.patch( "/nothere.html" )
+			.expectStatus( 405 )
+			.expectHeader( "status", "405 Method Not Allowed" )
+			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
+			.expectBody(/Method not allowed/)
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
+	it( "DELETE /nothere.html (405 / 'Method not allowed')", function ( done ) {
+		request()
+			.del( "/nothere.html" )
+			.expectStatus( 405 )
+			.expectHeader( "status", "405 Method Not Allowed" )
+			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
+			.expectBody(/Method not allowed/)
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
+	it( "GET /../README (404 / 'File not found')", function ( done ) {
+		request()
+			.get( "/../README" )
+			.expectStatus( 404 )
+			.expectHeader( "status", "404 Not Found" )
+			.expectBody(/File not found/)
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
+	it( "GET /././../README (404 / 'File not found')", function ( done ) {
+		request()
+			.get( "/././../README" )
+			.expectStatus( 404 )
+			.expectHeader( "status", "404 Not Found" )
+			.expectBody(/File not found/)
 			.end( function ( err ) {
 				if ( err ) throw err;
 				done();
