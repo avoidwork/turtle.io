@@ -1,12 +1,10 @@
 # turtle.io
 
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/avoidwork/turtle.io?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![build status](https://secure.travis-ci.org/avoidwork/turtle.io.svg)](http://travis-ci.org/avoidwork/turtle.io) [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/avoidwork/turtle.io?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 turtle.io is a HTTP 1.1 web server with a focus on simplicity.
 
 All you need to do is install it, and tell it what directory holds your web sites, & which hostnames to answer for.
-
-[![build status](https://secure.travis-ci.org/avoidwork/turtle.io.svg)](http://travis-ci.org/avoidwork/turtle.io)
 
 ## Getting Started
 
