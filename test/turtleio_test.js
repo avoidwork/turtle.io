@@ -50,40 +50,13 @@ describe( "Requests", function () {
 			} );
 	} );
 
-	it( "GET / (304 / empty)", function ( done ) {
-		request()
-			.header( "If-None-Match", etag )
-			.get( "/" )
-			.expectStatus( 304 )
-			.expectHeader( "status", "304 Not Modified" )
-			.expectHeader( "etag", etag )
-			.expectBody(/^$/)
-			.end( function ( err ) {
-				if ( err ) throw err;
-				done();
-			} );
-	} );
-
-	it( "GET / (304 / empty / validation)", function ( done ) {
-		request()
-			.header( "If-None-Match", etag )
-			.get( "/" )
-			.expectStatus( 304 )
-			.expectHeader( "status", "304 Not Modified" )
-			.expectHeader( "etag", etag )
-			.expectBody(/^$/)
-			.end( function ( err ) {
-				if ( err ) throw err;
-				done();
-			} );
-	} );
-
 	it( "GET / (206 / 'Partial response - 0 offset')", function ( done ) {
 		request()
 			.get( "/" )
 			.header( "range", "0-5" )
 			.expectStatus( 206 )
 			.expectHeader( "status", "206 Partial Content" )
+			.expectHeader( "content-length", "6" )
 			.expectBody(/^\<html\>$/)
 			.end( function ( err, res ) {
 				if ( err ) throw err;
@@ -98,10 +71,41 @@ describe( "Requests", function () {
 			.header( "range", "1-4" )
 			.expectStatus( 206 )
 			.expectHeader( "status", "206 Partial Content" )
+			.expectHeader( "content-length", "4" )
 			.expectBody(/^html$/)
 			.end( function ( err, res ) {
 				if ( err ) throw err;
 				etag = res.headers.etag;
+				done();
+			} );
+	} );
+
+	it( "GET / (304 / empty)", function ( done ) {
+		request()
+			.header( "If-None-Match", etag )
+			.get( "/" )
+			.expectStatus( 304 )
+			.expectHeader( "status", "304 Not Modified" )
+			.expectHeader( "content-length", undefined )
+			.expectHeader( "etag", etag )
+			.expectBody(/^$/)
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
+	it( "GET / (304 / empty / validation)", function ( done ) {
+		request()
+			.header( "If-None-Match", etag )
+			.get( "/" )
+			.expectStatus( 304 )
+			.expectHeader( "status", "304 Not Modified" )
+			.expectHeader( "content-length", undefined )
+			.expectHeader( "etag", etag )
+			.expectBody(/^$/)
+			.end( function ( err ) {
+				if ( err ) throw err;
 				done();
 			} );
 	} );

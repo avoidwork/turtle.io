@@ -16,7 +16,41 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	    timer    = precise().start(),
 	    ua       = req.headers["user-agent"],
 	    encoding = req.headers["accept-encoding"],
-	    cheaders, type, options;
+	    type, options;
+
+	function finalize () {
+		var cheaders;
+
+		if ( status === self.codes.NOT_MODIFIED || status < self.codes.MULTIPLE_CHOICE || status >= self.codes.BAD_REQUEST ) {
+			// req.parsed may not exist if coming from `error()`
+			if ( req.parsed ) {
+				if ( req.method === "GET" && ( status === self.codes.SUCCESS || status === self.codes.NOT_MODIFIED ) ) {
+					// Updating cache
+					if ( !REGEX_NOCACHE.test( headers["cache-control"] ) && !REGEX_PRIVATE.test( headers["cache-control"] ) ) {
+						if ( headers.etag === undefined ) {
+							headers.etag = "\"" + self.etag( req.parsed.href, body.length || 0, headers["last-modified"] || 0, body || 0 ) + "\"";
+						}
+
+						cheaders = clone( headers, true );
+						delete cheaders["access-control-allow-headers"];
+						delete cheaders["access-control-allow-methods"];
+						delete cheaders["access-control-allow-origin"];
+						delete cheaders["access-control-expose-headers"];
+						self.register( req.parsed.href, {etag: cheaders.etag.replace( /"/g, "" ), headers: cheaders, mimetype: cheaders["content-type"], timestamp: parseInt( new Date().getTime() / 1000, 10 )}, true );
+					}
+
+					// Setting a watcher on the local path
+					if ( req.path ) {
+						self.watch( req.parsed.href, req.path );
+					}
+				}
+			}
+			else {
+				delete headers.allow;
+				delete headers["access-control-allow-methods"];
+			}
+		}
+	}
 
 	if ( body === null || body === undefined ) {
 		body = this.messages.NO_CONTENT;
@@ -73,36 +107,6 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		}
 	}
 
-	if ( status === this.codes.NOT_MODIFIED || status < this.codes.MULTIPLE_CHOICE || status >= this.codes.BAD_REQUEST ) {
-		// req.parsed may not exist if coming from `error()`
-		if ( req.parsed ) {
-			if ( req.method === "GET" && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) ) {
-				// Updating cache
-				if ( !REGEX_NOCACHE.test( headers["cache-control"] ) && !REGEX_PRIVATE.test( headers["cache-control"] ) ) {
-					if ( headers.etag === undefined ) {
-						headers.etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers["last-modified"] || 0, body || 0 ) + "\"";
-					}
-
-					cheaders = clone( headers, true );
-					delete cheaders["access-control-allow-headers"];
-					delete cheaders["access-control-allow-methods"];
-					delete cheaders["access-control-allow-origin"];
-					delete cheaders["access-control-expose-headers"];
-					this.register( req.parsed.href, {etag: cheaders.etag.replace( /"/g, "" ), headers: cheaders, mimetype: cheaders["content-type"], timestamp: parseInt( new Date().getTime() / 1000, 10 )}, true );
-				}
-
-				// Setting a watcher on the local path
-				if ( req.path ) {
-					this.watch( req.parsed.href, req.path );
-				}
-			}
-		}
-		else {
-			delete headers.allow;
-			delete headers["access-control-allow-methods"];
-		}
-	}
-
 	// Fixing 'accept-ranges' for non-filesystem based responses
 	if ( !file ) {
 		delete headers["accept-ranges"];
@@ -152,6 +156,8 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			headers["content-length"] = number.diff( options.end, options.start ) + 1;
 		}
 
+		finalize();
+
 		if ( !res._header && !res._headerSent ) {
 			res.writeHead( status, headers );
 		}
@@ -181,6 +187,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		}
 
 		headers["transfer-encoding"] = "chunked";
+		finalize();
 
 		if ( !res._header && !res._headerSent ) {
 			res.writeHead( status, headers );
@@ -192,6 +199,8 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		} ).pipe( res );
 	}
 	else {
+		finalize();
+
 		if ( !res._header && !res._headerSent ) {
 			res.writeHead( status, headers );
 		}
