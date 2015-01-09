@@ -7,12 +7,12 @@
  * @return {Object}     TurtleIO instance
  */
 TurtleIO.prototype.route = function ( req, res ) {
-	var self   = this,
-	    url    = this.url( req ),
-	    method = req.method.toLowerCase(),
-	    parsed = parse( url ),
-	    update = false,
-	    payload;
+	var self = this,
+		url = this.url( req ),
+		method = req.method.toLowerCase(),
+		parsed = parse( url ),
+		update = false,
+		payload;
 
 	if ( REGEX_HEAD.test( method ) ) {
 		method = "get";
@@ -20,19 +20,19 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 	// Decorating parsed Object on request
 	req.parsed = parsed;
-	req.query  = parsed.query;
-	req.ip     = req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress;
+	req.query = parsed.query;
+	req.ip = req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress;
 	req.server = this;
-	req.timer  = precise().start();
+	req.timer = precise().start();
 
 	// Finding a matching vhost
 	array.each( this.vhostsRegExp, function ( i, idx ) {
 		if ( i.test( parsed.hostname ) ) {
-			return !( req.vhost = self.vhosts[idx] );
+			return !( req.vhost = self.vhosts[ idx ] );
 		}
 	} );
 
-	req.vhost = req.vhost || this.config["default"];
+	req.vhost = req.vhost || this.config[ "default" ];
 
 	// Adding middleware to avoid the round trip next time
 	if ( !this.allowed( "get", req.parsed.pathname, req.vhost ) ) {
@@ -47,7 +47,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 	// Decorating response
 	res.redirect = function ( uri ) {
-		self.respond( req, res, self.messages.NO_CONTENT, self.codes.FOUND, {location: uri} );
+		self.respond( req, res, self.messages.NO_CONTENT, self.codes.FOUND, { location: uri } );
 	};
 
 	res.respond = function ( arg, status, headers ) {
@@ -77,13 +77,14 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 		req.on( "end", function () {
 			if ( !req.invalid ) {
-				req.body = payload;
+				req.body = payload || "";
 				self.run( req, res, req.vhost, method );
 			}
 		} );
 	}
 	// Running middleware
 	else {
+		req.body = "";
 		self.run( req, res, req.vhost, method );
 	}
 

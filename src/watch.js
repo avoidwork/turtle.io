@@ -9,7 +9,7 @@
  */
 TurtleIO.prototype.watch = function ( url, path ) {
 	var self = this,
-	    watcher;
+		watcher;
 
 	/**
 	 * Cleans up caches
@@ -21,12 +21,12 @@ TurtleIO.prototype.watch = function ( url, path ) {
 	function cleanup () {
 		watcher.close();
 		self.unregister( url );
-		delete self.watching[path];
+		delete self.watching[ path ];
 	}
 
-	if ( !( this.watching[path] ) ) {
+	if ( !( this.watching[ path ] ) ) {
 		// Tracking
-		this.watching[path] = 1;
+		this.watching[ path ] = 1;
 
 		// Watching path for changes
 		watcher = fs.watch( path, function ( ev ) {
@@ -41,9 +41,9 @@ TurtleIO.prototype.watch = function ( url, path ) {
 						self.log( e );
 						cleanup();
 					}
-					else if ( self.etags.cache[url] ) {
-						value           = self.etags.cache[url].value;
-						value.etag      = self.etag( url, stat.size, stat.mtime );
+					else if ( self.etags.cache[ url ] ) {
+						value = self.etags.cache[ url ].value;
+						value.etag = self.etag( url, stat.size, stat.mtime );
 						value.timestamp = parseInt( new Date().getTime() / 1000, 10 );
 
 						self.register( url, value, true );

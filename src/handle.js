@@ -11,29 +11,35 @@
  * @return {Object}        TurtleIO instance
  */
 TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
-	var self   = this,
-	    allow, del, etag, headers, method, mimetype, modified, size, write;
+	var self = this,
+		allow, del, etag, headers, method, mimetype, modified, size, write;
 
-	allow  = req.allow;
-	write  = allow.indexOf( dir ? "POST" : "PUT" ) > -1;
-	del    = allow.indexOf( "DELETE" ) > -1;
+	allow = req.allow;
+	write = allow.indexOf( dir ? "POST" : "PUT" ) > -1;
+	del = allow.indexOf( "DELETE" ) > -1;
 	method = req.method;
 
 	// File request
 	if ( !dir ) {
 		if ( REGEX_GET.test( method ) ) {
 			mimetype = mime.lookup( path );
-			size     = stat.size;
+			size = stat.size;
 			modified = stat.mtime.toUTCString();
-			etag     = "\"" + this.etag( url, size, stat.mtime ) + "\"";
-			headers  = {allow: allow, "content-length": size, "content-type": mimetype, etag: etag, "last-modified": modified};
+			etag = "\"" + this.etag( url, size, stat.mtime ) + "\"";
+			headers = {
+				allow: allow,
+				"content-length": size,
+				"content-type": mimetype,
+				etag: etag,
+				"last-modified": modified
+			};
 
 			if ( method === "GET" ) {
 				// Decorating path for watcher
 				req.path = path;
 
 				// Client has current version
-				if ( ( req.headers["if-none-match"] === etag ) || ( !req.headers["if-none-match"] && Date.parse( req.headers["if-modified-since"] ) >= stat.mtime ) ) {
+				if ( ( req.headers[ "if-none-match" ] === etag ) || ( !req.headers[ "if-none-match" ] && Date.parse( req.headers[ "if-modified-since" ] ) >= stat.mtime ) ) {
 					this.respond( req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, headers, true );
 				}
 				// Sending current version

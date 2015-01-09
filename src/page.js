@@ -7,7 +7,7 @@
  * @return {String}      Response body
  */
 TurtleIO.prototype.page = function ( code, host ) {
-	host = host && this.pages[host] ? host : ALL;
+	host = host && this.pages[ host ] ? host : ALL;
 
-	return this.pages[host][code] || this.pages[host]["500"] || this.pages.all["500"];
+	return this.pages[ host ][ code ] || this.pages[ host ][ "500" ] || this.pages.all[ "500" ];
 };

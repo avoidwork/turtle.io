@@ -4,17 +4,17 @@
  * @constructor
  */
 function TurtleIO () {
-	this.config       = {};
-	this.dtp          = null;
-	this.etags        = lru( 1000 );
-	this.middleware   = {all: {}};
-	this.permissions  = lru( 1000 );
-	this.routeCache   = lru( 5000 ); // verbs * etags
-	this.pages        = {all: {}};
-	this.server       = null;
-	this.vhosts       = [];
+	this.config = {};
+	this.dtp = null;
+	this.etags = lru( 1000 );
+	this.middleware = { all: {} };
+	this.permissions = lru( 1000 );
+	this.routeCache = lru( 5000 ); // verbs * etags
+	this.pages = { all: {} };
+	this.server = null;
+	this.vhosts = [];
 	this.vhostsRegExp = [];
-	this.watching     = {};
+	this.watching = {};
 }
 
 // Prototype loop

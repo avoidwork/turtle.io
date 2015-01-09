@@ -15,7 +15,7 @@ TurtleIO.prototype.hash = function ( arg, cb ) {
 		return mmh3.murmur32HexSync( arg, this.config.seed );
 	}
 	else {
-		mmh3.murmur32Hex( arg, this.config.seed, function( e, value ) {
+		mmh3.murmur32Hex( arg, this.config.seed, function ( e, value ) {
 			if ( e ) {
 				cb( e, null );
 			}

@@ -12,8 +12,8 @@ TurtleIO.prototype.blacklist = function ( fn ) {
 		this.config.noaction = {};
 	}
 
-	if ( !this.config.noaction[hfn] ) {
-		this.config.noaction[hfn] = 1;
+	if ( !this.config.noaction[ hfn ] ) {
+		this.config.noaction[ hfn ] = 1;
 	}
 
 	return this;

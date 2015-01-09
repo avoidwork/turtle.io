@@ -12,7 +12,7 @@ TurtleIO.prototype.register = function ( url, state, stale ) {
 
 	// Removing stale cache from disk
 	if ( stale === true ) {
-		cached = this.etags.cache[url];
+		cached = this.etags.cache[ url ];
 
 		if ( cached && cached.value.etag !== state.etag ) {
 			this.unregister( url );

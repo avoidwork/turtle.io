@@ -9,20 +9,20 @@
  * @return {Array}
  */
 TurtleIO.prototype.routes = function ( uri, host, method, override ) {
-	var id     = method + ":" + host + ":" + uri,
-	    cached = override !== true && this.routeCache.get( id ),
-	    all, h, result;
+	var id = method + ":" + host + ":" + uri,
+		cached = override !== true && this.routeCache.get( id ),
+		all, h, result;
 
 	if ( cached ) {
 		return cached;
 	}
 
-	all    = this.middleware.all   || {};
-	h      = this.middleware[host] || {};
+	all = this.middleware.all || {};
+	h = this.middleware[ host ] || {};
 	result = [];
 
 	try {
-		array.each( [ all.all, all[method], h.all, h[method] ], function ( c ) {
+		array.each( [ all.all, all[ method ], h.all, h[ method ] ], function ( c ) {
 			if ( c ) {
 				array.each( array.keys( c ).filter( function ( i ) {
 					return new RegExp( "^" + i + "$", "i" ).test( uri );

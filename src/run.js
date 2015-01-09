@@ -9,18 +9,22 @@
  * @return {Object}        TurtleIO instance
  */
 TurtleIO.prototype.run = function ( req, res, host, method ) {
-	var self       = this,
-	    middleware = this.routes( req.parsed.pathname, host, method ),
-	    nth        = middleware.length,
-	    i          = -1;
+	var self = this,
+		middleware = this.routes( req.parsed.pathname, host, method ),
+		nth = middleware.length,
+		i = -1;
 
-	function last ( timer, err ) {
+	function stop ( timer ) {
 		if ( timer.stopped === null ) {
 			timer.stop();
 			self.signal( "middleware", function () {
-				return [host, req.url, timer.diff()];
+				return [ host, req.url, timer.diff() ];
 			} );
 		}
+	}
+
+	function last ( timer, err ) {
+		stop( timer );
 
 		if ( !err ) {
 			if ( REGEX_GET.test( method ) ) {
@@ -34,36 +38,36 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 			}
 		}
 		else {
-			self.error( req, res, ( self.codes[( err.message || err ).toUpperCase()] || self.codes.SERVER_ERROR ), ( err.stack || err.message || err ) );
+			self.error( req, res, ( res.statusCode || self.codes[ ( err.message || err ).toUpperCase() ] || self.codes.BAD_REQUEST ), err );
 		}
 	}
 
 	function next ( err ) {
 		var timer = precise().start(),
-		    arity = 3;
+			arity = 3;
 
-		if ( ++i < nth && typeof middleware[i] == "function" ) {
+		if ( ++i < nth && typeof middleware[ i ] == "function" ) {
 			try {
 				if ( err ) {
 					// Finding the next error handling middleware
-					arity = middleware[i].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
+					arity = middleware[ i ].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
 
 					if ( arity < 4 ) {
-						while ( arity < 4 && ++i < nth && middleware[i] == "function" ) {
-							arity = middleware[i].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
+						while ( arity < 4 && ++i < nth && middleware[ i ] == "function" ) {
+							arity = middleware[ i ].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
 						}
 					}
 				}
 
-				if ( timer.stopped === null ) {
-					timer.stop();
-					self.signal( "middleware", function () {
-						return [host, req.url, timer.diff()];
-					} );
-				}
+				stop( timer );
 
 				if ( i < nth ) {
-					arity === 3 ? middleware[i]( req, res, next ) : middleware[i]( err, req, res, next );
+					if ( err ) {
+						arity === 4 ? middleware[ i ]( err, req, res, next ) : last( timer, err );
+					}
+					else {
+						middleware[ i ]( req, res, next );
+					}
 				}
 				else {
 					last( timer, err );

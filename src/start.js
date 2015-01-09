@@ -8,7 +8,7 @@
  */
 TurtleIO.prototype.start = function ( cfg, err ) {
 	var self = this,
-	    config, headers, pages;
+		config, headers, pages;
 
 	config = clone( defaultConfig, true );
 
@@ -38,12 +38,12 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 
 	merge( this.config, config );
 
-	pages    = this.config.pages ? ( this.config.root + this.config.pages ) : ( __dirname + "/../pages" );
+	pages = this.config.pages ? ( this.config.root + this.config.pages ) : ( __dirname + "/../pages" );
 	LOGLEVEL = this.levels.indexOf( this.config.logs.level );
-	LOGGING  = this.config.logs.dtrace || this.config.logs.stdout || this.config.logs.syslog;
+	LOGGING = this.config.logs.dtrace || this.config.logs.stdout || this.config.logs.syslog;
 
 	// Looking for required setting
-	if ( !this.config["default"] ) {
+	if ( !this.config[ "default" ] ) {
 		this.log( new Error( "[client 0.0.0.0] Invalid default virtual host" ), "error" );
 		syslog.close();
 		process.exit( 1 );
@@ -54,13 +54,13 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	this.config.headers = {};
 
 	iterate( headers, function ( value, key ) {
-		self.config.headers[key.toLowerCase()] = value;
+		self.config.headers[ key.toLowerCase() ] = value;
 	} );
 
 	// Setting `Server` HTTP header
 	if ( !this.config.headers.server ) {
 		this.config.headers.server = "turtle.io/{{VERSION}}";
-		this.config.headers["x-powered-by"] = "node.js/" + process.versions.node.replace( /^v/, "" ) + " " + string.capitalize( process.platform ) + " V8/" + string.trim( process.versions.v8.toString() );
+		this.config.headers[ "x-powered-by" ] = "node.js/" + process.versions.node.replace( /^v/, "" ) + " " + string.capitalize( process.platform ) + " V8/" + string.trim( process.versions.v8.toString() );
 	}
 
 	// Creating REGEX_REWRITE
@@ -84,7 +84,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 		}
 		else if ( array.keys( self.config ).length > 0 ) {
 			array.each( files, function ( i ) {
-				self.pages.all[i.replace( REGEX_NEXT, "" )] = fs.readFileSync( pages + "/" + i, "utf8" );
+				self.pages.all[ i.replace( REGEX_NEXT, "" ) ] = fs.readFileSync( pages + "/" + i, "utf8" );
 			} );
 
 			// Starting server
@@ -101,14 +101,19 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 				if ( self.config.ssl.cert !== null && self.config.ssl.key !== null ) {
 					// POODLE
 					self.config.secureProtocol = "SSLv23_method";
-					self.config.secureOptions  = constants.SSL_OP_NO_SSLv3 | constants.SSL_OP_NO_SSLv2;
+					self.config.secureOptions = constants.SSL_OP_NO_SSLv3 | constants.SSL_OP_NO_SSLv2;
 
 					// Reading files
 					self.config.ssl.cert = fs.readFileSync( self.config.ssl.cert );
-					self.config.ssl.key  = fs.readFileSync( self.config.ssl.key );
+					self.config.ssl.key = fs.readFileSync( self.config.ssl.key );
 
 					// Starting server
-					self.server = https.createServer( merge( self.config.ssl, {port: self.config.port, host: self.config.address, secureProtocol: self.config.secureProtocol, secureOptions: self.config.secureOptions} ), function ( req, res ) {
+					self.server = https.createServer( merge( self.config.ssl, {
+						port: self.config.port,
+						host: self.config.address,
+						secureProtocol: self.config.secureProtocol,
+						secureOptions: self.config.secureOptions
+					} ), function ( req, res ) {
 						self.route( req, res );
 					} ).listen( self.config.port, self.config.address );
 				}

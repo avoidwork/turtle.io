@@ -8,9 +8,9 @@
  * @return {String}           Allowed methods
  */
 TurtleIO.prototype.allows = function ( uri, host, override ) {
-	var self   = this,
-	    timer  = precise().start(),
-	    result = !override ? this.permissions.get( host + "_" + uri ) : undefined;
+	var self = this,
+		timer = precise().start(),
+		result = !override ? this.permissions.get( host + "_" + uri ) : undefined;
 
 	if ( override || !result ) {
 		result = VERBS.filter( function ( i ) {
@@ -24,7 +24,7 @@ TurtleIO.prototype.allows = function ( uri, host, override ) {
 	timer.stop();
 
 	this.signal( "allows", function () {
-		return [host, uri, timer.diff()];
+		return [ host, uri, timer.diff() ];
 	} );
 
 	return result;

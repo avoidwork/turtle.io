@@ -8,22 +8,24 @@
  * @return {Object}     TurtleIO instance
  */
 TurtleIO.prototype.request = function ( req, res ) {
-	var self    = this,
-	    timer   = precise().start(),
-	    method  = req.method,
-	    handled = false,
-	    host    = req.vhost,
-	    pathname= req.parsed.pathname.replace( REGEX_ROOT, "" ),
-	    invalid = ( pathname.replace( REGEX_DIR, "" ).split( "/" ).filter( function ( i ) { return i != "."; } )[0] || "" ) == "..",
-	    out_dir = !invalid ? ( pathname.match( /\.{2}\//g ) || [] ).length : 0,
-	    in_dir  = !invalid ? ( pathname.match( /\w+?(\.\w+|\/)+/g ) || [] ).length : 0,
-	    count, path, nth, root;
+	var self = this,
+		timer = precise().start(),
+		method = req.method,
+		handled = false,
+		host = req.vhost,
+		pathname = req.parsed.pathname.replace( REGEX_ROOT, "" ),
+		invalid = ( pathname.replace( REGEX_DIR, "" ).split( "/" ).filter( function ( i ) {
+				return i != ".";
+			} )[ 0 ] || "" ) == "..",
+		out_dir = !invalid ? ( pathname.match( /\.{2}\//g ) || [] ).length : 0,
+		in_dir = !invalid ? ( pathname.match( /\w+?(\.\w+|\/)+/g ) || [] ).length : 0,
+		count, path, nth, root;
 
 	function end () {
 		timer.stop();
 		self.signal( "request", function () {
-			return [req.parsed.href, timer.diff()];
-		});
+			return [ req.parsed.href, timer.diff() ];
+		} );
 	}
 
 	// If an expectation can't be met, don't try!
@@ -39,7 +41,7 @@ TurtleIO.prototype.request = function ( req, res ) {
 	}
 
 	// Preparing file path
-	root = this.config.root + "/" + this.config.vhosts[host];
+	root = this.config.root + "/" + this.config.vhosts[ host ];
 	path = ( root + req.parsed.pathname ).replace( REGEX_DIR, "" );
 
 	// Determining if the request is valid
@@ -54,7 +56,7 @@ TurtleIO.prototype.request = function ( req, res ) {
 		}
 		else if ( REGEX_GET.test( method ) && !REGEX_DIR.test( req.parsed.pathname ) ) {
 			end();
-			self.respond( req, res, self.messages.NO_CONTENT, self.codes.REDIRECT, {"Location": ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + req.parsed.search} );
+			self.respond( req, res, self.messages.NO_CONTENT, self.codes.REDIRECT, { "Location": ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + req.parsed.search } );
 		}
 		else if ( !REGEX_GET.test( method ) ) {
 			end();
@@ -62,7 +64,7 @@ TurtleIO.prototype.request = function ( req, res ) {
 		}
 		else {
 			count = 0;
-			nth   = self.config.index.length;
+			nth = self.config.index.length;
 			path += "/";
 
 			array.each( self.config.index, function ( i ) {

@@ -7,17 +7,17 @@
  * @return {Object}     TurtleIO instance
  */
 TurtleIO.prototype.unregister = function ( url ) {
-	var self   = this,
-	    cached = this.etags.cache[url],
-	    path   = this.config.tmp + "/",
-	    gz, df;
+	var self = this,
+		cached = this.etags.cache[ url ],
+		path = this.config.tmp + "/",
+		gz, df;
 
 	if ( cached ) {
 		this.etags.remove( url );
 
 		path += cached.value.etag;
-		gz    = path + ".gz";
-		df    = path + ".zz";
+		gz = path + ".gz";
+		df = path + ".zz";
 
 		fs.exists( gz, function ( exists ) {
 			if ( exists ) {

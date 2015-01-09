@@ -8,13 +8,13 @@
  * @return {Object}      TurtleIO instance
  */
 TurtleIO.prototype.write = function ( req, res, path ) {
-	var self  = this,
-	    timer = precise().start(),
-	    put   = ( req.method === "PUT" ),
-	    body  = req.body,
-	    allow = req.allow,
-	    del   = this.allowed( "DELETE", req.parsed.pathname, req.vhost ),
-	    status;
+	var self = this,
+		timer = precise().start(),
+		put = ( req.method === "PUT" ),
+		body = req.body,
+		allow = req.allow,
+		del = this.allowed( "DELETE", req.parsed.pathname, req.vhost ),
+		status;
 
 	if ( !put && REGEX_ENDSLSH.test( req.url ) ) {
 		status = del ? this.codes.CONFLICT : this.codes.SERVER_ERROR;
@@ -22,10 +22,10 @@ TurtleIO.prototype.write = function ( req, res, path ) {
 		timer.stop();
 
 		this.signal( "write", function () {
-			return [req.headers.host, req.url, req.method, path, timer.diff()];
-		});
+			return [ req.headers.host, req.url, req.method, path, timer.diff() ];
+		} );
 
-		this.respond( req, res, this.page( status, this.hostname( req ) ), status, {allow: allow}, false );
+		this.respond( req, res, this.page( status, this.hostname( req ) ), status, { allow: allow }, false );
 	}
 	else {
 		allow = array.remove( string.explode( allow ), "POST" ).join( ", " );
@@ -44,7 +44,7 @@ TurtleIO.prototype.write = function ( req, res, path ) {
 						}
 						else {
 							status = put ? self.codes.NO_CONTENT : self.codes.CREATED;
-							self.respond( req, res, self.page( status, self.hostname( req ) ), status, {allow: allow}, false );
+							self.respond( req, res, self.page( status, self.hostname( req ) ), status, { allow: allow }, false );
 						}
 					} );
 				}
@@ -57,8 +57,8 @@ TurtleIO.prototype.write = function ( req, res, path ) {
 		timer.stop();
 
 		this.signal( "write", function () {
-			return [req.headers.host, req.url, req.method, path, timer.diff()];
-		});
+			return [ req.headers.host, req.url, req.method, path, timer.diff() ];
+		} );
 	}
 
 	return this;

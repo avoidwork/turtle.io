@@ -11,27 +11,27 @@
 TurtleIO.prototype.use = function ( path, fn, host, method ) {
 	if ( typeof path != "string" ) {
 		host = fn;
-		fn   = path;
+		fn = path;
 		path = "/.*";
 	}
 
-	host   = host   || ALL;
+	host = host || ALL;
 	method = method || ALL;
 
 	if ( typeof fn != "function" && ( fn && typeof fn.handle != "function" ) ) {
 		throw new Error( "Invalid middleware" );
 	}
 
-	if ( !this.middleware[host] ) {
-		this.middleware[host] = {};
+	if ( !this.middleware[ host ] ) {
+		this.middleware[ host ] = {};
 	}
 
-	if ( !this.middleware[host][method] ) {
-		this.middleware[host][method] = {};
+	if ( !this.middleware[ host ][ method ] ) {
+		this.middleware[ host ][ method ] = {};
 	}
 
-	if ( !this.middleware[host][method][path] ) {
-		this.middleware[host][method][path] = [];
+	if ( !this.middleware[ host ][ method ][ path ] ) {
+		this.middleware[ host ][ method ][ path ] = [];
 	}
 
 	if ( fn.handle ) {
@@ -41,7 +41,7 @@ TurtleIO.prototype.use = function ( path, fn, host, method ) {
 	// hash for permission checks
 	fn.hash = this.hash( fn.toString() );
 
-	this.middleware[host][method][path].push( fn );
+	this.middleware[ host ][ method ][ path ].push( fn );
 
 	return this;
 };

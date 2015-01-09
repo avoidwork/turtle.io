@@ -1,4 +1,3 @@
-
 /**
  * Determines what/if compression is supported for a request
  *
@@ -9,9 +8,9 @@
  * @return {Mixed}           Supported compression or null
  */
 TurtleIO.prototype.compression = function ( agent, encoding, mimetype ) {
-	var timer     = precise().start(),
-	    result    = null,
-	    encodings = typeof encoding == "string" ? string.explode( encoding ) : [];
+	var timer = precise().start(),
+		result = null,
+		encodings = typeof encoding == "string" ? string.explode( encoding ) : [];
 
 	// Safari can't handle compression for proxies (socket doesn't close) or on an iDevice for simple GETs
 	if ( this.config.compress === true && REGEX_COMP.test( mimetype ) && !REGEX_IE.test( agent ) && !REGEX_IDEVICE.test( agent ) && ( !REGEX_SAFARI.test( agent ) || REGEX_CHROME.test( agent ) ) ) {
@@ -34,7 +33,7 @@ TurtleIO.prototype.compression = function ( agent, encoding, mimetype ) {
 	timer.stop();
 
 	this.signal( "compression", function () {
-		return [agent, timer.diff()];
+		return [ agent, timer.diff() ];
 	} );
 
 	return result;

@@ -39,7 +39,7 @@ TurtleIO.prototype.del = function ( route, fn, host ) {
  * @param  {String}   host  [Optional] Virtual host, default is `all`
  * @return {Object}         TurtleIO instance
  */
-TurtleIO.prototype["delete"] = function ( route, fn, host ) {
+TurtleIO.prototype[ "delete" ] = function ( route, fn, host ) {
 	return this.use( route, fn, host, "delete" );
 };
 

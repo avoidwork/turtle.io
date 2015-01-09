@@ -9,10 +9,10 @@
  * @return {Object}        TurtleIO instance
  */
 TurtleIO.prototype.error = function ( req, res, status, msg ) {
-	var timer  = precise().start(),
-	    method = req.method.toLowerCase(),
-	    host   = req.parsed ? req.parsed.hostname : ALL,
-	    kdx    = -1,
+	var timer = precise().start(),
+		method = req.method.toLowerCase(),
+		host = req.parsed ? req.parsed.hostname : ALL,
+		kdx = -1,
 		body;
 
 	if ( isNaN( status ) ) {
@@ -39,16 +39,19 @@ TurtleIO.prototype.error = function ( req, res, status, msg ) {
 	} );
 
 	if ( msg === undefined ) {
-		msg = kdx ? array.cast( this.messages )[kdx] : "Unknown error";
+		msg = kdx ? array.cast( this.messages )[ kdx ] : "Unknown error";
 	}
 
-	this.log( new Error( "[client " + ( req.headers["x-forwarded-for"] ? array.last( string.explode( req.headers["x-forwarded-for"] ) ) : req.connection.remoteAddress ) + "] " + msg ), "debug" );
+	this.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + msg ), "debug" );
 
 	timer.stop();
 
 	this.signal( "error", function () {
-		return [req.headers.host, req.parsed.path, status, msg, timer.diff()];
+		return [ req.headers.host, req.parsed.path, status, msg, timer.diff() ];
 	} );
 
-	return this.respond( req, res, body, status, {"cache-control": "no-cache", "content-length": Buffer.byteLength( body )} );
+	return this.respond( req, res, body, status, {
+		"cache-control": "no-cache",
+		"content-length": Buffer.byteLength( body )
+	} );
 };
