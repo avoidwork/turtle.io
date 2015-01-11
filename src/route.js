@@ -44,6 +44,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 	}
 
 	req.allow = this.allows( req.parsed.pathname, req.vhost, update );
+	req.body = "";
 
 	// Decorating response
 	res.redirect = function ( uri ) {
@@ -77,14 +78,16 @@ TurtleIO.prototype.route = function ( req, res ) {
 
 		req.on( "end", function () {
 			if ( !req.invalid ) {
-				req.body = payload || "";
+				if ( payload ) {
+					req.body = payload;
+				}
+
 				self.run( req, res, req.vhost, method );
 			}
 		} );
 	}
 	// Running middleware
 	else {
-		req.body = "";
 		self.run( req, res, req.vhost, method );
 	}
 
