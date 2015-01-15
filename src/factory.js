@@ -7,12 +7,9 @@
 function factory () {
 	var self = new TurtleIO();
 
-	function cors () {
-		var req = arguments[ 0 ],
-			ref = req.headers.referer;
-
-		req.cors = ref !== undefined && ref !== req.parsed.protocol + "//" + req.parsed.host;
-		arguments[ 2 ]();
+	function cors ( req, res, next ) {
+		req.cors = ( req.headers.origin !== undefined );
+		next();
 	}
 
 	function etag ( req, res, next ) {
@@ -38,5 +35,6 @@ function factory () {
 
 	self.use( cors ).blacklist( cors );
 	self.use( etag ).blacklist( etag );
+
 	return self;
 }
