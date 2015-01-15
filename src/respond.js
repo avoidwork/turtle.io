@@ -135,63 +135,44 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	// Setting `x-response-time`
 	headers[ "x-response-time" ] = ( ( req.timer.stopped === null ? req.timer.stop() : req.timer ).diff() / 1000000 ).toFixed( 2 ) + " ms";
 
+	// Setting the partial content headers
+	if ( req.headers.range ) {
+		options = {};
+
+		array.each( req.headers.range.match( /\d+/g ) || [], function ( i, idx ) {
+			options[ idx === 0 ? "start" : "end" ] = parseInt( i, 10 );
+		} );
+
+		if ( options.end === undefined ) {
+			options.end = headers[ "content-length" ];
+		}
+
+		if ( isNaN( options.start ) || isNaN( options.end ) || options.start >= options.end ) {
+			delete req.headers.range;
+			return this.error( req, res, this.codes.NOT_SATISFIABLE );
+		}
+
+		status = this.codes.PARTIAL_CONTENT;
+		headers.status = status + " " + http.STATUS_CODES[ status ];
+		headers[ "content-range" ] = "bytes " + options.start + "-" + options.end + "/" + headers[ "content-length" ];
+		headers[ "content-length" ] = number.diff( options.end, options.start ) + 1;
+	}
+
 	// Determining if response should be compressed
-	if ( ua && status === this.codes.SUCCESS && body && this.config.compress && ( type = this.compression( ua, encoding, headers[ "content-type" ] ) ) && type !== null ) {
+	if ( ua && ( status === this.codes.SUCCESS || status === this.codes.PARTIAL_CONTENT ) && body !== undefined && this.config.compress && ( type = this.compression( ua, encoding, headers[ "content-type" ] ) ) && type !== null ) {
 		headers[ "content-encoding" ] = REGEX_GZIP.test( type ) ? "gzip" : "deflate";
-		headers[ "transfer-encoding" ] = "chunked";
 
-		if ( file && req.headers.range ) {
-			options = {};
-
-			array.each( req.headers.range.match( /\d+/g ) || [], function ( i, idx ) {
-				options[ idx === 0 ? "start" : "end" ] = parseInt( i, 10 );
-			} );
-
-			if ( options.end === undefined ) {
-				options.end = headers[ "content-length" ];
-			}
-
-			if ( isNaN( options.start ) || isNaN( options.end ) || options.start >= options.end ) {
-				return this.error( req, res, this.codes.NOT_SATISFIABLE );
-			}
-
-			status = this.codes.PARTIAL_CONTENT;
-			headers.status = status + " " + http.STATUS_CODES[ status ];
-			headers[ "content-range" ] = "bytes " + options.start + "-" + options.end + "/" + headers[ "content-length" ];
-			headers[ "content-length" ] = number.diff( options.end, options.start ) + 1;
+		if ( file ) {
+			headers[ "transfer-encoding" ] = "chunked";
 		}
 
 		finalize();
 
-		if ( !res._header && !res._headerSent ) {
-			res.writeHead( status, headers );
-		}
-
-		this.compress( req, res, body, type, headers.etag ? headers.etag.replace( /"/g, "" ) : undefined, file, options );
+		this.compress( req, res, body, type, headers.etag ? headers.etag.replace( /"/g, "" ) : undefined, file, options, status, headers );
 	}
-	else if ( status === this.codes.SUCCESS && file && req.method === "GET" ) {
-		if ( req.headers.range ) {
-			options = {};
-
-			array.each( req.headers.range.match( /\d+/g ) || [], function ( i, idx ) {
-				options[ idx === 0 ? "start" : "end" ] = parseInt( i, 10 );
-			} );
-
-			if ( options.end === undefined ) {
-				options.end = headers[ "content-length" ];
-			}
-
-			if ( isNaN( options.start ) || isNaN( options.end ) || options.start >= options.end ) {
-				return this.error( req, res, this.codes.NOT_SATISFIABLE );
-			}
-
-			status = this.codes.PARTIAL_CONTENT;
-			headers.status = status + " " + http.STATUS_CODES[ status ];
-			headers[ "content-range" ] = "bytes " + options.start + "-" + options.end + "/" + headers[ "content-length" ];
-			headers[ "content-length" ] = number.diff( options.end, options.start ) + 1;
-		}
-
+	else if ( ( status === this.codes.SUCCESS || status === this.codes.PARTIAL_CONTENT ) && file && req.method === "GET" ) {
 		headers[ "transfer-encoding" ] = "chunked";
+
 		finalize();
 
 		if ( !res._header && !res._headerSent ) {
@@ -210,7 +191,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			res.writeHead( status, headers );
 		}
 
-		res.end( body );
+		res.end( status === this.codes.PARTIAL_CONTENT ? body.slice( options.start, options.end ) : body );
 	}
 
 	timer.stop();

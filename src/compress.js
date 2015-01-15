@@ -8,10 +8,12 @@
  * @param  {Object}  type    gzip (gz) or deflate (df)
  * @param  {String}  etag    Etag
  * @param  {Boolean} file    Indicates `body` is a file path
- * @param  {Object}  options [Optional] Stream options
+ * @param  {Object}  options Stream options
+ * @param  {Number}  status  HTTP status
+ * @param  {Object}  headers HTTP headers
  * @return {Object}          TurtleIO instance
  */
-TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, options ) {
+TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, options, status, headers ) {
 	var self = this,
 		timer = precise().start(),
 		method = REGEX_GZIP.test( type ) ? "createGzip" : "createDeflate",
@@ -22,6 +24,10 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 		if ( !file ) {
 			// Pipe Stream through compression to Client & disk
 			if ( typeof body.pipe == "function" ) {
+				if ( !res._header && !res._headerSent ) {
+					res.writeHead( status, headers );
+				}
+
 				body.pipe( zlib[ method ]() ).pipe( res );
 				body.pipe( zlib[ method ]() ).pipe( fs.createWriteStream( fp ) );
 
@@ -40,6 +46,11 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 						self.error( req, res, self.codes.SERVER_ERROR );
 					}
 					else {
+						if ( !res._header && !res._headerSent ) {
+							headers["content-length"] = data.length;
+							res.writeHead( status, headers );
+						}
+
 						res.end( data );
 
 						if ( fp ) {
@@ -61,6 +72,10 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 			}
 		}
 		else {
+			if ( !res._header && !res._headerSent ) {
+				res.writeHead( status, headers );
+			}
+
 			// Pipe compressed asset to Client
 			fs.createReadStream( body, options ).on( "error", function ( e ) {
 				self.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
@@ -86,17 +101,35 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 	if ( fp ) {
 		fs.exists( fp, function ( exist ) {
 			// Pipe compressed asset to Client
-			if ( exist && !options ) {
-				fs.createReadStream( fp ).on( "error", function ( e ) {
-					self.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
-					self.unregister( req.parsed.href );
-					self.error( req, res, self.codes.SERVER_ERROR );
-				} ).pipe( res );
+			if ( exist ) {
+				fs.lstat( fp, function ( e, stats ) {
+					if ( e ) {
+						self.error( req, res, e );
+					}
+					else {
+						if ( !res._header && !res._headerSent ) {
+							headers[ "content-length" ] = stats.size;
 
-				timer.stop();
+							if ( options ) {
+								headers[ "content-range" ] = "bytes " + options.start + "-" + options.end + "/" + headers[ "content-length" ];
+								headers[ "content-length" ] = number.diff( options.end, options.start ) + 1;
+							}
 
-				self.signal( "compress", function () {
-					return [ etag, fp, timer.diff() ];
+							res.writeHead( status, headers );
+						}
+
+						fs.createReadStream( fp, options ).on( "error", function ( e ) {
+							self.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
+							self.unregister( req.parsed.href );
+							self.error( req, res, self.codes.SERVER_ERROR );
+						} ).pipe( res );
+
+						timer.stop();
+
+						self.signal( "compress", function () {
+							return [ etag, fp, timer.diff() ];
+						} );
+					}
 				} );
 			}
 			else {
@@ -105,7 +138,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 		} );
 	}
 	else {
-		next();
+		next( false );
 	}
 
 	return this;

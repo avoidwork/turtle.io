@@ -24,6 +24,8 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 	}
 
 	function last ( timer, err ) {
+		var status;
+
 		stop( timer );
 
 		if ( !err ) {
@@ -38,7 +40,8 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 			}
 		}
 		else {
-			self.error( req, res, ( res.statusCode || self.codes[ ( err.message || err ).toUpperCase() ] || self.codes.BAD_REQUEST ), err );
+			status = res.statusCode >= self.codes.BAD_REQUEST ? res.statusCode : self.codes[ ( err.message || err ).toUpperCase() ] || self.codes.SERVER_ERROR;
+			self.error( req, res, status, err );
 		}
 	}
 
