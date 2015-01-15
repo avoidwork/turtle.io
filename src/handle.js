@@ -21,7 +21,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 
 	// File request
 	if ( !dir ) {
-		if ( REGEX_GET.test( method ) ) {
+		if ( regex.get.test( method ) ) {
 			mimetype = mime.lookup( path );
 			size = stat.size;
 			modified = stat.mtime.toUTCString();

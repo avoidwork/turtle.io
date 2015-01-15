@@ -29,7 +29,7 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 		stop( timer );
 
 		if ( !err ) {
-			if ( REGEX_GET.test( method ) ) {
+			if ( regex.get.test( method ) ) {
 				self.request( req, res );
 			}
 			else if ( self.allowed( "get", req.parsed.pathname, req.vhost ) ) {

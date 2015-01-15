@@ -63,8 +63,8 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 		this.config.headers[ "x-powered-by" ] = "node.js/" + process.versions.node.replace( /^v/, "" ) + " " + string.capitalize( process.platform ) + " V8/" + string.trim( process.versions.v8.toString() );
 	}
 
-	// Creating REGEX_REWRITE
-	REGEX_REWRITE = new RegExp( "^(" + this.config.proxy.rewrite.join( "|" ) + ")$" );
+	// Creating regex.rewrite
+	regex.rewrite = new RegExp( "^(" + this.config.proxy.rewrite.join( "|" ) + ")$" );
 
 	// Setting default routes
 	this.host( ALL );
@@ -84,7 +84,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 		}
 		else if ( array.keys( self.config ).length > 0 ) {
 			array.each( files, function ( i ) {
-				self.pages.all[ i.replace( REGEX_NEXT, "" ) ] = fs.readFileSync( pages + "/" + i, "utf8" );
+				self.pages.all[ i.replace( regex.next, "" ) ] = fs.readFileSync( pages + "/" + i, "utf8" );
 			} );
 
 			// Starting server

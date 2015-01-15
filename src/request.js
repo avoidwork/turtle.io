@@ -13,8 +13,8 @@ TurtleIO.prototype.request = function ( req, res ) {
 		method = req.method,
 		handled = false,
 		host = req.vhost,
-		pathname = req.parsed.pathname.replace( REGEX_ROOT, "" ),
-		invalid = ( pathname.replace( REGEX_DIR, "" ).split( "/" ).filter( function ( i ) {
+		pathname = req.parsed.pathname.replace( regex.root, "" ),
+		invalid = ( pathname.replace( regex.dir, "" ).split( "/" ).filter( function ( i ) {
 				return i != ".";
 			} )[ 0 ] || "" ) == "..",
 		out_dir = !invalid ? ( pathname.match( /\.{2}\//g ) || [] ).length : 0,
@@ -42,7 +42,7 @@ TurtleIO.prototype.request = function ( req, res ) {
 
 	// Preparing file path
 	root = this.config.root + "/" + this.config.vhosts[ host ];
-	path = ( root + req.parsed.pathname ).replace( REGEX_DIR, "" );
+	path = ( root + req.parsed.pathname ).replace( regex.dir, "" );
 
 	// Determining if the request is valid
 	fs.lstat( path, function ( e, stats ) {
@@ -54,11 +54,11 @@ TurtleIO.prototype.request = function ( req, res ) {
 			end();
 			self.handle( req, res, path, req.parsed.href, false, stats );
 		}
-		else if ( REGEX_GET.test( method ) && !REGEX_DIR.test( req.parsed.pathname ) ) {
+		else if ( regex.get.test( method ) && !regex.dir.test( req.parsed.pathname ) ) {
 			end();
 			self.respond( req, res, self.messages.NO_CONTENT, self.codes.REDIRECT, { "Location": ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + req.parsed.search } );
 		}
-		else if ( !REGEX_GET.test( method ) ) {
+		else if ( !regex.get.test( method ) ) {
 			end();
 			self.handle( req, res, path, req.parsed.href, true );
 		}

@@ -11,7 +11,7 @@
  * @return {Object}          TurtleIO instance
  */
 TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) {
-	var head = REGEX_HEAD.test( req.method ),
+	var head = regex.head.test( req.method ),
 		self = this,
 		timer = precise().start(),
 		ua = req.headers[ "user-agent" ],
@@ -26,16 +26,20 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			if ( req.parsed ) {
 				if ( req.method === "GET" && ( status === self.codes.SUCCESS || status === self.codes.NOT_MODIFIED ) ) {
 					// Updating cache
-					if ( !REGEX_NOCACHE.test( headers[ "cache-control" ] ) && !REGEX_PRIVATE.test( headers[ "cache-control" ] ) ) {
+					if ( !regex.nocache.test( headers[ "cache-control" ] ) && !regex[ "private" ].test( headers[ "cache-control" ] ) ) {
 						if ( headers.etag === undefined ) {
 							headers.etag = "\"" + self.etag( req.parsed.href, body.length || 0, headers[ "last-modified" ] || 0, body || 0 ) + "\"";
 						}
 
 						cheaders = clone( headers, true );
-						delete cheaders[ "access-control-allow-headers" ];
-						delete cheaders[ "access-control-allow-methods" ];
+
 						delete cheaders[ "access-control-allow-origin" ];
 						delete cheaders[ "access-control-expose-headers" ];
+						delete cheaders[ "access-control-max-age" ];
+						delete cheaders[ "access-control-allow-credentials" ];
+						delete cheaders[ "access-control-allow-methods" ];
+						delete cheaders[ "access-control-allow-headers" ];
+
 						self.register( req.parsed.href, {
 							etag: cheaders.etag.replace( /"/g, "" ),
 							headers: cheaders,
@@ -94,13 +98,13 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		}
 
 		// Ensuring JSON has proper mimetype
-		if ( REGEX_JSONWRP.test( body ) ) {
+		if ( regex.json_wrap.test( body ) ) {
 			headers[ "content-type" ] = "application/json";
 		}
 
 		if ( req.method === "GET" ) {
 			// CSV hook
-			if ( status === this.codes.SUCCESS && body && headers[ "content-type" ] === "application/json" && req.headers.accept && REGEX_CSV.test( string.explode( req.headers.accept )[ 0 ].replace( REGEX_NVAL, "" ) ) ) {
+			if ( status === this.codes.SUCCESS && body && headers[ "content-type" ] === "application/json" && req.headers.accept && regex.csv.test( string.explode( req.headers.accept )[ 0 ].replace( regex.nval, "" ) ) ) {
 				headers[ "content-type" ] = "text/csv";
 
 				if ( !headers[ "content-disposition" ] ) {
@@ -159,8 +163,8 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	}
 
 	// Determining if response should be compressed
-	if ( ua && ( status === this.codes.SUCCESS || status === this.codes.PARTIAL_CONTENT ) && body !== undefined && this.config.compress && ( type = this.compression( ua, encoding, headers[ "content-type" ] ) ) && type !== null ) {
-		headers[ "content-encoding" ] = REGEX_GZIP.test( type ) ? "gzip" : "deflate";
+	if ( ua && ( status === this.codes.SUCCESS || status === this.codes.PARTIAL_CONTENT ) && body !== this.messages.NO_CONTENT && this.config.compress && ( type = this.compression( ua, encoding, headers[ "content-type" ] ) ) && type !== null ) {
+		headers[ "content-encoding" ] = regex.gzip.test( type ) ? "gzip" : "deflate";
 
 		if ( file ) {
 			headers[ "transfer-encoding" ] = "chunked";

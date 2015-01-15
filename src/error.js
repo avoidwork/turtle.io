@@ -19,7 +19,7 @@ TurtleIO.prototype.error = function ( req, res, status, msg ) {
 		status = this.codes.NOT_FOUND;
 
 		// If valid, determine what kind of error to respond with
-		if ( !REGEX_GET.test( method ) && !REGEX_HEAD.test( method ) ) {
+		if ( !regex.get.test( method ) && !regex.head.test( method ) ) {
 			if ( this.allowed( method, req.parsed.pathname, req.vhost ) ) {
 				status = this.codes.SERVER_ERROR;
 			}

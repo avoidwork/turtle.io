@@ -11,7 +11,7 @@ TurtleIO.prototype.url = function ( req ) {
 		token;
 
 	if ( !string.isEmpty( header ) ) {
-		token = header.split( REGEX_SPACE ).pop() || "",
+		token = header.split( regex.space ).pop() || "",
 			auth = new Buffer( token, "base64" ).toString();
 
 		if ( !string.isEmpty( auth ) ) {

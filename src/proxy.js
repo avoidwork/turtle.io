@@ -25,7 +25,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	 */
 	function handle ( req, res, arg, xhr ) {
 		var etag = "",
-			regexOrigin = new RegExp( origin.replace( REGEX_ENDSLSH, "" ), "g" ),
+			regexOrigin = new RegExp( origin.replace( regex.end_slash, "" ), "g" ),
 			url = req.parsed.href,
 			stale = STALE,
 			get = req.method === "GET",
@@ -45,10 +45,10 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		}
 		else {
 			// Determining if the response will be cached
-			if ( get && ( xhr.status === self.codes.SUCCESS || xhr.status === self.codes.NOT_MODIFIED ) && !REGEX_NOCACHE.test( resHeaders[ "cache-control" ] ) && !REGEX_PRIVATE.test( resHeaders[ "cache-control" ] ) ) {
+			if ( get && ( xhr.status === self.codes.SUCCESS || xhr.status === self.codes.NOT_MODIFIED ) && !regex.nocache.test( resHeaders[ "cache-control" ] ) && !regex[ "private" ].test( resHeaders[ "cache-control" ] ) ) {
 				// Determining how long rep is valid
-				if ( resHeaders[ "cache-control" ] && REGEX_NUMBER.test( resHeaders[ "cache-control" ] ) ) {
-					stale = number.parse( REGEX_NUMBER.exec( resHeaders[ "cache-control" ] )[ 0 ], 10 );
+				if ( resHeaders[ "cache-control" ] && regex.number.test( resHeaders[ "cache-control" ] ) ) {
+					stale = number.parse( regex.number.exec( resHeaders[ "cache-control" ] )[ 0 ], 10 );
 				}
 				else if ( resHeaders.expires !== undefined ) {
 					stale = new Date( resHeaders.expires );
@@ -64,7 +64,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 			}
 
 			if ( xhr.status !== self.codes.NOT_MODIFIED ) {
-				rewrite = REGEX_REWRITE.test( ( resHeaders[ "content-type" ] || "" ).replace( REGEX_NVAL, "" ) );
+				rewrite = regex.rewrite.test( ( resHeaders[ "content-type" ] || "" ).replace( regex.nval, "" ) );
 
 				// Setting headers
 				if ( get && xhr.status === self.codes.SUCCESS ) {
@@ -90,7 +90,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, resHeaders );
 				}
 				else {
-					if ( REGEX_HEAD.test( req.method.toLowerCase() ) ) {
+					if ( regex.head.test( req.method.toLowerCase() ) ) {
 						arg = self.messages.NO_CONTENT;
 					}
 					// Fixing root path of response
@@ -141,8 +141,8 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 			array.each( string.trim( args ).split( "\n" ), function ( i ) {
 				var header, value;
 
-				value = i.replace( REGEX_HEADVAL, "" );
-				header = i.replace( REGEX_HEADKEY, "" ).toLowerCase();
+				value = i.replace( regex.headVAL, "" );
+				header = i.replace( regex.headKEY, "" ).toLowerCase();
 				result[ header ] = !isNaN( value ) ? Number( value ) : value;
 			} );
 		}
@@ -167,7 +167,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 			parsed = parse( url ),
 			cached = self.etags.get( url ),
 			streamd = ( stream === true ),
-			mimetype = cached ? cached.mimetype : mime.lookup( !REGEX_EXT.test( parsed.pathname ) ? "index.htm" : parsed.pathname ),
+			mimetype = cached ? cached.mimetype : mime.lookup( !regex.ext.test( parsed.pathname ) ? "index.htm" : parsed.pathname ),
 			defer, fn, options, proxyReq, xhr;
 
 		// Facade to handle()
@@ -182,7 +182,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		};
 
 		// Streaming formats that do not need to be rewritten
-		if ( !streamd && ( REGEX_EXT.test( parsed.pathname ) && !REGEX_JSON.test( mimetype ) ) && REGEX_STREAM.test( mimetype ) ) {
+		if ( !streamd && ( regex.ext.test( parsed.pathname ) && !regex.json.test( mimetype ) ) && regex.stream.test( mimetype ) ) {
 			streamd = true;
 		}
 
@@ -218,10 +218,10 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 			} );
 
 			proxyReq.on( "error", function ( e ) {
-				self.error( req, res, REGEX_REFUSED.test( e.message ) ? self.codes.SERVER_UNAVAILABLE : self.codes.SERVER_ERROR );
+				self.error( req, res, regex.refused.test( e.message ) ? self.codes.SERVER_UNAVAILABLE : self.codes.SERVER_ERROR );
 			} );
 
-			if ( REGEX_BODY.test( req.method ) ) {
+			if ( regex.body.test( req.method ) ) {
 				proxyReq.write( req.body );
 			}
 

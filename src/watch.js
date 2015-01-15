@@ -30,7 +30,7 @@ TurtleIO.prototype.watch = function ( url, path ) {
 
 		// Watching path for changes
 		watcher = fs.watch( path, function ( ev ) {
-			if ( REGEX_RENAME.test( ev ) ) {
+			if ( regex.rename.test( ev ) ) {
 				cleanup();
 			}
 			else {

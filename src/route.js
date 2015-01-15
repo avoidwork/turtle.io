@@ -14,7 +14,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 		update = false,
 		payload;
 
-	if ( REGEX_HEAD.test( method ) ) {
+	if ( regex.head.test( method ) ) {
 		method = "get";
 	}
 
@@ -64,7 +64,7 @@ TurtleIO.prototype.route = function ( req, res ) {
 	res.header = res.setHeader;
 
 	// Setting listeners if expecting a body
-	if ( REGEX_BODY.test( method ) ) {
+	if ( regex.body.test( method ) ) {
 		req.setEncoding( "utf-8" );
 
 		req.on( "data", function ( data ) {

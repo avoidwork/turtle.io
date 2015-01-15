@@ -15,7 +15,7 @@ TurtleIO.prototype.encode = function ( arg, accept ) {
 	}
 	// Converting to JSON
 	else if ( arg instanceof Array || arg instanceof Object ) {
-		header = REGEX_INDENT.exec( accept );
+		header = regex.indent.exec( accept );
 		indent = header !== null ? parseInt( header[ 1 ], 10 ) : this.config.json;
 
 		return JSON.stringify( arg, null, indent );

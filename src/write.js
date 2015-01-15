@@ -16,7 +16,7 @@ TurtleIO.prototype.write = function ( req, res, path ) {
 		del = this.allowed( "DELETE", req.parsed.pathname, req.vhost ),
 		status;
 
-	if ( !put && REGEX_ENDSLSH.test( req.url ) ) {
+	if ( !put && regex.end_slash.test( req.url ) ) {
 		status = del ? this.codes.CONFLICT : this.codes.SERVER_ERROR;
 
 		timer.stop();

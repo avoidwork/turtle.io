@@ -16,7 +16,7 @@
 TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, options, status, headers ) {
 	var self = this,
 		timer = precise().start(),
-		method = REGEX_GZIP.test( type ) ? "createGzip" : "createDeflate",
+		method = regex.gzip.test( type ) ? "createGzip" : "createDeflate",
 		sMethod = method.replace( "create", "" ).toLowerCase(),
 		fp = etag ? this.config.tmp + "/" + etag + "." + type : null;
 
@@ -47,7 +47,7 @@ TurtleIO.prototype.compress = function ( req, res, body, type, etag, file, optio
 					}
 					else {
 						if ( !res._header && !res._headerSent ) {
-							headers["content-length"] = data.length;
+							headers[ "content-length" ] = data.length;
 							res.writeHead( status, headers );
 						}
 

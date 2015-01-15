@@ -9,7 +9,7 @@
  */
 TurtleIO.prototype.headers = function ( req, rHeaders, status ) {
 	var timer = precise().start(),
-		get = REGEX_GET.test( req.method ),
+		get = regex.get.test( req.method ),
 		headers;
 
 	// Decorating response headers
