@@ -34,10 +34,12 @@ TurtleIO.prototype.headers = function ( req, rHeaders, status ) {
 			headers[ "access-control-allow-methods" ] = headers.allow;
 		}
 		else {
-			delete headers[ "access-control-allow-headers" ];
-			delete headers[ "access-control-allow-methods" ];
 			delete headers[ "access-control-allow-origin" ];
 			delete headers[ "access-control-expose-headers" ];
+			delete headers[ "access-control-max-age" ];
+			delete headers[ "access-control-allow-credentials" ];
+			delete headers[ "access-control-allow-methods" ];
+			delete headers[ "access-control-allow-headers" ];
 		}
 
 		// Decorating "Transfer-Encoding" header
