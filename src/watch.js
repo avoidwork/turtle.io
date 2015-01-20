@@ -44,8 +44,6 @@ TurtleIO.prototype.watch = function ( url, path ) {
 					else if ( self.etags.cache[ url ] ) {
 						value = self.etags.cache[ url ].value;
 						value.etag = self.etag( url, stat.size, stat.mtime );
-						value.timestamp = parseInt( new Date().getTime() / 1000, 10 );
-
 						self.register( url, value, true );
 					}
 					else {

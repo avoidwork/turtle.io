@@ -19,12 +19,12 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		type, options;
 
 	function finalize () {
-		var cheaders;
+		var cheaders, cached;
 
 		if ( status === self.codes.NOT_MODIFIED || status < self.codes.MULTIPLE_CHOICE || status >= self.codes.BAD_REQUEST ) {
 			// req.parsed may not exist if coming from `error()`
 			if ( req.parsed ) {
-				if ( req.method === "GET" && ( status === self.codes.SUCCESS || status === self.codes.NOT_MODIFIED ) ) {
+				if ( req.method === "GET" && status === self.codes.SUCCESS ) {
 					// Updating cache
 					if ( !regex.nocache.test( headers[ "cache-control" ] ) && !regex[ "private" ].test( headers[ "cache-control" ] ) ) {
 						if ( headers.etag === undefined ) {
@@ -40,12 +40,16 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 						delete cheaders[ "access-control-allow-methods" ];
 						delete cheaders[ "access-control-allow-headers" ];
 
-						self.register( req.parsed.href, {
-							etag: cheaders.etag.replace( /"/g, "" ),
-							headers: cheaders,
-							mimetype: cheaders[ "content-type" ],
-							timestamp: parseInt( new Date().getTime() / 1000, 10 )
-						}, true );
+						cached = self.etags.get( req.parsed.href );
+
+						if ( !cached ) {
+							self.register( req.parsed.href, {
+								etag: cheaders.etag.replace( /"/g, "" ),
+								headers: cheaders,
+								mimetype: cheaders[ "content-type" ],
+								timestamp: parseInt( new Date().getTime() / 1000, 10 )
+							}, true );
+						}
 					}
 
 					// Setting a watcher on the local path
