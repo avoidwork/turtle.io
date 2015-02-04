@@ -4,7 +4,7 @@
  * @method probes
  * @return {Object} TurtleIO instance
  */
-TurtleIO.prototype.probes = function () {
+probes () {
 	this.dtp.addProbe( "allowed", "char *", "char *", "char *", "int" );
 	this.dtp.addProbe( "allows", "char *", "char *", "int" );
 	this.dtp.addProbe( "compress", "char *", "char *", "int" );
@@ -18,6 +18,5 @@ TurtleIO.prototype.probes = function () {
 	this.dtp.addProbe( "respond", "char *", "char *", "char *", "int", "int" );
 	this.dtp.addProbe( "status", "int", "int", "int", "int", "int" );
 	this.dtp.addProbe( "write", "char *", "char *", "char *", "char *", "int" );
-
 	this.dtp.enable();
-};
+}

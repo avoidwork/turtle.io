@@ -7,8 +7,8 @@
  * @param  {Object} headers HTTP(S) response headers
  * @return {String}         Log message
  */
-TurtleIO.prototype.prep = function ( req, res, headers ) {
-	var msg = this.config.logs.format,
+prep ( req, res, headers ) {
+	let msg = this.config.logs.format,
 		user = req.parsed ? ( req.parsed.auth.split( ":" )[ 0 ] || "-" ) : "-";
 
 	msg = msg.replace( "%v", req.headers.host )
@@ -23,4 +23,4 @@ TurtleIO.prototype.prep = function ( req, res, headers ) {
 		.replace( "%{User-agent}i", req.headers[ "user-agent" ] || "-" );
 
 	return msg;
-};
+}

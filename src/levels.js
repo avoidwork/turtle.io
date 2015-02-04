@@ -3,7 +3,7 @@
  *
  * @type {Array}
  */
-TurtleIO.prototype.levels = [
+const LEVELS = [
 	"emerg",
 	"alert",
 	"crit",

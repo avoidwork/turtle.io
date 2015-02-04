@@ -3,7 +3,7 @@
  *
  * @type {Object}
  */
-TurtleIO.prototype.codes = {
+const CODES = {
 	CONTINUE: 100,
 	SWITCH_PROTOCOL: 101,
 	SUCCESS: 200,

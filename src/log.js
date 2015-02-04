@@ -6,8 +6,8 @@
  * @param  {String} level [Optional] `level` must match a valid LogLevel - http://httpd.apache.org/docs/1.3/mod/core.html#loglevel, default is `notice`
  * @return {Object}       TurtleIO instance
  */
-TurtleIO.prototype.log = function ( arg, level ) {
-	var self, timer, e, syslogMethod;
+log ( arg, level ) {
+	let self, timer, e, syslogMethod;
 
 	if ( LOGGING ) {
 		self = this;
@@ -15,7 +15,7 @@ TurtleIO.prototype.log = function ( arg, level ) {
 		e = arg instanceof Error;
 		level = level || "notice";
 
-		if ( this.config.logs.stdout && this.levels.indexOf( level ) <= LOGLEVEL ) {
+		if ( this.config.logs.stdout && LEVELS.indexOf( level ) <= LOGLEVEL ) {
 			if ( e ) {
 				console.error( "[" + moment().format( this.config.logs.time ) + "] [" + level + "] " + ( arg.stack || arg.message || arg ) );
 			}
@@ -40,10 +40,10 @@ TurtleIO.prototype.log = function ( arg, level ) {
 
 		timer.stop();
 
-		this.signal( "log", function () {
+		this.signal( "log", () => {
 			return [ level, self.config.logs.stdout, self.config.logs.syslog, timer.diff() ];
 		} );
 	}
 
 	return this;
-};
+}

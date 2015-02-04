@@ -5,13 +5,13 @@
  * @param  {Object} req Request Object
  * @return {String}     Requested URL
  */
-TurtleIO.prototype.url = function ( req ) {
-	var header = req.headers.authorization || "",
+url ( req ) {
+	let header = req.headers.authorization || "",
 		auth = "",
 		token;
 
 	if ( !string.isEmpty( header ) ) {
-		token = header.split( regex.space ).pop() || "",
+		token = header.split( REGEX.space ).pop() || "",
 			auth = new Buffer( token, "base64" ).toString();
 
 		if ( !string.isEmpty( auth ) ) {
@@ -20,4 +20,4 @@ TurtleIO.prototype.url = function ( req ) {
 	}
 
 	return "http" + ( this.config.ssl.cert ? "s" : "" ) + "://" + auth + req.headers.host + req.url;
-};
+}

@@ -7,8 +7,8 @@
  * @param  {String} mimetype Mimetype of URL
  * @return {Object}          TurtleIO instance
  */
-TurtleIO.prototype.watch = function ( url, path ) {
-	var self = this,
+watch ( url, path ) {
+	let self = this,
 		watcher;
 
 	/**
@@ -18,7 +18,7 @@ TurtleIO.prototype.watch = function ( url, path ) {
 	 * @private
 	 * @return {Undefined} undefined
 	 */
-	function cleanup () {
+	let cleanup = () => {
 		watcher.close();
 		self.unregister( url );
 		delete self.watching[ path ];
@@ -29,13 +29,13 @@ TurtleIO.prototype.watch = function ( url, path ) {
 		this.watching[ path ] = 1;
 
 		// Watching path for changes
-		watcher = fs.watch( path, function ( ev ) {
-			if ( regex.rename.test( ev ) ) {
+		watcher = fs.watch( path, ( ev ) => {
+			if ( REGEX.rename.test( ev ) ) {
 				cleanup();
 			}
 			else {
-				fs.lstat( path, function ( e, stat ) {
-					var value;
+				fs.lstat( path, ( e, stat ) => {
+					let value;
 
 					if ( e ) {
 						self.log( e );
@@ -56,4 +56,4 @@ TurtleIO.prototype.watch = function ( url, path ) {
 	}
 
 	return this;
-};
+}

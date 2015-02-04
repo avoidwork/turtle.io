@@ -8,9 +8,9 @@
  * @param  {Boolean} stream [Optional] Stream response to client (default is false)
  * @return {Object}         TurtleIO instance
  */
-TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
+proxy ( route, origin, host, stream ) {
 	stream = ( stream === true );
-	var self = this;
+	let self = this;
 
 	/**
 	 * Response handler
@@ -23,9 +23,9 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	 * @param  {Object} xhr XmlHttpRequest
 	 * @return {Undefined}  undefined
 	 */
-	function handle ( req, res, arg, xhr ) {
-		var etag = "",
-			regexOrigin = new RegExp( origin.replace( regex.end_slash, "" ), "g" ),
+	let handle = ( req, res, arg, xhr ) => {
+		let etag = "",
+			REGEXOrigin = new RegExp( origin.replace( REGEX.end_slash, "" ), "g" ),
 			url = req.parsed.href,
 			stale = STALE,
 			get = req.method === "GET",
@@ -37,18 +37,18 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		resHeaders.server = self.config.headers.server;
 
 		// Something went wrong
-		if ( xhr.status < self.codes.CONTINUE ) {
-			self.error( req, res, self.codes.BAD_GATEWAY );
+		if ( xhr.status < CODES.CONTINUE ) {
+			self.error( req, res, CODES.BAD_GATEWAY );
 		}
-		else if ( xhr.status >= self.codes.SERVER_ERROR ) {
+		else if ( xhr.status >= CODES.SERVER_ERROR ) {
 			self.error( req, res, xhr.status );
 		}
 		else {
 			// Determining if the response will be cached
-			if ( get && ( xhr.status === self.codes.SUCCESS || xhr.status === self.codes.NOT_MODIFIED ) && !regex.nocache.test( resHeaders[ "cache-control" ] ) && !regex[ "private" ].test( resHeaders[ "cache-control" ] ) ) {
+			if ( get && ( xhr.status === CODES.SUCCESS || xhr.status === CODES.NOT_MODIFIED ) && !REGEX.nocache.test( resHeaders[ "cache-control" ] ) && !REGEX[ "private" ].test( resHeaders[ "cache-control" ] ) ) {
 				// Determining how long rep is valid
-				if ( resHeaders[ "cache-control" ] && regex.number.test( resHeaders[ "cache-control" ] ) ) {
-					stale = number.parse( regex.number.exec( resHeaders[ "cache-control" ] )[ 0 ], 10 );
+				if ( resHeaders[ "cache-control" ] && REGEX.number.test( resHeaders[ "cache-control" ] ) ) {
+					stale = number.parse( REGEX.number.exec( resHeaders[ "cache-control" ] )[ 0 ], 10 );
 				}
 				else if ( resHeaders.expires !== undefined ) {
 					stale = new Date( resHeaders.expires );
@@ -57,17 +57,17 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 
 				// Removing from LRU when invalid
 				if ( stale > 0 ) {
-					setTimeout( function () {
+					setTimeout( () => {
 						self.unregister( url );
 					}, stale * 1000 );
 				}
 			}
 
-			if ( xhr.status !== self.codes.NOT_MODIFIED ) {
-				rewrite = regex.rewrite.test( ( resHeaders[ "content-type" ] || "" ).replace( regex.nval, "" ) );
+			if ( xhr.status !== CODES.NOT_MODIFIED ) {
+				rewrite = REGEX.rewrite.test( ( resHeaders[ "content-type" ] || "" ).replace( REGEX.nval, "" ) );
 
 				// Setting headers
-				if ( get && xhr.status === self.codes.SUCCESS ) {
+				if ( get && xhr.status === CODES.SUCCESS ) {
 					etag = resHeaders.etag || "\"" + self.etag( url, resHeaders[ "content-length" ] || 0, resHeaders[ "last-modified" ] || 0, self.encode( arg ) ) + "\"";
 
 					if ( resHeaders.etag !== etag ) {
@@ -87,11 +87,11 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 						resHeaders.age = parseInt( new Date().getTime() / 1000 - cached.value.timestamp, 10 );
 					}
 
-					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NOT_MODIFIED, resHeaders );
+					self.respond( req, res, MESSAGES.NO_CONTENT, CODES.NOT_MODIFIED, resHeaders );
 				}
 				else {
-					if ( regex.head.test( req.method.toLowerCase() ) ) {
-						arg = self.messages.NO_CONTENT;
+					if ( REGEX.head.test( req.method.toLowerCase() ) ) {
+						arg = MESSAGES.NO_CONTENT;
 					}
 					// Fixing root path of response
 					else if ( rewrite ) {
@@ -99,7 +99,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 						delete resHeaders[ "content-length" ];
 
 						if ( arg instanceof Array || arg instanceof Object ) {
-							arg = json.encode( arg, req.headers.accept ).replace( regexOrigin, rewriteOrigin );
+							arg = json.encode( arg, req.headers.accept ).replace( REGEXOrigin, rewriteOrigin );
 
 							if ( route !== "/" ) {
 								arg = arg.replace( /"(\/[^?\/]\w+)\//g, "\"" + route + "$1/" );
@@ -108,7 +108,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 							arg = json.decode( arg );
 						}
 						else if ( typeof arg == "string" ) {
-							arg = arg.replace( regexOrigin, rewriteOrigin );
+							arg = arg.replace( REGEXOrigin, rewriteOrigin );
 
 							if ( route !== "/" ) {
 								arg = arg.replace( /(href|src)=("|')([^http|mailto|<|_|\s|\/\/].*?)("|')/g, ( "$1=$2" + route + "/$3$4" ) )
@@ -134,15 +134,15 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	 * @param  {Object} args Response headers
 	 * @return {Object}      Reshaped response headers
 	 */
-	function headers ( args ) {
-		var result = {};
+	let headers = ( args ) => {
+		let result = {};
 
 		if ( !string.isEmpty( args ) ) {
-			array.each( string.trim( args ).split( "\n" ), function ( i ) {
-				var header, value;
+			array.each( string.trim( args ).split( "\n" ), ( i ) => {
+				let header, value;
 
-				value = i.replace( regex.headVAL, "" );
-				header = i.replace( regex.headKEY, "" ).toLowerCase();
+				value = i.replace( REGEX.headVAL, "" );
+				header = i.replace( REGEX.headKEY, "" ).toLowerCase();
 				result[ header ] = !isNaN( value ) ? Number( value ) : value;
 			} );
 		}
@@ -159,22 +159,22 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	 * @param  {Object} res HTTP(S) response Object
 	 * @return {Undefined}  undefined
 	 */
-	function wrapper ( req, res ) {
-		var timer = precise().start(),
+	let wrapper = ( req, res ) => {
+		let timer = precise().start(),
 			url = origin + ( route !== "/" ? req.url.replace( new RegExp( "^" + route ), "" ) : req.url ),
 			method = req.method.toLowerCase(),
 			headerz = clone( req.headers, true ),
 			parsed = parse( url ),
 			cached = self.etags.get( url ),
 			streamd = ( stream === true ),
-			mimetype = cached ? cached.mimetype : mime.lookup( !regex.ext.test( parsed.pathname ) ? "index.htm" : parsed.pathname ),
+			mimetype = cached ? cached.mimetype : mime.lookup( !REGEX.ext.test( parsed.pathname ) ? "index.htm" : parsed.pathname ),
 			defer, fn, options, proxyReq, xhr;
 
 		// Facade to handle()
-		fn = function ( arg ) {
+		fn = ( arg ) => {
 			timer.stop();
 
-			self.signal( "proxy", function () {
+			self.signal( "proxy", () => {
 				return [ req.headers.host, req.method, route, origin, timer.diff() ];
 			} );
 
@@ -182,7 +182,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 		};
 
 		// Streaming formats that do not need to be rewritten
-		if ( !streamd && ( regex.ext.test( parsed.pathname ) && !regex.json.test( mimetype ) ) && regex.stream.test( mimetype ) ) {
+		if ( !streamd && ( REGEX.ext.test( parsed.pathname ) && !REGEX.json.test( mimetype ) ) && REGEX.stream.test( mimetype ) ) {
 			streamd = true;
 		}
 
@@ -212,16 +212,16 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 				options.auth = parsed.auth;
 			}
 
-			proxyReq = http.request( options, function ( proxyRes ) {
+			proxyReq = http.request( options, ( proxyRes ) => {
 				res.writeHeader( proxyRes.statusCode, proxyRes.headers );
 				proxyRes.pipe( res );
 			} );
 
-			proxyReq.on( "error", function ( e ) {
-				self.error( req, res, regex.refused.test( e.message ) ? self.codes.SERVER_UNAVAILABLE : self.codes.SERVER_ERROR );
+			proxyReq.on( "error", ( e ) => {
+				self.error( req, res, REGEX.refused.test( e.message ) ? CODES.SERVER_UNAVAILABLE : CODES.SERVER_ERROR );
 			} );
 
-			if ( regex.body.test( req.method ) ) {
+			if ( REGEX.body.test( req.method ) ) {
 				proxyReq.write( req.body );
 			}
 
@@ -240,7 +240,7 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	}
 
 	// Setting route
-	array.each( VERBS, function ( i ) {
+	array.each( VERBS, ( i ) => {
 		if ( route === "/" ) {
 			self[ i ]( "/.*", wrapper, host );
 		}
@@ -251,4 +251,4 @@ TurtleIO.prototype.proxy = function ( route, origin, host, stream ) {
 	} );
 
 	return this;
-};
+}

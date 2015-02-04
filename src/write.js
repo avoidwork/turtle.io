@@ -7,8 +7,8 @@
  * @param  {String} path File path
  * @return {Object}      TurtleIO instance
  */
-TurtleIO.prototype.write = function ( req, res, path ) {
-	var self = this,
+write ( req, res, path ) {
+	let self = this,
 		timer = precise().start(),
 		put = ( req.method === "PUT" ),
 		body = req.body,
@@ -16,12 +16,12 @@ TurtleIO.prototype.write = function ( req, res, path ) {
 		del = this.allowed( "DELETE", req.parsed.pathname, req.vhost ),
 		status;
 
-	if ( !put && regex.end_slash.test( req.url ) ) {
-		status = del ? this.codes.CONFLICT : this.codes.SERVER_ERROR;
+	if ( !put && REGEX.end_slash.test( req.url ) ) {
+		status = del ? CODES.CONFLICT : CODES.SERVER_ERROR;
 
 		timer.stop();
 
-		this.signal( "write", function () {
+		this.signal( "write", () => {
 			return [ req.headers.host, req.url, req.method, path, timer.diff() ];
 		} );
 
@@ -30,36 +30,37 @@ TurtleIO.prototype.write = function ( req, res, path ) {
 	else {
 		allow = array.remove( string.explode( allow ), "POST" ).join( ", " );
 
-		fs.lstat( path, function ( e, stat ) {
+		fs.lstat( path, ( e, stat ) => {
 			if ( e ) {
-				self.error( req, res, self.codes.NOT_FOUND );
+				self.error( req, res, CODES.NOT_FOUND );
 			}
 			else {
-				var etag = "\"" + self.etag( req.parsed.href, stat.size, stat.mtime ) + "\"";
+				let etag = "\"" + self.etag( req.parsed.href, stat.size, stat.mtime ) + "\"";
 
 				if ( !req.headers.hasOwnProperty( "etag" ) || req.headers.etag === etag ) {
-					fs.writeFile( path, body, function ( e ) {
+					fs.writeFile( path, body, ( e ) => {
 						if ( e ) {
-							self.error( req, req, self.codes.SERVER_ERROR );
+							self.error( req, req, CODES.SERVER_ERROR );
 						}
 						else {
-							status = put ? self.codes.NO_CONTENT : self.codes.CREATED;
+							status = put ? CODES.NO_CONTENT : CODES.CREATED;
 							self.respond( req, res, self.page( status, self.hostname( req ) ), status, { allow: allow }, false );
 						}
 					} );
 				}
 				else if ( req.headers.etag !== etag ) {
-					self.respond( req, res, self.messages.NO_CONTENT, self.codes.FAILED, {}, false );
+					self.respond( req, res, MESSAGES.NO_CONTENT, CODES.FAILED, {}, false );
 				}
 			}
 		} );
 
 		timer.stop();
 
-		this.signal( "write", function () {
+		this.signal( "write", () => {
 			return [ req.headers.host, req.url, req.method, path, timer.diff() ];
 		} );
 	}
 
 	return this;
-};
+}
+}

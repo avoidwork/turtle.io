@@ -8,18 +8,18 @@
  * @param  {Boolean} permanent [Optional] `true` will indicate the redirection is permanent
  * @return {Object}            instance
  */
-TurtleIO.prototype.redirect = function ( route, url, host, permanent ) {
-	var code = this.codes[ permanent === true ? "MOVED" : "REDIRECT" ],
+redirect ( route, url, host, permanent ) {
+	let code = CODES[ permanent === true ? "MOVED" : "REDIRECT" ],
 		pattern = new RegExp( "^" + route + "$" );
 
-	this.get( route, function ( req, res ) {
-		var rewrite = ( pattern.exec( req.url ) || [] ).length > 0;
+	this.get( route, ( req, res ) => {
+		let rewrite = ( pattern.exec( req.url ) || [] ).length > 0;
 
-		this.respond( req, res, this.messages.NO_CONTENT, code, {
+		this.respond( req, res, MESSAGES.NO_CONTENT, code, {
 			"Location": ( rewrite ? req.url.replace( pattern, url ) : url ),
 			"Cache-Control": "no-cache"
 		} );
 	}, host );
 
 	return this;
-};
+}

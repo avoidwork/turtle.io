@@ -6,7 +6,7 @@
  * @param  {Function} cb  [Optional] Callback function, triggers async behavior
  * @return {String}       Hash of arg
  */
-TurtleIO.prototype.hash = function ( arg, cb ) {
+hash ( arg, cb ) {
 	if ( typeof arg != "string" && !( arg instanceof Buffer ) ) {
 		arg = "";
 	}
@@ -15,7 +15,7 @@ TurtleIO.prototype.hash = function ( arg, cb ) {
 		return mmh3.murmur32HexSync( arg, this.config.seed );
 	}
 	else {
-		mmh3.murmur32Hex( arg, this.config.seed, function ( e, value ) {
+		mmh3.murmur32Hex( arg, this.config.seed, ( e, value ) => {
 			if ( e ) {
 				cb( e, null );
 			}
@@ -24,4 +24,4 @@ TurtleIO.prototype.hash = function ( arg, cb ) {
 			}
 		} );
 	}
-};
+}

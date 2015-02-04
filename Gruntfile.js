@@ -20,11 +20,13 @@ module.exports = function (grunt) {
 					"<banner>",
 					"src/intro.js",
 					"src/regex.js",
+					"src/codes.js",
+					"src/levels.js",
+					"src/messages.js",
 					"src/constructor.js",
 					"src/allowed.js",
 					"src/allows.js",
 					"src/blacklist.js",
-					"src/codes.js",
 					"src/compress.js",
 					"src/compression.js",
 					"src/encode.js",
@@ -34,9 +36,7 @@ module.exports = function (grunt) {
 					"src/hash.js",
 					"src/headers.js",
 					"src/host.js",
-					"src/levels.js",
 					"src/log.js",
-					"src/messages.js",
 					"src/page.js",
 					"src/probes.js",
 					"src/prep.js",
@@ -62,14 +62,18 @@ module.exports = function (grunt) {
 					"src/factory.js",
 					"src/outro.js"
 				],
-				dest : "lib/<%= pkg.name %>.js"
+				dest : "lib/<%= pkg.name %>.es6.js"
 			}
 		},
-		jshint : {
-			options : {
-				jshintrc : ".jshintrc"
+		"6to5": {
+			options: {
+				sourceMap: false
 			},
-			src : "lib/<%= pkg.name %>.js"
+			dist: {
+				files: {
+					"lib/<%= pkg.name %>.js": "lib/<%= pkg.name %>.es6.js"
+				}
+			}
 		},
 		mochaTest : {
 			options: {
@@ -101,14 +105,14 @@ module.exports = function (grunt) {
 	// tasks
 	grunt.loadNpmTasks("grunt-sed");
 	grunt.loadNpmTasks("grunt-contrib-concat");
-	grunt.loadNpmTasks("grunt-contrib-jshint");
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks("grunt-mocha-test");
 	grunt.loadNpmTasks("grunt-nsp-package");
+	grunt.loadNpmTasks("grunt-6to5");
 
 	// aliases
-	grunt.registerTask("test", ["jshint", "mochaTest"]);
-	grunt.registerTask("build", ["concat", "sed"]);
+	grunt.registerTask("test", ["mochaTest"]);
+	grunt.registerTask("build", ["concat", "sed", "6to5"]);
 	grunt.registerTask("validate", "validate-package");
 	grunt.registerTask("default", ["build", "test"]);
 	grunt.registerTask("package", ["validate", "default"]);

@@ -6,10 +6,10 @@
  * @param  {Function} fn   DTP handler
  * @return {Object}        TurtleIO instance
  */
-TurtleIO.prototype.signal = function ( name, fn ) {
+signal ( name, fn ) {
 	if ( this.config.logs.dtrace ) {
 		this.dtp.fire( name, fn );
 	}
 
 	return this;
-};
+}

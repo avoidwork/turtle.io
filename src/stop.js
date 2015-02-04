@@ -4,8 +4,8 @@
  * @method stop
  * @return {Object} TurtleIO instance
  */
-TurtleIO.prototype.stop = function () {
-	var port = this.config.port;
+stop () {
+	let port = this.config.port;
 
 	this.log( "Stopping " + this.config.id + " on port " + port, "debug" );
 
@@ -25,4 +25,4 @@ TurtleIO.prototype.stop = function () {
 	}
 
 	return this;
-};
+}

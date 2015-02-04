@@ -5,8 +5,8 @@
  * @param  {Function} fn Function to add
  * @return {Object}      TurtleIO instance
  */
-TurtleIO.prototype.blacklist = function ( fn ) {
-	var hfn = fn.hash || this.hash( fn.toString() );
+blacklist ( fn ) {
+	let hfn = fn.hash || this.hash( fn.toString() );
 
 	if ( this.config.noaction === undefined ) {
 		this.config.noaction = {};
@@ -17,4 +17,4 @@ TurtleIO.prototype.blacklist = function ( fn ) {
 	}
 
 	return this;
-};
+}

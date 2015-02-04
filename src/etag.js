@@ -8,6 +8,6 @@
  * @param  {Object} body     [Optional] Response body
  * @return {String}          Etag value
  */
-TurtleIO.prototype.etag = function ( /*url, size, modified, body*/ ) {
+etag () {
 	return this.hash( array.cast( arguments ).join( "-" ) );
-};
+}

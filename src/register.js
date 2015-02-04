@@ -7,8 +7,8 @@
  * @param  {Boolean} stale [Optional] Remove cache from disk
  * @return {Object}        TurtleIO instance
  */
-TurtleIO.prototype.register = function ( url, state, stale ) {
-	var cached;
+register ( url, state, stale ) {
+	let cached;
 
 	// Removing stale cache from disk
 	if ( stale === true ) {
@@ -23,4 +23,4 @@ TurtleIO.prototype.register = function ( url, state, stale ) {
 	this.etags.set( url, state );
 
 	return this;
-};
+}

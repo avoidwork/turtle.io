@@ -5,15 +5,15 @@
  * @public
  * @return {Object} Status
  */
-TurtleIO.prototype.status = function () {
-	var timer = precise().start(),
+status () {
+	let timer = precise().start(),
 		ram = process.memoryUsage(),
 		uptime = process.uptime(),
 		state = { config: {}, etags: {}, process: {}, server: {} },
 		invalid = /^(auth|session|ssl)$/;
 
 	// Startup parameters
-	iterate( this.config, function ( v, k ) {
+	iterate( this.config, ( v, k ) => {
 		if ( !invalid.test( k ) ) {
 			state.config[ k ] = v;
 		}
@@ -34,16 +34,16 @@ TurtleIO.prototype.status = function () {
 	// LRU cache
 	state.etags = {
 		items: this.etags.length,
-		bytes: Buffer.byteLength( array.cast( this.etags.cache ).map( function ( i ) {
+		bytes: Buffer.byteLength( array.cast( this.etags.cache ).map( ( i ) => {
 			return i.value;
 		} ).join( "" ) )
 	};
 
 	timer.stop();
 
-	this.signal( "status", function () {
+	this.signal( "status", () => {
 		return [ state.server.connections, uptime, ram.heapUsed, ram.heapTotal, timer.diff() ];
 	} );
 
 	return state;
-};
+}

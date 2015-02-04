@@ -6,8 +6,8 @@
  * @param  {String} url URL requested
  * @return {Object}     TurtleIO instance
  */
-TurtleIO.prototype.unregister = function ( url ) {
-	var self = this,
+unregister ( url ) {
+	let self = this,
 		cached = this.etags.cache[ url ],
 		path = this.config.tmp + "/",
 		gz, df;
@@ -19,9 +19,9 @@ TurtleIO.prototype.unregister = function ( url ) {
 		gz = path + ".gz";
 		df = path + ".zz";
 
-		fs.exists( gz, function ( exists ) {
+		fs.exists( gz, ( exists ) => {
 			if ( exists ) {
-				fs.unlink( gz, function ( e ) {
+				fs.unlink( gz, ( e ) => {
 					if ( e ) {
 						self.log( e );
 					}
@@ -29,9 +29,9 @@ TurtleIO.prototype.unregister = function ( url ) {
 			}
 		} );
 
-		fs.exists( df, function ( exists ) {
+		fs.exists( df, ( exists ) => {
 			if ( exists ) {
-				fs.unlink( df, function ( e ) {
+				fs.unlink( df, ( e ) => {
 					if ( e ) {
 						self.log( e );
 					}
@@ -41,4 +41,4 @@ TurtleIO.prototype.unregister = function ( url ) {
 	}
 
 	return this;
-};
+}

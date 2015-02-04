@@ -6,8 +6,8 @@
  * @param  {String} accept Accept HTTP header
  * @return {Mixed}         Original Object or JSON string
  */
-TurtleIO.prototype.encode = function ( arg, accept ) {
-	var header, indent;
+encode ( arg, accept ) {
+	let header, indent;
 
 	// Do not want to coerce this Object to a String!
 	if ( arg instanceof Buffer || typeof arg.pipe == "function" ) {
@@ -15,7 +15,7 @@ TurtleIO.prototype.encode = function ( arg, accept ) {
 	}
 	// Converting to JSON
 	else if ( arg instanceof Array || arg instanceof Object ) {
-		header = regex.indent.exec( accept );
+		header = REGEX.indent.exec( accept );
 		indent = header !== null ? parseInt( header[ 1 ], 10 ) : this.config.json;
 
 		return JSON.stringify( arg, null, indent );
@@ -24,4 +24,4 @@ TurtleIO.prototype.encode = function ( arg, accept ) {
 	else {
 		return arg;
 	}
-};
+}

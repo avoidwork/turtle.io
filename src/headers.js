@@ -7,13 +7,13 @@
  * @param  {Number}  status   HTTP status code, default is 200
  * @return {Object}           Response headers
  */
-TurtleIO.prototype.headers = function ( req, rHeaders, status ) {
-	var timer = precise().start(),
-		get = regex.get.test( req.method ),
+headers ( req, rHeaders, status ) {
+	let timer = precise().start(),
+		get = REGEX.get.test( req.method ),
 		headers;
 
 	// Decorating response headers
-	if ( status !== this.codes.NOT_MODIFIED && status >= this.codes.MULTIPLE_CHOICE && status < this.codes.BAD_REQUEST ) {
+	if ( status !== CODES.NOT_MODIFIED && status >= CODES.MULTIPLE_CHOICE && status < CODES.BAD_REQUEST ) {
 		headers = rHeaders;
 	}
 	else if ( rHeaders instanceof Object ) {
@@ -48,17 +48,17 @@ TurtleIO.prototype.headers = function ( req, rHeaders, status ) {
 		}
 
 		// Removing headers not wanted in the response
-		if ( !get || status >= this.codes.BAD_REQUEST ) {
+		if ( !get || status >= CODES.BAD_REQUEST ) {
 			delete headers[ "cache-control" ];
 			delete headers.etag;
 			delete headers[ "last-modified" ];
 		}
 
-		if ( status === this.codes.NOT_MODIFIED ) {
+		if ( status === CODES.NOT_MODIFIED ) {
 			delete headers[ "last-modified" ];
 		}
 
-		if ( ( status === this.codes.NOT_FOUND && headers.allow ) || status >= this.codes.SERVER_ERROR ) {
+		if ( ( status === CODES.NOT_FOUND && headers.allow ) || status >= CODES.SERVER_ERROR ) {
 			delete headers[ "accept-ranges" ];
 		}
 
@@ -71,9 +71,9 @@ TurtleIO.prototype.headers = function ( req, rHeaders, status ) {
 
 	timer.stop();
 
-	this.signal( "headers", function () {
+	this.signal( "headers", () => {
 		return [ status, timer.diff() ];
 	} );
 
 	return headers;
-};
+}

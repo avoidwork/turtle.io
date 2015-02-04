@@ -8,45 +8,45 @@
  * @param  {String} method HTTP method
  * @return {Object}        TurtleIO instance
  */
-TurtleIO.prototype.run = function ( req, res, host, method ) {
-	var self = this,
+run ( req, res, host, method ) {
+	let self = this,
 		middleware = this.routes( req.parsed.pathname, host, method ),
 		nth = middleware.length,
 		i = -1;
 
-	function stop ( timer ) {
+	let stop = ( timer ) => {
 		if ( timer.stopped === null ) {
 			timer.stop();
-			self.signal( "middleware", function () {
+			self.signal( "middleware", () => {
 				return [ host, req.url, timer.diff() ];
 			} );
 		}
-	}
+	};
 
-	function last ( timer, err ) {
-		var status;
+	let last = ( timer, err ) => {
+		let status;
 
 		stop( timer );
 
 		if ( !err ) {
-			if ( regex.get.test( method ) ) {
+			if ( REGEX.get.test( method ) ) {
 				self.request( req, res );
 			}
 			else if ( self.allowed( "get", req.parsed.pathname, req.vhost ) ) {
-				self.error( req, res, self.codes.NOT_ALLOWED );
+				self.error( req, res, CODES.NOT_ALLOWED );
 			}
 			else {
-				self.error( req, res, self.codes.NOT_FOUND );
+				self.error( req, res, CODES.NOT_FOUND );
 			}
 		}
 		else {
-			status = res.statusCode >= self.codes.BAD_REQUEST ? res.statusCode : self.codes[ ( err.message || err ).toUpperCase() ] || self.codes.SERVER_ERROR;
+			status = res.statusCode >= CODES.BAD_REQUEST ? res.statusCode : CODES[ ( err.message || err ).toUpperCase() ] || CODES.SERVER_ERROR;
 			self.error( req, res, status, err );
 		}
-	}
+	};
 
-	function next ( err ) {
-		var timer = precise().start(),
+	let next = ( err ) => {
+		let timer = precise().start(),
 			arity = 3;
 
 		if ( ++i < nth && typeof middleware[ i ] == "function" ) {
@@ -83,9 +83,9 @@ TurtleIO.prototype.run = function ( req, res, host, method ) {
 		else if ( !res._header && self.config.catchAll ) {
 			last( timer, err );
 		}
-	}
 
-	next();
+		return self;
+	};
 
-	return this;
-};
+	return next();
+}

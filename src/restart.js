@@ -4,10 +4,8 @@
  * @method restart
  * @return {Object} TurtleIO instance
  */
-TurtleIO.prototype.restart = function () {
-	var config = this.config;
+restart () {
+	let config = this.config;
 
-	this.stop().start( config );
-
-	return this;
-};
+	return this.stop().start( config );
+}

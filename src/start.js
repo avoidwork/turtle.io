@@ -6,8 +6,8 @@
  * @param  {Function} err    Error handler
  * @return {Object}          TurtleIO instance
  */
-TurtleIO.prototype.start = function ( cfg, err ) {
-	var self = this,
+start ( cfg, err ) {
+	let self = this,
 		config, headers, pages;
 
 	config = clone( defaultConfig, true );
@@ -39,7 +39,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	merge( this.config, config );
 
 	pages = this.config.pages ? ( this.config.root + this.config.pages ) : ( __dirname + "/../pages" );
-	LOGLEVEL = this.levels.indexOf( this.config.logs.level );
+	LOGLEVEL = LEVELS.indexOf( this.config.logs.level );
 	LOGGING = this.config.logs.dtrace || this.config.logs.stdout || this.config.logs.syslog;
 
 	// Looking for required setting
@@ -53,7 +53,7 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	delete this.config.headers;
 	this.config.headers = {};
 
-	iterate( headers, function ( value, key ) {
+	iterate( headers, ( value, key ) => {
 		self.config.headers[ key.toLowerCase() ] = value;
 	} );
 
@@ -63,8 +63,8 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 		this.config.headers[ "x-powered-by" ] = "node.js/" + process.versions.node.replace( /^v/, "" ) + " " + string.capitalize( process.platform ) + " V8/" + string.trim( process.versions.v8.toString() );
 	}
 
-	// Creating regex.rewrite
-	regex.rewrite = new RegExp( "^(" + this.config.proxy.rewrite.join( "|" ) + ")$" );
+	// Creating REGEX.rewrite
+	REGEX.rewrite = new RegExp( "^(" + this.config.proxy.rewrite.join( "|" ) + ")$" );
 
 	// Setting default routes
 	this.host( ALL );
@@ -73,18 +73,18 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	this.probes();
 
 	// Registering virtual hosts
-	array.each( array.cast( config.vhosts, true ), function ( i ) {
+	array.each( array.cast( config.vhosts, true ), ( i ) => {
 		self.host( i );
 	} );
 
 	// Loading default error pages
-	fs.readdir( pages, function ( e, files ) {
+	fs.readdir( pages, ( e, files ) => {
 		if ( e ) {
 			self.log( new Error( "[client 0.0.0.0] " + e.message ), "error" );
 		}
 		else if ( array.keys( self.config ).length > 0 ) {
-			array.each( files, function ( i ) {
-				self.pages.all[ i.replace( regex.next, "" ) ] = fs.readFileSync( pages + "/" + i, "utf8" );
+			array.each( files, ( i ) => {
+				self.pages.all[ i.replace( REGEX.next, "" ) ] = fs.readFileSync( pages + "/" + i, "utf8" );
 			} );
 
 			// Starting server
@@ -113,12 +113,12 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 						host: self.config.address,
 						secureProtocol: self.config.secureProtocol,
 						secureOptions: self.config.secureOptions
-					} ), function ( req, res ) {
+					} ), ( req, res ) => {
 						self.route( req, res );
 					} ).listen( self.config.port, self.config.address );
 				}
 				else {
-					self.server = http.createServer( function ( req, res ) {
+					self.server = http.createServer( ( req, res ) => {
 						self.route( req, res );
 					} ).listen( self.config.port, self.config.address );
 				}
@@ -137,10 +137,10 @@ TurtleIO.prototype.start = function ( cfg, err ) {
 	} );
 
 	// Something went wrong, server must restart
-	process.on( "uncaughtException", function ( e ) {
+	process.on( "uncaughtException", ( e ) => {
 		self.log( e, "error" );
 		process.exit( 1 );
 	} );
 
 	return this;
-};
+}

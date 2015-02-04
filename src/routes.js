@@ -8,8 +8,8 @@
  * @param  {Boolean} override Overrides cached version
  * @return {Array}
  */
-TurtleIO.prototype.routes = function ( uri, host, method, override ) {
-	var id = method + ":" + host + ":" + uri,
+routes ( uri, host, method, override ) {
+	let id = method + ":" + host + ":" + uri,
 		cached = override !== true && this.routeCache.get( id ),
 		all, h, result;
 
@@ -22,11 +22,11 @@ TurtleIO.prototype.routes = function ( uri, host, method, override ) {
 	result = [];
 
 	try {
-		array.each( [ all.all, all[ method ], h.all, h[ method ] ], function ( c ) {
+		array.each( [ all.all, all[ method ], h.all, h[ method ] ], ( c ) => {
 			if ( c ) {
-				array.each( array.keys( c ).filter( function ( i ) {
+				array.each( array.keys( c ).filter( ( i ) => {
 					return new RegExp( "^" + i + "$", "i" ).test( uri );
-				} ), function ( i ) {
+				} ), ( i ) => {
 					result = result.concat( c[ i ] );
 				} );
 			}
@@ -39,4 +39,4 @@ TurtleIO.prototype.routes = function ( uri, host, method, override ) {
 	this.routeCache.set( id, result );
 
 	return result;
-};
+}

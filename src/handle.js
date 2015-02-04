@@ -10,8 +10,8 @@
  * @param  {Object}  stat  fs.Stat Object
  * @return {Object}        TurtleIO instance
  */
-TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
-	var self = this,
+handle ( req, res, path, url, dir, stat ) {
+	let self = this,
 		allow, del, etag, headers, method, mimetype, modified, size, write;
 
 	allow = req.allow;
@@ -21,7 +21,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 
 	// File request
 	if ( !dir ) {
-		if ( regex.get.test( method ) ) {
+		if ( REGEX.get.test( method ) ) {
 			mimetype = mime.lookup( path );
 			size = stat.size;
 			modified = stat.mtime.toUTCString();
@@ -40,26 +40,26 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 
 				// Client has current version
 				if ( ( req.headers[ "if-none-match" ] === etag ) || ( !req.headers[ "if-none-match" ] && Date.parse( req.headers[ "if-modified-since" ] ) >= stat.mtime ) ) {
-					this.respond( req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, headers, true );
+					this.respond( req, res, MESSAGES.NO_CONTENT, CODES.NOT_MODIFIED, headers, true );
 				}
 				// Sending current version
 				else {
-					this.respond( req, res, path, this.codes.SUCCESS, headers, true );
+					this.respond( req, res, path, CODES.SUCCESS, headers, true );
 				}
 			}
 			else {
-				this.respond( req, res, this.messages.NO_CONTENT, this.codes.SUCCESS, headers, true );
+				this.respond( req, res, MESSAGES.NO_CONTENT, CODES.SUCCESS, headers, true );
 			}
 		}
 		else if ( method === "DELETE" && del ) {
 			this.unregister( this.url( req ) );
 
-			fs.unlink( path, function ( e ) {
+			fs.unlink( path, ( e ) => {
 				if ( e ) {
-					self.error( req, req, self.codes.SERVER_ERROR );
+					self.error( req, req, CODES.SERVER_ERROR );
 				}
 				else {
-					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NO_CONTENT, {} );
+					self.respond( req, res, MESSAGES.NO_CONTENT, CODES.NO_CONTENT, {} );
 				}
 			} );
 		}
@@ -67,7 +67,7 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 			this.write( req, res, path );
 		}
 		else {
-			this.error( req, req, this.codes.SERVER_ERROR );
+			this.error( req, req, CODES.SERVER_ERROR );
 		}
 	}
 	// Directory request
@@ -78,19 +78,19 @@ TurtleIO.prototype.handle = function ( req, res, path, url, dir, stat ) {
 		else if ( method === "DELETE" && del ) {
 			this.unregister( req.parsed.href );
 
-			fs.unlink( path, function ( e ) {
+			fs.unlink( path, ( e ) => {
 				if ( e ) {
-					self.error( req, req, self.codes.SERVER_ERROR );
+					self.error( req, req, CODES.SERVER_ERROR );
 				}
 				else {
-					self.respond( req, res, self.messages.NO_CONTENT, self.codes.NO_CONTENT, {} );
+					self.respond( req, res, MESSAGES.NO_CONTENT, CODES.NO_CONTENT, {} );
 				}
 			} );
 		}
 		else {
-			this.error( req, req, this.codes.NOT_ALLOWED );
+			this.error( req, req, CODES.NOT_ALLOWED );
 		}
 	}
 
 	return this;
-};
+}

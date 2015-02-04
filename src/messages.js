@@ -3,7 +3,7 @@
  *
  * @type {Object}
  */
-TurtleIO.prototype.messages = {
+const MESSAGES = {
 	CONTINUE: "Continue",
 	SWITCH_PROTOCOL: "Switching protocols",
 	SUCCESS: "Success",

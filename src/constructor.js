@@ -1,12 +1,16 @@
+class TurtleIO {
 /**
  * TurtleIO
  *
  * @constructor
  */
-function TurtleIO () {
+constructor () {
 	this.config = {};
+	this.codes = CODES;
 	this.dtp = null;
 	this.etags = lru( 1000 );
+	this.levels = LEVELS;
+	this.messages = MESSAGES;
 	this.middleware = { all: {} };
 	this.permissions = lru( 1000 );
 	this.routeCache = lru( 5000 ); // verbs * etags
@@ -16,6 +20,3 @@ function TurtleIO () {
 	this.vhostsRegExp = [];
 	this.watching = {};
 }
-
-// Prototype loop
-TurtleIO.prototype.constructor = TurtleIO;

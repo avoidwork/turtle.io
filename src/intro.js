@@ -1,6 +1,4 @@
-"use strict";
-
-var constants = require( "constants" ),
+let constants = require( "constants" ),
 	mmh3 = require( "murmurhash3" ),
 	defaultConfig = require( __dirname + "/../config.json" ),
 	dtrace = require( "dtrace-provider" ),

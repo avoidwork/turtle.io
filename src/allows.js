@@ -7,13 +7,13 @@
  * @param  {Boolean} override Overrides cached version
  * @return {String}           Allowed methods
  */
-TurtleIO.prototype.allows = function ( uri, host, override ) {
-	var self = this,
+allows ( uri, host, override ) {
+	let self = this,
 		timer = precise().start(),
 		result = !override ? this.permissions.get( host + "_" + uri ) : undefined;
 
 	if ( override || !result ) {
-		result = VERBS.filter( function ( i ) {
+		result = VERBS.filter( ( i ) => {
 			return self.allowed( i, uri, host, override );
 		} );
 
@@ -23,9 +23,9 @@ TurtleIO.prototype.allows = function ( uri, host, override ) {
 
 	timer.stop();
 
-	this.signal( "allows", function () {
+	this.signal( "allows", () => {
 		return [ host, uri, timer.diff() ];
 	} );
 
 	return result;
-};
+}

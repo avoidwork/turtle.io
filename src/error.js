@@ -8,30 +8,30 @@
  * @param  {String} msg    [Optional] Response body
  * @return {Object}        TurtleIO instance
  */
-TurtleIO.prototype.error = function ( req, res, status, msg ) {
-	var timer = precise().start(),
+error ( req, res, status, msg ) {
+	let timer = precise().start(),
 		method = req.method.toLowerCase(),
 		host = req.parsed ? req.parsed.hostname : ALL,
 		kdx = -1,
 		body;
 
 	if ( isNaN( status ) ) {
-		status = this.codes.NOT_FOUND;
+		status = CODES.NOT_FOUND;
 
 		// If valid, determine what kind of error to respond with
-		if ( !regex.get.test( method ) && !regex.head.test( method ) ) {
+		if ( !REGEX.get.test( method ) && !REGEX.head.test( method ) ) {
 			if ( this.allowed( method, req.parsed.pathname, req.vhost ) ) {
-				status = this.codes.SERVER_ERROR;
+				status = CODES.SERVER_ERROR;
 			}
 			else {
-				status = this.codes.NOT_ALLOWED;
+				status = CODES.NOT_ALLOWED;
 			}
 		}
 	}
 
 	body = this.page( status, host );
 
-	array.each( array.cast( this.codes ), function ( i, idx ) {
+	array.each( array.cast( CODES ), ( i, idx ) => {
 		if ( i === status ) {
 			kdx = idx;
 			return false;
@@ -39,14 +39,14 @@ TurtleIO.prototype.error = function ( req, res, status, msg ) {
 	} );
 
 	if ( msg === undefined ) {
-		msg = kdx ? array.cast( this.messages )[ kdx ] : "Unknown error";
+		msg = kdx ? array.cast( MESSAGES )[ kdx ] : "Unknown error";
 	}
 
 	this.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + msg ), "debug" );
 
 	timer.stop();
 
-	this.signal( "error", function () {
+	this.signal( "error", () => {
 		return [ req.headers.host, req.parsed.path, status, msg, timer.diff() ];
 	} );
 
@@ -54,4 +54,4 @@ TurtleIO.prototype.error = function ( req, res, status, msg ) {
 		"cache-control": "no-cache",
 		"content-length": Buffer.byteLength( body )
 	} );
-};
+}

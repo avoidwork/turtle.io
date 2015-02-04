@@ -7,15 +7,15 @@
  * @param  {String}   host  [Optional] Virtual host, default is `all`
  * @return {Object}         TurtleIO instance
  */
-TurtleIO.prototype.all = function ( route, fn, host ) {
-	var self = this;
+all ( route, fn, host ) {
+	let self = this;
 
-	array.each( VERBS, function ( i ) {
+	array.each( VERBS, ( i ) => {
 		self.use( route, fn, host, i );
 	} );
 
 	return this;
-};
+}
 
 /**
  * Sets a DELETE handler
@@ -26,9 +26,9 @@ TurtleIO.prototype.all = function ( route, fn, host ) {
  * @param  {String}   host  [Optional] Virtual host, default is `all`
  * @return {Object}         TurtleIO instance
  */
-TurtleIO.prototype.del = function ( route, fn, host ) {
+del ( route, fn, host ) {
 	return this.use( route, fn, host, "delete" );
-};
+}
 
 /**
  * Sets a DELETE handler
@@ -39,9 +39,9 @@ TurtleIO.prototype.del = function ( route, fn, host ) {
  * @param  {String}   host  [Optional] Virtual host, default is `all`
  * @return {Object}         TurtleIO instance
  */
-TurtleIO.prototype[ "delete" ] = function ( route, fn, host ) {
+delete ( route, fn, host ) {
 	return this.use( route, fn, host, "delete" );
-};
+}
 
 /**
  * Sets a GET handler
@@ -52,9 +52,9 @@ TurtleIO.prototype[ "delete" ] = function ( route, fn, host ) {
  * @param  {String}   host  [Optional] Virtual host, default is `all`
  * @return {Object}         TurtleIO instance
  */
-TurtleIO.prototype.get = function ( route, fn, host ) {
+get ( route, fn, host ) {
 	return this.use( route, fn, host, "get" );
-};
+}
 
 /**
  * Sets a PATCH handler
@@ -65,9 +65,9 @@ TurtleIO.prototype.get = function ( route, fn, host ) {
  * @param  {String}   host  [Optional] Virtual host, default is `all`
  * @return {Object}         TurtleIO instance
  */
-TurtleIO.prototype.patch = function ( route, fn, host ) {
+patch ( route, fn, host ) {
 	return this.use( route, fn, host, "patch" );
-};
+}
 
 /**
  * Sets a POST handler
@@ -78,9 +78,9 @@ TurtleIO.prototype.patch = function ( route, fn, host ) {
  * @param  {String}   host  [Optional] Virtual host, default is `all`
  * @return {Object}         TurtleIO instance
  */
-TurtleIO.prototype.post = function ( route, fn, host ) {
+post ( route, fn, host ) {
 	return this.use( route, fn, host, "post" );
-};
+}
 
 /**
  * Sets a PUT handler
@@ -91,6 +91,6 @@ TurtleIO.prototype.post = function ( route, fn, host ) {
  * @param  {String}   host  [Optional] Virtual host, default is `all`
  * @return {Object}         TurtleIO instance
  */
-TurtleIO.prototype.put = function ( route, fn, host ) {
+put ( route, fn, host ) {
 	return this.use( route, fn, host, "put" );
-};
+}

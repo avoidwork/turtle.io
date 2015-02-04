@@ -8,7 +8,7 @@
  * @param  {String}   method [Optional] HTTP method
  * @return {Object}          TurtleIO instance
  */
-TurtleIO.prototype.use = function ( path, fn, host, method ) {
+use ( path, fn, host, method ) {
 	if ( typeof path != "string" ) {
 		host = fn;
 		fn = path;
@@ -44,4 +44,4 @@ TurtleIO.prototype.use = function ( path, fn, host, method ) {
 	this.middleware[ host ][ method ][ path ].push( fn );
 
 	return this;
-};
+}

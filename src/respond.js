@@ -10,23 +10,23 @@
  * @param  {Boolean} file    [Optional] Indicates `body` is a file path
  * @return {Object}          TurtleIO instance
  */
-TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) {
-	var head = regex.head.test( req.method ),
+respond ( req, res, body, status, headers, file ) {
+	let head = REGEX.head.test( req.method ),
 		self = this,
 		timer = precise().start(),
 		ua = req.headers[ "user-agent" ],
 		encoding = req.headers[ "accept-encoding" ],
 		type, options;
 
-	function finalize () {
-		var cheaders, cached;
+	let finalize = () => {
+		let cheaders, cached;
 
-		if ( status === self.codes.NOT_MODIFIED || status < self.codes.MULTIPLE_CHOICE || status >= self.codes.BAD_REQUEST ) {
+		if ( status === CODES.NOT_MODIFIED || status < CODES.MULTIPLE_CHOICE || status >= CODES.BAD_REQUEST ) {
 			// req.parsed may not exist if coming from `error()`
 			if ( req.parsed ) {
-				if ( req.method === "GET" && status === self.codes.SUCCESS ) {
+				if ( req.method === "GET" && status === CODES.SUCCESS ) {
 					// Updating cache
-					if ( !regex.nocache.test( headers[ "cache-control" ] ) && !regex[ "private" ].test( headers[ "cache-control" ] ) ) {
+					if ( !REGEX.nocache.test( headers[ "cache-control" ] ) && !REGEX[ "private" ].test( headers[ "cache-control" ] ) ) {
 						if ( headers.etag === undefined ) {
 							headers.etag = "\"" + self.etag( req.parsed.href, body.length || 0, headers[ "last-modified" ] || 0, body || 0 ) + "\"";
 						}
@@ -66,10 +66,10 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	}
 
 	if ( body === null || body === undefined ) {
-		body = this.messages.NO_CONTENT;
+		body = MESSAGES.NO_CONTENT;
 	}
 
-	status = status || this.codes.SUCCESS;
+	status = status || CODES.SUCCESS;
 	headers = this.headers( req, headers || { "content-type": "text/plain" }, status );
 	file = file === true;
 
@@ -78,7 +78,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		delete headers[ "last-modified" ];
 	}
 
-	if ( !file && body !== this.messages.NO_CONTENT ) {
+	if ( !file && body !== MESSAGES.NO_CONTENT ) {
 		body = this.encode( body, req.headers.accept );
 
 		if ( headers[ "content-length" ] === undefined ) {
@@ -93,7 +93,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		headers[ "content-length" ] = headers[ "content-length" ] || 0;
 
 		if ( head ) {
-			body = this.messages.NO_CONTENT;
+			body = MESSAGES.NO_CONTENT;
 
 			if ( req.method === "OPTIONS" ) {
 				headers[ "content-length" ] = 0;
@@ -102,13 +102,13 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		}
 
 		// Ensuring JSON has proper mimetype
-		if ( regex.json_wrap.test( body ) ) {
+		if ( REGEX.json_wrap.test( body ) ) {
 			headers[ "content-type" ] = "application/json";
 		}
 
 		if ( req.method === "GET" ) {
 			// CSV hook
-			if ( status === this.codes.SUCCESS && body && headers[ "content-type" ] === "application/json" && req.headers.accept && regex.csv.test( string.explode( req.headers.accept )[ 0 ].replace( regex.nval, "" ) ) ) {
+			if ( status === CODES.SUCCESS && body && headers[ "content-type" ] === "application/json" && req.headers.accept && REGEX.csv.test( string.explode( req.headers.accept )[ 0 ].replace( REGEX.nval, "" ) ) ) {
 				headers[ "content-type" ] = "text/csv";
 
 				if ( !headers[ "content-disposition" ] ) {
@@ -125,7 +125,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 		delete headers[ "accept-ranges" ];
 	}
 
-	if ( status === this.codes.NOT_MODIFIED ) {
+	if ( status === CODES.NOT_MODIFIED ) {
 		delete headers[ "accept-ranges" ];
 		delete headers[ "content-encoding" ];
 		delete headers[ "content-length" ];
@@ -135,7 +135,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	}
 
 	// Clean up, in case it these are still hanging around
-	if ( status === this.codes.NOT_FOUND ) {
+	if ( status === CODES.NOT_FOUND ) {
 		delete headers.allow;
 		delete headers[ "access-control-allow-methods" ];
 	}
@@ -147,7 +147,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 	if ( req.headers.range ) {
 		options = {};
 
-		array.each( req.headers.range.match( /\d+/g ) || [], function ( i, idx ) {
+		array.each( req.headers.range.match( /\d+/g ) || [], ( i, idx ) => {
 			options[ idx === 0 ? "start" : "end" ] = parseInt( i, 10 );
 		} );
 
@@ -157,18 +157,18 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 
 		if ( isNaN( options.start ) || isNaN( options.end ) || options.start >= options.end ) {
 			delete req.headers.range;
-			return this.error( req, res, this.codes.NOT_SATISFIABLE );
+			return this.error( req, res, CODES.NOT_SATISFIABLE );
 		}
 
-		status = this.codes.PARTIAL_CONTENT;
+		status = CODES.PARTIAL_CONTENT;
 		headers.status = status + " " + http.STATUS_CODES[ status ];
 		headers[ "content-range" ] = "bytes " + options.start + "-" + options.end + "/" + headers[ "content-length" ];
 		headers[ "content-length" ] = number.diff( options.end, options.start ) + 1;
 	}
 
 	// Determining if response should be compressed
-	if ( ua && ( status === this.codes.SUCCESS || status === this.codes.PARTIAL_CONTENT ) && body !== this.messages.NO_CONTENT && this.config.compress && ( type = this.compression( ua, encoding, headers[ "content-type" ] ) ) && type !== null ) {
-		headers[ "content-encoding" ] = regex.gzip.test( type ) ? "gzip" : "deflate";
+	if ( ua && ( status === CODES.SUCCESS || status === CODES.PARTIAL_CONTENT ) && body !== MESSAGES.NO_CONTENT && this.config.compress && ( type = this.compression( ua, encoding, headers[ "content-type" ] ) ) && type !== null ) {
+		headers[ "content-encoding" ] = REGEX.gzip.test( type ) ? "gzip" : "deflate";
 
 		if ( file ) {
 			headers[ "transfer-encoding" ] = "chunked";
@@ -178,7 +178,7 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 
 		this.compress( req, res, body, type, headers.etag ? headers.etag.replace( /"/g, "" ) : undefined, file, options, status, headers );
 	}
-	else if ( ( status === this.codes.SUCCESS || status === this.codes.PARTIAL_CONTENT ) && file && req.method === "GET" ) {
+	else if ( ( status === CODES.SUCCESS || status === CODES.PARTIAL_CONTENT ) && file && req.method === "GET" ) {
 		headers[ "transfer-encoding" ] = "chunked";
 
 		finalize();
@@ -187,9 +187,9 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			res.writeHead( status, headers );
 		}
 
-		fs.createReadStream( body, options ).on( "error", function ( e ) {
+		fs.createReadStream( body, options ).on( "error", ( e ) => {
 			self.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
-			self.error( req, res, self.codes.SERVER_ERROR );
+			self.error( req, res, CODES.SERVER_ERROR );
 		} ).pipe( res );
 	}
 	else {
@@ -199,14 +199,14 @@ TurtleIO.prototype.respond = function ( req, res, body, status, headers, file ) 
 			res.writeHead( status, headers );
 		}
 
-		res.end( status === this.codes.PARTIAL_CONTENT ? body.slice( options.start, options.end ) : body );
+		res.end( status === CODES.PARTIAL_CONTENT ? body.slice( options.start, options.end ) : body );
 	}
 
 	timer.stop();
 
-	this.signal( "respond", function () {
+	this.signal( "respond", () => {
 		return [ req.headers.host, req.method, req.url, status, timer.diff() ];
 	} );
 
 	return this.log( this.prep( req, res, headers ), "info" );
-};
+}
