@@ -9,7 +9,7 @@
  */
 headers ( req, rHeaders, status ) {
 	let timer = precise().start(),
-		get = REGEX.get.test( req.method ),
+		get = regex.get.test( req.method ),
 		headers;
 
 	// Decorating response headers

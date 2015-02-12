@@ -25,7 +25,7 @@ proxy ( route, origin, host, stream ) {
 	 */
 	let handle = ( req, res, arg, xhr ) => {
 		let etag = "",
-			REGEXOrigin = new RegExp( origin.replace( REGEX.end_slash, "" ), "g" ),
+			regexOrigin = new RegExp( origin.replace( regex.end_slash, "" ), "g" ),
 			url = req.parsed.href,
 			stale = STALE,
 			get = req.method === "GET",
@@ -45,10 +45,10 @@ proxy ( route, origin, host, stream ) {
 		}
 		else {
 			// Determining if the response will be cached
-			if ( get && ( xhr.status === CODES.SUCCESS || xhr.status === CODES.NOT_MODIFIED ) && !REGEX.nocache.test( resHeaders[ "cache-control" ] ) && !REGEX[ "private" ].test( resHeaders[ "cache-control" ] ) ) {
+			if ( get && ( xhr.status === CODES.SUCCESS || xhr.status === CODES.NOT_MODIFIED ) && !regex.nocache.test( resHeaders[ "cache-control" ] ) && !regex[ "private" ].test( resHeaders[ "cache-control" ] ) ) {
 				// Determining how long rep is valid
-				if ( resHeaders[ "cache-control" ] && REGEX.number.test( resHeaders[ "cache-control" ] ) ) {
-					stale = number.parse( REGEX.number.exec( resHeaders[ "cache-control" ] )[ 0 ], 10 );
+				if ( resHeaders[ "cache-control" ] && regex.number.test( resHeaders[ "cache-control" ] ) ) {
+					stale = number.parse( regex.number.exec( resHeaders[ "cache-control" ] )[ 0 ], 10 );
 				}
 				else if ( resHeaders.expires !== undefined ) {
 					stale = new Date( resHeaders.expires );
@@ -64,7 +64,7 @@ proxy ( route, origin, host, stream ) {
 			}
 
 			if ( xhr.status !== CODES.NOT_MODIFIED ) {
-				rewrite = REGEX.rewrite.test( ( resHeaders[ "content-type" ] || "" ).replace( REGEX.nval, "" ) );
+				rewrite = regex.rewrite.test( ( resHeaders[ "content-type" ] || "" ).replace( regex.nval, "" ) );
 
 				// Setting headers
 				if ( get && xhr.status === CODES.SUCCESS ) {
@@ -90,7 +90,7 @@ proxy ( route, origin, host, stream ) {
 					self.respond( req, res, MESSAGES.NO_CONTENT, CODES.NOT_MODIFIED, resHeaders );
 				}
 				else {
-					if ( REGEX.head.test( req.method.toLowerCase() ) ) {
+					if ( regex.head.test( req.method.toLowerCase() ) ) {
 						arg = MESSAGES.NO_CONTENT;
 					}
 					// Fixing root path of response
@@ -99,7 +99,7 @@ proxy ( route, origin, host, stream ) {
 						delete resHeaders[ "content-length" ];
 
 						if ( arg instanceof Array || arg instanceof Object ) {
-							arg = json.encode( arg, req.headers.accept ).replace( REGEXOrigin, rewriteOrigin );
+							arg = json.encode( arg, req.headers.accept ).replace( regexOrigin, rewriteOrigin );
 
 							if ( route !== "/" ) {
 								arg = arg.replace( /"(\/[^?\/]\w+)\//g, "\"" + route + "$1/" );
@@ -108,7 +108,7 @@ proxy ( route, origin, host, stream ) {
 							arg = json.decode( arg );
 						}
 						else if ( typeof arg == "string" ) {
-							arg = arg.replace( REGEXOrigin, rewriteOrigin );
+							arg = arg.replace( regexOrigin, rewriteOrigin );
 
 							if ( route !== "/" ) {
 								arg = arg.replace( /(href|src)=("|')([^http|mailto|<|_|\s|\/\/].*?)("|')/g, ( "$1=$2" + route + "/$3$4" ) )
@@ -141,8 +141,8 @@ proxy ( route, origin, host, stream ) {
 			array.each( string.trim( args ).split( "\n" ), ( i ) => {
 				let header, value;
 
-				value = i.replace( REGEX.headVAL, "" );
-				header = i.replace( REGEX.headKEY, "" ).toLowerCase();
+				value = i.replace( regex.headVAL, "" );
+				header = i.replace( regex.headKEY, "" ).toLowerCase();
 				result[ header ] = !isNaN( value ) ? Number( value ) : value;
 			} );
 		}
@@ -167,7 +167,7 @@ proxy ( route, origin, host, stream ) {
 			parsed = parse( url ),
 			cached = self.etags.get( url ),
 			streamd = ( stream === true ),
-			mimetype = cached ? cached.mimetype : mime.lookup( !REGEX.ext.test( parsed.pathname ) ? "index.htm" : parsed.pathname ),
+			mimetype = cached ? cached.mimetype : mime.lookup( !regex.ext.test( parsed.pathname ) ? "index.htm" : parsed.pathname ),
 			defer, fn, options, proxyReq, xhr;
 
 		// Facade to handle()
@@ -182,7 +182,7 @@ proxy ( route, origin, host, stream ) {
 		};
 
 		// Streaming formats that do not need to be rewritten
-		if ( !streamd && ( REGEX.ext.test( parsed.pathname ) && !REGEX.json.test( mimetype ) ) && REGEX.stream.test( mimetype ) ) {
+		if ( !streamd && ( regex.ext.test( parsed.pathname ) && !regex.json.test( mimetype ) ) && regex.stream.test( mimetype ) ) {
 			streamd = true;
 		}
 
@@ -218,10 +218,10 @@ proxy ( route, origin, host, stream ) {
 			} );
 
 			proxyReq.on( "error", ( e ) => {
-				self.error( req, res, REGEX.refused.test( e.message ) ? CODES.SERVER_UNAVAILABLE : CODES.SERVER_ERROR );
+				self.error( req, res, regex.refused.test( e.message ) ? CODES.SERVER_UNAVAILABLE : CODES.SERVER_ERROR );
 			} );
 
-			if ( REGEX.body.test( req.method ) ) {
+			if ( regex.body.test( req.method ) ) {
 				proxyReq.write( req.body );
 			}
 

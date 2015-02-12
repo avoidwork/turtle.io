@@ -11,7 +11,7 @@
  * @return {Object}          TurtleIO instance
  */
 respond ( req, res, body, status, headers, file ) {
-	let head = REGEX.head.test( req.method ),
+	let head = regex.head.test( req.method ),
 		self = this,
 		timer = precise().start(),
 		ua = req.headers[ "user-agent" ],
@@ -26,7 +26,7 @@ respond ( req, res, body, status, headers, file ) {
 			if ( req.parsed ) {
 				if ( req.method === "GET" && status === CODES.SUCCESS ) {
 					// Updating cache
-					if ( !REGEX.nocache.test( headers[ "cache-control" ] ) && !REGEX[ "private" ].test( headers[ "cache-control" ] ) ) {
+					if ( !regex.nocache.test( headers[ "cache-control" ] ) && !regex[ "private" ].test( headers[ "cache-control" ] ) ) {
 						if ( headers.etag === undefined ) {
 							headers.etag = "\"" + self.etag( req.parsed.href, body.length || 0, headers[ "last-modified" ] || 0, body || 0 ) + "\"";
 						}
@@ -102,13 +102,13 @@ respond ( req, res, body, status, headers, file ) {
 		}
 
 		// Ensuring JSON has proper mimetype
-		if ( REGEX.json_wrap.test( body ) ) {
+		if ( regex.json_wrap.test( body ) ) {
 			headers[ "content-type" ] = "application/json";
 		}
 
 		if ( req.method === "GET" ) {
 			// CSV hook
-			if ( status === CODES.SUCCESS && body && headers[ "content-type" ] === "application/json" && req.headers.accept && REGEX.csv.test( string.explode( req.headers.accept )[ 0 ].replace( REGEX.nval, "" ) ) ) {
+			if ( status === CODES.SUCCESS && body && headers[ "content-type" ] === "application/json" && req.headers.accept && regex.csv.test( string.explode( req.headers.accept )[ 0 ].replace( regex.nval, "" ) ) ) {
 				headers[ "content-type" ] = "text/csv";
 
 				if ( !headers[ "content-disposition" ] ) {
@@ -168,7 +168,7 @@ respond ( req, res, body, status, headers, file ) {
 
 	// Determining if response should be compressed
 	if ( ua && ( status === CODES.SUCCESS || status === CODES.PARTIAL_CONTENT ) && body !== MESSAGES.NO_CONTENT && this.config.compress && ( type = this.compression( ua, encoding, headers[ "content-type" ] ) ) && type !== null ) {
-		headers[ "content-encoding" ] = REGEX.gzip.test( type ) ? "gzip" : "deflate";
+		headers[ "content-encoding" ] = regex.gzip.test( type ) ? "gzip" : "deflate";
 
 		if ( file ) {
 			headers[ "transfer-encoding" ] = "chunked";

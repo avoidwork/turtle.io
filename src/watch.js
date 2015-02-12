@@ -30,7 +30,7 @@ watch ( url, path ) {
 
 		// Watching path for changes
 		watcher = fs.watch( path, ( ev ) => {
-			if ( REGEX.rename.test( ev ) ) {
+			if ( regex.rename.test( ev ) ) {
 				cleanup();
 			}
 			else {

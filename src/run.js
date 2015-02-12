@@ -29,7 +29,7 @@ run ( req, res, host, method ) {
 		stop( timer );
 
 		if ( !err ) {
-			if ( REGEX.get.test( method ) ) {
+			if ( regex.get.test( method ) ) {
 				self.request( req, res );
 			}
 			else if ( self.allowed( "get", req.parsed.pathname, req.vhost ) ) {

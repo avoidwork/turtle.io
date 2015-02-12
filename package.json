@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Easy to use web server with virtual hosts & reverse proxies",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "homepage": "http://turtle.io",
   "author": {
     "name": "Jason Mulligan",
@@ -31,14 +31,13 @@
     "keigai": "~1.1.4",
     "mime": "~1.2.11",
     "moment": "~2.9.0",
-    "node-syslog": "~1.1.7",
     "dtrace-provider": "~0.4.0",
     "precise": "~1.0.1",
     "murmurhash3": "~0.2.10"
   },
   "devDependencies": {
     "grunt" : "~0.4.5",
-    "grunt-6to5": "^2.0.0",
+    "grunt-6to5": "^3.0.0",
     "grunt-cli" : "~0.1.13",
     "grunt-sed": "~0.1.1",
     "grunt-contrib-concat": "~0.5.0",

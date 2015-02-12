@@ -15,12 +15,6 @@ start ( cfg, err ) {
 	// Merging custom with default config
 	merge( config, cfg || {} );
 
-	// Hooking syslog output
-	if ( !BOOTSTRAPPED ) {
-		BOOTSTRAPPED = true;
-		syslog.init( config.id || "turtle_io", syslog.LOG_PID | syslog.LOG_ODELAY, syslog.LOG_LOCAL0 );
-	}
-
 	this.dtp = dtrace.createDTraceProvider( config.id || "turtle-io" );
 
 	// Duplicating headers for re-decoration
@@ -40,12 +34,11 @@ start ( cfg, err ) {
 
 	pages = this.config.pages ? ( this.config.root + this.config.pages ) : ( __dirname + "/../pages" );
 	LOGLEVEL = LEVELS.indexOf( this.config.logs.level );
-	LOGGING = this.config.logs.dtrace || this.config.logs.stdout || this.config.logs.syslog;
+	LOGGING = this.config.logs.dtrace || this.config.logs.stdout;
 
 	// Looking for required setting
 	if ( !this.config[ "default" ] ) {
 		this.log( new Error( "[client 0.0.0.0] Invalid default virtual host" ), "error" );
-		syslog.close();
 		process.exit( 1 );
 	}
 
@@ -63,8 +56,8 @@ start ( cfg, err ) {
 		this.config.headers[ "x-powered-by" ] = "node.js/" + process.versions.node.replace( /^v/, "" ) + " " + string.capitalize( process.platform ) + " V8/" + string.trim( process.versions.v8.toString() );
 	}
 
-	// Creating REGEX.rewrite
-	REGEX.rewrite = new RegExp( "^(" + this.config.proxy.rewrite.join( "|" ) + ")$" );
+	// Creating regex.rewrite
+	regex.rewrite = new RegExp( "^(" + this.config.proxy.rewrite.join( "|" ) + ")$" );
 
 	// Setting default routes
 	this.host( ALL );
@@ -84,7 +77,7 @@ start ( cfg, err ) {
 		}
 		else if ( array.keys( self.config ).length > 0 ) {
 			array.each( files, ( i ) => {
-				self.pages.all[ i.replace( REGEX.next, "" ) ] = fs.readFileSync( pages + "/" + i, "utf8" );
+				self.pages.all[ i.replace( regex.next, "" ) ] = fs.readFileSync( pages + "/" + i, "utf8" );
 			} );
 
 			// Starting server

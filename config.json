@@ -23,7 +23,6 @@
 		"format" : "%v %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"",
 		"level"  : "info",
 		"stdout" : true,
-		"syslog" : false,
 		"dtrace" : false
 	},
 	"maxBytes": 0,

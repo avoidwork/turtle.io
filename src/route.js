@@ -14,7 +14,7 @@ route ( req, res ) {
 		update = false,
 		payload;
 
-	if ( REGEX.head.test( method ) ) {
+	if ( regex.head.test( method ) ) {
 		method = "get";
 	}
 
@@ -64,7 +64,7 @@ route ( req, res ) {
 	res.header = res.setHeader;
 
 	// Setting listeners if expecting a body
-	if ( REGEX.body.test( method ) ) {
+	if ( regex.body.test( method ) ) {
 		req.setEncoding( "utf-8" );
 
 		req.on( "data", ( data ) => {

@@ -13,13 +13,13 @@ compression ( agent, encoding, mimetype ) {
 		encodings = typeof encoding == "string" ? string.explode( encoding ) : [];
 
 	// Safari can't handle compression for proxies (socket doesn't close) or on an iDevice for simple GETs
-	if ( this.config.compress === true && REGEX.comp.test( mimetype ) && !REGEX.ie.test( agent ) && !REGEX.idevice.test( agent ) && ( !REGEX.safari.test( agent ) || REGEX.chrome.test( agent ) ) ) {
+	if ( this.config.compress === true && regex.comp.test( mimetype ) && !regex.ie.test( agent ) && !regex.idevice.test( agent ) && ( !regex.safari.test( agent ) || regex.chrome.test( agent ) ) ) {
 		// Iterating supported encodings
 		array.each( encodings, ( i ) => {
-			if ( REGEX.gzip.test( i ) ) {
+			if ( regex.gzip.test( i ) ) {
 				result = "gz";
 			}
-			else if ( REGEX.def.test( i ) ) {
+			else if ( regex.def.test( i ) ) {
 				result = "zz";
 			}
 

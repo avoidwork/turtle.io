@@ -16,7 +16,7 @@ write ( req, res, path ) {
 		del = this.allowed( "DELETE", req.parsed.pathname, req.vhost ),
 		status;
 
-	if ( !put && REGEX.end_slash.test( req.url ) ) {
+	if ( !put && regex.end_slash.test( req.url ) ) {
 		status = del ? CODES.CONFLICT : CODES.SERVER_ERROR;
 
 		timer.stop();

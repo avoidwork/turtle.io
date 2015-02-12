@@ -3,7 +3,7 @@
  *
  * @type {Object}
  */
-const REGEX = {
+let regex = {
 	body: /^(put|post|patch)$/i,
 	comp: /javascript|json|text|xml/,
 	csv: /text\/csv/,

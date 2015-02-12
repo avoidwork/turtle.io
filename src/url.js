@@ -11,7 +11,7 @@ url ( req ) {
 		token;
 
 	if ( !string.isEmpty( header ) ) {
-		token = header.split( REGEX.space ).pop() || "",
+		token = header.split( regex.space ).pop() || "",
 			auth = new Buffer( token, "base64" ).toString();
 
 		if ( !string.isEmpty( auth ) ) {

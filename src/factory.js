@@ -15,7 +15,7 @@ let factory = () => {
 	let etag = ( req, res, next ) => {
 		let cached, headers;
 
-		if ( REGEX.get_only.test( req.method ) && !req.headers.range ) {
+		if ( regex.get_only.test( req.method ) && !req.headers.range ) {
 			cached = self.etags.get( req.parsed.href );
 
 			// Sending a 304 if Client is making a GET & has current representation

@@ -19,7 +19,7 @@ error ( req, res, status, msg ) {
 		status = CODES.NOT_FOUND;
 
 		// If valid, determine what kind of error to respond with
-		if ( !REGEX.get.test( method ) && !REGEX.head.test( method ) ) {
+		if ( !regex.get.test( method ) && !regex.head.test( method ) ) {
 			if ( this.allowed( method, req.parsed.pathname, req.vhost ) ) {
 				status = CODES.SERVER_ERROR;
 			}

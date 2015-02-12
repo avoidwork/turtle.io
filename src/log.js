@@ -7,7 +7,7 @@
  * @return {Object}       TurtleIO instance
  */
 log ( arg, level ) {
-	let self, timer, e, syslogMethod;
+	let self, timer, e;
 
 	if ( LOGGING ) {
 		self = this;
@@ -24,24 +24,10 @@ log ( arg, level ) {
 			}
 		}
 
-		if ( this.config.logs.syslog ) {
-			if ( level === "error" ) {
-				syslogMethod = "LOG_ERR";
-			}
-			else if ( level === "warn" ) {
-				syslogMethod = "LOG_WARNING";
-			}
-			else {
-				syslogMethod = "LOG_" + level.toUpperCase();
-			}
-
-			syslog.log( syslog[ syslogMethod ], arg.stack || arg.message || arg );
-		}
-
 		timer.stop();
 
 		this.signal( "log", () => {
-			return [ level, self.config.logs.stdout, self.config.logs.syslog, timer.diff() ];
+			return [ level, self.config.logs.stdout, false, timer.diff() ];
 		} );
 	}
 
