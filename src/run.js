@@ -53,14 +53,12 @@ run ( req, res, host, method ) {
 			item = middleware.next();
 
 		if ( !item.done ) {
-			if ( err ) {
+			if ( err && !item.done ) {
 				// Finding the next error handling middleware
 				arity = get_arity( item.value );
-
 				do {
-					item = middleware.next();
 					arity = get_arity( item.value );
-				} while ( !item.done && arity < 4 )
+				} while ( arity < 4 && ( item = middleware.next() ) && !item.done )
 			}
 
 			stop( timer );
