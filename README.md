@@ -16,7 +16,7 @@ You can also create complex web applications, with a familiar API.
 ## Examples
 turtle.io requires a ***default*** virtual host to be specified, because it is the failover when a request can't be routed.
 
-### Virtual hosts
+#### Virtual hosts
 Virtual host keys are the hostname, and the value is the directory relative to "root".
 
 ```javascript
@@ -34,7 +34,7 @@ server.start({
 });
 ```
 
-### Proxy routes
+#### Proxy routes
 This example has `/api` act as a reverse proxy to another service.
 
 ```javascript
@@ -44,15 +44,15 @@ server.start(require(__dirname + "/config.json"));
 ```
 
 ## Benchmark with express.js
-### Specs
+#### Specs
 - **Machine** MacBook Air (Early '14) / Core i7 @ 1.7Ghz / 8GB ram / 512 flash / OS X 10.10.2
 - **ulimit** 2560
 - **express** 4.11.2
 - **turtle.io** 3.2.2
 - **benchmark** ```siege -c100 -b -q -H 'Connection: Keep-Alive' -t15S localhost:$@```
 
-### Test
-#### express.js
+#### Test
+##### express.js
 `Hello World!` from a route (content-length: 12), no `allow` header.
 
 ```javascript
@@ -66,7 +66,7 @@ app.get('/', function (req, res) {
 app.listen(3000);
 ```
 
-#### turtle.io
+##### turtle.io
 `Hello World!` html file streamed from disk (content-length: 53), has accurate `allow` header.
 
 ```javascript
@@ -86,131 +86,179 @@ server.start( {
 	}
 } );
 ```
-### Transactions/s
+#### Transactions/s
 - **turtle.io** ```[1233.78, 1203.2, 1187.44]  (1208.14 avg)```
 - **express**   ```[1105.85, 1124.25, 1167.57] (1132.56 avg)```
 
-### Concurrency
+#### Concurrency
 - **turtle.io** ```[99.33, 99.47, 99.57] (99.46 avg)```
 - **express**   ```[42.81, 41.2, 44.27]  (42.76 avg)```
 
 ## Handling Uploads
 The `request` object is passed to every route handler as the second argument, will have a `body` property with the payload from the Client. It will not be coerced to another format, so if you expect JSON, you'll have to `JSON.parse()` it yourself (for now).
 
+## API & decoration
+#### request
+##### allow
+_String_
+
+Allowed HTTP methods
+
+##### ip
+_Number_
+
+Request IP
+
+##### parsed
+_Object_
+
+Parsed HTTP request
+
+##### query
+_String_
+
+Parsed query string
+
+##### server
+_Object_
+
+turtle.io instance
+
+##### vhost
+_String_
+
+Virtual host handling the request.
+
+#### respond
+##### error
+_Function (status, body)_
+
+Send an error response.
+
+##### redirect
+_Function (url)_
+
+Send a redirection.
+
+##### respond
+_Function (body[, status, headers])_
+
+Send a response.
+
 ## Configuration
 Configuration values can be set by editing `config.json` in the turtle.io directory, or by passing an Object to `start()`.
 
-### cache
+#### cache
 _Number (1000)_
 
 Size of LRU cache for Etag validation.
 
-### catchAll
+#### catchAll
 _Boolean (true)_
 
 Handle unterminated requests
 
-### default
+#### default
 _String_
 
 ***[Required]*** Default hostname to handle requests which are not specified within _vhosts_; must be a valid entry within _vhosts_.
 
-### headers
+#### headers
 _Object_
 
 Response headers. CORS is enabled by default.
 
-### id
+#### id
 _String (turtle_io)_
 
 DTrace application identifier
 
-### index
+#### index
 _Array_
 
 Files to look for when accessing a directory resource.
 
-### json
+#### json
 _Number (2)_
 
 Default "pretty" ident size
 
-### logs
+#### logs
 _Object_
 
 Logging configuration.
 
-### logs.format
+#### logs.format
 _String_ (%v %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\")
 
 Common Log Format string of tokens, defaulting to standard Virtual Host format.
 
-### logs.level
+#### logs.level
 _String_ ("info")
 
 Minimum Common Log Level which is emitted to `stdout`.
 
-### logs.stdout
+#### logs.stdout
 _Boolean_ (true)
 
 Override & disable `stdout` emitting by setting to `false`.
 
-### logs.dtrace
+#### logs.dtrace
 _Boolean_ (false)
 
 Override & enable `dtrace` probes which emit nanosecond timing of hot paths.
 
-### logs.time
+#### logs.time
 _String_ (D/MMM/YYYY:HH:mm:ss ZZ)
 
 Format for the date/time portion of a log message.
 
-### maxBytes
+#### maxBytes
 _Number (0/unlimited)_
 
 Default maximum request body size, when exceeded a 429 is sent.
 
-### pages
+#### pages
 _String (null)_
 
 Directory relative to `root` which has files named for HTTP status codes, to be served upon error, e.g. `404.htm`.
 
-### port
+#### port
 _Number (8000)_
 
 Port the server will listen on.
 
-### proxy
+#### proxy
 _Object_
 
 Proxy configuration.
 
-### proxy.rewrite
+#### proxy.rewrite
 _Array (["index.htm", "index.html"])_
 
 Content-Type header values to apply URL rewrites to.
 
-### root
+#### root
 _String ("")_
 
 Relative path to the web root directory.
 
-### ssl.cert
+#### ssl.cert
 _Object_
 
 [Optional] SSL certificate
 
-### ssl.key
+#### ssl.key
 _Object_
 
 [Optional] SSL certificate key/pem
 
-### uid
+#### uid
 _Number (null)_
 
 [Optional] UID the server runs as.
 
-### vhosts
+#### vhosts
 _Object_
 
 ***[Required]*** Virtual hosts the server will respond for, `key` is the hostname & `value` is the directory relative to `root`.
