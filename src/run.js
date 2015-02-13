@@ -10,9 +10,11 @@
  */
 run ( req, res, host, method ) {
 	let self = this,
-		middleware = this.routes( req.parsed.pathname, host, method ),
-		nth = middleware.length,
-		i = -1;
+		middleware = array.iterator( this.routes( req.parsed.pathname, host, method ) );
+
+	let get_arity = ( arg ) => {
+		return arg.toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
+	};
 
 	let stop = ( timer ) => {
 		if ( timer.stopped === null ) {
@@ -47,45 +49,55 @@ run ( req, res, host, method ) {
 
 	let next = ( err ) => {
 		let timer = precise().start(),
-			arity = 3;
+			arity = 3,
+			item = middleware.next();
 
-		if ( ++i < nth && typeof middleware[ i ] == "function" ) {
-			try {
+		if ( !item.done ) {
+			if ( err ) {
+				// Finding the next error handling middleware
+				arity = get_arity( item.value );
+
+				do {
+					item = middleware.next();
+					arity = get_arity( item.value );
+				} while ( !item.done && arity < 4 )
+			}
+
+			stop( timer );
+
+			if ( !item.done ) {
 				if ( err ) {
-					// Finding the next error handling middleware
-					arity = middleware[ i ].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
-
-					if ( arity < 4 ) {
-						while ( arity < 4 && ++i < nth && middleware[ i ] == "function" ) {
-							arity = middleware[ i ].toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
+					if ( arity === 4 ) {
+						try {
+							item.value( req, res, next );
+						}
+						catch ( e ) {
+							next( e );
 						}
 					}
-				}
-
-				stop( timer );
-
-				if ( i < nth ) {
-					if ( err ) {
-						arity === 4 ? middleware[ i ]( err, req, res, next ) : last( timer, err );
-					}
 					else {
-						middleware[ i ]( req, res, next );
+						last( timer, err );
 					}
 				}
 				else {
-					last( timer, err );
+					try {
+						item.value( req, res, next );
+					}
+					catch ( e ) {
+						next( e );
+					}
 				}
 			}
-			catch ( e ) {
-				next( e );
+			else {
+				last( timer, err );
 			}
 		}
 		else if ( !res._header && self.config.catchAll ) {
 			last( timer, err );
 		}
-
-		return self;
 	};
 
-	return next();
+	next();
+
+	return this;
 }

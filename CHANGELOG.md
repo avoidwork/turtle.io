@@ -41,10 +41,14 @@ Significant changes only
 - Refactored dual pipeline to a single, middleware based pipeline
 
 ## 3.1.0
-- Refactoring `hash()` to utilize murmur3 for middleware
+- Refactored `hash()` to utilize murmur3 for middleware
 
 ## 3.2.0
 - Refactored to ECMAScript 6 syntax, utilizing '6to5' to transpile to ECMAScript 5
 
 ## 3.2.1
-- Dropping `node-syslog`, as it won't compile for node.js 0.12.0 or io.js 1.x.x
+- Dropped `node-syslog`, as it won't compile for node.js 0.12.0 or io.js 1.x.x
+
+## 3.2.2
+- Refactored `run()` to use an `array.iterator()` from keigai & constrained `try / catch` scope
+- Sorted `config.json` keys alphabetically
