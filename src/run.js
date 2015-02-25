@@ -53,7 +53,7 @@ run ( req, res, host, method ) {
 			item = middleware.next();
 
 		if ( !item.done ) {
-			if ( err && !item.done ) {
+			if ( err ) {
 				// Finding the next error handling middleware
 				arity = get_arity( item.value );
 				do {
@@ -67,7 +67,7 @@ run ( req, res, host, method ) {
 				if ( err ) {
 					if ( arity === 4 ) {
 						try {
-							item.value( req, res, next );
+							item.value( err, req, res, next );
 						}
 						catch ( e ) {
 							next( e );
