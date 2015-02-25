@@ -28,12 +28,12 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "keigai": "~1.1.4",
+    "keigai": "~1.1.5",
     "mime": "~1.2.11",
     "moment": "~2.9.0",
     "dtrace-provider": "~0.4.0",
     "precise": "~1.0.1",
-    "murmurhash3": "~0.2.10"
+    "murmurhash3": "~0.3.1"
   },
   "devDependencies": {
     "grunt" : "~0.4.5",
