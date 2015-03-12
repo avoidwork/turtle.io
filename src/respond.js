@@ -147,7 +147,7 @@ respond ( req, res, body, status, headers, file ) {
 	if ( req.headers.range ) {
 		options = {};
 
-		array.each( req.headers.range.match( /\d+/g ) || [], ( i, idx ) => {
+		array.iterate( req.headers.range.match( /\d+/g ) || [], ( i, idx ) => {
 			options[ idx === 0 ? "start" : "end" ] = parseInt( i, 10 );
 		} );
 

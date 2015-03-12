@@ -22,9 +22,9 @@ routes ( uri, host, method, override ) {
 	result = [];
 
 	try {
-		array.each( [ all.all, all[ method ], h.all, h[ method ] ], ( c ) => {
+		array.iterate( [ all.all, all[ method ], h.all, h[ method ] ], ( c ) => {
 			if ( c ) {
-				array.each( array.keys( c ).filter( ( i ) => {
+				array.iterate( array.keys( c ).filter( ( i ) => {
 					return new RegExp( "^" + i + "$", "i" ).test( uri );
 				} ), ( i ) => {
 					result = result.concat( c[ i ] );

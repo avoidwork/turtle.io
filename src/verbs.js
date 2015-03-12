@@ -10,7 +10,7 @@
 all ( route, fn, host ) {
 	let self = this;
 
-	array.each( VERBS, ( i ) => {
+	array.iterate( VERBS, ( i ) => {
 		self.use( route, fn, host, i );
 	} );
 

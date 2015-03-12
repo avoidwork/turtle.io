@@ -1,6 +1,10 @@
 # Change Log
 Significant changes only
 
+## 3.2.5
+- Updated to keigai 1.2.0
+- Implemented `array.iterate()`
+
 ## 3.2.4
 - Fixed a regression in error passing within `run()`
 - Removed an unneeded comparison from `run()`

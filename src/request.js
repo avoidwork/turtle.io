@@ -67,7 +67,7 @@ request ( req, res ) {
 			nth = self.config.index.length;
 			path += "/";
 
-			array.each( self.config.index, ( i ) => {
+			array.iterate( self.config.index, ( i ) => {
 				fs.lstat( path + i, ( e, stats ) => {
 					if ( !e && !handled ) {
 						handled = true;
