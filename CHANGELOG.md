@@ -1,6 +1,9 @@
 # Change Log
 Significant changes only
 
+## 3.2.6
+- Fixing compression for iOS devices, & Safari
+
 ## 3.2.5
 - Updated to keigai 1.2.0
 - Implemented `array.iterate()`
