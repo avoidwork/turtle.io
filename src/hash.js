@@ -6,5 +6,5 @@
  * @return {String} Hash of arg
  */
 hash ( arg ) {
-	return mmh3.x86.hash32( arg, this.config.seed );
+	return mmh3( arg, this.config.seed );
 }
