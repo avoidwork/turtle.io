@@ -27,7 +27,6 @@ describe( "Requests", function () {
 			.expectStatus( 200 )
 			.expectHeader( "status", "200 OK" )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
-			.expectHeader( "content-length", "53" )
 			.expectBody(/Hello world!/)
 			.end( function ( err, res ) {
 				if ( err ) throw err;
@@ -42,7 +41,6 @@ describe( "Requests", function () {
 			.expectStatus( 200 )
 			.expectHeader( "status", "200 OK" )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
-			.expectHeader( "content-length", "53" )
 			.expectBody(/^$/)
 			.end( function ( err ) {
 				if ( err ) throw err;

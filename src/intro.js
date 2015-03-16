@@ -1,5 +1,5 @@
 let constants = require( "constants" ),
-	mmh3 = require( "murmurhash3" ),
+	mmh3 = require( "murmurhash3js" ),
 	defaultConfig = require( __dirname + "/../config.json" ),
 	dtrace = require( "dtrace-provider" ),
 	precise = require( "precise" ),

@@ -1,6 +1,9 @@
 # Change Log
 Significant changes only
 
+## 3.2.7
+- Changing murmur3 hash module to a pure JavaScript implementation, such that turtle.io can be installed on Windows / io.js
+
 ## 3.2.6
 - Fixing compression for iOS devices, & Safari
 

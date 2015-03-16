@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Easy to use web server with virtual hosts & reverse proxies",
-  "version": "3.2.6",
+  "version": "3.2.7",
   "homepage": "http://turtle.io",
   "author": {
     "name": "Jason Mulligan",
@@ -33,7 +33,7 @@
     "moment": "~2.9.0",
     "dtrace-provider": "~0.4.0",
     "precise": "~1.0.1",
-    "murmurhash3": "~0.3.1"
+    "murmurhash3js": "~3.0.0"
   },
   "devDependencies": {
     "grunt" : "~0.4.5",
