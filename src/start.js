@@ -7,8 +7,7 @@
  * @return {Object}          TurtleIO instance
  */
 start ( cfg, err ) {
-	let self = this,
-		config, headers, pages;
+	let config, headers, pages;
 
 	config = clone( defaultConfig, true );
 
@@ -47,7 +46,7 @@ start ( cfg, err ) {
 	this.config.headers = {};
 
 	iterate( headers, ( value, key ) => {
-		self.config.headers[ key.toLowerCase() ] = value;
+		this.config.headers[ key.toLowerCase() ] = value;
 	} );
 
 	// Setting `Server` HTTP header
@@ -67,71 +66,71 @@ start ( cfg, err ) {
 
 	// Registering virtual hosts
 	array.iterate( array.cast( config.vhosts, true ), ( i ) => {
-		self.host( i );
+		this.host( i );
 	} );
 
 	// Loading default error pages
 	fs.readdir( pages, ( e, files ) => {
 		if ( e ) {
-			self.log( new Error( "[client 0.0.0.0] " + e.message ), "error" );
+			this.log( new Error( "[client 0.0.0.0] " + e.message ), "error" );
 		}
-		else if ( array.keys( self.config ).length > 0 ) {
+		else if ( array.keys( this.config ).length > 0 ) {
 			array.iterate( files, ( i ) => {
-				self.pages.all[ i.replace( regex.next, "" ) ] = fs.readFileSync( pages + "/" + i, "utf8" );
+				this.pages.all[ i.replace( regex.next, "" ) ] = fs.readFileSync( pages + "/" + i, "utf8" );
 			} );
 
 			// Starting server
-			if ( self.server === null ) {
+			if ( this.server === null ) {
 				// For proxy behavior
-				if ( https.globalAgent.maxSockets < self.config.proxy.maxConnections ) {
-					https.globalAgent.maxConnections = self.config.proxy.maxConnections;
+				if ( https.globalAgent.maxSockets < this.config.proxy.maxConnections ) {
+					https.globalAgent.maxConnections = this.config.proxy.maxConnections;
 				}
 
-				if ( http.globalAgent.maxSockets < self.config.proxy.maxConnections ) {
-					http.globalAgent.maxConnections = self.config.proxy.maxConnections;
+				if ( http.globalAgent.maxSockets < this.config.proxy.maxConnections ) {
+					http.globalAgent.maxConnections = this.config.proxy.maxConnections;
 				}
 
-				if ( self.config.ssl.cert !== null && self.config.ssl.key !== null ) {
+				if ( this.config.ssl.cert !== null && this.config.ssl.key !== null ) {
 					// POODLE
-					self.config.secureProtocol = "SSLv23_method";
-					self.config.secureOptions = constants.SSL_OP_NO_SSLv3 | constants.SSL_OP_NO_SSLv2;
+					this.config.secureProtocol = "SSLv23_method";
+					this.config.secureOptions = constants.SSL_OP_NO_SSLv3 | constants.SSL_OP_NO_SSLv2;
 
 					// Reading files
-					self.config.ssl.cert = fs.readFileSync( self.config.ssl.cert );
-					self.config.ssl.key = fs.readFileSync( self.config.ssl.key );
+					this.config.ssl.cert = fs.readFileSync( this.config.ssl.cert );
+					this.config.ssl.key = fs.readFileSync( this.config.ssl.key );
 
 					// Starting server
-					self.server = https.createServer( merge( self.config.ssl, {
-						port: self.config.port,
-						host: self.config.address,
-						secureProtocol: self.config.secureProtocol,
-						secureOptions: self.config.secureOptions
+					this.server = https.createServer( merge( this.config.ssl, {
+						port: this.config.port,
+						host: this.config.address,
+						secureProtocol: this.config.secureProtocol,
+						secureOptions: this.config.secureOptions
 					} ), ( req, res ) => {
-						self.route( req, res );
-					} ).listen( self.config.port, self.config.address );
+						this.route( req, res );
+					} ).listen( this.config.port, this.config.address );
 				}
 				else {
-					self.server = http.createServer( ( req, res ) => {
-						self.route( req, res );
-					} ).listen( self.config.port, self.config.address );
+					this.server = http.createServer( ( req, res ) => {
+						this.route( req, res );
+					} ).listen( this.config.port, this.config.address );
 				}
 			}
 			else {
-				self.server.listen( self.config.port, self.config.address );
+				this.server.listen( this.config.port, this.config.address );
 			}
 
 			// Dropping process
-			if ( self.config.uid && !isNaN( self.config.uid ) ) {
-				process.setuid( self.config.uid );
+			if ( this.config.uid && !isNaN( this.config.uid ) ) {
+				process.setuid( this.config.uid );
 			}
 
-			self.log( "Started " + self.config.id + " on port " + self.config.port, "debug" );
+			this.log( "Started " + this.config.id + " on port " + this.config.port, "debug" );
 		}
 	} );
 
 	// Something went wrong, server must restart
 	process.on( "uncaughtException", ( e ) => {
-		self.log( e, "error" );
+		this.log( e, "error" );
 		process.exit( 1 );
 	} );
 

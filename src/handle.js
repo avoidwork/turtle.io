@@ -11,8 +11,7 @@
  * @return {Object}        TurtleIO instance
  */
 handle ( req, res, path, url, dir, stat ) {
-	let self = this,
-		allow, del, etag, headers, method, mimetype, modified, size, write;
+	let allow, del, etag, headers, method, mimetype, modified, size, write;
 
 	allow = req.allow;
 	write = allow.indexOf( dir ? "POST" : "PUT" ) > -1;
@@ -56,10 +55,10 @@ handle ( req, res, path, url, dir, stat ) {
 
 			fs.unlink( path, ( e ) => {
 				if ( e ) {
-					self.error( req, req, CODES.SERVER_ERROR );
+					this.error( req, req, CODES.SERVER_ERROR );
 				}
 				else {
-					self.respond( req, res, MESSAGES.NO_CONTENT, CODES.NO_CONTENT, {} );
+					this.respond( req, res, MESSAGES.NO_CONTENT, CODES.NO_CONTENT, {} );
 				}
 			} );
 		}
@@ -80,10 +79,10 @@ handle ( req, res, path, url, dir, stat ) {
 
 			fs.unlink( path, ( e ) => {
 				if ( e ) {
-					self.error( req, req, CODES.SERVER_ERROR );
+					this.error( req, req, CODES.SERVER_ERROR );
 				}
 				else {
-					self.respond( req, res, MESSAGES.NO_CONTENT, CODES.NO_CONTENT, {} );
+					this.respond( req, res, MESSAGES.NO_CONTENT, CODES.NO_CONTENT, {} );
 				}
 			} );
 		}

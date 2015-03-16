@@ -8,13 +8,12 @@
  * @return {String}           Allowed methods
  */
 allows ( uri, host, override ) {
-	let self = this,
-		timer = precise().start(),
+	let timer = precise().start(),
 		result = !override ? this.permissions.get( host + "_" + uri ) : undefined;
 
 	if ( override || !result ) {
 		result = VERBS.filter( ( i ) => {
-			return self.allowed( i, uri, host, override );
+			return this.allowed( i, uri, host, override );
 		} );
 
 		result = result.join( ", " ).toUpperCase().replace( "GET", "GET, HEAD, OPTIONS" );

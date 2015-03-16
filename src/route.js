@@ -7,8 +7,7 @@
  * @return {Object}     TurtleIO instance
  */
 route ( req, res ) {
-	let self = this,
-		url = this.url( req ),
+	let url = this.url( req ),
 		method = req.method.toLowerCase(),
 		parsed = parse( url ),
 		update = false,
@@ -28,7 +27,7 @@ route ( req, res ) {
 	// Finding a matching vhost
 	array.iterate( this.vhostsRegExp, ( i, idx ) => {
 		if ( i.test( parsed.hostname ) ) {
-			return !( req.vhost = self.vhosts[ idx ] );
+			return !( req.vhost = this.vhosts[ idx ] );
 		}
 	} );
 
@@ -37,7 +36,7 @@ route ( req, res ) {
 	// Adding middleware to avoid the round trip next time
 	if ( !this.allowed( "get", req.parsed.pathname, req.vhost ) ) {
 		this.get( req.parsed.pathname, ( req, res ) => {
-			self.request( req, res );
+			this.request( req, res );
 		}, req.vhost );
 
 		update = true;
@@ -48,15 +47,15 @@ route ( req, res ) {
 
 	// Decorating response
 	res.redirect = ( uri ) => {
-		self.respond( req, res, MESSAGES.NO_CONTENT, CODES.FOUND, { location: uri } );
+		this.respond( req, res, MESSAGES.NO_CONTENT, CODES.FOUND, { location: uri } );
 	};
 
 	res.respond = ( arg, status, headers ) => {
-		self.respond( req, res, arg, status, headers );
+		this.respond( req, res, arg, status, headers );
 	};
 
 	res.error = ( status, arg ) => {
-		self.error( req, res, status, arg );
+		this.error( req, res, status, arg );
 	};
 
 	// Mimic express for middleware interoperability
@@ -70,9 +69,9 @@ route ( req, res ) {
 		req.on( "data", ( data ) => {
 			payload = payload === undefined ? data : payload + data;
 
-			if ( self.config.maxBytes > 0 && Buffer.byteLength( payload ) > self.config.maxBytes ) {
+			if ( this.config.maxBytes > 0 && Buffer.byteLength( payload ) > this.config.maxBytes ) {
 				req.invalid = true;
-				self.error( req, res, CODES.REQ_TOO_LARGE );
+				this.error( req, res, CODES.REQ_TOO_LARGE );
 			}
 		} );
 
@@ -82,13 +81,13 @@ route ( req, res ) {
 					req.body = payload;
 				}
 
-				self.run( req, res, req.vhost, method );
+				this.run( req, res, req.vhost, method );
 			}
 		} );
 	}
 	// Running middleware
 	else {
-		self.run( req, res, req.vhost, method );
+		this.run( req, res, req.vhost, method );
 	}
 
 	return this;

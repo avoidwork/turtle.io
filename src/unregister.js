@@ -7,8 +7,7 @@
  * @return {Object}     TurtleIO instance
  */
 unregister ( url ) {
-	let self = this,
-		cached = this.etags.cache[ url ],
+	let cached = this.etags.cache[ url ],
 		path = this.config.tmp + "/",
 		gz, df;
 
@@ -23,7 +22,7 @@ unregister ( url ) {
 			if ( exists ) {
 				fs.unlink( gz, ( e ) => {
 					if ( e ) {
-						self.log( e );
+						this.log( e );
 					}
 				} );
 			}
@@ -33,7 +32,7 @@ unregister ( url ) {
 			if ( exists ) {
 				fs.unlink( df, ( e ) => {
 					if ( e ) {
-						self.log( e );
+						this.log( e );
 					}
 				} );
 			}

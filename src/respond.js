@@ -12,7 +12,6 @@
  */
 respond ( req, res, body, status, headers, file ) {
 	let head = regex.head.test( req.method ),
-		self = this,
 		timer = precise().start(),
 		ua = req.headers[ "user-agent" ],
 		encoding = req.headers[ "accept-encoding" ],
@@ -28,7 +27,7 @@ respond ( req, res, body, status, headers, file ) {
 					// Updating cache
 					if ( !regex.nocache.test( headers[ "cache-control" ] ) && !regex[ "private" ].test( headers[ "cache-control" ] ) ) {
 						if ( headers.etag === undefined ) {
-							headers.etag = "\"" + self.etag( req.parsed.href, body.length || 0, headers[ "last-modified" ] || 0, body || 0 ) + "\"";
+							headers.etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers[ "last-modified" ] || 0, body || 0 ) + "\"";
 						}
 
 						cheaders = clone( headers, true );
@@ -40,10 +39,10 @@ respond ( req, res, body, status, headers, file ) {
 						delete cheaders[ "access-control-allow-methods" ];
 						delete cheaders[ "access-control-allow-headers" ];
 
-						cached = self.etags.get( req.parsed.href );
+						cached = this.etags.get( req.parsed.href );
 
 						if ( !cached ) {
-							self.register( req.parsed.href, {
+							this.register( req.parsed.href, {
 								etag: cheaders.etag.replace( /"/g, "" ),
 								headers: cheaders,
 								mimetype: cheaders[ "content-type" ],
@@ -54,7 +53,7 @@ respond ( req, res, body, status, headers, file ) {
 
 					// Setting a watcher on the local path
 					if ( req.path ) {
-						self.watch( req.parsed.href, req.path );
+						this.watch( req.parsed.href, req.path );
 					}
 				}
 			}
@@ -188,8 +187,8 @@ respond ( req, res, body, status, headers, file ) {
 		}
 
 		fs.createReadStream( body, options ).on( "error", ( e ) => {
-			self.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
-			self.error( req, res, CODES.SERVER_ERROR );
+			this.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
+			this.error( req, res, CODES.SERVER_ERROR );
 		} ).pipe( res );
 	}
 	else {

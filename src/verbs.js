@@ -8,10 +8,8 @@
  * @return {Object}         TurtleIO instance
  */
 all ( route, fn, host ) {
-	let self = this;
-
 	array.iterate( VERBS, ( i ) => {
-		self.use( route, fn, host, i );
+		this.use( route, fn, host, i );
 	} );
 
 	return this;

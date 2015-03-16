@@ -9,8 +9,7 @@
  * @return {Object}        TurtleIO instance
  */
 run ( req, res, host, method ) {
-	let self = this,
-		middleware = array.iterator( this.routes( req.parsed.pathname, host, method ) );
+	let middleware = array.iterator( this.routes( req.parsed.pathname, host, method ) );
 
 	let get_arity = ( arg ) => {
 		return arg.toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
@@ -19,7 +18,7 @@ run ( req, res, host, method ) {
 	let stop = ( timer ) => {
 		if ( timer.stopped === null ) {
 			timer.stop();
-			self.signal( "middleware", () => {
+			this.signal( "middleware", () => {
 				return [ host, req.url, timer.diff() ];
 			} );
 		}
@@ -32,18 +31,18 @@ run ( req, res, host, method ) {
 
 		if ( !err ) {
 			if ( regex.get.test( method ) ) {
-				self.request( req, res );
+				this.request( req, res );
 			}
-			else if ( self.allowed( "get", req.parsed.pathname, req.vhost ) ) {
-				self.error( req, res, CODES.NOT_ALLOWED );
+			else if ( this.allowed( "get", req.parsed.pathname, req.vhost ) ) {
+				this.error( req, res, CODES.NOT_ALLOWED );
 			}
 			else {
-				self.error( req, res, CODES.NOT_FOUND );
+				this.error( req, res, CODES.NOT_FOUND );
 			}
 		}
 		else {
 			status = res.statusCode >= CODES.BAD_REQUEST ? res.statusCode : CODES[ ( err.message || err ).toUpperCase() ] || CODES.SERVER_ERROR;
-			self.error( req, res, status, err );
+			this.error( req, res, status, err );
 		}
 	};
 
@@ -90,7 +89,7 @@ run ( req, res, host, method ) {
 				last( timer, err );
 			}
 		}
-		else if ( !res._header && self.config.catchAll ) {
+		else if ( !res._header && this.config.catchAll ) {
 			last( timer, err );
 		}
 	};

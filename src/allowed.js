@@ -9,12 +9,9 @@
  * @return {Boolean}          Boolean indicating if method is allowed
  */
 allowed ( method, uri, host, override ) {
-	let self = this;
 	let timer = precise().start();
-	let result = this.routes( uri, host, method, override );
-
-	result = result.filter( ( i ) => {
-		return self.config.noaction[ i.hash || self.hash( i ) ] === undefined;
+	let result = this.routes( uri, host, method, override ).filter( ( i ) => {
+		return this.config.noaction[ i.hash || this.hash( i ) ] === undefined;
 	} );
 
 	timer.stop();

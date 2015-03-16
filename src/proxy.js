@@ -8,10 +8,7 @@
  * @param  {Boolean} stream [Optional] Stream response to client (default is false)
  * @return {Object}         TurtleIO instance
  */
-proxy ( route, origin, host, stream ) {
-	stream = ( stream === true );
-	let self = this;
-
+proxy ( route, origin, host, stream=false ) {
 	/**
 	 * Response handler
 	 *
@@ -34,14 +31,14 @@ proxy ( route, origin, host, stream ) {
 
 		resHeaders = headers( xhr.getAllResponseHeaders() );
 		resHeaders.via = ( resHeaders.via ? resHeaders.via + ", " : "" ) + resHeaders.server;
-		resHeaders.server = self.config.headers.server;
+		resHeaders.server = this.config.headers.server;
 
 		// Something went wrong
 		if ( xhr.status < CODES.CONTINUE ) {
-			self.error( req, res, CODES.BAD_GATEWAY );
+			this.error( req, res, CODES.BAD_GATEWAY );
 		}
 		else if ( xhr.status >= CODES.SERVER_ERROR ) {
-			self.error( req, res, xhr.status );
+			this.error( req, res, xhr.status );
 		}
 		else {
 			// Determining if the response will be cached
@@ -58,7 +55,7 @@ proxy ( route, origin, host, stream ) {
 				// Removing from LRU when invalid
 				if ( stale > 0 ) {
 					setTimeout( () => {
-						self.unregister( url );
+						this.unregister( url );
 					}, stale * 1000 );
 				}
 			}
@@ -68,7 +65,7 @@ proxy ( route, origin, host, stream ) {
 
 				// Setting headers
 				if ( get && xhr.status === CODES.SUCCESS ) {
-					etag = resHeaders.etag || "\"" + self.etag( url, resHeaders[ "content-length" ] || 0, resHeaders[ "last-modified" ] || 0, self.encode( arg ) ) + "\"";
+					etag = resHeaders.etag || "\"" + this.etag( url, resHeaders[ "content-length" ] || 0, resHeaders[ "last-modified" ] || 0, this.encode( arg ) ) + "\"";
 
 					if ( resHeaders.etag !== etag ) {
 						resHeaders.etag = etag;
@@ -81,13 +78,13 @@ proxy ( route, origin, host, stream ) {
 
 				// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
 				if ( get && req.headers[ "if-none-match" ] === etag ) {
-					cached = self.etags.get( url );
+					cached = this.etags.get( url );
 
 					if ( cached ) {
 						resHeaders.age = parseInt( new Date().getTime() / 1000 - cached.value.timestamp, 10 );
 					}
 
-					self.respond( req, res, MESSAGES.NO_CONTENT, CODES.NOT_MODIFIED, resHeaders );
+					this.respond( req, res, MESSAGES.NO_CONTENT, CODES.NOT_MODIFIED, resHeaders );
 				}
 				else {
 					if ( regex.head.test( req.method.toLowerCase() ) ) {
@@ -117,11 +114,11 @@ proxy ( route, origin, host, stream ) {
 						}
 					}
 
-					self.respond( req, res, arg, xhr.status, resHeaders );
+					this.respond( req, res, arg, xhr.status, resHeaders );
 				}
 			}
 			else {
-				self.respond( req, res, arg, xhr.status, resHeaders );
+				this.respond( req, res, arg, xhr.status, resHeaders );
 			}
 		}
 	}
@@ -165,7 +162,7 @@ proxy ( route, origin, host, stream ) {
 			method = req.method.toLowerCase(),
 			headerz = clone( req.headers, true ),
 			parsed = parse( url ),
-			cached = self.etags.get( url ),
+			cached = this.etags.get( url ),
 			streamd = ( stream === true ),
 			mimetype = cached ? cached.mimetype : mime.lookup( !regex.ext.test( parsed.pathname ) ? "index.htm" : parsed.pathname ),
 			defer, fn, options, proxyReq, xhr;
@@ -174,7 +171,7 @@ proxy ( route, origin, host, stream ) {
 		fn = ( arg ) => {
 			timer.stop();
 
-			self.signal( "proxy", () => {
+			this.signal( "proxy", () => {
 				return [ req.headers.host, req.method, route, origin, timer.diff() ];
 			} );
 
@@ -190,7 +187,7 @@ proxy ( route, origin, host, stream ) {
 		headerz[ "x-host" ] = parsed.host;
 		headerz[ "x-forwarded-for" ] = headerz[ "x-forwarded-for" ] ? headerz[ "x-forwarded-for" ] + ", " + req.ip : req.ip;
 		headerz[ "x-forwarded-proto" ] = parsed.protocol.replace( ":", "" );
-		headerz[ "x-forwarded-server" ] = self.config.headers.server;
+		headerz[ "x-forwarded-server" ] = this.config.headers.server;
 
 		if ( !headerz[ "x-real-ip" ] ) {
 			headerz[ "x-real-ip" ] = req.ip;
@@ -218,7 +215,7 @@ proxy ( route, origin, host, stream ) {
 			} );
 
 			proxyReq.on( "error", ( e ) => {
-				self.error( req, res, regex.refused.test( e.message ) ? CODES.SERVER_UNAVAILABLE : CODES.SERVER_ERROR );
+				this.error( req, res, regex.refused.test( e.message ) ? CODES.SERVER_UNAVAILABLE : CODES.SERVER_ERROR );
 			} );
 
 			if ( regex.body.test( req.method ) ) {
@@ -242,11 +239,11 @@ proxy ( route, origin, host, stream ) {
 	// Setting route
 	array.iterate( VERBS, ( i ) => {
 		if ( route === "/" ) {
-			self[ i ]( "/.*", wrapper, host );
+			this[ i ]( "/.*", wrapper, host );
 		}
 		else {
-			self[ i ]( route, wrapper, host );
-			self[ i ]( route + "/.*", wrapper, host );
+			this[ i ]( route, wrapper, host );
+			this[ i ]( route + "/.*", wrapper, host );
 		}
 	} );
 

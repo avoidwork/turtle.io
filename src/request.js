@@ -8,8 +8,7 @@
  * @return {Object}     TurtleIO instance
  */
 request ( req, res ) {
-	let self = this,
-		timer = precise().start(),
+	let timer = precise().start(),
 		method = req.method,
 		handled = false,
 		host = req.vhost,
@@ -23,7 +22,7 @@ request ( req, res ) {
 
 	let end = () => {
 		timer.stop();
-		self.signal( "request", () => {
+		this.signal( "request", () => {
 			return [ req.parsed.href, timer.diff() ];
 		} );
 	};
@@ -48,35 +47,35 @@ request ( req, res ) {
 	fs.lstat( path, ( e, stats ) => {
 		if ( e ) {
 			end();
-			self.error( req, res, CODES.NOT_FOUND );
+			this.error( req, res, CODES.NOT_FOUND );
 		}
 		else if ( !stats.isDirectory() ) {
 			end();
-			self.handle( req, res, path, req.parsed.href, false, stats );
+			this.handle( req, res, path, req.parsed.href, false, stats );
 		}
 		else if ( regex.get.test( method ) && !regex.dir.test( req.parsed.pathname ) ) {
 			end();
-			self.respond( req, res, MESSAGES.NO_CONTENT, CODES.REDIRECT, { "Location": ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + req.parsed.search } );
+			this.respond( req, res, MESSAGES.NO_CONTENT, CODES.REDIRECT, { "Location": ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + req.parsed.search } );
 		}
 		else if ( !regex.get.test( method ) ) {
 			end();
-			self.handle( req, res, path, req.parsed.href, true );
+			this.handle( req, res, path, req.parsed.href, true );
 		}
 		else {
 			count = 0;
-			nth = self.config.index.length;
+			nth = this.config.index.length;
 			path += "/";
 
-			array.iterate( self.config.index, ( i ) => {
+			array.iterate( this.config.index, ( i ) => {
 				fs.lstat( path + i, ( e, stats ) => {
 					if ( !e && !handled ) {
 						handled = true;
 						end();
-						self.handle( req, res, path + i, ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + i + req.parsed.search, false, stats );
+						this.handle( req, res, path + i, ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + i + req.parsed.search, false, stats );
 					}
 					else if ( ++count === nth && !handled ) {
 						end();
-						self.error( req, res, CODES.NOT_FOUND );
+						this.error( req, res, CODES.NOT_FOUND );
 					}
 				} );
 			} );

@@ -8,8 +8,7 @@
  * @return {Object}      TurtleIO instance
  */
 write ( req, res, path ) {
-	let self = this,
-		timer = precise().start(),
+	let timer = precise().start(),
 		put = ( req.method === "PUT" ),
 		body = req.body,
 		allow = req.allow,
@@ -32,24 +31,24 @@ write ( req, res, path ) {
 
 		fs.lstat( path, ( e, stat ) => {
 			if ( e ) {
-				self.error( req, res, CODES.NOT_FOUND );
+				this.error( req, res, CODES.NOT_FOUND );
 			}
 			else {
-				let etag = "\"" + self.etag( req.parsed.href, stat.size, stat.mtime ) + "\"";
+				let etag = "\"" + this.etag( req.parsed.href, stat.size, stat.mtime ) + "\"";
 
 				if ( !req.headers.hasOwnProperty( "etag" ) || req.headers.etag === etag ) {
 					fs.writeFile( path, body, ( e ) => {
 						if ( e ) {
-							self.error( req, req, CODES.SERVER_ERROR );
+							this.error( req, req, CODES.SERVER_ERROR );
 						}
 						else {
 							status = put ? CODES.NO_CONTENT : CODES.CREATED;
-							self.respond( req, res, self.page( status, self.hostname( req ) ), status, { allow: allow }, false );
+							this.respond( req, res, this.page( status, this.hostname( req ) ), status, { allow: allow }, false );
 						}
 					} );
 				}
 				else if ( req.headers.etag !== etag ) {
-					self.respond( req, res, MESSAGES.NO_CONTENT, CODES.FAILED, {}, false );
+					this.respond( req, res, MESSAGES.NO_CONTENT, CODES.FAILED, {}, false );
 				}
 			}
 		} );

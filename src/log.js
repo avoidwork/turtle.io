@@ -7,10 +7,9 @@
  * @return {Object}       TurtleIO instance
  */
 log ( arg, level ) {
-	let self, timer, e;
+	let timer, e;
 
 	if ( LOGGING ) {
-		self = this;
 		timer = precise().start();
 		e = arg instanceof Error;
 		level = level || "notice";
@@ -27,7 +26,7 @@ log ( arg, level ) {
 		timer.stop();
 
 		this.signal( "log", () => {
-			return [ level, self.config.logs.stdout, false, timer.diff() ];
+			return [ level, this.config.logs.stdout, false, timer.diff() ];
 		} );
 	}
 

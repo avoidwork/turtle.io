@@ -14,8 +14,7 @@
  * @return {Object}          TurtleIO instance
  */
 compress ( req, res, body, type, etag, file, options, status, headers ) {
-	let self = this,
-		timer = precise().start(),
+	let timer = precise().start(),
 		method = regex.gzip.test( type ) ? "createGzip" : "createDeflate",
 		sMethod = method.replace( "create", "" ).toLowerCase(),
 		fp = etag ? this.config.tmp + "/" + etag + "." + type : null;
@@ -33,7 +32,7 @@ compress ( req, res, body, type, etag, file, options, status, headers ) {
 
 				timer.stop();
 
-				self.signal( "compress", () => {
+				this.signal( "compress", () => {
 					return [ etag, fp, timer.diff() ];
 				} );
 			}
@@ -41,9 +40,9 @@ compress ( req, res, body, type, etag, file, options, status, headers ) {
 			else {
 				zlib[ sMethod ]( body, ( e, data ) => {
 					if ( e ) {
-						self.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
-						self.unregister( req.parsed.href );
-						self.error( req, res, CODES.SERVER_ERROR );
+						this.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
+						this.unregister( req.parsed.href );
+						this.error( req, res, CODES.SERVER_ERROR );
 					}
 					else {
 						if ( !res._header && !res._headerSent ) {
@@ -56,15 +55,15 @@ compress ( req, res, body, type, etag, file, options, status, headers ) {
 						if ( fp ) {
 							fs.writeFile( fp, data, "utf8", ( e ) => {
 								if ( e ) {
-									self.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
-									self.unregister( req.parsed.href );
+									this.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
+									this.unregister( req.parsed.href );
 								}
 							} );
 						}
 
 						timer.stop();
 
-						self.signal( "compress", () => {
+						this.signal( "compress", () => {
 							return [ etag, fp || "dynamic", timer.diff() ];
 						} );
 					}
@@ -78,21 +77,21 @@ compress ( req, res, body, type, etag, file, options, status, headers ) {
 
 			// Pipe compressed asset to Client
 			fs.createReadStream( body, options ).on( "error", ( e ) => {
-				self.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
-				self.unregister( req.parsed.href );
-				self.error( req, res, CODES.SERVER_ERROR );
+				this.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
+				this.unregister( req.parsed.href );
+				this.error( req, res, CODES.SERVER_ERROR );
 			} ).pipe( zlib[ method ]() ).pipe( res );
 
 			// Pipe compressed asset to disk
 			if ( exist === false ) {
 				fs.createReadStream( body ).on( "error", ( e ) => {
-					self.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
+					this.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
 				} ).pipe( zlib[ method ]() ).pipe( fs.createWriteStream( fp ) );
 			}
 
 			timer.stop();
 
-			self.signal( "compress", () => {
+			this.signal( "compress", () => {
 				return [ etag, fp, timer.diff() ];
 			} );
 		}
@@ -104,7 +103,7 @@ compress ( req, res, body, type, etag, file, options, status, headers ) {
 			if ( exist ) {
 				fs.lstat( fp, ( e, stats ) => {
 					if ( e ) {
-						self.error( req, res, e );
+						this.error( req, res, e );
 					}
 					else {
 						if ( !res._header && !res._headerSent ) {
@@ -119,14 +118,14 @@ compress ( req, res, body, type, etag, file, options, status, headers ) {
 						}
 
 						fs.createReadStream( fp, options ).on( "error", ( e ) => {
-							self.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
-							self.unregister( req.parsed.href );
-							self.error( req, res, CODES.SERVER_ERROR );
+							this.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
+							this.unregister( req.parsed.href );
+							this.error( req, res, CODES.SERVER_ERROR );
 						} ).pipe( res );
 
 						timer.stop();
 
-						self.signal( "compress", () => {
+						this.signal( "compress", () => {
 							return [ etag, fp, timer.diff() ];
 						} );
 					}

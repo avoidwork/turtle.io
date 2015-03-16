@@ -8,8 +8,7 @@
  * @return {Object}          TurtleIO instance
  */
 watch ( url, path ) {
-	let self = this,
-		watcher;
+	let watcher;
 
 	/**
 	 * Cleans up caches
@@ -20,8 +19,8 @@ watch ( url, path ) {
 	 */
 	let cleanup = () => {
 		watcher.close();
-		self.unregister( url );
-		delete self.watching[ path ];
+		this.unregister( url );
+		delete this.watching[ path ];
 	}
 
 	if ( !( this.watching[ path ] ) ) {
@@ -38,14 +37,14 @@ watch ( url, path ) {
 					let value;
 
 					if ( e ) {
-						self.log( e );
+						this.log( e );
 						cleanup();
 					}
-					else if ( self.etags.cache[ url ] ) {
-						value = self.etags.cache[ url ].value;
-						value.etag = self.etag( url, stat.size, stat.mtime );
+					else if ( this.etags.cache[ url ] ) {
+						value = this.etags.cache[ url ].value;
+						value.etag = this.etag( url, stat.size, stat.mtime );
 						value.timestamp = parseInt( new Date().getTime() / 1000, 10 );
-						self.register( url, value, true );
+						this.register( url, value, true );
 					}
 					else {
 						cleanup();
