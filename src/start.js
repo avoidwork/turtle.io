@@ -31,6 +31,9 @@ start ( cfg, err ) {
 
 	merge( this.config, config );
 
+	// Setting temp folder
+	this.config.tmp = this.config.tmp || os.tmpdir();
+
 	pages = this.config.pages ? ( this.config.root + this.config.pages ) : ( __dirname + "/../pages" );
 	LOGLEVEL = LEVELS.indexOf( this.config.logs.level );
 	LOGGING = this.config.logs.dtrace || this.config.logs.stdout;

@@ -1,6 +1,10 @@
 # Change Log
 Significant changes only
 
+## 3.2.8
+- Changing default value of `config.tmp` to `null`, such that `os.tmpdir()` will be used, unless specified
+- Fixing signature of `etag()` by using the spread operator
+
 ## 3.2.7
 - Changing murmurhash3 module to a pure JavaScript implementation, such that turtle.io can be installed on Windows / io.js
 - Removed all `self` references 'cause fat arrows

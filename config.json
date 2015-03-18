@@ -41,7 +41,7 @@
 		"key"  : null,
 		"cert" : null
 	},
-	"tmp"     : "/tmp",
+	"tmp"     : null,
 	"uid"     : null,
 	"vhosts"  : {}
 }
