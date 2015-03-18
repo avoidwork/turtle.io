@@ -25,7 +25,7 @@ proxy ( route, origin, host, stream=false ) {
 			regexOrigin = new RegExp( origin.replace( regex.end_slash, "" ), "g" ),
 			url = req.parsed.href,
 			stale = STALE,
-			get = req.method === "GET",
+			get = regex.get_only.test( req.method ),
 			rewriteOrigin = req.parsed.protocol + "//" + req.parsed.host + ( route == "/" ? "" : route ),
 			cached, resHeaders, rewrite;
 

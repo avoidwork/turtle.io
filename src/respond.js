@@ -23,7 +23,7 @@ respond ( req, res, body, status, headers, file ) {
 		if ( status === CODES.NOT_MODIFIED || status < CODES.MULTIPLE_CHOICE || status >= CODES.BAD_REQUEST ) {
 			// req.parsed may not exist if coming from `error()`
 			if ( req.parsed ) {
-				if ( req.method === "GET" && status === CODES.SUCCESS ) {
+				if ( regex.get_only.test( req.method ) && status === CODES.SUCCESS ) {
 					// Updating cache
 					if ( !regex.nocache.test( headers[ "cache-control" ] ) && !regex[ "private" ].test( headers[ "cache-control" ] ) ) {
 						if ( headers.etag === undefined ) {
