@@ -8,6 +8,6 @@
  * @param  {Object} body     [Optional] Response body
  * @return {String}          Etag value
  */
-etag () {
-	return this.hash( array.cast( arguments ).join( "-" ) );
+etag ( ...args ) {
+	return this.hash( args.join( "-" ) );
 }
