@@ -1,6 +1,9 @@
 # Change Log
 Significant changes only
 
+## 3.2.9
+- Changing the signature of `etag()` middleware
+
 ## 3.2.8
 - Changing default value of `config.tmp` to `null`, such that `os.tmpdir()` will be used, unless specified
 - Fixing signature of `etag()` by using the spread operator
