@@ -19,7 +19,8 @@ compression ( agent, encoding, mimetype ) {
 			if ( regex.gzip.test( i ) ) {
 				result = "gz";
 			}
-			else if ( regex.def.test( i ) ) {
+
+			if ( regex.def.test( i ) ) {
 				result = "zz";
 			}
 

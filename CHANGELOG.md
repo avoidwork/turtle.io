@@ -1,6 +1,9 @@
 # Change Log
 Significant changes only
 
+## 3.2.10
+- Implementing `RegExp` tests in lieu of `String` comparisons (for consistent code base)
+
 ## 3.2.9
 - Changing the signature of `etag()` middleware
 

@@ -9,7 +9,7 @@
  */
 write ( req, res, path ) {
 	let timer = precise().start(),
-		put = ( req.method === "PUT" ),
+		put = regex.put.test( req.method ),
 		body = req.body,
 		allow = req.allow,
 		del = this.allowed( "DELETE", req.parsed.pathname, req.vhost ),

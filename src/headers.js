@@ -26,7 +26,7 @@ headers ( req, rHeaders, status ) {
 		}
 
 		if ( req.cors ) {
-			if ( ( req.method == "OPTIONS" || req.headers[ "x-requested-with" ] ) && headers[ "access-control-allow-origin" ] === "*" ) {
+			if ( ( regex.options.test( req.method ) || req.headers[ "x-requested-with" ] ) && headers[ "access-control-allow-origin" ] === "*" ) {
 				headers[ "access-control-allow-origin" ] = req.headers.origin || req.headers.referer.replace( /\/$/, "" );
 				headers[ "access-control-allow-credentials" ] = "true";
 			}

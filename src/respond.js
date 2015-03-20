@@ -94,7 +94,7 @@ respond ( req, res, body, status, headers, file ) {
 		if ( head ) {
 			body = MESSAGES.NO_CONTENT;
 
-			if ( req.method === "OPTIONS" ) {
+			if ( regex.options.test( req.method ) ) {
 				headers[ "content-length" ] = 0;
 				delete headers[ "content-type" ];
 			}
@@ -105,7 +105,7 @@ respond ( req, res, body, status, headers, file ) {
 			headers[ "content-type" ] = "application/json";
 		}
 
-		if ( req.method === "GET" ) {
+		if ( regex.get_only.test( req.method ) ) {
 			// CSV hook
 			if ( status === CODES.SUCCESS && body && headers[ "content-type" ] === "application/json" && req.headers.accept && regex.csv.test( string.explode( req.headers.accept )[ 0 ].replace( regex.nval, "" ) ) ) {
 				headers[ "content-type" ] = "text/csv";
@@ -177,7 +177,7 @@ respond ( req, res, body, status, headers, file ) {
 
 		this.compress( req, res, body, type, headers.etag ? headers.etag.replace( /"/g, "" ) : undefined, file, options, status, headers );
 	}
-	else if ( ( status === CODES.SUCCESS || status === CODES.PARTIAL_CONTENT ) && file && req.method === "GET" ) {
+	else if ( ( status === CODES.SUCCESS || status === CODES.PARTIAL_CONTENT ) && file && regex.get_only.test( req.method ) ) {
 		headers[ "transfer-encoding" ] = "chunked";
 
 		finalize();

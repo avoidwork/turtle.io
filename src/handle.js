@@ -33,7 +33,7 @@ handle ( req, res, path, url, dir, stat ) {
 				"last-modified": modified
 			};
 
-			if ( method === "GET" ) {
+			if ( regex.get_only.test( method ) ) {
 				// Decorating path for watcher
 				req.path = path;
 
@@ -50,7 +50,7 @@ handle ( req, res, path, url, dir, stat ) {
 				this.respond( req, res, MESSAGES.NO_CONTENT, CODES.SUCCESS, headers, true );
 			}
 		}
-		else if ( method === "DELETE" && del ) {
+		else if ( regex.del.test( method ) && del ) {
 			this.unregister( this.url( req ) );
 
 			fs.unlink( path, ( e ) => {
@@ -62,7 +62,7 @@ handle ( req, res, path, url, dir, stat ) {
 				}
 			} );
 		}
-		else if ( method === "PUT" && write ) {
+		else if ( regex.put.test( method ) && write ) {
 			this.write( req, res, path );
 		}
 		else {
@@ -71,10 +71,10 @@ handle ( req, res, path, url, dir, stat ) {
 	}
 	// Directory request
 	else {
-		if ( ( method === "POST" || method === "PUT" ) && write ) {
+		if ( ( regex.post.test( method ) || regex.put.test( method ) ) && write ) {
 			this.write( req, res, path );
 		}
-		else if ( method === "DELETE" && del ) {
+		else if ( regex.del.test( method ) && del ) {
 			this.unregister( req.parsed.href );
 
 			fs.unlink( path, ( e ) => {
