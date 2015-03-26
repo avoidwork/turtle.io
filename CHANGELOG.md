@@ -1,5 +1,13 @@
 # Change Log
 
+## [3.2.12](https://github.com/avoidwork/turtle.io/tree/3.2.12) (2015-03-26)
+
+[Full Changelog](https://github.com/avoidwork/turtle.io/compare/3.2.11...3.2.12)
+
+## [3.2.11](https://github.com/avoidwork/turtle.io/tree/3.2.11) (2015-03-26)
+
+[Full Changelog](https://github.com/avoidwork/turtle.io/compare/3.2.10...3.2.11)
+
 ## [3.2.10](https://github.com/avoidwork/turtle.io/tree/3.2.10) (2015-03-20)
 
 [Full Changelog](https://github.com/avoidwork/turtle.io/compare/3.2.9...3.2.10)
