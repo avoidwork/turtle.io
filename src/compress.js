@@ -49,6 +49,7 @@ compress ( req, res, body, type, etag, file, options, status, headers ) {
 					else {
 						if ( !res._header && !res._headerSent ) {
 							headers[ "content-length" ] = data.length;
+							headers[ "transfer-encoding" ] = "identity";
 							res.writeHead( status, headers );
 						}
 
@@ -74,6 +75,8 @@ compress ( req, res, body, type, etag, file, options, status, headers ) {
 		}
 		else {
 			if ( !res._header && !res._headerSent ) {
+				headers[ "transfer-encoding" ] = "chunked";
+				delete headers["content-length"];
 				res.writeHead( status, headers );
 			}
 
@@ -109,11 +112,11 @@ compress ( req, res, body, type, etag, file, options, status, headers ) {
 					}
 					else {
 						if ( !res._header && !res._headerSent ) {
-							headers[ "content-length" ] = stats.size;
+							headers[ "transfer-encoding" ] = "chunked";
+							delete headers["content-length"];
 
 							if ( options ) {
-								headers[ "content-range" ] = "bytes " + options.start + "-" + options.end + "/" + headers[ "content-length" ];
-								headers[ "content-length" ] = number.diff( options.end, options.start ) + 1;
+								headers[ "content-range" ] = "bytes " + options.start + "-" + options.end + "/" + stats.size;
 							}
 
 							res.writeHead( status, headers );
