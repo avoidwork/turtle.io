@@ -171,6 +171,7 @@ respond ( req, res, body, status, headers, file ) {
 
 		if ( file ) {
 			headers[ "transfer-encoding" ] = "chunked";
+			delete headers["content-length"];
 		}
 
 		finalize();
@@ -179,6 +180,7 @@ respond ( req, res, body, status, headers, file ) {
 	}
 	else if ( ( status === CODES.SUCCESS || status === CODES.PARTIAL_CONTENT ) && file && regex.get_only.test( req.method ) ) {
 		headers[ "transfer-encoding" ] = "chunked";
+		delete headers["content-length"];
 
 		finalize();
 

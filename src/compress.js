@@ -24,6 +24,8 @@ compress ( req, res, body, type, etag, file, options, status, headers ) {
 			// Pipe Stream through compression to Client & disk
 			if ( typeof body.pipe == "function" ) {
 				if ( !res._header && !res._headerSent ) {
+					headers[ "transfer-encoding" ] = "chunked";
+					delete headers["content-length"];
 					res.writeHead( status, headers );
 				}
 

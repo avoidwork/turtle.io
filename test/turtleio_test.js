@@ -27,6 +27,8 @@ describe( "Requests", function () {
 			.expectStatus( 200 )
 			.expectHeader( "status", "200 OK" )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
+			.expectHeader( "transfer-encoding", "chunked" )
+			.expectHeader( "content-length", undefined )
 			.expectBody(/Hello world!/)
 			.end( function ( err, res ) {
 				if ( err ) throw err;
@@ -54,7 +56,8 @@ describe( "Requests", function () {
 			.header( "range", "0-5" )
 			.expectStatus( 206 )
 			.expectHeader( "status", "206 Partial Content" )
-			.expectHeader( "content-length", "6" )
+			.expectHeader( "transfer-encoding", "chunked" )
+			.expectHeader( "content-length", undefined )
 			.expectBody(/^\<html\>$/)
 			.end( function ( err, res ) {
 				if ( err ) throw err;
@@ -69,7 +72,8 @@ describe( "Requests", function () {
 			.header( "range", "1-4" )
 			.expectStatus( 206 )
 			.expectHeader( "status", "206 Partial Content" )
-			.expectHeader( "content-length", "4" )
+			.expectHeader( "transfer-encoding", "chunked" )
+			.expectHeader( "content-length", undefined )
 			.expectBody(/^html$/)
 			.end( function ( err, res ) {
 				if ( err ) throw err;
@@ -114,6 +118,7 @@ describe( "Requests", function () {
 			.header( "range", "a-b" )
 			.expectStatus( 416 )
 			.expectHeader( "status", "416 Requested Range Not Satisfiable" )
+			.expectHeader( "transfer-encoding", "identity" )
 			.expectBody(/Requested Range not Satisfiable/)
 			.end( function ( err, res ) {
 				if ( err ) throw err;
@@ -128,6 +133,7 @@ describe( "Requests", function () {
 			.header( "range", "5-0" )
 			.expectStatus( 416 )
 			.expectHeader( "status", "416 Requested Range Not Satisfiable" )
+			.expectHeader( "transfer-encoding", "identity" )
 			.expectBody(/Requested Range not Satisfiable/)
 			.end( function ( err, res ) {
 				if ( err ) throw err;
@@ -142,6 +148,7 @@ describe( "Requests", function () {
 			.expectStatus( 405 )
 			.expectHeader( "status", "405 Method Not Allowed" )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
+			.expectHeader( "transfer-encoding", "identity" )
 			.expectBody(/Method not allowed/)
 			.end( function ( err ) {
 				if ( err ) throw err;
@@ -155,6 +162,7 @@ describe( "Requests", function () {
 			.expectStatus( 405 )
 			.expectHeader( "status", "405 Method Not Allowed" )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
+			.expectHeader( "transfer-encoding", "identity" )
 			.expectBody(/Method not allowed/)
 			.end( function ( err ) {
 				if ( err ) throw err;
@@ -168,6 +176,7 @@ describe( "Requests", function () {
 			.expectStatus( 405 )
 			.expectHeader( "status", "405 Method Not Allowed" )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
+			.expectHeader( "transfer-encoding", "identity" )
 			.expectBody(/Method not allowed/)
 			.end( function ( err ) {
 				if ( err ) throw err;
@@ -193,6 +202,7 @@ describe( "Requests", function () {
 			.get( "/nothere.html" )
 			.expectStatus( 404 )
 			.expectHeader( "status", "404 Not Found" )
+			.expectHeader( "transfer-encoding", "identity" )
 			.expectBody(/File not found/)
 			.end( function ( err ) {
 				if ( err ) throw err;
@@ -207,6 +217,7 @@ describe( "Requests", function () {
 			.expectStatus( 405 )
 			.expectHeader( "status", "405 Method Not Allowed" )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
+			.expectHeader( "transfer-encoding", "identity" )
 			.expectBody(/Method not allowed/)
 			.end( function ( err ) {
 				if ( err ) throw err;
@@ -220,6 +231,7 @@ describe( "Requests", function () {
 			.expectStatus( 405 )
 			.expectHeader( "status", "405 Method Not Allowed" )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
+			.expectHeader( "transfer-encoding", "identity" )
 			.expectBody(/Method not allowed/)
 			.end( function ( err ) {
 				if ( err ) throw err;
@@ -233,6 +245,7 @@ describe( "Requests", function () {
 			.expectStatus( 405 )
 			.expectHeader( "status", "405 Method Not Allowed" )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
+			.expectHeader( "transfer-encoding", "identity" )
 			.expectBody(/Method not allowed/)
 			.end( function ( err ) {
 				if ( err ) throw err;
@@ -246,6 +259,7 @@ describe( "Requests", function () {
 			.expectStatus( 405 )
 			.expectHeader( "status", "405 Method Not Allowed" )
 			.expectHeader( "allow", "GET, HEAD, OPTIONS" )
+			.expectHeader( "transfer-encoding", "identity" )
 			.expectBody(/Method not allowed/)
 			.end( function ( err ) {
 				if ( err ) throw err;
@@ -258,6 +272,7 @@ describe( "Requests", function () {
 			.get( "/../README" )
 			.expectStatus( 404 )
 			.expectHeader( "status", "404 Not Found" )
+			.expectHeader( "transfer-encoding", "identity" )
 			.expectBody(/File not found/)
 			.end( function ( err ) {
 				if ( err ) throw err;
@@ -270,6 +285,7 @@ describe( "Requests", function () {
 			.get( "/././../README" )
 			.expectStatus( 404 )
 			.expectHeader( "status", "404 Not Found" )
+			.expectHeader( "transfer-encoding", "identity" )
 			.expectBody(/File not found/)
 			.end( function ( err ) {
 				if ( err ) throw err;
