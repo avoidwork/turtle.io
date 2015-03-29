@@ -10,7 +10,7 @@
  * @param  {Boolean} file    [Optional] Indicates `body` is a file path
  * @return {Object}          TurtleIO instance
  */
-respond ( req, res, body, status, headers, file ) {
+respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 	let head = regex.head.test( req.method ),
 		timer = precise().start(),
 		ua = req.headers[ "user-agent" ],
@@ -68,9 +68,7 @@ respond ( req, res, body, status, headers, file ) {
 		body = MESSAGES.NO_CONTENT;
 	}
 
-	status = status || CODES.SUCCESS;
 	headers = this.headers( req, headers || { "content-type": "text/plain" }, status );
-	file = file === true;
 
 	if ( head ) {
 		delete headers.etag;
