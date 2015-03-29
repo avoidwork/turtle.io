@@ -9,4 +9,5 @@
 .gitignore
 .jshintrc
 Gruntfile.js
+CHANGELOG.md
 sample.js
