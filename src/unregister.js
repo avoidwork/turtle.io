@@ -8,34 +8,24 @@
  */
 unregister ( url ) {
 	let cached = this.etags.cache[ url ],
-		path = this.config.tmp + "/",
-		gz, df;
+		lpath = this.config.tmp,
+		ext = [ "gz", "zz" ];
 
 	if ( cached ) {
+		lpath = path.join( lpath, cached.value.etag );
 		this.etags.remove( url );
+		array.iterate( ext, ( i ) => {
+			let lfile = lpath + "." + i;
 
-		path += cached.value.etag;
-		gz = path + ".gz";
-		df = path + ".zz";
-
-		fs.exists( gz, ( exists ) => {
-			if ( exists ) {
-				fs.unlink( gz, ( e ) => {
-					if ( e ) {
-						this.log( e );
-					}
-				} );
-			}
-		} );
-
-		fs.exists( df, ( exists ) => {
-			if ( exists ) {
-				fs.unlink( df, ( e ) => {
-					if ( e ) {
-						this.log( e );
-					}
-				} );
-			}
+			fs.exists( lfile, ( exists ) => {
+				if ( exists ) {
+					fs.unlink( lfile, ( e ) => {
+						if ( e ) {
+							this.log( e );
+						}
+					} );
+				}
+			} );
 		} );
 	}
 
