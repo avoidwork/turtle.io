@@ -34,7 +34,7 @@ start ( cfg, err ) {
 	// Setting temp folder
 	this.config.tmp = this.config.tmp || os.tmpdir();
 
-	pages = this.config.pages ? ( this.config.root + this.config.pages ) : ( __dirname + "/../pages" );
+	pages = this.config.pages ? path.join( this.config.root, this.config.pages ) : path.join( __dirname, "../pages" );
 	LOGLEVEL = LEVELS.indexOf( this.config.logs.level );
 	LOGGING = this.config.logs.dtrace || this.config.logs.stdout;
 
@@ -79,7 +79,7 @@ start ( cfg, err ) {
 		}
 		else if ( array.keys( this.config ).length > 0 ) {
 			array.iterate( files, ( i ) => {
-				this.pages.all[ i.replace( regex.next, "" ) ] = fs.readFileSync( pages + "/" + i, "utf8" );
+				this.pages.all[ i.replace( regex.next, "" ) ] = fs.readFileSync( path.join( pages, i ), "utf8" );
 			} );
 
 			// Starting server

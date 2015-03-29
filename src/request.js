@@ -18,7 +18,7 @@ request ( req, res ) {
 			} )[ 0 ] || "" ) == "..",
 		out_dir = !invalid ? ( pathname.match( /\.{2}\//g ) || [] ).length : 0,
 		in_dir = !invalid ? ( pathname.match( /\w+?(\.\w+|\/)+/g ) || [] ).length : 0,
-		count, path, nth, root;
+		count, lpath, nth, root;
 
 	let end = () => {
 		timer.stop();
@@ -40,18 +40,18 @@ request ( req, res ) {
 	}
 
 	// Preparing file path
-	root = this.config.root + "/" + this.config.vhosts[ host ];
-	path = ( root + req.parsed.pathname ).replace( regex.dir, "" );
+	root = path.join( this.config.root, this.config.vhosts[ host ] );
+	lpath = path.join( root, req.parsed.pathname.replace( regex.dir, "" ) );
 
 	// Determining if the request is valid
-	fs.lstat( path, ( e, stats ) => {
+	fs.lstat( lpath, ( e, stats ) => {
 		if ( e ) {
 			end();
 			this.error( req, res, CODES.NOT_FOUND );
 		}
 		else if ( !stats.isDirectory() ) {
 			end();
-			this.handle( req, res, path, req.parsed.href, false, stats );
+			this.handle( req, res, lpath, req.parsed.href, false, stats );
 		}
 		else if ( regex.get.test( method ) && !regex.dir.test( req.parsed.pathname ) ) {
 			end();
@@ -59,19 +59,20 @@ request ( req, res ) {
 		}
 		else if ( !regex.get.test( method ) ) {
 			end();
-			this.handle( req, res, path, req.parsed.href, true );
+			this.handle( req, res, lpath, req.parsed.href, true );
 		}
 		else {
 			count = 0;
 			nth = this.config.index.length;
-			path += "/";
 
 			array.iterate( this.config.index, ( i ) => {
-				fs.lstat( path + i, ( e, stats ) => {
+				let npath = path.join( lpath, i );
+
+				fs.lstat( npath, ( e, stats ) => {
 					if ( !e && !handled ) {
 						handled = true;
 						end();
-						this.handle( req, res, path + i, ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + i + req.parsed.search, false, stats );
+						this.handle( req, res, npath, ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + i + req.parsed.search, false, stats );
 					}
 					else if ( ++count === nth && !handled ) {
 						end();

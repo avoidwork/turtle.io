@@ -17,7 +17,7 @@ compress ( req, res, body, type, etag, file, options, status, headers ) {
 	let timer = precise().start(),
 		method = regex.gzip.test( type ) ? "createGzip" : "createDeflate",
 		sMethod = method.replace( "create", "" ).toLowerCase(),
-		fp = etag ? this.config.tmp + "/" + etag + "." + type : null;
+		fp = etag ? path.join( this.config.tmp, etag + "." + type ) : null;
 
 	let next = ( exist ) => {
 		if ( !file ) {
