@@ -48,10 +48,14 @@ headers ( req, rHeaders, status ) {
 		}
 
 		// Removing headers not wanted in the response
-		if ( !get || status >= CODES.BAD_REQUEST ) {
+		if ( !get || status >= CODES.BAD_REQUEST || headers["x-ratelimit-limit"] ) {
 			delete headers[ "cache-control" ];
 			delete headers.etag;
 			delete headers[ "last-modified" ];
+		}
+
+		if ( headers["x-ratelimit-limit"] ) {
+			headers["cache-control"] = "no-cache";
 		}
 
 		if ( status === CODES.NOT_MODIFIED ) {
