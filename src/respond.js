@@ -70,9 +70,13 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 
 	headers = this.headers( req, headers || { "content-type": "text/plain" }, status );
 
-	if ( head ) {
+	if ( head || headers["x-ratelimit-limit"] ) {
 		delete headers.etag;
 		delete headers[ "last-modified" ];
+
+		if ( headers["x-ratelimit-limit"] ) {
+			headers["cache-control"] = "no-cache";
+		}
 	}
 
 	if ( !file && body !== MESSAGES.NO_CONTENT ) {
