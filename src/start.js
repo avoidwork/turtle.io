@@ -68,7 +68,7 @@ start ( cfg, err ) {
 	this.probes();
 
 	// Registering virtual hosts
-	array.iterate( array.cast( config.vhosts, true ), ( i ) => {
+	array.each( array.cast( config.vhosts, true ), ( i ) => {
 		this.host( i );
 	} );
 
@@ -78,7 +78,7 @@ start ( cfg, err ) {
 			this.log( new Error( "[client 0.0.0.0] " + e.message ), "error" );
 		}
 		else if ( array.keys( this.config ).length > 0 ) {
-			array.iterate( files, ( i ) => {
+			array.each( files, ( i ) => {
 				this.pages.all[ i.replace( regex.next, "" ) ] = fs.readFileSync( path.join( pages, i ), "utf8" );
 			} );
 

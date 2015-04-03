@@ -31,7 +31,7 @@ error ( req, res, status, msg ) {
 
 	body = this.page( status, host );
 
-	array.iterate( array.cast( CODES ), ( i, idx ) => {
+	array.each( array.cast( CODES ), ( i, idx ) => {
 		if ( i === status ) {
 			kdx = idx;
 			return false;

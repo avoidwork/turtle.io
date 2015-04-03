@@ -14,7 +14,7 @@ unregister ( url ) {
 	if ( cached ) {
 		lpath = path.join( lpath, cached.value.etag );
 		this.etags.remove( url );
-		array.iterate( ext, ( i ) => {
+		array.each( ext, ( i ) => {
 			let lfile = lpath + "." + i;
 
 			fs.exists( lfile, ( exists ) => {

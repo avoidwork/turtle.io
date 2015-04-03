@@ -25,7 +25,7 @@ route ( req, res ) {
 	req.timer = precise().start();
 
 	// Finding a matching vhost
-	array.iterate( this.vhostsRegExp, ( i, idx ) => {
+	array.each( this.vhostsRegExp, ( i, idx ) => {
 		if ( i.test( parsed.hostname ) ) {
 			return !( req.vhost = this.vhosts[ idx ] );
 		}

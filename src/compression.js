@@ -15,7 +15,7 @@ compression ( agent, encoding, mimetype ) {
 	// No soup for IE!
 	if ( this.config.compress === true && regex.comp.test( mimetype ) && !regex.ie.test( agent ) ) {
 		// Iterating supported encodings
-		array.iterate( encodings, ( i ) => {
+		array.each( encodings, ( i ) => {
 			if ( regex.gzip.test( i ) ) {
 				result = "gz";
 			}

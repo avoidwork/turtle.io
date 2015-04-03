@@ -144,7 +144,7 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 	if ( req.headers.range ) {
 		options = {};
 
-		array.iterate( req.headers.range.match( /\d+/g ) || [], ( i, idx ) => {
+		array.each( req.headers.range.match( /\d+/g ) || [], ( i, idx ) => {
 			options[ idx === 0 ? "start" : "end" ] = parseInt( i, 10 );
 		} );
 

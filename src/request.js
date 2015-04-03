@@ -65,7 +65,7 @@ request ( req, res ) {
 			count = 0;
 			nth = this.config.index.length;
 
-			array.iterate( this.config.index, ( i ) => {
+			array.each( this.config.index, ( i ) => {
 				let npath = path.join( lpath, i );
 
 				fs.lstat( npath, ( e, stats ) => {

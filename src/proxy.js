@@ -135,7 +135,7 @@ proxy ( route, origin, host, stream=false ) {
 		let result = {};
 
 		if ( !string.isEmpty( args ) ) {
-			array.iterate( string.trim( args ).split( "\n" ), ( i ) => {
+			array.each( string.trim( args ).split( "\n" ), ( i ) => {
 				let header, value;
 
 				value = i.replace( regex.headVAL, "" );
@@ -237,7 +237,7 @@ proxy ( route, origin, host, stream=false ) {
 	}
 
 	// Setting route
-	array.iterate( VERBS, ( i ) => {
+	array.each( VERBS, ( i ) => {
 		if ( route === "/" ) {
 			this[ i ]( "/.*", wrapper, host );
 		}
