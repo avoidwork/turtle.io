@@ -38,8 +38,8 @@ decorate ( req, res ) {
 		this.get( req.parsed.pathname, ( req, res, next ) => {
 			this.request( req, res ).then( function () {
 				next();
-			}, function () {
-				next();
+			}, function ( e ) {
+				next( e );
 			} );
 		}, req.vhost );
 
