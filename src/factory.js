@@ -16,7 +16,8 @@ let factory = function () {
 		let cached, headers;
 
 		if ( regex.get_only.test( req.method ) && !req.headers.range ) {
-			cached = app.etags.get( req.parsed.href );
+			// Not mutating cache, because `respond()` will do it
+			cached = app.etags.cache[ req.parsed.href ];
 
 			// Sending a 304 if Client is making a GET & has current representation
 			if ( cached && ( req.headers[ "if-none-match" ] || "" ).replace( /\"/g, "" ) === cached.etag ) {

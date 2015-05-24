@@ -27,22 +27,20 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 				if ( regex.get_only.test( req.method ) && ( status === CODES.SUCCESS || status === CODES.NOT_MODIFIED ) ) {
 					// Updating cache
 					if ( !regex.nocache.test( headers[ "cache-control" ] ) && !regex[ "private" ].test( headers[ "cache-control" ] ) ) {
-						if ( headers.etag === undefined ) {
-							headers.etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers[ "last-modified" ] || 0, body || 0 ) + "\"";
-						}
-
-						cheaders = clone( headers, true );
-
-						delete cheaders[ "access-control-allow-origin" ];
-						delete cheaders[ "access-control-expose-headers" ];
-						delete cheaders[ "access-control-max-age" ];
-						delete cheaders[ "access-control-allow-credentials" ];
-						delete cheaders[ "access-control-allow-methods" ];
-						delete cheaders[ "access-control-allow-headers" ];
-
 						cached = this.etags.get( req.parsed.href );
 
 						if ( !cached ) {
+							if ( headers.etag === undefined ) {
+								headers.etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers[ "last-modified" ] || 0, body || 0 ) + "\"";
+							}
+
+							cheaders = clone( headers, true );
+
+							// Ensuring the content type is known
+							if ( !cheaders[ "content-type" ] ) {
+								cheaders[ "content-type" ] = mime.lookup( req.path || req.parsed.pathname );
+							}
+
 							this.register( req.parsed.href, {
 								etag: cheaders.etag.replace( /"/g, "" ),
 								headers: cheaders,

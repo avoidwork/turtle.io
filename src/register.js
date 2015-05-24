@@ -20,11 +20,22 @@ register ( url, state, stale ) {
 	}
 
 	// Removing superficial headers
-	delete state.headers[ "content-encoding" ];
-	delete state.headers[ "server" ];
-	delete state.headers[ "transfer-encoding" ];
-	delete state.headers[ "x-powered-by" ];
-	delete state.headers[ "x-response-time" ];
+	array.each( [
+		"content-encoding",
+		"server",
+		"status",
+		"transfer-encoding",
+		"x-powered-by",
+		"x-response-time",
+		"access-control-allow-origin",
+		"access-control-expose-headers",
+		"access-control-max-age",
+		"access-control-allow-credentials",
+		"access-control-allow-methods",
+		"access-control-allow-headers"
+	], function ( i ) {
+		delete state.headers[ i ];
+	} );
 
 	// Updating LRU
 	this.etags.set( url, state );
