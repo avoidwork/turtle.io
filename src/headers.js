@@ -7,7 +7,7 @@
  * @param  {Number}  status   HTTP status code, default is 200
  * @return {Object}           Response headers
  */
-headers ( req, rHeaders, status ) {
+headers ( req, rHeaders={}, status ) {
 	let timer = precise().start(),
 		get = regex.get.test( req.method ),
 		headers;
@@ -15,7 +15,7 @@ headers ( req, rHeaders, status ) {
 	// Decorating response headers
 	if ( status !== CODES.NOT_MODIFIED && status >= CODES.MULTIPLE_CHOICE && status < CODES.BAD_REQUEST ) {
 		headers = rHeaders;
-	} else if ( rHeaders instanceof Object ) {
+	} else {
 		headers = clone( this.config.headers, true );
 		merge( headers, rHeaders );
 		headers.allow = req.allow;
@@ -25,11 +25,8 @@ headers ( req, rHeaders, status ) {
 		}
 
 		if ( req.cors ) {
-			if ( ( regex.options.test( req.method ) || req.headers[ "x-requested-with" ] ) && headers[ "access-control-allow-origin" ] === "*" ) {
-				headers[ "access-control-allow-origin" ] = req.headers.origin || req.headers.referer.replace( /\/$/, "" );
-				headers[ "access-control-allow-credentials" ] = "true";
-			}
-
+			headers[ "access-control-allow-origin" ] = req.headers.origin || req.headers.referer.replace( /\/$/, "" );
+			headers[ "access-control-allow-credentials" ] = "true";
 			headers[ "access-control-allow-methods" ] = headers.allow;
 		} else {
 			delete headers[ "access-control-allow-origin" ];
@@ -52,8 +49,8 @@ headers ( req, rHeaders, status ) {
 			delete headers[ "last-modified" ];
 		}
 
-		if ( headers["x-ratelimit-limit"] ) {
-			headers["cache-control"] = "no-cache";
+		if ( headers[ "x-ratelimit-limit" ] ) {
+			headers[ "cache-control" ] = "no-cache";
 		}
 
 		if ( status === CODES.NOT_MODIFIED ) {
@@ -70,9 +67,7 @@ headers ( req, rHeaders, status ) {
 	}
 
 	headers.status = status + " " + http.STATUS_CODES[ status ];
-
 	timer.stop();
-
 	this.signal( "headers", function () {
 		return [ status, timer.diff() ];
 	} );

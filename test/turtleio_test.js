@@ -92,7 +92,7 @@ describe( "Requests", function () {
 			.expectHeader( "etag", etag )
 			.expectBody(/^$/)
 			.end( function ( err ) {
-				if ( err ) throw err;
+				if ( err ) { console.log(err); throw err; }
 				done();
 			} );
 	} );

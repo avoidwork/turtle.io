@@ -69,6 +69,13 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 	headers = this.headers( req, headers || { "content-type": "text/plain" }, status );
 
 	if ( head ) {
+		body = MESSAGES.NO_CONTENT;
+
+		if ( regex.options.test( req.method ) ) {
+			headers[ "content-length" ] = 0;
+			delete headers[ "content-type" ];
+		}
+
 		delete headers.etag;
 		delete headers[ "last-modified" ];
 	}
@@ -87,15 +94,6 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 		}
 
 		headers[ "content-length" ] = headers[ "content-length" ] || 0;
-
-		if ( head ) {
-			body = MESSAGES.NO_CONTENT;
-
-			if ( regex.options.test( req.method ) ) {
-				headers[ "content-length" ] = 0;
-				delete headers[ "content-type" ];
-			}
-		}
 
 		// Ensuring JSON has proper mimetype
 		if ( regex.json_wrap.test( body ) ) {
