@@ -78,7 +78,7 @@ compress ( req, res, body, type, etag, file, options, status, headers ) {
 			fs.createReadStream( body, options ).on( "error", () => {
 				this.unregister( req.parsed.href );
 				deferred.reject( new Error( CODES.SERVER_ERROR ) );
-			} ).pipe( zlib[ method ]() ).on( "end", function () {
+			} ).pipe( zlib[ method ]() ).on( "close", function () {
 				deferred.resolve( true );
 			} ).pipe( res );
 
@@ -118,7 +118,7 @@ compress ( req, res, body, type, etag, file, options, status, headers ) {
 						fs.createReadStream( fp, options ).on( "error", () => {
 							this.unregister( req.parsed.href );
 							deferred.reject( new Error( CODES.SERVER_ERROR ) );
-						} ).on( "end", function () {
+						} ).on( "close", function () {
 							deferred.resolve( true );
 						} ).pipe( res );
 						timer.stop();

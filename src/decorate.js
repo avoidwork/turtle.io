@@ -15,11 +15,14 @@ decorate ( req, res ) {
 		update = false;
 
 	// Decorating parsed Object on request
-	req.timer = timer;
+	req.body = "";
+	res.header = res.setHeader;
+	req.ip = req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress;
+	res.locals = {};
 	req.parsed = parsed;
 	req.query = parsed.query;
-	req.ip = req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress;
 	req.server = this;
+	req.timer = timer;
 
 	// Finding a matching virtual host
 	array.each( this.vhostsRegExp, ( i, idx ) => {
@@ -40,7 +43,6 @@ decorate ( req, res ) {
 	}
 
 	req.allow = this.allows( req.parsed.pathname, req.vhost, update );
-	req.body = "";
 
 	// Adding methods
 	res.redirect = uri => {
@@ -54,10 +56,6 @@ decorate ( req, res ) {
 	res.error = ( status, arg ) => {
 		this.error( req, res, status, arg );
 	};
-
-	// Mimic express for middleware interoperability
-	res.locals = {};
-	res.header = res.setHeader;
 
 	deferred.resolve( [ req, res ] );
 

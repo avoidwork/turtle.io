@@ -31,8 +31,7 @@ routes ( uri, host, method, override ) {
 				} );
 			}
 		} );
-	}
-	catch ( e ) {
+	} catch ( e ) {
 		result = [];
 	}
 

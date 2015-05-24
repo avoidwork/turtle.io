@@ -152,7 +152,11 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 
 		if ( isNaN( options.start ) || isNaN( options.end ) || options.start >= options.end ) {
 			delete req.headers.range;
-			return this.error( req, res, CODES.NOT_SATISFIABLE );
+			return this.error( req, res, CODES.NOT_SATISFIABLE ).then( function () {
+				deferred.resolve( true );
+			}, function ( e ) {
+				deferred.reject( e );
+			} );
 		}
 
 		status = CODES.PARTIAL_CONTENT;
@@ -171,7 +175,11 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 		}
 
 		finalize();
-		deferred.resolve( this.compress( req, res, body, type, headers.etag ? headers.etag.replace( /"/g, "" ) : undefined, file, options, status, headers ) );
+		this.compress( req, res, body, type, headers.etag ? headers.etag.replace( /"/g, "" ) : undefined, file, options, status, headers ).then( function () {
+			deferred.resolve( true );
+		}, function ( e ) {
+			deferred.reject( e );
+		} );
 	} else if ( ( status === CODES.SUCCESS || status === CODES.PARTIAL_CONTENT ) && file && regex.get_only.test( req.method ) ) {
 		headers[ "transfer-encoding" ] = "chunked";
 		delete headers["content-length"];
@@ -183,7 +191,7 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 
 		fs.createReadStream( body, options ).on( "error", () => {
 			deferred.reject( new Error( CODES.SERVER_ERROR ) );
-		} ).on( "end", function () {
+		} ).on( "close", function () {
 			deferred.resolve( true );
 		} ).pipe( res );
 	} else {
@@ -194,6 +202,7 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 		}
 
 		res.end( status === CODES.PARTIAL_CONTENT ? body.slice( options.start, options.end ) : body );
+		deferred.resolve( true );
 	}
 
 	timer.stop();

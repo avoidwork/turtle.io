@@ -16,8 +16,6 @@ error ( req, res, status, msg ) {
 		kdx = -1,
 		body;
 
-	console.log(status);
-
 	if ( isNaN( status ) ) {
 		status = CODES.NOT_FOUND;
 
@@ -25,15 +23,13 @@ error ( req, res, status, msg ) {
 		if ( !regex.get.test( method ) ) {
 			if ( this.allowed( method, req.parsed.pathname, req.vhost ) ) {
 				status = CODES.SERVER_ERROR;
-			}
-			else {
+			} else {
 				status = CODES.NOT_ALLOWED;
 			}
 		}
 	}
 
 	body = this.page( status, host );
-
 	array.each( array.cast( CODES ), function ( i, idx ) {
 		if ( i === status ) {
 			kdx = idx;
@@ -46,19 +42,16 @@ error ( req, res, status, msg ) {
 	}
 
 	timer.stop();
-
 	this.signal( "error", function () {
 		return [ req.vhost, req.parsed.path, status, msg, timer.diff() ];
 	} );
 
-	console.log(status);
-	console.log('---');
-
 	this.respond( req, res, body, status, {
 		"cache-control": "no-cache",
 		"content-length": Buffer.byteLength( body )
-	} ).finally( function () {
-		this.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + msg ), "debug" );
+	} ).then( function () {
+		deferred.resolve( true );
+	}, function () {
 		deferred.resolve( true );
 	} );
 

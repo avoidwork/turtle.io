@@ -22,13 +22,11 @@ let factory = () => {
 			if ( cached && ( req.headers[ "if-none-match" ] || "" ).replace( /\"/g, "" ) === cached.etag ) {
 				headers = clone( cached.headers, true );
 				headers.age = parseInt( new Date().getTime() / 1000 - cached.timestamp, 10 );
-				return self.respond( req, res, MESSAGES.NO_CONTENT, CODES.NOT_MODIFIED, self.headers( req, headers, CODES.NOT_MODIFIED ) );
-			}
-			else {
+				self.respond( req, res, MESSAGES.NO_CONTENT, CODES.NOT_MODIFIED, self.headers( req, headers, CODES.NOT_MODIFIED ) );
+			} else {
 				next();
 			}
-		}
-		else {
+		} else {
 			next();
 		}
 	};
@@ -37,4 +35,4 @@ let factory = () => {
 	self.use( etag ).blacklist( etag );
 
 	return self;
-}
+};

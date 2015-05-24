@@ -76,9 +76,19 @@ start ( cfg, err ) {
 	fs.readdir( pages, ( e, files ) => {
 		if ( e ) {
 			this.log( new Error( "[client 0.0.0.0] " + e.message ), "error" );
-		}
-		else if ( array.keys( this.config ).length > 0 ) {
-			array.each( files, ( i ) => {
+		} else if ( array.keys( this.config ).length > 0 ) {
+			let next = ( req, res ) => {
+				this.pipeline( req, res ).then( function ( arg ) {
+					console.log("here");
+					return arg;
+				}, e => {
+					return this.error( req, res, e );
+				} ).then( () => {
+					this.log( this.prep( req, res, res._headers || {} ), "info" );
+				} );
+			};
+
+			array.each( files, i => {
 				this.pages.all[ i.replace( regex.next, "" ) ] = fs.readFileSync( path.join( pages, i ), "utf8" );
 			} );
 
@@ -99,25 +109,11 @@ start ( cfg, err ) {
 						host: this.config.address,
 						secureProtocol: this.config.secureProtocol,
 						secureOptions: this.config.secureOptions
-					} ), ( req, res ) => {
-						this.pipeline( req, res ).then( () => {
-							this.log( this.prep( req, res, res._headers || {} ), "info" );
-						}, e => {
-							this.error( req, res, e );
-						} );
-					} ).listen( this.config.port, this.config.address );
+					} ), next ).listen( this.config.port, this.config.address );
+				} else {
+					this.server = http.createServer( next ).listen( this.config.port, this.config.address );
 				}
-				else {
-					this.server = http.createServer( ( req, res ) => {
-						this.pipeline( req, res ).then( () => {
-							this.log( this.prep( req, res, res._headers || {} ), "info" );
-						}, e => {
-							this.error( req, res, e );
-						} );
-					} ).listen( this.config.port, this.config.address );
-				}
-			}
-			else {
+			} else {
 				this.server.listen( this.config.port, this.config.address );
 			}
 

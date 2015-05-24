@@ -44,8 +44,6 @@ request ( req, res ) {
 	root = path.join( this.config.root, this.config.vhosts[ host ] );
 	lpath = path.join( root, req.parsed.pathname.replace( regex.dir, "" ) );
 
-	console.log(lpath);
-
 	// Determining if the request is valid
 	fs.lstat( lpath, ( e, stats ) => {
 		if ( e ) {
@@ -80,8 +78,6 @@ request ( req, res ) {
 
 			array.each( this.config.index, ( i ) => {
 				let npath = path.join( lpath, i );
-
-				console.log(npath);
 
 				fs.lstat( npath, ( e, stats ) => {
 					if ( !e && !handled ) {
