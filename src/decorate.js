@@ -36,7 +36,11 @@ decorate ( req, res ) {
 	// Adding middleware to avoid the round trip next time
 	if ( !this.allowed( "get", req.parsed.pathname, req.vhost ) ) {
 		this.get( req.parsed.pathname, ( req, res, next ) => {
-			this.request( req, res ).then( next, next );
+			this.request( req, res ).then( function () {
+				next();
+			}, function () {
+				next();
+			} );
 		}, req.vhost );
 
 		update = true;

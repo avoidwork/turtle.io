@@ -19,6 +19,13 @@ register ( url, state, stale ) {
 		}
 	}
 
+	// Removing superficial headers
+	delete state.headers[ "content-encoding" ];
+	delete state.headers[ "server" ];
+	delete state.headers[ "transfer-encoding" ];
+	delete state.headers[ "x-powered-by" ];
+	delete state.headers[ "x-response-time" ];
+
 	// Updating LRU
 	this.etags.set( url, state );
 

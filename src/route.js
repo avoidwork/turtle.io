@@ -69,6 +69,8 @@ route ( args ) {
 			}
 		} else if ( !res._header && this.config.catchAll ) {
 			last( err );
+		} else if ( res._header ) {
+			deferred.resolve( args );
 		}
 	};
 

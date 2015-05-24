@@ -79,7 +79,6 @@ start ( cfg, err ) {
 		} else if ( array.keys( this.config ).length > 0 ) {
 			let next = ( req, res ) => {
 				this.pipeline( req, res ).then( function ( arg ) {
-					console.log("here");
 					return arg;
 				}, e => {
 					return this.error( req, res, e );
