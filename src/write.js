@@ -59,3 +59,4 @@ write ( req, res, path ) {
 
 	return deferred.promise;
 }
+}

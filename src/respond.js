@@ -106,14 +106,13 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 
 		// CSV hook
 		if ( regex.get_only.test( req.method ) && status === CODES.SUCCESS && body && headers[ "content-type" ] === "application/json" && req.headers.accept && regex.csv.test( string.explode( req.headers.accept )[ 0 ].replace( regex.nval, "" ) ) ) {
-				headers[ "content-type" ] = "text/csv";
+			headers[ "content-type" ] = "text/csv";
 
-				if ( !headers[ "content-disposition" ] ) {
-					headers[ "content-disposition" ] = "attachment; filename=\"" + req.parsed.pathname.replace( /.*\//g, "" ).replace( /\..*/, "_" ) + req.parsed.search.replace( "?", "" ).replace( /\&/, "_" ) + ".csv\"";
-				}
-
-				body = csv.encode( body );
+			if ( !headers[ "content-disposition" ] ) {
+				headers[ "content-disposition" ] = "attachment; filename=\"" + req.parsed.pathname.replace( /.*\//g, "" ).replace( /\..*/, "_" ) + req.parsed.search.replace( "?", "" ).replace( /\&/, "_" ) + ".csv\"";
 			}
+
+			body = csv.encode( body );
 		}
 	}
 
