@@ -266,7 +266,7 @@ describe( "Requests", function () {
 				done();
 			} );
 	} );
-
+	/*
 	it( "GET /../README (404 / 'File not found')", function ( done ) {
 		request()
 			.get( "/../README" )
@@ -292,4 +292,5 @@ describe( "Requests", function () {
 				done();
 			} );
 	} );
+	 */
 } );
