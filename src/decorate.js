@@ -7,7 +7,7 @@
  * @return {Object}     Promise
  */
 decorate ( req, res ) {
-	let timer = precise().start(),
+	let timer = precise().start(), // Assigning as early as possible
 		deferred = defer(),
 		url = this.url( req ),
 		parsed = parse( url ),
@@ -32,8 +32,8 @@ decorate ( req, res ) {
 
 	// Adding middleware to avoid the round trip next time
 	if ( !this.allowed( "get", req.parsed.pathname, req.vhost ) ) {
-		this.get( req.parsed.pathname, ( req, res ) => {
-			this.request( req, res );
+		this.get( req.parsed.pathname, ( req, res, next ) => {
+			this.request( req, res ).then( next, next );
 		}, req.vhost );
 
 		update = true;
@@ -59,7 +59,7 @@ decorate ( req, res ) {
 	res.locals = {};
 	res.header = res.setHeader;
 
-	deferred.resolve( [req, res] );
+	deferred.resolve( [ req, res ] );
 
 	return deferred.promise;
 }

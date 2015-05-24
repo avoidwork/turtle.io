@@ -38,12 +38,24 @@ handle ( req, res, path, url, dir, stat ) {
 
 				// Client has current version
 				if ( ( req.headers[ "if-none-match" ] === etag ) || ( !req.headers[ "if-none-match" ] && Date.parse( req.headers[ "if-modified-since" ] ) >= stat.mtime ) ) {
-					deferred.resolve( this.respond( req, res, MESSAGES.NO_CONTENT, CODES.NOT_MODIFIED, headers, true ) );
+					this.respond( req, res, MESSAGES.NO_CONTENT, CODES.NOT_MODIFIED, headers, true ).then( function ( arg ) {
+						deferred.resolve( arg );
+					}, function ( e ) {
+						deferred.reject( e );
+					} );
 				} else {
-					deferred.resolve( this.respond( req, res, path, CODES.SUCCESS, headers, true ) );
+					this.respond( req, res, path, CODES.SUCCESS, headers, true ).then( function ( arg ) {
+						deferred.resolve( arg );
+					}, function ( e ) {
+						deferred.reject( e );
+					} );
 				}
 			} else {
-				deferred.resolve( this.respond( req, res, MESSAGES.NO_CONTENT, CODES.SUCCESS, headers, true ) );
+				this.respond( req, res, MESSAGES.NO_CONTENT, CODES.SUCCESS, headers, true ).then( function ( arg ) {
+					deferred.resolve( arg );
+				}, function ( e ) {
+					deferred.reject( e );
+				} );
 			}
 		} else if ( regex.del.test( method ) && del ) {
 			this.unregister( this.url( req ) );
@@ -52,26 +64,41 @@ handle ( req, res, path, url, dir, stat ) {
 				if ( e ) {
 					deferred.reject( new Error( CODES.SERVER_ERROR ) );
 				} else {
-					deferred.resolve( this.respond( req, res, MESSAGES.NO_CONTENT, CODES.NO_CONTENT, {} ) );
+					this.respond( req, res, MESSAGES.NO_CONTENT, CODES.NO_CONTENT, {} ).then( function ( arg ) {
+						deferred.resolve( arg );
+					}, function ( e ) {
+						deferred.reject( e );
+					} );
 				}
 			} );
 		} else if ( regex.put.test( method ) && write ) {
-			deferred.resolve( this.write( req, res, path ) );
-		}
-		else {
+			this.write( req, res, path ).then( function ( arg ) {
+				deferred.resolve( arg );
+			}, function ( e ) {
+				deferred.reject( e );
+			} );
+		} else {
 			deferred.reject( new Error( CODES.SERVER_ERROR ) );
 		}
 	} else {
 		if ( ( regex.post.test( method ) || regex.put.test( method ) ) && write ) {
-			deferred.resolve( this.write( req, res, path ) );
+			this.write( req, res, path ).then( function ( arg ) {
+				deferred.resolve( arg );
+			}, function ( e ) {
+				deferred.reject( e );
+			} );
 		} else if ( regex.del.test( method ) && del ) {
 			this.unregister( req.parsed.href );
 
-			fs.unlink( path, ( e ) => {
+			fs.unlink( path, e => {
 				if ( e ) {
 					deferred.reject( new Error( CODES.SERVER_ERROR ) );
 				} else {
-					deferred.resolve( this.respond( req, res, MESSAGES.NO_CONTENT, CODES.NO_CONTENT, {} ) );
+					this.respond( req, res, MESSAGES.NO_CONTENT, CODES.NO_CONTENT, {} ).then( function ( arg ) {
+						deferred.resolve( arg );
+					}, function ( e ) {
+						deferred.reject( e );
+					} );
 				}
 			} );
 		} else {

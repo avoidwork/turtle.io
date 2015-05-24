@@ -84,15 +84,6 @@ start ( cfg, err ) {
 
 			// Starting server
 			if ( this.server === null ) {
-				// For proxy behavior
-				if ( https.globalAgent.maxSockets < this.config.proxy.maxConnections ) {
-					https.globalAgent.maxConnections = this.config.proxy.maxConnections;
-				}
-
-				if ( http.globalAgent.maxSockets < this.config.proxy.maxConnections ) {
-					http.globalAgent.maxConnections = this.config.proxy.maxConnections;
-				}
-
 				if ( this.config.ssl.cert !== null && this.config.ssl.key !== null ) {
 					// POODLE
 					this.config.secureProtocol = "SSLv23_method";
@@ -109,12 +100,20 @@ start ( cfg, err ) {
 						secureProtocol: this.config.secureProtocol,
 						secureOptions: this.config.secureOptions
 					} ), ( req, res ) => {
-						this.route( req, res );
+						this.pipeline( req, res ).then( () => {
+							this.log( this.prep( req, res, res._headers || {} ), "info" );
+						}, e => {
+							this.error( req, res, e );
+						} );
 					} ).listen( this.config.port, this.config.address );
 				}
 				else {
 					this.server = http.createServer( ( req, res ) => {
-						this.route( req, res );
+						this.pipeline( req, res ).then( () => {
+							this.log( this.prep( req, res, res._headers || {} ), "info" );
+						}, e => {
+							this.error( req, res, e );
+						} );
 					} ).listen( this.config.port, this.config.address );
 				}
 			}
@@ -132,7 +131,7 @@ start ( cfg, err ) {
 	} );
 
 	// Something went wrong, server must restart
-	process.on( "uncaughtException", ( e ) => {
+	process.on( "uncaughtException", e => {
 		this.log( e, "error" );
 		process.exit( 1 );
 	} );

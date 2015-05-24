@@ -3,11 +3,10 @@
  *
  * @type {Function}
  */
-let pipeline = monad()
-	.lift( decorate )
-	.lift( connect )
-	.lift( route )
-	.lift( request )
-	.lift( headers )
-	.lift( respond )
-	.lift( log );
+pipeline ( req, res ) {
+	return this.decorate( req, res ).then( args => {
+		return this.connect( args );
+	} ).then( args => {
+		return this.route( args );
+	} );
+}

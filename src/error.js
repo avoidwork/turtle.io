@@ -16,6 +16,8 @@ error ( req, res, status, msg ) {
 		kdx = -1,
 		body;
 
+	console.log(status);
+
 	if ( isNaN( status ) ) {
 		status = CODES.NOT_FOUND;
 
@@ -48,6 +50,9 @@ error ( req, res, status, msg ) {
 	this.signal( "error", function () {
 		return [ req.vhost, req.parsed.path, status, msg, timer.diff() ];
 	} );
+
+	console.log(status);
+	console.log('---');
 
 	this.respond( req, res, body, status, {
 		"cache-control": "no-cache",
