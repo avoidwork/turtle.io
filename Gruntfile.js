@@ -78,7 +78,7 @@ module.exports = function (grunt) {
 		},
 		mochaTest : {
 			options: {
-				reporter: "nyan"
+				reporter: "spec"
 			},
 			test : {
 				src : ["test/*_test.js"]
