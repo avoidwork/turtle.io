@@ -10,6 +10,7 @@
  */
 error ( req, res, status, msg ) {
 	let timer = precise().start(),
+		deferred = defer(),
 		method = req.method.toLowerCase(),
 		host = req.parsed ? req.parsed.hostname : ALL,
 		kdx = -1,
@@ -31,7 +32,7 @@ error ( req, res, status, msg ) {
 
 	body = this.page( status, host );
 
-	array.each( array.cast( CODES ), ( i, idx ) => {
+	array.each( array.cast( CODES ), function ( i, idx ) {
 		if ( i === status ) {
 			kdx = idx;
 			return false;
@@ -42,16 +43,19 @@ error ( req, res, status, msg ) {
 		msg = kdx ? array.cast( MESSAGES )[ kdx ] : "Unknown error";
 	}
 
-	this.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + msg ), "debug" );
-
 	timer.stop();
 
-	this.signal( "error", () => {
-		return [ req.headers.host, req.parsed.path, status, msg, timer.diff() ];
+	this.signal( "error", function () {
+		return [ req.vhost, req.parsed.path, status, msg, timer.diff() ];
 	} );
 
-	return this.respond( req, res, body, status, {
+	this.respond( req, res, body, status, {
 		"cache-control": "no-cache",
 		"content-length": Buffer.byteLength( body )
+	} ).finally( function () {
+		this.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + msg ), "debug" );
+		deferred.resolve( true );
 	} );
+
+	return deferred.promise;
 }

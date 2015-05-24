@@ -1,94 +1,103 @@
 /**
- * Routes a request to a handler
+ * Runs middleware in a chain
  *
- * @method route
- * @param  {Object} req Request Object
- * @param  {Object} res Response Object
- * @return {Object}     TurtleIO instance
+ * @method run
+ * @param  {Object} req    Request Object
+ * @param  {Object} res    Response Object
+ * @param  {String} host   [Optional] Host
+ * @param  {String} method HTTP method
+ * @return {Object}        Promise
  */
-route ( req, res ) {
-	let url = this.url( req ),
-		method = req.method.toLowerCase(),
-		parsed = parse( url ),
-		update = false,
-		payload;
+route ( promise ) {
+	let deferred = defer();
 
-	if ( regex.head.test( method ) ) {
-		method = "get";
-	}
+	promise.then( args => {
+		let req = args[ 0 ],
+			res = args[ 1 ],
+			method = req.parsed.method.toLowerCase(),
+			middleware;
 
-	// Decorating parsed Object on request
-	req.parsed = parsed;
-	req.query = parsed.query;
-	req.ip = req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress;
-	req.server = this;
-	req.timer = precise().start();
-
-	// Finding a matching vhost
-	array.each( this.vhostsRegExp, ( i, idx ) => {
-		if ( i.test( parsed.hostname ) ) {
-			return !( req.vhost = this.vhosts[ idx ] );
+		function get_arity ( arg ) {
+			return arg.toString().replace( /(^.*\()|(\).*)|(\n.*)/g, "" ).split( "," ).length;
 		}
-	} );
 
-	req.vhost = req.vhost || this.config[ "default" ];
+		let last = ( timer, err ) => {
+			let status;
 
-	// Adding middleware to avoid the round trip next time
-	if ( !this.allowed( "get", req.parsed.pathname, req.vhost ) ) {
-		this.get( req.parsed.pathname, ( req, res ) => {
-			this.request( req, res );
-		}, req.vhost );
+			stop( timer );
 
-		update = true;
-	}
-
-	req.allow = this.allows( req.parsed.pathname, req.vhost, update );
-	req.body = "";
-
-	// Decorating response
-	res.redirect = ( uri ) => {
-		this.respond( req, res, MESSAGES.NO_CONTENT, CODES.FOUND, { location: uri } );
-	};
-
-	res.respond = ( arg, status, headers ) => {
-		this.respond( req, res, arg, status, headers );
-	};
-
-	res.error = ( status, arg ) => {
-		this.error( req, res, status, arg );
-	};
-
-	// Mimic express for middleware interoperability
-	res.locals = {};
-	res.header = res.setHeader;
-
-	// Setting listeners if expecting a body
-	if ( regex.body.test( method ) ) {
-		req.setEncoding( "utf-8" );
-
-		req.on( "data", ( data ) => {
-			payload = payload === undefined ? data : payload + data;
-
-			if ( this.config.maxBytes > 0 && Buffer.byteLength( payload ) > this.config.maxBytes ) {
-				req.invalid = true;
-				this.error( req, res, CODES.REQ_TOO_LARGE );
+			if ( !err ) {
+				if ( regex.get.test( method ) ) {
+					deferred.resolve( [ req, res ] );
+				} else if ( this.allowed( "get", req.parsed.pathname, req.vhost ) ) {
+					deferred.reject( new Error( CODES.NOT_ALLOWED ) );
+				} else {
+					deferred.reject( new Error( CODES.NOT_FOUND ) );
+				}
+			} else {
+				status = res.statusCode >= CODES.BAD_REQUEST ? res.statusCode : CODES[ ( err.message || err ).toUpperCase() ] || CODES.SERVER_ERROR;
+				deferred.reject( new Error( status ) );
 			}
-		} );
+		};
 
-		req.on( "end", () => {
-			if ( !req.invalid ) {
-				if ( payload ) {
-					req.body = payload;
+		let next = err => {
+			let timer = precise().start(),
+				arity = 3,
+				item = middleware.next();
+
+			if ( !item.done ) {
+				if ( err ) {
+					// Finding the next error handling middleware
+					arity = get_arity( item.value );
+					do {
+						arity = get_arity( item.value );
+					} while ( arity < 4 && ( item = middleware.next() ) && !item.done )
 				}
 
-				this.run( req, res, req.vhost, method );
-			}
-		} );
-	}
-	// Running middleware
-	else {
-		this.run( req, res, req.vhost, method );
-	}
+				stop( timer );
 
-	return this;
+				if ( !item.done ) {
+					if ( err ) {
+						if ( arity === 4 ) {
+							try {
+								item.value( err, req, res, next );
+							} catch ( e ) {
+								next( e );
+							}
+						} else {
+							last( timer, err );
+						}
+					} else {
+						try {
+							item.value( req, res, next );
+						} catch ( e ) {
+							next( e );
+						}
+					}
+				} else {
+					last( timer, err );
+				}
+			} else if ( !res._header && this.config.catchAll ) {
+				last( timer, err );
+			}
+		};
+
+		let stop = timer => {
+			if ( timer.stopped === null ) {
+				timer.stop();
+				this.signal( "middleware", function () {
+					return [ req.vhost, req.url, timer.diff() ];
+				} );
+			}
+		};
+
+		if ( reqex.head.test( method ) ) {
+			method = "get";
+		}
+
+		middleware = array.iterator( this.routes( req.parsed.pathname, req.vhost, method ) );
+		next();
+	} );
+
+	return deferred.promise;
 }

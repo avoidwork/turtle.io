@@ -172,7 +172,7 @@ proxy ( route, origin, host, stream=false ) {
 			timer.stop();
 
 			this.signal( "proxy", () => {
-				return [ req.headers.host, req.method, route, origin, timer.diff() ];
+				return [ req.vhost, req.method, route, origin, timer.diff() ];
 			} );
 
 			handle( req, res, arg, xhr );

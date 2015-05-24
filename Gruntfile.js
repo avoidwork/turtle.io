@@ -17,7 +17,6 @@ module.exports = function (grunt) {
 			},
 			dist: {
 				src : [
-					"<banner>",
 					"src/intro.js",
 					"src/regex.js",
 					"src/codes.js",
@@ -27,8 +26,10 @@ module.exports = function (grunt) {
 					"src/allowed.js",
 					"src/allows.js",
 					"src/blacklist.js",
+					"src/connect.js",
 					"src/compress.js",
 					"src/compression.js",
+					"src/decorate.js",
 					"src/encode.js",
 					"src/error.js",
 					"src/etag.js",

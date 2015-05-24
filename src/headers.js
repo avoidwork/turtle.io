@@ -15,8 +15,7 @@ headers ( req, rHeaders, status ) {
 	// Decorating response headers
 	if ( status !== CODES.NOT_MODIFIED && status >= CODES.MULTIPLE_CHOICE && status < CODES.BAD_REQUEST ) {
 		headers = rHeaders;
-	}
-	else if ( rHeaders instanceof Object ) {
+	} else if ( rHeaders instanceof Object ) {
 		headers = clone( this.config.headers, true );
 		merge( headers, rHeaders );
 		headers.allow = req.allow;
@@ -32,8 +31,7 @@ headers ( req, rHeaders, status ) {
 			}
 
 			headers[ "access-control-allow-methods" ] = headers.allow;
-		}
-		else {
+		} else {
 			delete headers[ "access-control-allow-origin" ];
 			delete headers[ "access-control-expose-headers" ];
 			delete headers[ "access-control-max-age" ];
@@ -75,7 +73,7 @@ headers ( req, rHeaders, status ) {
 
 	timer.stop();
 
-	this.signal( "headers", () => {
+	this.signal( "headers", function () {
 		return [ status, timer.diff() ];
 	} );
 

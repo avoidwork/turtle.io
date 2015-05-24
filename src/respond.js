@@ -11,8 +11,9 @@
  * @return {Object}          TurtleIO instance
  */
 respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
-	let head = regex.head.test( req.method ),
-		timer = precise().start(),
+	let timer = precise().start(),
+		deferred = defer(),
+		head = regex.head.test( req.method ),
 		ua = req.headers[ "user-agent" ],
 		encoding = req.headers[ "accept-encoding" ],
 		type, options;
@@ -56,13 +57,12 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 						this.watch( req.parsed.href, req.path );
 					}
 				}
-			}
-			else {
+			} else {
 				delete headers.allow;
 				delete headers[ "access-control-allow-methods" ];
 			}
 		}
-	}
+	};
 
 	if ( body === null || body === undefined ) {
 		body = MESSAGES.NO_CONTENT;
@@ -82,7 +82,8 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 			if ( body instanceof Buffer ) {
 				headers[ "content-length" ] = Buffer.byteLength( body.toString() );
 			}
-			else if ( typeof body == "string" ) {
+
+			if ( typeof body == "string" ) {
 				headers[ "content-length" ] = Buffer.byteLength( body );
 			}
 		}
@@ -103,9 +104,8 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 			headers[ "content-type" ] = "application/json";
 		}
 
-		if ( regex.get_only.test( req.method ) ) {
-			// CSV hook
-			if ( status === CODES.SUCCESS && body && headers[ "content-type" ] === "application/json" && req.headers.accept && regex.csv.test( string.explode( req.headers.accept )[ 0 ].replace( regex.nval, "" ) ) ) {
+		// CSV hook
+		if ( regex.get_only.test( req.method ) && status === CODES.SUCCESS && body && headers[ "content-type" ] === "application/json" && req.headers.accept && regex.csv.test( string.explode( req.headers.accept )[ 0 ].replace( regex.nval, "" ) ) ) {
 				headers[ "content-type" ] = "text/csv";
 
 				if ( !headers[ "content-disposition" ] ) {
@@ -143,7 +143,6 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 	// Setting the partial content headers
 	if ( req.headers.range ) {
 		options = {};
-
 		array.each( req.headers.range.match( /\d+/g ) || [], ( i, idx ) => {
 			options[ idx === 0 ? "start" : "end" ] = parseInt( i, 10 );
 		} );
@@ -173,25 +172,22 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 		}
 
 		finalize();
-
-		this.compress( req, res, body, type, headers.etag ? headers.etag.replace( /"/g, "" ) : undefined, file, options, status, headers );
-	}
-	else if ( ( status === CODES.SUCCESS || status === CODES.PARTIAL_CONTENT ) && file && regex.get_only.test( req.method ) ) {
+		deferred.resolve( this.compress( req, res, body, type, headers.etag ? headers.etag.replace( /"/g, "" ) : undefined, file, options, status, headers ) );
+	} else if ( ( status === CODES.SUCCESS || status === CODES.PARTIAL_CONTENT ) && file && regex.get_only.test( req.method ) ) {
 		headers[ "transfer-encoding" ] = "chunked";
 		delete headers["content-length"];
-
 		finalize();
 
 		if ( !res._header && !res._headerSent ) {
 			res.writeHead( status, headers );
 		}
 
-		fs.createReadStream( body, options ).on( "error", ( e ) => {
-			this.log( new Error( "[client " + ( req.headers[ "x-forwarded-for" ] ? array.last( string.explode( req.headers[ "x-forwarded-for" ] ) ) : req.connection.remoteAddress ) + "] " + e.message ), "error" );
-			this.error( req, res, CODES.SERVER_ERROR );
+		fs.createReadStream( body, options ).on( "error", () => {
+			deferred.reject( new Error( CODES.SERVER_ERROR ) );
+		} ).on( "end", function () {
+			deferred.resolve( true );
 		} ).pipe( res );
-	}
-	else {
+	} else {
 		finalize();
 
 		if ( !res._header && !res._headerSent ) {
@@ -202,10 +198,9 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 	}
 
 	timer.stop();
-
-	this.signal( "respond", () => {
-		return [ req.headers.host, req.method, req.url, status, timer.diff() ];
+	this.signal( "respond", function () {
+		return [ req.vhost, req.method, req.url, status, timer.diff() ];
 	} );
 
-	return this.log( this.prep( req, res, headers ), "info" );
+	return deferred.promise;
 }
