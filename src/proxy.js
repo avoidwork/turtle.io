@@ -211,7 +211,13 @@ proxy ( route, origin, host, stream=false ) {
 			}
 		}
 
-		obj = parsed.protocol.indexOf( "https" ) > -1 ? https : http;
+		if ( parsed.protocol.indexOf( "https" ) > -1 ) {
+			options.rejectUnauthorized = false;
+			obj = https;
+		} else {
+			obj = http;
+		}
+
 		proxyReq = obj.request( options, next );
 		proxyReq.on( "error", ( e ) => {
 			this.error( req, res, regex.refused.test( e.message ) ? CODES.SERVER_UNAVAILABLE : CODES.SERVER_ERROR, e.message );
