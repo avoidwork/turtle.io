@@ -32,8 +32,7 @@
 			"text/html",
 			"text/plain",
 			"application/json"
-		],
-		"maxConnections" : 1000
+		]
 	},
 	"root"    : "",
 	"seed"    : 20110625,

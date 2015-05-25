@@ -264,5 +264,5 @@ _Object_
 ***[Required]*** Virtual hosts the server will respond for, `key` is the hostname & `value` is the directory relative to `root`.
 
 ## License
-Copyright (c) 2014 Jason Mulligan  
+Copyright (c) 2015 Jason Mulligan  
 Licensed under the BSD-3 license.
