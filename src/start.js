@@ -81,7 +81,17 @@ start ( cfg, err ) {
 				this.pipeline( req, res ).then( function ( arg ) {
 					return arg;
 				}, e => {
-					return this.error( req, res, e );
+					let body, status;
+
+					if ( isNaN( e.message ) ) {
+						body = e;
+						status = new Error( CODES.SERVER_ERROR );
+					} else {
+						body = e.extended;
+						status = e;
+					}
+
+					return this.error( req, res, status, body );
 				} ).then( () => {
 					this.log( this.prep( req, res, res._headers || {} ), "info" );
 				} );

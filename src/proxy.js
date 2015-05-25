@@ -214,7 +214,7 @@ proxy ( route, origin, host, stream=false ) {
 		obj = parsed.protocol.indexOf( "https" ) > -1 ? https : http;
 		proxyReq = obj.request( options, next );
 		proxyReq.on( "error", ( e ) => {
-			this.error( req, res, regex.refused.test( e.message ) ? CODES.SERVER_UNAVAILABLE : CODES.SERVER_ERROR );
+			this.error( req, res, regex.refused.test( e.message ) ? CODES.SERVER_UNAVAILABLE : CODES.SERVER_ERROR, e.message );
 		} );
 
 		if ( regex.body.test( req.method ) ) {

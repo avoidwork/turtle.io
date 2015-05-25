@@ -17,7 +17,7 @@ route ( args ) {
 	}
 
 	let last = ( err ) => {
-		let status;
+		let error, status;
 
 		if ( !err ) {
 			if ( regex.get.test( method ) ) {
@@ -29,7 +29,10 @@ route ( args ) {
 			}
 		} else {
 			status = res.statusCode >= CODES.BAD_REQUEST ? res.statusCode : ( !isNaN( err.message ) ? err.message : ( CODES[ ( err.message || err ).toUpperCase() ] || CODES.SERVER_ERROR ) );
-			deferred.reject( new Error( status ) );
+			error = new Error( status );
+			error.extended = isNaN( err.message ) ? err.message : undefined;
+
+			deferred.reject( error );
 		}
 	};
 
