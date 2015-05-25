@@ -25,8 +25,8 @@ let factory = function () {
 				headers.age = parseInt( new Date().getTime() / 1000 - cached.timestamp, 10 );
 				app.respond( req, res, MESSAGES.NO_CONTENT, CODES.NOT_MODIFIED, headers ).then( function () {
 					next();
-				},  function () {
-					next();
+				},  function ( e ) {
+					next( e );
 				} );
 			} else {
 				next();

@@ -189,7 +189,6 @@ describe( "Invalid Requests", function () {
 			} );
 	} );
 
-/*
 	it( "GET /././../README (404 / 'File not found')", function ( done ) {
 		request()
 			.get( "/././../README" )
@@ -202,5 +201,4 @@ describe( "Invalid Requests", function () {
 				done();
 			} );
 	} );
-*/
 } );

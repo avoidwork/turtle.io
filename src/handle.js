@@ -16,10 +16,20 @@ handle ( req, res, path, url, dir, stat ) {
 		write = allow.indexOf( dir ? "POST" : "PUT" ) > -1,
 		del = allow.indexOf( "DELETE" ) > -1,
 		method = req.method,
-		etag, headers, mimetype, modified, size;
+		etag, headers, mimetype, modified, size, pathname, invalid, out_dir, in_dir;
 
 	if ( !dir ) {
-		if ( regex.get.test( method ) ) {
+		pathname = req.parsed.pathname.replace( regex.root, "" );
+		invalid = ( pathname.replace( regex.dir, "" ).split( "/" ).filter( function ( i ) {
+			return i != ".";
+		} )[ 0 ] || "" ) === "..";
+		out_dir = !invalid ? ( pathname.match( /\.{2}\//g ) || [] ).length : 0;
+		in_dir = !invalid ? ( pathname.match( /\w+?(\.\w+|\/)+/g ) || [] ).length : 0;
+
+		// Are we still in the virtual host root?
+		if ( invalid || ( out_dir > 0 && out_dir >= in_dir ) ) {
+			deferred.reject( new Error( CODES.NOT_FOUND ) );
+		} else if ( regex.get.test( method ) ) {
 			mimetype = mime.lookup( path );
 			size = stat.size;
 			modified = stat.mtime.toUTCString();
