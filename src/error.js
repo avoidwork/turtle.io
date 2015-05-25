@@ -29,7 +29,6 @@ error ( req, res, status, msg ) {
 		}
 	}
 
-	body = this.page( status, host );
 	array.each( array.cast( CODES ), function ( i, idx ) {
 		if ( i === status ) {
 			kdx = idx;
@@ -38,17 +37,17 @@ error ( req, res, status, msg ) {
 	} );
 
 	if ( msg === undefined ) {
-		msg = kdx ? array.cast( MESSAGES )[ kdx ] : "Unknown error";
+		body = this.page( status, host );
 	}
 
 	timer.stop();
 	this.signal( "error", function () {
-		return [ req.vhost, req.parsed.path, status, msg, timer.diff() ];
+		return [ req.vhost, req.parsed.path, status, msg || kdx ? array.cast( MESSAGES )[ kdx ] : "Unknown error", timer.diff() ];
 	} );
 
-	this.respond( req, res, body, status, {
+	this.respond( req, res, msg || body, status, {
 		"cache-control": "no-cache",
-		"content-length": Buffer.byteLength( body )
+		"content-length": Buffer.byteLength( msg || body )
 	} ).then( function () {
 		deferred.resolve( true );
 	}, function () {
