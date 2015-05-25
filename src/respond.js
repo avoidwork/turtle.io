@@ -21,44 +21,39 @@ respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
 	let finalize = () => {
 		let cheaders, cached;
 
-		if ( status === CODES.NOT_MODIFIED || status < CODES.MULTIPLE_CHOICE || status >= CODES.BAD_REQUEST ) {
-			// req.parsed may not exist if coming from `error()`
-			if ( req.parsed ) {
-				if ( regex.get_only.test( req.method ) && ( status === CODES.SUCCESS || status === CODES.NOT_MODIFIED ) ) {
-					// Updating cache
-					if ( !regex.nocache.test( headers[ "cache-control" ] ) && !regex[ "private" ].test( headers[ "cache-control" ] ) ) {
-						cached = this.etags.get( req.parsed.href );
+		if ( regex.get_only.test( req.method ) && ( status === CODES.SUCCESS || status === CODES.NOT_MODIFIED ) ) {
+			// Updating cache
+			if ( !regex.nocache.test( headers[ "cache-control" ] ) && !regex[ "private" ].test( headers[ "cache-control" ] ) ) {
+				cached = this.etags.get( req.parsed.href );
 
-						if ( !cached ) {
-							if ( headers.etag === undefined ) {
-								headers.etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers[ "last-modified" ] || 0, body || 0 ) + "\"";
-							}
-
-							cheaders = clone( headers, true );
-
-							// Ensuring the content type is known
-							if ( !cheaders[ "content-type" ] ) {
-								cheaders[ "content-type" ] = mime.lookup( req.path || req.parsed.pathname );
-							}
-
-							this.register( req.parsed.href, {
-								etag: cheaders.etag.replace( /"/g, "" ),
-								headers: cheaders,
-								mimetype: cheaders[ "content-type" ],
-								timestamp: parseInt( new Date().getTime() / 1000, 10 )
-							}, true );
-						}
+				if ( !cached ) {
+					if ( headers.etag === undefined ) {
+						headers.etag = "\"" + this.etag( req.parsed.href, body.length || 0, headers[ "last-modified" ] || 0, body || 0 ) + "\"";
 					}
 
-					// Setting a watcher on the local path
-					if ( req.path ) {
-						this.watch( req.parsed.href, req.path );
+					cheaders = clone( headers, true );
+
+					// Ensuring the content type is known
+					if ( !cheaders[ "content-type" ] ) {
+						cheaders[ "content-type" ] = mime.lookup( req.path || req.parsed.pathname );
 					}
+
+					this.register( req.parsed.href, {
+						etag: cheaders.etag.replace( /"/g, "" ),
+						headers: cheaders,
+						mimetype: cheaders[ "content-type" ],
+						timestamp: parseInt( new Date().getTime() / 1000, 10 )
+					}, true );
 				}
-			} else {
-				delete headers.allow;
-				delete headers[ "access-control-allow-methods" ];
 			}
+
+			// Setting a watcher on the local path
+			if ( req.path ) {
+				this.watch( req.parsed.href, req.path );
+			}
+		} else if ( status === CODES.NOT_FOUND ) {
+			delete headers.allow;
+			delete headers[ "access-control-allow-methods" ];
 		}
 	};
 

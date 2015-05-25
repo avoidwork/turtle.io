@@ -14,11 +14,6 @@ request ( req, res ) {
 		handled = false,
 		host = req.vhost,
 		pathname = req.parsed.pathname.replace( regex.root, "" ),
-		invalid = ( pathname.replace( regex.dir, "" ).split( "/" ).filter( function ( i ) {
-				return i != ".";
-			} )[ 0 ] || "" ) === "..",
-		out_dir = !invalid ? ( pathname.match( /\.{2}\//g ) || [] ).length : 0,
-		in_dir = !invalid ? ( pathname.match( /\w+?(\.\w+|\/)+/g ) || [] ).length : 0,
 		count, lpath, nth, root;
 
 	let end = () => {
@@ -32,12 +27,6 @@ request ( req, res ) {
 	if ( req.headers.expect ) {
 		end();
 		deferred.reject( new Error( CODES.EXPECTATION_FAILED ) );
-	}
-
-	// Are we still in the virtual host root?
-	if ( invalid || ( out_dir > 0 && out_dir >= in_dir ) ) {
-		end();
-		deferred.reject( new Error( CODES.NOT_FOUND ) );
 	}
 
 	// Preparing file path
