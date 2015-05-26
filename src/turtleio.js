@@ -1005,7 +1005,7 @@ class TurtleIO {
 				hostname: parsed.hostname,
 				method: req.method,
 				path: parsed.path,
-				port: parsed.port || headerz[ "x-forwarded-proto" ] === "https" ? 443 : 80,
+				port: parsed.port || ( headerz["x-forwarded-proto"] === "https" ? 443 : 80 ),
 				agent: false
 			};
 
