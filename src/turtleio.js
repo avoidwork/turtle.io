@@ -1166,62 +1166,63 @@ class TurtleIO {
 		if ( req.headers.expect ) {
 			end();
 			deferred.reject( new Error( this.codes.EXPECTATION_FAILED ) );
-		}
+		} else {
+			// Preparing file path
+			root = path.join( this.config.root, this.config.vhosts[ host ] );
+			lpath = path.join( root, req.parsed.pathname.replace( regex.dir, "" ) );
 
-		// Preparing file path
-		root = path.join( this.config.root, this.config.vhosts[ host ] );
-		lpath = path.join( root, req.parsed.pathname.replace( regex.dir, "" ) );
-
-		// Determining if the request is valid
-		fs.lstat( lpath, ( e, stats ) => {
-			if ( e ) {
-				end();
-				deferred.reject( new Error( this.codes.NOT_FOUND ) );
-			} else if ( !stats.isDirectory() ) {
-				end();
-				this.handle( req, res, lpath, req.parsed.href, false, stats ).then( function ( arg ) {
-					deferred.resolve( arg );
-				}, function ( e ) {
-					deferred.reject( e );
-				} );
-			} else if ( regex.get.test( method ) && !regex.dir.test( req.parsed.pathname ) ) {
-				end();
-				this.respond( req, res, this.messages.NO_CONTENT, this.codes.REDIRECT, { "location": ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + req.parsed.search } ).then( function ( arg ) {
-					deferred.resolve( arg );
-				}, function ( e ) {
-					deferred.reject( e );
-				} );
-			} else if ( !regex.get.test( method ) ) {
-				end();
-				this.handle( req, res, lpath, req.parsed.href, true ).then( function ( arg ) {
-					deferred.resolve( arg );
-				}, function ( e ) {
-					deferred.reject( e );
-				} );
-			} else {
-				count = 0;
-				nth = this.config.index.length;
-
-				array.each( this.config.index, ( i ) => {
-					let npath = path.join( lpath, i );
-
-					fs.lstat( npath, ( e, stats ) => {
-						if ( !e && !handled ) {
-							handled = true;
-							end();
-							this.handle( req, res, npath, ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + i + req.parsed.search, false, stats ).then( function ( arg ) {
-								deferred.resolve( arg );
-							}, function ( e ) {
-								deferred.reject( e );
-							} );
-						} else if ( ++count === nth && !handled ) {
-							end();
-							deferred.reject( new Error( this.codes.NOT_FOUND ) );
-						}
+			// Determining if the request is valid
+			fs.lstat( lpath, ( e, stats ) => {
+				if ( e ) {
+					end();
+					deferred.reject( new Error( this.codes.NOT_FOUND ) );
+				} else if ( !stats.isDirectory() ) {
+					end();
+					this.handle( req, res, lpath, req.parsed.href, false, stats ).then( function ( arg ) {
+						deferred.resolve( arg );
+					}, function ( e ) {
+						deferred.reject( e );
 					} );
-				} );
-			}
-		} );
+				} else if ( regex.get.test( method ) && !regex.dir.test( req.parsed.pathname ) ) {
+					end();
+					this.respond( req, res, this.messages.NO_CONTENT, this.codes.REDIRECT, { "location": ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + req.parsed.search } ).then( function ( arg ) {
+						deferred.resolve( arg );
+					}, function ( e ) {
+						deferred.reject( e );
+					} );
+				} else if ( !regex.get.test( method ) ) {
+					end();
+					this.handle( req, res, lpath, req.parsed.href, true ).then( function ( arg ) {
+						deferred.resolve( arg );
+					}, function ( e ) {
+						deferred.reject( e );
+					} );
+				} else {
+					count = 0;
+					nth = this.config.index.length;
+
+					array.each( this.config.index, ( i ) => {
+						let npath = path.join( lpath, i );
+
+						fs.lstat( npath, ( e, stats ) => {
+							if ( !e && !handled ) {
+								handled = true;
+								end();
+								this.handle( req, res, npath, ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + i + req.parsed.search, false, stats ).then( function ( arg ) {
+									deferred.resolve( arg );
+								}, function ( e ) {
+									deferred.reject( e );
+								} );
+							}
+							else if ( ++count === nth && !handled ) {
+								end();
+								deferred.reject( new Error( this.codes.NOT_FOUND ) );
+							}
+						} );
+					} );
+				}
+			} );
+		}
 
 		return deferred.promise;
 	}
