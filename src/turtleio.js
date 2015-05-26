@@ -474,10 +474,6 @@ class TurtleIO {
 	 * Generates an Etag
 	 *
 	 * @method etag
-	 * @param  {String} url      URL requested
-	 * @param  {Number} size     Response size
-	 * @param  {Number} modified Modified time
-	 * @param  {Object} body     [Optional] Response body
 	 * @return {String}          Etag value
 	 */
 	etag ( ...args ) {
@@ -625,7 +621,7 @@ class TurtleIO {
 	 * @param  {Number}  status   HTTP status code, default is 200
 	 * @return {Object}           Response headers
 	 */
-	headers ( req, rHeaders={}, status ) {
+	headers ( req, rHeaders={}, status=CODES.SUCCESS ) {
 		let timer = precise().start(),
 			get = regex.get.test( req.method ),
 			headers;
@@ -1239,7 +1235,7 @@ class TurtleIO {
 	 * @param  {Boolean} file    [Optional] Indicates `body` is a file path
 	 * @return {Object}          TurtleIO instance
 	 */
-	respond ( req, res, body, status=CODES.SUCCESS, headers, file=false ) {
+	respond ( req, res, body, status=CODES.SUCCESS, headers={ "content-type": "text/plain" }, file=false ) {
 		let timer = precise().start(),
 			deferred = defer(),
 			head = regex.head.test( req.method ),
@@ -1286,7 +1282,7 @@ class TurtleIO {
 			}
 		};
 
-		headers = this.headers( req, headers || { "content-type": "text/plain" }, status );
+		headers = this.headers( req, headers, status );
 
 		if ( head ) {
 			body = this.messages.NO_CONTENT;
@@ -1590,9 +1586,9 @@ class TurtleIO {
 	 * Starts the instance
 	 *
 	 * @method start
-	 * @param  {Object}   config Configuration
-	 * @param  {Function} err    Error handler
-	 * @return {Object}          TurtleIO instance
+	 * @param  {Object}   cfg Configuration
+	 * @param  {Function} err Error handler
+	 * @return {Object}       TurtleIO instance
 	 */
 	start ( cfg, err ) {
 		let config, headers, pages;
@@ -2011,10 +2007,9 @@ class TurtleIO {
 	 * Watches `path` for changes & updated LRU
 	 *
 	 * @method watcher
-	 * @param  {String} url      LRUItem url
-	 * @param  {String} path     File path
-	 * @param  {String} mimetype Mimetype of URL
-	 * @return {Object}          TurtleIO instance
+	 * @param  {String} url  LRUItem url
+	 * @param  {String} path File path
+	 * @return {Object}      TurtleIO instance
 	 */
 	watch ( url, path ) {
 		let watcher;
