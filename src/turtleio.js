@@ -119,7 +119,7 @@ class TurtleIO {
 
 				if ( this.config.maxBytes > 0 && Buffer.byteLength( payload ) > this.config.maxBytes ) {
 					req.invalid = true;
-					deferred.reject( new Error( CODES.REQ_TOO_LARGE ) );
+					deferred.reject( new Error( this.codes.REQ_TOO_LARGE ) );
 				}
 			} );
 
@@ -182,7 +182,7 @@ class TurtleIO {
 					zlib[ sMethod ]( body, ( e, data ) => {
 						if ( e ) {
 							this.unregister( req.parsed.href );
-							deferred.reject( new Error( CODES.SERVER_ERROR ) );
+							deferred.reject( new Error( this.codes.SERVER_ERROR ) );
 						} else {
 							if ( !res._header && !res._headerSent ) {
 								headers[ "content-length" ] = data.length;
@@ -218,7 +218,7 @@ class TurtleIO {
 				// Pipe compressed asset to Client
 				fs.createReadStream( body, options ).on( "error", () => {
 					this.unregister( req.parsed.href );
-					deferred.reject( new Error( CODES.SERVER_ERROR ) );
+					deferred.reject( new Error( this.codes.SERVER_ERROR ) );
 				} ).pipe( zlib[ method ]() ).on( "close", function () {
 					deferred.resolve( true );
 				} ).pipe( res );
@@ -243,7 +243,7 @@ class TurtleIO {
 				if ( exist ) {
 					fs.lstat( fp, ( e, stats ) => {
 						if ( e ) {
-							deferred.reject( new Error( CODES.SERVER_ERROR ) );
+							deferred.reject( new Error( this.codes.SERVER_ERROR ) );
 						} else {
 							if ( !res._header && !res._headerSent ) {
 								headers[ "transfer-encoding" ] = "chunked";
@@ -258,7 +258,7 @@ class TurtleIO {
 
 							fs.createReadStream( fp, options ).on( "error", () => {
 								this.unregister( req.parsed.href );
-								deferred.reject( new Error( CODES.SERVER_ERROR ) );
+								deferred.reject( new Error( this.codes.SERVER_ERROR ) );
 							} ).on( "close", function () {
 								deferred.resolve( true );
 							} ).pipe( res );
@@ -372,7 +372,7 @@ class TurtleIO {
 
 		// Adding methods
 		res.redirect = uri => {
-			this.respond( req, res, MESSAGES.NO_CONTENT, CODES.FOUND, { location: uri } );
+			this.respond( req, res, this.messages.NO_CONTENT, this.codes.FOUND, { location: uri } );
 		};
 
 		res.respond = ( arg, status, headers ) => {
@@ -430,19 +430,19 @@ class TurtleIO {
 			body;
 
 		if ( isNaN( status ) ) {
-			status = CODES.NOT_FOUND;
+			status = this.codes.NOT_FOUND;
 
 			// If valid, determine what kind of error to respond with
 			if ( !regex.get.test( method ) ) {
 				if ( this.allowed( method, req.parsed.pathname, req.vhost ) ) {
-					status = CODES.SERVER_ERROR;
+					status = this.codes.SERVER_ERROR;
 				} else {
-					status = CODES.NOT_ALLOWED;
+					status = this.codes.NOT_ALLOWED;
 				}
 			}
 		}
 
-		array.each( array.cast( CODES ), function ( i, idx ) {
+		array.each( array.cast( this.codes ), function ( i, idx ) {
 			if ( i === status ) {
 				kdx = idx;
 				return false;
@@ -454,8 +454,8 @@ class TurtleIO {
 		}
 
 		timer.stop();
-		this.signal( "error", function () {
-			return [ req.vhost, req.parsed.path, status, msg || kdx ? array.cast( MESSAGES )[ kdx ] : "Unknown error", timer.diff() ];
+		this.signal( "error", () => {
+			return [ req.vhost, req.parsed.path, status, msg || kdx ? array.cast( this.messages )[ kdx ] : "Unknown error", timer.diff() ];
 		} );
 
 		this.respond( req, res, msg || body, status, {
@@ -514,7 +514,7 @@ class TurtleIO {
 
 			// Are we still in the virtual host root?
 			if ( invalid || ( out_dir > 0 && out_dir >= in_dir ) ) {
-				deferred.reject( new Error( CODES.NOT_FOUND ) );
+				deferred.reject( new Error( this.codes.NOT_FOUND ) );
 			} else if ( regex.get.test( method ) ) {
 				mimetype = mime.lookup( path );
 				size = stat.size;
@@ -534,20 +534,20 @@ class TurtleIO {
 
 					// Client has current version
 					if ( ( req.headers[ "if-none-match" ] === etag ) || ( !req.headers[ "if-none-match" ] && Date.parse( req.headers[ "if-modified-since" ] ) >= stat.mtime ) ) {
-						this.respond( req, res, MESSAGES.NO_CONTENT, CODES.NOT_MODIFIED, headers, true ).then( function ( arg ) {
+						this.respond( req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, headers, true ).then( function ( arg ) {
 							deferred.resolve( arg );
 						}, function ( e ) {
 							deferred.reject( e );
 						} );
 					} else {
-						this.respond( req, res, path, CODES.SUCCESS, headers, true ).then( function ( arg ) {
+						this.respond( req, res, path, this.codes.SUCCESS, headers, true ).then( function ( arg ) {
 							deferred.resolve( arg );
 						}, function ( e ) {
 							deferred.reject( e );
 						} );
 					}
 				} else {
-					this.respond( req, res, MESSAGES.NO_CONTENT, CODES.SUCCESS, headers, true ).then( function ( arg ) {
+					this.respond( req, res, this.messages.NO_CONTENT, this.codes.SUCCESS, headers, true ).then( function ( arg ) {
 						deferred.resolve( arg );
 					}, function ( e ) {
 						deferred.reject( e );
@@ -558,9 +558,9 @@ class TurtleIO {
 
 				fs.unlink( path, ( e ) => {
 					if ( e ) {
-						deferred.reject( new Error( CODES.SERVER_ERROR ) );
+						deferred.reject( new Error( this.codes.SERVER_ERROR ) );
 					} else {
-						this.respond( req, res, MESSAGES.NO_CONTENT, CODES.NO_CONTENT, {} ).then( function ( arg ) {
+						this.respond( req, res, this.messages.NO_CONTENT, this.codes.NO_CONTENT, {} ).then( function ( arg ) {
 							deferred.resolve( arg );
 						}, function ( e ) {
 							deferred.reject( e );
@@ -574,7 +574,7 @@ class TurtleIO {
 					deferred.reject( e );
 				} );
 			} else {
-				deferred.reject( new Error( CODES.SERVER_ERROR ) );
+				deferred.reject( new Error( this.codes.SERVER_ERROR ) );
 			}
 		} else {
 			if ( ( regex.post.test( method ) || regex.put.test( method ) ) && write ) {
@@ -588,9 +588,9 @@ class TurtleIO {
 
 				fs.unlink( path, e => {
 					if ( e ) {
-						deferred.reject( new Error( CODES.SERVER_ERROR ) );
+						deferred.reject( new Error( this.codes.SERVER_ERROR ) );
 					} else {
-						this.respond( req, res, MESSAGES.NO_CONTENT, CODES.NO_CONTENT, {} ).then( function ( arg ) {
+						this.respond( req, res, this.messages.NO_CONTENT, this.codes.NO_CONTENT, {} ).then( function ( arg ) {
 							deferred.resolve( arg );
 						}, function ( e ) {
 							deferred.reject( e );
@@ -598,7 +598,7 @@ class TurtleIO {
 					}
 				} );
 			} else {
-				deferred.reject( new Error( CODES.NOT_ALLOWED ) );
+				deferred.reject( new Error( this.codes.NOT_ALLOWED ) );
 			}
 		}
 
@@ -631,7 +631,7 @@ class TurtleIO {
 			headers;
 
 		// Decorating response headers
-		if ( status !== CODES.NOT_MODIFIED && status >= CODES.MULTIPLE_CHOICE && status < CODES.BAD_REQUEST ) {
+		if ( status !== this.codes.NOT_MODIFIED && status >= this.codes.MULTIPLE_CHOICE && status < this.codes.BAD_REQUEST ) {
 			headers = rHeaders;
 		} else {
 			headers = clone( this.config.headers, true );
@@ -661,7 +661,7 @@ class TurtleIO {
 			}
 
 			// Removing headers not wanted in the response
-			if ( !get || status >= CODES.BAD_REQUEST || headers["x-ratelimit-limit"] ) {
+			if ( !get || status >= this.codes.BAD_REQUEST || headers["x-ratelimit-limit"] ) {
 				delete headers[ "cache-control" ];
 				delete headers.etag;
 				delete headers[ "last-modified" ];
@@ -671,11 +671,11 @@ class TurtleIO {
 				headers[ "cache-control" ] = "no-cache";
 			}
 
-			if ( status === CODES.NOT_MODIFIED ) {
+			if ( status === this.codes.NOT_MODIFIED ) {
 				delete headers[ "last-modified" ];
 			}
 
-			if ( ( status === CODES.NOT_FOUND && headers.allow ) || status >= CODES.SERVER_ERROR ) {
+			if ( ( status === this.codes.NOT_FOUND && headers.allow ) || status >= this.codes.SERVER_ERROR ) {
 				delete headers[ "accept-ranges" ];
 			}
 
@@ -725,7 +725,7 @@ class TurtleIO {
 			e = arg instanceof Error;
 			level = level || "notice";
 
-			if ( this.config.logs.stdout && LEVELS.indexOf( level ) <= LOGLEVEL ) {
+			if ( this.config.logs.stdout && this.levels.indexOf( level ) <= LOGLEVEL ) {
 				if ( e ) {
 					console.error( "[" + moment().format( this.config.logs.time ) + "] [" + level + "] " + ( arg.stack || arg.message || arg ) );
 				} else {
@@ -861,13 +861,13 @@ class TurtleIO {
 
 			headers.server = this.config.headers.server;
 
-			if ( status >= CODES.BAD_REQUEST ) {
+			if ( status >= this.codes.BAD_REQUEST ) {
 				this.error( req, res, status, arg ).then( function ( arg ) {
 					deferred.resolve( arg );
 				} );
 			} else {
 				// Determining if the response will be cached
-				if ( get && ( status === CODES.SUCCESS || status === CODES.NOT_MODIFIED ) && !regex.nocache.test( headers[ "cache-control" ] ) && !regex[ "private" ].test( headers[ "cache-control" ] ) ) {
+				if ( get && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) && !regex.nocache.test( headers[ "cache-control" ] ) && !regex[ "private" ].test( headers[ "cache-control" ] ) ) {
 					// Determining how long rep is valid
 					if ( headers[ "cache-control" ] && regex.number.test( headers[ "cache-control" ] ) ) {
 						stale = number.parse( regex.number.exec( headers[ "cache-control" ] )[ 0 ], 10 );
@@ -884,11 +884,11 @@ class TurtleIO {
 					}
 				}
 
-				if ( status !== CODES.NOT_MODIFIED ) {
+				if ( status !== this.codes.NOT_MODIFIED ) {
 					rewrite = regex.rewrite.test( ( headers[ "content-type" ] || "" ).replace( regex.nval, "" ) );
 
 					// Setting headers
-					if ( get && status === CODES.SUCCESS ) {
+					if ( get && status === this.codes.SUCCESS ) {
 						etag = headers.etag || "\"" + this.etag( url, headers[ "content-length" ] || 0, headers[ "last-modified" ] || 0, this.encode( arg ) ) + "\"";
 
 						if ( headers.etag !== etag ) {
@@ -908,14 +908,14 @@ class TurtleIO {
 							headers.age = parseInt( new Date().getTime() / 1000 - cached.value.timestamp, 10 );
 						}
 
-						this.respond( req, res, MESSAGES.NO_CONTENT, CODES.NOT_MODIFIED, headers ).then( function ( arg ) {
+						this.respond( req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, headers ).then( function ( arg ) {
 							deferred.resolve( arg );
 						}, function ( e ) {
 							deferred.reject( e );
 						} );
 					} else {
 						if ( regex.head.test( req.method.toLowerCase() ) ) {
-							arg = MESSAGES.NO_CONTENT;
+							arg = this.messages.NO_CONTENT;
 						} else if ( rewrite ) {
 							// Changing the size of the response body
 							delete headers[ "content-length" ];
@@ -1044,7 +1044,7 @@ class TurtleIO {
 
 			proxyReq = obj.request( options, next );
 			proxyReq.on( "error", e => {
-				this.error( req, res, regex.refused.test( e.message ) ? CODES.SERVER_UNAVAILABLE : CODES.SERVER_ERROR, e.message );
+				this.error( req, res, this.codes[ regex.refused.test( e.message ) ? "SERVER_UNAVAILABLE" : "SERVER_ERROR" ], e.message );
 			} );
 
 			if ( regex.body.test( req.method ) ) {
@@ -1079,16 +1079,15 @@ class TurtleIO {
 	 * @param  {Boolean} permanent [Optional] `true` will indicate the redirection is permanent
 	 * @return {Object}            instance
 	 */
-	redirect ( route, url, host, permanent ) {
-		let code = CODES[ permanent === true ? "MOVED" : "REDIRECT" ],
-			pattern = new RegExp( "^" + route + "$" );
+	redirect ( route, url, host, permanent=false ) {
+		let pattern = new RegExp( "^" + route + "$" );
 
 		this.get( route, ( req, res ) => {
 			let rewrite = ( pattern.exec( req.url ) || [] ).length > 0;
 
-			this.respond( req, res, MESSAGES.NO_CONTENT, code, {
-				"Location": ( rewrite ? req.url.replace( pattern, url ) : url ),
-				"Cache-Control": "no-cache"
+			this.respond( req, res, this.messages.NO_CONTENT, this.codes[ permanent ? "MOVED" : "REDIRECT" ], {
+				location: rewrite ? req.url.replace( pattern, url ) : url,
+				"cache-control": "no-cache"
 			} );
 		}, host );
 
@@ -1167,7 +1166,7 @@ class TurtleIO {
 		// If an expectation can't be met, don't try!
 		if ( req.headers.expect ) {
 			end();
-			deferred.reject( new Error( CODES.EXPECTATION_FAILED ) );
+			deferred.reject( new Error( this.codes.EXPECTATION_FAILED ) );
 		}
 
 		// Preparing file path
@@ -1178,7 +1177,7 @@ class TurtleIO {
 		fs.lstat( lpath, ( e, stats ) => {
 			if ( e ) {
 				end();
-				deferred.reject( new Error( CODES.NOT_FOUND ) );
+				deferred.reject( new Error( this.codes.NOT_FOUND ) );
 			} else if ( !stats.isDirectory() ) {
 				end();
 				this.handle( req, res, lpath, req.parsed.href, false, stats ).then( function ( arg ) {
@@ -1188,7 +1187,7 @@ class TurtleIO {
 				} );
 			} else if ( regex.get.test( method ) && !regex.dir.test( req.parsed.pathname ) ) {
 				end();
-				this.respond( req, res, MESSAGES.NO_CONTENT, CODES.REDIRECT, { "Location": ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + req.parsed.search } ).then( function ( arg ) {
+				this.respond( req, res, this.messages.NO_CONTENT, this.codes.REDIRECT, { "location": ( req.parsed.pathname != "/" ? req.parsed.pathname : "" ) + "/" + req.parsed.search } ).then( function ( arg ) {
 					deferred.resolve( arg );
 				}, function ( e ) {
 					deferred.reject( e );
@@ -1218,7 +1217,7 @@ class TurtleIO {
 							} );
 						} else if ( ++count === nth && !handled ) {
 							end();
-							deferred.reject( new Error( CODES.NOT_FOUND ) );
+							deferred.reject( new Error( this.codes.NOT_FOUND ) );
 						}
 					} );
 				} );
@@ -1251,7 +1250,7 @@ class TurtleIO {
 		let finalize = () => {
 			let cheaders, cached;
 
-			if ( regex.get_only.test( req.method ) && ( status === CODES.SUCCESS || status === CODES.NOT_MODIFIED ) ) {
+			if ( regex.get_only.test( req.method ) && ( status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED ) ) {
 				// Updating cache
 				if ( !regex.nocache.test( headers[ "cache-control" ] ) && !regex[ "private" ].test( headers[ "cache-control" ] ) ) {
 					cached = this.etags.get( req.parsed.href );
@@ -1281,20 +1280,16 @@ class TurtleIO {
 				if ( req.path ) {
 					this.watch( req.parsed.href, req.path );
 				}
-			} else if ( status === CODES.NOT_FOUND ) {
+			} else if ( status === this.codes.NOT_FOUND ) {
 				delete headers.allow;
 				delete headers[ "access-control-allow-methods" ];
 			}
 		};
 
-		if ( body === null || body === undefined ) {
-			body = MESSAGES.NO_CONTENT;
-		}
-
 		headers = this.headers( req, headers || { "content-type": "text/plain" }, status );
 
 		if ( head ) {
-			body = MESSAGES.NO_CONTENT;
+			body = this.messages.NO_CONTENT;
 
 			if ( regex.options.test( req.method ) ) {
 				headers[ "content-length" ] = 0;
@@ -1303,9 +1298,11 @@ class TurtleIO {
 
 			delete headers.etag;
 			delete headers[ "last-modified" ];
+		} else if ( body === null || body === undefined ) {
+			body = this.messages.NO_CONTENT;
 		}
 
-		if ( !file && body !== MESSAGES.NO_CONTENT ) {
+		if ( !file && body !== this.messages.NO_CONTENT ) {
 			body = this.encode( body, req.headers.accept );
 
 			if ( headers[ "content-length" ] === undefined ) {
@@ -1326,7 +1323,7 @@ class TurtleIO {
 			}
 
 			// CSV hook
-			if ( regex.get_only.test( req.method ) && status === CODES.SUCCESS && body && headers[ "content-type" ] === "application/json" && req.headers.accept && regex.csv.test( string.explode( req.headers.accept )[ 0 ].replace( regex.nval, "" ) ) ) {
+			if ( regex.get_only.test( req.method ) && status === this.codes.SUCCESS && body && headers[ "content-type" ] === "application/json" && req.headers.accept && regex.csv.test( string.explode( req.headers.accept )[ 0 ].replace( regex.nval, "" ) ) ) {
 				headers[ "content-type" ] = "text/csv";
 
 				if ( !headers[ "content-disposition" ] ) {
@@ -1342,7 +1339,7 @@ class TurtleIO {
 			delete headers[ "accept-ranges" ];
 		}
 
-		if ( status === CODES.NOT_MODIFIED ) {
+		if ( status === this.codes.NOT_MODIFIED ) {
 			delete headers[ "accept-ranges" ];
 			delete headers[ "content-encoding" ];
 			delete headers[ "content-length" ];
@@ -1352,7 +1349,7 @@ class TurtleIO {
 		}
 
 		// Clean up, in case it these are still hanging around
-		if ( status === CODES.NOT_FOUND ) {
+		if ( status === this.codes.NOT_FOUND ) {
 			delete headers.allow;
 			delete headers[ "access-control-allow-methods" ];
 		}
@@ -1373,21 +1370,21 @@ class TurtleIO {
 
 			if ( isNaN( options.start ) || isNaN( options.end ) || options.start >= options.end ) {
 				delete req.headers.range;
-				return this.error( req, res, CODES.NOT_SATISFIABLE ).then( function () {
+				return this.error( req, res, this.codes.NOT_SATISFIABLE ).then( function () {
 					deferred.resolve( true );
 				}, function ( e ) {
 					deferred.reject( e );
 				} );
 			}
 
-			status = CODES.PARTIAL_CONTENT;
+			status = this.codes.PARTIAL_CONTENT;
 			headers.status = status + " " + http.STATUS_CODES[ status ];
 			headers[ "content-range" ] = "bytes " + options.start + "-" + options.end + "/" + headers[ "content-length" ];
 			headers[ "content-length" ] = number.diff( options.end, options.start ) + 1;
 		}
 
 		// Determining if response should be compressed
-		if ( ua && ( status === CODES.SUCCESS || status === CODES.PARTIAL_CONTENT ) && body !== MESSAGES.NO_CONTENT && this.config.compress && ( type = this.compression( ua, encoding, headers[ "content-type" ] ) ) && type !== null ) {
+		if ( ua && ( status === this.codes.SUCCESS || status === this.codes.PARTIAL_CONTENT ) && body !== this.messages.NO_CONTENT && this.config.compress && ( type = this.compression( ua, encoding, headers[ "content-type" ] ) ) && type !== null ) {
 			headers[ "content-encoding" ] = regex.gzip.test( type ) ? "gzip" : "deflate";
 
 			if ( file ) {
@@ -1401,7 +1398,7 @@ class TurtleIO {
 			}, function ( e ) {
 				deferred.reject( e );
 			} );
-		} else if ( ( status === CODES.SUCCESS || status === CODES.PARTIAL_CONTENT ) && file && regex.get_only.test( req.method ) ) {
+		} else if ( ( status === this.codes.SUCCESS || status === this.codes.PARTIAL_CONTENT ) && file && regex.get_only.test( req.method ) ) {
 			headers[ "transfer-encoding" ] = "chunked";
 			delete headers["content-length"];
 			finalize();
@@ -1411,7 +1408,7 @@ class TurtleIO {
 			}
 
 			fs.createReadStream( body, options ).on( "error", () => {
-				deferred.reject( new Error( CODES.SERVER_ERROR ) );
+				deferred.reject( new Error( this.codes.SERVER_ERROR ) );
 			} ).on( "close", function () {
 				deferred.resolve( true );
 			} ).pipe( res );
@@ -1422,7 +1419,7 @@ class TurtleIO {
 				res.writeHead( status, headers );
 			}
 
-			res.end( status === CODES.PARTIAL_CONTENT ? body.slice( options.start, options.end ) : body );
+			res.end( status === this.codes.PARTIAL_CONTENT ? body.slice( options.start, options.end ) : body );
 			deferred.resolve( true );
 		}
 
@@ -1471,12 +1468,12 @@ class TurtleIO {
 				if ( regex.get.test( method ) ) {
 					deferred.resolve( args );
 				} else if ( this.allowed( "get", req.parsed.pathname, req.vhost ) ) {
-					deferred.reject( new Error( CODES.NOT_ALLOWED ) );
+					deferred.reject( new Error( this.codes.NOT_ALLOWED ) );
 				} else {
-					deferred.reject( new Error( CODES.NOT_FOUND ) );
+					deferred.reject( new Error( this.codes.NOT_FOUND ) );
 				}
 			} else {
-				status = res.statusCode >= CODES.BAD_REQUEST ? res.statusCode : ( !isNaN( err.message ) ? err.message : ( CODES[ ( err.message || err ).toUpperCase() ] || CODES.SERVER_ERROR ) );
+				status = res.statusCode >= this.codes.BAD_REQUEST ? res.statusCode : ( !isNaN( err.message ) ? err.message : ( this.codes[ ( err.message || err ).toUpperCase() ] || this.codes.SERVER_ERROR ) );
 				error = new Error( status );
 				error.extended = isNaN( err.message ) ? err.message : undefined;
 
@@ -1626,7 +1623,7 @@ class TurtleIO {
 		this.config.tmp = this.config.tmp || os.tmpdir();
 
 		pages = this.config.pages ? path.join( this.config.root, this.config.pages ) : path.join( __dirname, "../pages" );
-		LOGLEVEL = LEVELS.indexOf( this.config.logs.level );
+		LOGLEVEL = this.levels.indexOf( this.config.logs.level );
 		LOGGING = this.config.logs.dtrace || this.config.logs.stdout;
 
 		// Looking for required setting
@@ -1676,7 +1673,7 @@ class TurtleIO {
 
 						if ( isNaN( e.message ) ) {
 							body = e;
-							status = new Error( CODES.SERVER_ERROR );
+							status = new Error( this.codes.SERVER_ERROR );
 						} else {
 							body = e.extended;
 							status = e;
@@ -2085,7 +2082,7 @@ class TurtleIO {
 			status;
 
 		if ( !put && regex.end_slash.test( req.url ) ) {
-			status = del ? CODES.CONFLICT : CODES.SERVER_ERROR;
+			status = this.codes[ del ? "CONFLICT" : "SERVER_ERROR" ];
 			timer.stop();
 
 			this.signal( "write", function () {
@@ -2100,21 +2097,21 @@ class TurtleIO {
 				let etag;
 
 				if ( e ) {
-					deferred.reject( new Error( CODES.NOT_FOUND ) );
+					deferred.reject( new Error( this.codes.NOT_FOUND ) );
 				} else {
 					etag = "\"" + this.etag( req.parsed.href, stat.size, stat.mtime ) + "\"";
 
 					if ( !req.headers.hasOwnProperty( "etag" ) || req.headers.etag === etag ) {
 						fs.writeFile( path, body, e => {
 							if ( e ) {
-								deferred.reject( new Error( CODES.SERVER_ERROR ) );
+								deferred.reject( new Error( this.codes.SERVER_ERROR ) );
 							} else {
-								status = put ? CODES.NO_CONTENT : CODES.CREATED;
+								status = this.codes[ put ? "NO_CONTENT" : "CREATED" ];
 								deferred.resolve( this.respond( req, res, this.page( status, this.hostname( req ) ), status, { allow: allow }, false ) );
 							}
 						} );
 					} else if ( req.headers.etag !== etag ) {
-						deferred.resolve( this.respond( req, res, MESSAGES.NO_CONTENT, CODES.FAILED, {}, false ) );
+						deferred.resolve( this.respond( req, res, this.messages.NO_CONTENT, this.codes.FAILED, {}, false ) );
 					}
 				}
 			} );
