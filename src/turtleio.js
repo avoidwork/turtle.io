@@ -999,6 +999,9 @@ class TurtleIO {
 				headerz[ "x-real-ip" ] = req.ip;
 			}
 
+			// Removing compression for rewriting
+			delete headerz[ "accept-encoding" ];
+
 			headerz.host = req.headers.host;
 			options = {
 				headers: headerz,
