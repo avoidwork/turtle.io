@@ -1,5 +1,53 @@
 # Change Log
 
+## [4.0.3](https://github.com/avoidwork/turtle.io/tree/4.0.3) (2015-05-26)
+
+[Full Changelog](https://github.com/avoidwork/turtle.io/compare/4.0.2...4.0.3)
+
+**Implemented enhancements:**
+
+- Fix file organization [\#334](https://github.com/avoidwork/turtle.io/issues/334)
+
+## [4.0.2](https://github.com/avoidwork/turtle.io/tree/4.0.2) (2015-05-25)
+
+[Full Changelog](https://github.com/avoidwork/turtle.io/compare/4.0.1...4.0.2)
+
+**Closed issues:**
+
+- Reverse proxy regression with self-signed certs [\#332](https://github.com/avoidwork/turtle.io/issues/332)
+
+## [4.0.1](https://github.com/avoidwork/turtle.io/tree/4.0.1) (2015-05-25)
+
+[Full Changelog](https://github.com/avoidwork/turtle.io/compare/4.0.0...4.0.1)
+
+## [4.0.0](https://github.com/avoidwork/turtle.io/tree/4.0.0) (2015-05-25)
+
+[Full Changelog](https://github.com/avoidwork/turtle.io/compare/3.2.18...4.0.0)
+
+**Implemented enhancements:**
+
+- I'd like to see `res.send\(\)` [\#329](https://github.com/avoidwork/turtle.io/issues/329)
+
+**Fixed bugs:**
+
+- Reverse proxy is busted [\#331](https://github.com/avoidwork/turtle.io/issues/331)
+
+## [3.2.18](https://github.com/avoidwork/turtle.io/tree/3.2.18) (2015-04-03)
+
+[Full Changelog](https://github.com/avoidwork/turtle.io/compare/3.2.17...3.2.18)
+
+## [3.2.17](https://github.com/avoidwork/turtle.io/tree/3.2.17) (2015-03-31)
+
+[Full Changelog](https://github.com/avoidwork/turtle.io/compare/3.2.16...3.2.17)
+
+## [3.2.16](https://github.com/avoidwork/turtle.io/tree/3.2.16) (2015-03-30)
+
+[Full Changelog](https://github.com/avoidwork/turtle.io/compare/3.2.15...3.2.16)
+
+## [3.2.15](https://github.com/avoidwork/turtle.io/tree/3.2.15) (2015-03-30)
+
+[Full Changelog](https://github.com/avoidwork/turtle.io/compare/3.2.14...3.2.15)
+
 ## [3.2.14](https://github.com/avoidwork/turtle.io/tree/3.2.14) (2015-03-29)
 
 [Full Changelog](https://github.com/avoidwork/turtle.io/compare/3.2.13...3.2.14)
