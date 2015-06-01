@@ -2048,7 +2048,8 @@ class TurtleIO {
 							cleanup();
 						} else if ( this.etags.cache[ url ] ) {
 							value = this.etags.cache[ url ].value;
-							value.etag = this.etag( url, stat.size, stat.mtime );
+							value.etag = this.etag( url, stat.size, stat.mtime ).toString();
+							value.headers.etag = "\"" + value.etag + "\"";
 							value.timestamp = parseInt( new Date().getTime() / 1000, 10 );
 							this.register( url, value, true );
 						} else {
