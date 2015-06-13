@@ -19,6 +19,7 @@ module.exports = function (grunt) {
 				src : [
 					"src/intro.js",
 					"src/regex.js",
+					"src/clone.js",
 					"src/codes.js",
 					"src/levels.js",
 					"src/messages.js",

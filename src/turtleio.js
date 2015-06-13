@@ -552,7 +552,7 @@ class TurtleIO {
 			} else if (regex.del.test(method) && del) {
 				this.unregister(this.url(req));
 
-				fs.unlink(fpath, (e) => {
+				fs.unlink(fpath, e => {
 					if (e) {
 						deferred.reject(new Error(this.codes.SERVER_ERROR));
 					} else {
@@ -628,7 +628,7 @@ class TurtleIO {
 		if (status !== this.codes.NOT_MODIFIED && status >= this.codes.MULTIPLE_CHOICE && status < this.codes.BAD_REQUEST) {
 			headers = rHeaders;
 		} else {
-			headers = clone(this.config.headers, true);
+			headers = clone(this.config.headers);
 			merge(headers, rHeaders);
 			headers.allow = req.allow;
 
@@ -963,7 +963,7 @@ class TurtleIO {
 			let timer = precise().start(),
 				deferred = defer(),
 				url = origin + (route !== "/" ? req.url.replace(new RegExp("^" + route), "") : req.url),
-				headerz = clone(req.headers, true),
+				headerz = clone(req.headers),
 				parsed = parse(url),
 				streamd = (stream === true),
 				mimetype = mime.lookup(!regex.ext.test(parsed.pathname) ? "index.htm" : parsed.pathname),
@@ -1054,7 +1054,7 @@ class TurtleIO {
 		};
 
 		// Setting route
-		array.each(VERBS, (i) => {
+		array.each(VERBS, i => {
 			if (route === "/") {
 				this[i]("/.*", wrapper, host);
 			} else {
@@ -1260,7 +1260,7 @@ class TurtleIO {
 							lheaders.etag = "\"" + this.etag(req.parsed.href, lbody.length || 0, lheaders["last-modified"] || 0, lbody || 0) + "\"";
 						}
 
-						cheaders = clone(lheaders, true);
+						cheaders = clone(lheaders);
 
 						// Ensuring the content type is known
 						if (!cheaders["content-type"]) {
@@ -1597,7 +1597,7 @@ class TurtleIO {
 	start (cfg, err) {
 		let config, headers, pages;
 
-		config = clone(defaultConfig, true);
+		config = clone(defaultConfig);
 
 		// Merging custom with default config
 		merge(config, cfg || {});
@@ -1605,7 +1605,7 @@ class TurtleIO {
 		this.dtp = dtrace.createDTraceProvider(config.id || "turtle-io");
 
 		// Duplicating headers for re-decoration
-		headers = clone(config.headers, true);
+		headers = clone(config.headers);
 
 		// Overriding default error handler
 		if (typeof err === "function") {
@@ -1656,7 +1656,7 @@ class TurtleIO {
 		this.probes();
 
 		// Registering virtual hosts
-		array.each(array.cast(config.vhosts, true), (i) => {
+		array.each(array.cast(config.vhosts, true), i => {
 			this.host(i);
 		});
 
@@ -1824,12 +1824,12 @@ class TurtleIO {
 		if (cached) {
 			lpath = path.join(lpath, cached.value.etag);
 			this.etags.remove(url);
-			array.each(ext, (i) => {
+			array.each(ext, i => {
 				let lfile = lpath + "." + i;
 
 				fs.exists(lfile, (exists) => {
 					if (exists) {
-						fs.unlink(lfile, (e) => {
+						fs.unlink(lfile, e => {
 							if (e) {
 								this.log(e);
 							}
@@ -1927,7 +1927,7 @@ class TurtleIO {
 	 * @return {Object}         TurtleIO instance
 	 */
 	all (route, fn, host) {
-		array.each(VERBS, (i) => {
+		array.each(VERBS, i => {
 			this.use(route, fn, host, i);
 		});
 
