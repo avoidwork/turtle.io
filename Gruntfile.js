@@ -39,6 +39,9 @@ module.exports = function (grunt) {
 				}
 			}
 		},
+		eslint: {
+			target: ["lib/<%= pkg.name %>.es6.js"]
+		},
 		mochaTest : {
 			options: {
 				reporter: "spec"
@@ -73,9 +76,10 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-mocha-test");
 	grunt.loadNpmTasks("grunt-nsp-package");
 	grunt.loadNpmTasks("grunt-babel");
+	grunt.loadNpmTasks("grunt-eslint");
 
 	// aliases
-	grunt.registerTask("test", ["mochaTest"]);
+	grunt.registerTask("test", ["eslint", "mochaTest"]);
 	grunt.registerTask("build", ["concat", "sed", "babel"]);
 	grunt.registerTask("validate", "validate-package");
 	grunt.registerTask("default", ["build", "test"]);
