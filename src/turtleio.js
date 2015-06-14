@@ -679,7 +679,7 @@ class TurtleIO {
 			}
 		}
 
-		headers.status = status + " " + http.STATUS_CODES[status];
+		headers.status = status + " " + (http.STATUS_CODES[status] || "");
 		timer.stop();
 		this.signal("headers", function () {
 			return [status, timer.diff()];
