@@ -427,9 +427,10 @@ class TurtleIO {
 			method = req.method.toLowerCase(),
 			host = req.parsed ? req.parsed.hostname : ALL,
 			kdx = -1,
-			body, lstatus;
+			lstatus = status,
+			body;
 
-		if (isNaN(status)) {
+		if (isNaN(lstatus)) {
 			lstatus = this.codes.NOT_FOUND;
 
 			// If valid, determine what kind of error to respond with
@@ -458,7 +459,7 @@ class TurtleIO {
 			return [req.vhost, req.parsed.path, lstatus, msg || kdx ? array.cast(this.messages)[kdx] : "Unknown error", timer.diff()];
 		});
 
-		this.respond(req, res, msg || body, status, {
+		this.respond(req, res, msg || body, lstatus, {
 			"cache-control": "no-cache",
 			"content-length": Buffer.byteLength(msg || body)
 		}).then(function () {
@@ -1676,7 +1677,7 @@ class TurtleIO {
 							status = new Error(this.codes.SERVER_ERROR);
 						} else {
 							body = errz.extended;
-							status = errz;
+							status = Number(errz.message);
 						}
 
 						return this.error(req, res, status, body);
