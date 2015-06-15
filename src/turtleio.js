@@ -1428,7 +1428,10 @@ class TurtleIO {
 		this.signal("respond", function () {
 			return [req.vhost, req.method, req.url, lstatus, timer.diff()];
 		});
-		this.log(this.prep(req, res, headers), "info");
+
+		process.nextTick(() => {
+			this.log(this.prep(req, res, lheaders), "info");
+		});
 
 		return deferred.promise;
 	}
@@ -1529,7 +1532,7 @@ class TurtleIO {
 		}
 
 		middleware = array.iterator(this.routes(req.parsed.pathname, req.vhost, method));
-		delay(next);
+		process.nextTick(next);
 
 		return deferred.promise;
 	}
