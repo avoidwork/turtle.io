@@ -372,21 +372,15 @@ class TurtleIO {
 
 		// Adding methods
 		res.redirect = uri => {
-			return this.respond(req, res, this.messages.NO_CONTENT, this.codes.FOUND, {location: uri}).then(() => {
-				this.log(this.prep(req, res, res._headers || {}), "info");
-			});
+			return this.respond(req, res, this.messages.NO_CONTENT, this.codes.FOUND, {location: uri});
 		};
 
 		res.respond = (arg, status, headers) => {
-			return this.respond(req, res, arg, status, headers).then(() => {
-				this.log(this.prep(req, res, res._headers || {}), "info");
-			});
+			return this.respond(req, res, arg, status, headers);
 		};
 
 		res.error = (status, arg) => {
-			return this.error(req, res, status, arg).then(() => {
-				this.log(this.prep(req, res, res._headers || {}), "info");
-			});
+			return this.error(req, res, status, arg);
 		};
 
 		deferred.resolve([req, res]);
@@ -1434,6 +1428,7 @@ class TurtleIO {
 		this.signal("respond", function () {
 			return [req.vhost, req.method, req.url, lstatus, timer.diff()];
 		});
+		this.log(this.prep(req, res, headers), "info");
 
 		return deferred.promise;
 	}
@@ -1687,8 +1682,6 @@ class TurtleIO {
 						}
 
 						return this.error(req, res, status, body);
-					}).then(() => {
-						this.log(this.prep(req, res, res._headers || {}), "info");
 					});
 				};
 
