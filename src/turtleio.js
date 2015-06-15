@@ -372,15 +372,21 @@ class TurtleIO {
 
 		// Adding methods
 		res.redirect = uri => {
-			this.respond(req, res, this.messages.NO_CONTENT, this.codes.FOUND, {location: uri});
+			return this.respond(req, res, this.messages.NO_CONTENT, this.codes.FOUND, {location: uri}).then(() => {
+				this.log(this.prep(req, res, res._headers || {}), "info");
+			});
 		};
 
 		res.respond = (arg, status, headers) => {
-			this.respond(req, res, arg, status, headers);
+			return this.respond(req, res, arg, status, headers).then(() => {
+				this.log(this.prep(req, res, res._headers || {}), "info");
+			});
 		};
 
 		res.error = (status, arg) => {
-			this.error(req, res, status, arg);
+			return this.error(req, res, status, arg).then(() => {
+				this.log(this.prep(req, res, res._headers || {}), "info");
+			});
 		};
 
 		deferred.resolve([req, res]);
