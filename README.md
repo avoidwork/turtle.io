@@ -2,7 +2,7 @@
 
 [![build status](https://secure.travis-ci.org/avoidwork/turtle.io.svg)](http://travis-ci.org/avoidwork/turtle.io) [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/avoidwork/turtle.io?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-turtle.io is an HTTP server that gets faster by learning as it handles traffic. It achieves > 99% concurrency with a higher amount of HTTP transactions/s than other popular servers.
+turtle.io is an HTTP server that gets faster by learning as it handles traffic (memoization). It achieves > 99% concurrency with a higher amount of HTTP transactions/s than other popular servers.
 
 turtle.io is very easy to get up and running! All you need to do is install it, and tell it what directory holds your web sites, & which hostnames to answer for.
 
