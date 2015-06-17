@@ -11,7 +11,16 @@ You can also create complex web applications, with a familiar API.
 ## Getting Started
 1. Install the module with: `npm install turtle.io`
 2. Create a script to load & start a server. You could use `sample.js` in the turtle.io directory (./node_modules/turtle.io) as a template, or see the examples below
-3. [Optional] Edit `config.json` in the turtle.io directory to configure server defaults; you can override defaults by passing server.start() an Object
+3. [Optional] Edit `config.json` in the turtle.io directory to configure server defaults; you can override defaults by passing `start()` an Object
+
+#### Upstart
+Use the provided upstart recipe: `sudo cp node_modules/turtle.io/turtleio.conf /etc/init & service start turtleio`
+
+#### Systemd
+Use the provided systemd service: `sudo cp node_modules/turtle.io/turtleio.service /etc/systemd/system & systemctl enable turtleio & systemctl start turtleio`
+
+#### What about Windows?
+It runs great on Windows, but you're on your own to daemonize it!
 
 ## Examples
 turtle.io requires a ***default*** virtual host to be specified, because it is the failover when a request can't be routed.
@@ -44,6 +53,8 @@ server.start(require(__dirname + "/config.json"));
 ```
 
 ## Benchmark with express.js
+`siege` was used instead of `ab` because we want to compare _accurate_ transaction rates.
+
 #### Specs
 - **Machine** MacBook Air (Early '14) / Core i7 @ 1.7Ghz / 8GB ram / 512 flash / OS X 10.10.2
 - **ulimit** 2560
@@ -86,11 +97,14 @@ server.start( {
 	}
 } );
 ```
+
 #### Transactions/s
+Transaction rates are similar.
 - **turtle.io** ```[1233.78, 1203.2, 1187.44]  (1208.14 avg)```
 - **express**   ```[1105.85, 1124.25, 1167.57] (1132.56 avg)```
 
 #### Concurrency
+`turtle.io` averages more than double the concurrent load of express.js!
 - **turtle.io** ```[99.33, 99.47, 99.57] (99.46 avg)```
 - **express**   ```[42.81, 41.2, 44.27]  (42.76 avg)```
 

@@ -1,0 +1,20 @@
+[Unit]
+Description=Job that runs the turtle.io server
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /opt/turtleio/app.js
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=turtleio
+Environment=NODE_ENV=production
+LimitFSIZE=unlimited
+LimitCPU=unlimited
+LimitAS=unlimited
+LimitNOFILE=64000
+LimitRSS=unlimited
+LimitNPROC=32000
+
+[Install]
+WantedBy=multi-user.target

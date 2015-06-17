@@ -1466,7 +1466,7 @@ class TurtleIO {
 			return arg.toString().replace(/(^.*\()|(\).*)|(\n.*)/g, "").split(",").length;
 		}
 
-		let last = (err) => {
+		let last = err => {
 			let error, status;
 
 			if (!err) {
