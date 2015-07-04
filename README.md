@@ -13,11 +13,13 @@ You can also create complex web applications, with a familiar API.
 2. Create a script to load & start a server. You could use `sample.js` in the turtle.io directory (./node_modules/turtle.io) as a template, or see the examples below
 3. [Optional] Edit `config.json` in the turtle.io directory to configure server defaults; you can override defaults by passing `start()` an Object
 
+The following examples assume you've installed turtle.io into `/opt/turtleio`, if this is not the case you need to edit the applicable file to correct the path.
+
 #### Upstart
-Use the provided upstart recipe: `sudo cp node_modules/turtle.io/turtleio.conf /etc/init & service start turtleio`
+Use the provided upstart recipe: `sudo sh -c 'cp node_modules/turtle.io/turtleio.conf /etc/init; service start turtleio;'`
 
 #### Systemd
-Use the provided systemd service: `sudo cp node_modules/turtle.io/turtleio.service /etc/systemd/system & systemctl enable turtleio & systemctl start turtleio`
+Use the provided systemd service: `sudo sh -c 'cp node_modules/turtle.io/turtleio.service /etc/systemd/system; systemctl enable turtleio; systemctl start turtleio;'`
 
 #### What about Windows?
 It runs great on Windows, but you're on your own to daemonize it!
