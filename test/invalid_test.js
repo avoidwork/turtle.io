@@ -119,6 +119,19 @@ describe( "Invalid Requests", function () {
 			} );
 	} );
 
+	it( "GET /nothere.html%3fa=b?=c (404 / 'File not found')", function ( done ) {
+		request()
+			.get( "/nothere.html%3fa=b?=c" )
+			.expectStatus( 404 )
+			.expectHeader( "status", "404 Not Found" )
+			.expectHeader( "transfer-encoding", "identity" )
+			.expectBody(/File not found/)
+			.end( function ( err ) {
+				if ( err ) throw err;
+				done();
+			} );
+	} );
+
 	// 405 is a result of a cached route that leads to a file system based 404 on GET
 	it( "POST /nothere.html (405 / 'Method not allowed')", function ( done ) {
 		request()
