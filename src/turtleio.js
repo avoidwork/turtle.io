@@ -5,7 +5,7 @@
  */
 class TurtleIO {
 	constructor () {
-		this.config = {};
+		this.config = clone(defaultConfig);
 		this.codes = CODES;
 		this.dtp = null;
 		this.etags = lru(1000);
@@ -291,7 +291,7 @@ class TurtleIO {
 	compression (agent, encoding, mimetype) {
 		let timer = precise().start(),
 			result = null,
-			encodings = typeof encoding === "string" ? string.explode(encoding) : [];
+			encodings = typeof encoding === "string" ? explode(encoding) : [];
 
 		// No soup for IE!
 		if (this.config.compress === true && regex.comp.test(mimetype) && !regex.ie.test(agent)) {
@@ -331,15 +331,15 @@ class TurtleIO {
 	decorate (req, res) {
 		let timer = precise().start(), // Assigning as early as possible
 			deferred = defer(),
-			url = this.url(req),
-			parsed = parse(url),
+			uri = this.url(req),
+			parsed = parse(uri),
 			hostname = parsed.hostname,
 			update = false;
 
 		// Decorating parsed Object on request
 		req.body = "";
 		res.header = res.setHeader;
-		req.ip = req.headers["x-forwarded-for"] ? array.last(string.explode(req.headers["x-forwarded-for"])) : req.connection.remoteAddress;
+		req.ip = req.headers["x-forwarded-for"] ? array.last(explode(req.headers["x-forwarded-for"])) : req.connection.remoteAddress;
 		res.locals = {};
 		req.parsed = parsed;
 		req.query = parsed.query;
@@ -371,8 +371,8 @@ class TurtleIO {
 		req.allow = this.allows(req.parsed.pathname, req.vhost, update);
 
 		// Adding methods
-		res.redirect = uri => {
-			return this.respond(req, res, this.messages.NO_CONTENT, this.codes.FOUND, {location: uri});
+		res.redirect = target => {
+			return this.respond(req, res, this.messages.NO_CONTENT, this.codes.FOUND, {location: target});
 		};
 
 		res.respond = (arg, status, headers) => {
@@ -488,12 +488,12 @@ class TurtleIO {
 	 * @param  {Object}  req    HTTP(S) request Object
 	 * @param  {Object}  res    HTTP(S) response Object
 	 * @param  {String}  fpath  File path
-	 * @param  {String}  url    Requested URL
+	 * @param  {String}  uri    Requested URL
 	 * @param  {Boolean} dir    `true` is `path` is a directory
 	 * @param  {Object}  stat   fs.Stat Object
 	 * @return {Object}         Promise
 	 */
-	handle (req, res, fpath, url, dir, stat) {
+	handle (req, res, fpath, uri, dir, stat) {
 		let deferred = defer(),
 			allow = req.allow,
 			write = allow.indexOf(dir ? "POST" : "PUT") > -1,
@@ -516,7 +516,7 @@ class TurtleIO {
 				mimetype = mime.lookup(fpath);
 				size = stat.size;
 				modified = stat.mtime.toUTCString();
-				etag = "\"" + this.etag(url, size, stat.mtime) + "\"";
+				etag = "\"" + this.etag(uri, size, stat.mtime) + "\"";
 				headers = {
 					allow: allow,
 					"content-length": size,
@@ -629,8 +629,7 @@ class TurtleIO {
 		if (status !== this.codes.NOT_MODIFIED && status >= this.codes.MULTIPLE_CHOICE && status < this.codes.BAD_REQUEST) {
 			headers = rHeaders;
 		} else {
-			headers = clone(this.config.headers);
-			merge(headers, rHeaders);
+			headers = merge(clone(this.config.headers), rHeaders);
 			headers.allow = req.allow;
 
 			if (!headers.date) {
@@ -843,7 +842,7 @@ class TurtleIO {
 			let deferred = defer(),
 				etag = "",
 				regexOrigin = new RegExp(origin.replace(regex.end_slash, ""), "g"),
-				url = req.parsed.href,
+				uri = req.parsed.href,
 				stale = STALE,
 				get = regex.get_only.test(req.method),
 				rewriteOrigin = req.parsed.protocol + "//" + req.parsed.host + (route === "/" ? "" : route),
@@ -865,16 +864,15 @@ class TurtleIO {
 				if (get && (status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED) && !regex.nocache.test(headers["cache-control"]) && !regex.private.test(headers["cache-control"])) {
 					// Determining how long rep is valid
 					if (headers["cache-control"] && regex.number.test(headers["cache-control"])) {
-						stale = number.parse(regex.number.exec(headers["cache-control"])[0], 10);
+						stale = parseInt(regex.number.exec(headers["cache-control"])[0], 10);
 					} else if (headers.expires !== undefined) {
-						stale = new Date(headers.expires);
-						stale = number.diff(stale, new Date());
+						stale = new Date().getTime() - new Date(headers.expires);
 					}
 
 					// Removing from LRU when invalid
 					if (stale > 0) {
 						setTimeout(() => {
-							this.unregister(url);
+							this.unregister(uri);
 						}, stale * 1000);
 					}
 				}
@@ -884,20 +882,20 @@ class TurtleIO {
 
 					// Setting headers
 					if (get && status === this.codes.SUCCESS) {
-						etag = headers.etag || "\"" + this.etag(url, headers["content-length"] || 0, headers["last-modified"] || 0, this.encode(arg)) + "\"";
+						etag = headers.etag || "\"" + this.etag(uri, headers["content-length"] || 0, headers["last-modified"] || 0, this.encode(arg)) + "\"";
 
 						if (headers.etag !== etag) {
 							headers.etag = etag;
 						}
 					}
 
-					if (headers.allow === undefined || string.isEmpty(headers.allow)) {
+					if (headers.allow === undefined || isEmpty(headers.allow)) {
 						headers.allow = headers["access-control-allow-methods"] || "GET";
 					}
 
 					// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
 					if (get && req.headers["if-none-match"] === etag) {
-						cached = this.etags.get(url);
+						cached = this.etags.get(uri);
 
 						if (cached) {
 							headers.age = parseInt(new Date().getTime() / 1000 - cached.value.timestamp, 10);
@@ -916,13 +914,13 @@ class TurtleIO {
 							delete headers["content-length"];
 
 							if (larg instanceof Array || larg instanceof Object) {
-								larg = json.encode(larg, req.headers.accept).replace(regexOrigin, rewriteOrigin);
+								larg = JSON.stringify(larg).replace(regexOrigin, rewriteOrigin);
 
 								if (route !== "/") {
 									larg = larg.replace(/"(\/[^?\/]\w+)\//g, "\"" + route + "$1/");
 								}
 
-								larg = json.decode(larg);
+								larg = JSON.parse(larg);
 							} else if (typeof larg === "string") {
 								larg = larg.replace(regexOrigin, rewriteOrigin);
 
@@ -933,7 +931,7 @@ class TurtleIO {
 							}
 						}
 
-						this.respond(req, res, arg, status, headers).then(function (argz) {
+						this.respond(req, res, larg, status, headers).then(function (argz) {
 							deferred.resolve(argz);
 						}, function (e) {
 							deferred.reject(e);
@@ -963,9 +961,9 @@ class TurtleIO {
 		let wrapper = (req, res) => {
 			let timer = precise().start(),
 				deferred = defer(),
-				url = origin + (route !== "/" ? req.url.replace(new RegExp("^" + route), "") : req.url),
+				uri = origin + (route !== "/" ? req.url.replace(new RegExp("^" + route), "") : req.url),
 				headerz = clone(req.headers),
-				parsed = parse(url),
+				parsed = parse(uri),
 				streamd = (stream === true),
 				mimetype = mime.lookup(!regex.ext.test(parsed.pathname) ? "index.htm" : parsed.pathname),
 				fn, options, proxyReq, next, obj;
@@ -1011,7 +1009,7 @@ class TurtleIO {
 				agent: false
 			};
 
-			if (!string.isEmpty(parsed.auth)) {
+			if (!isEmpty(parsed.auth)) {
 				options.auth = parsed.auth;
 			}
 
@@ -1072,19 +1070,19 @@ class TurtleIO {
 	 *
 	 * @method redirect
 	 * @param  {String}  route     Route to redirect
-	 * @param  {String}  url       URL to redirect the Client to
+	 * @param  {String}  uri       URL to redirect the Client to
 	 * @param  {String}  host      [Optional] Hostname this route is for (default is all)
 	 * @param  {Boolean} permanent [Optional] `true` will indicate the redirection is permanent
 	 * @return {Object}            instance
 	 */
-	redirect (route, url, host, permanent = false) {
+	redirect (route, uri, host, permanent = false) {
 		let pattern = new RegExp("^" + route + "$");
 
 		this.get(route, (req, res) => {
 			let rewrite = (pattern.exec(req.url) || []).length > 0;
 
 			this.respond(req, res, this.messages.NO_CONTENT, this.codes[permanent ? "MOVED" : "REDIRECT"], {
-				location: rewrite ? req.url.replace(pattern, url) : url,
+				location: rewrite ? req.url.replace(pattern, uri) : uri,
 				"cache-control": "no-cache"
 			});
 		}, host);
@@ -1096,20 +1094,20 @@ class TurtleIO {
 	 * Registers an Etag in the LRU cache
 	 *
 	 * @method register
-	 * @param  {String}  url   URL requested
+	 * @param  {String}  uri   URL requested
 	 * @param  {Object}  state Object describing state `{etag: $etag, mimetype: $mimetype}`
 	 * @param  {Boolean} stale [Optional] Remove cache from disk
 	 * @return {Object}        TurtleIO instance
 	 */
-	register (url, state, stale) {
+	register (uri, state, stale) {
 		let cached;
 
 		// Removing stale cache from disk
 		if (stale === true) {
-			cached = this.etags.cache[url];
+			cached = this.etags.cache[uri];
 
 			if (cached && cached.value.etag !== state.etag) {
-				this.unregister(url);
+				this.unregister(uri);
 			}
 		}
 
@@ -1132,7 +1130,7 @@ class TurtleIO {
 		});
 
 		// Updating LRU
-		this.etags.set(url, state);
+		this.etags.set(uri, state);
 
 		return this;
 	}
@@ -1324,7 +1322,7 @@ class TurtleIO {
 			}
 
 			// CSV hook
-			if (regex.get_only.test(req.method) && lstatus === this.codes.SUCCESS && lbody && lheaders["content-type"] === "application/json" && req.headers.accept && regex.csv.test(string.explode(req.headers.accept)[0].replace(regex.nval, ""))) {
+			if (regex.get_only.test(req.method) && lstatus === this.codes.SUCCESS && lbody && lheaders["content-type"] === "application/json" && req.headers.accept && regex.csv.test(explode(req.headers.accept)[0].replace(regex.nval, ""))) {
 				lheaders["content-type"] = "text/csv";
 
 				if (!lheaders["content-disposition"]) {
@@ -1381,7 +1379,7 @@ class TurtleIO {
 			lstatus = this.codes.PARTIAL_CONTENT;
 			lheaders.status = lstatus + " " + http.STATUS_CODES[lstatus];
 			lheaders["content-range"] = "bytes " + options.start + "-" + options.end + "/" + lheaders["content-length"];
-			lheaders["content-length"] = number.diff(options.end, options.start) + 1;
+			lheaders["content-length"] = (options.end - options.start) + 1;
 		}
 
 		// Determining if response should be compressed
@@ -1599,13 +1597,9 @@ class TurtleIO {
 	 * @param  {Function} err Error handler
 	 * @return {Object}       TurtleIO instance
 	 */
-	start (cfg, err) {
-		let config, headers, pages;
-
-		config = clone(defaultConfig);
-
-		// Merging custom with default config
-		merge(config, cfg || {});
+	start (cfg={}, err) {
+		let config = merge(clone(defaultConfig), cfg),
+			headers, pages;
 
 		this.dtp = dtrace.createDTraceProvider(config.id || "turtle-io");
 
@@ -1622,12 +1616,12 @@ class TurtleIO {
 			config.port = 8000;
 		}
 
-		merge(this.config, config);
+		this.config = merge(this.config, config);
 
 		// Setting temp folder
 		this.config.tmp = this.config.tmp || os.tmpdir();
 
-		pages = this.config.pages ? path.join(this.config.root, this.config.pages) : path.join(__dirname, "../pages");
+		pages = this.config.pages ? path.join(this.config.root, this.config.pages) : path.join(__dirname, "..", "pages");
 		LOGLEVEL = this.levels.indexOf(this.config.logs.level);
 		LOGGING = this.config.logs.dtrace || this.config.logs.stdout;
 
@@ -1647,8 +1641,8 @@ class TurtleIO {
 
 		// Setting `Server` HTTP header
 		if (!this.config.headers.server) {
-			this.config.headers.server = "turtle.io/{{VERSION}}";
-			this.config.headers["x-powered-by"] = "node.js/" + process.versions.node.replace(/^v/, "") + " " + string.capitalize(process.platform) + " V8/" + string.trim(process.versions.v8.toString());
+			this.config.headers.server = "turtle.io/" + VERSION;
+			this.config.headers["x-powered-by"] = "node.js/" + process.versions.node.replace(/^v/, "") + " " + capitalize(process.platform) + " V8/" + trim(process.versions.v8.toString());
 		}
 
 		// Creating regex.rewrite
@@ -1794,7 +1788,7 @@ class TurtleIO {
 		let port = this.config.port;
 
 		this.log("Stopping " + this.config.id + " on port " + port, "debug");
-		this.config = {};
+		this.config = clone(defaultConfig);
 		this.dtp = null;
 		this.etags = lru(1000);
 		this.pages = {all: {}};
@@ -1816,17 +1810,17 @@ class TurtleIO {
 	 * Unregisters an Etag in the LRU cache and removes stale representation from disk
 	 *
 	 * @method unregister
-	 * @param  {String} url URL requested
+	 * @param  {String} uri URL requested
 	 * @return {Object}     TurtleIO instance
 	 */
-	unregister (url) {
-		let cached = this.etags.cache[url],
+	unregister (uri) {
+		let cached = this.etags.cache[uri],
 			lpath = this.config.tmp,
 			ext = ["gz", "zz"];
 
 		if (cached) {
 			lpath = path.join(lpath, cached.value.etag);
-			this.etags.remove(url);
+			this.etags.remove(uri);
 			array.each(ext, i => {
 				let lfile = lpath + "." + i;
 
@@ -1857,11 +1851,11 @@ class TurtleIO {
 			auth = "",
 			token;
 
-		if (!string.isEmpty(header)) {
+		if (!isEmpty(header)) {
 			token = header.split(regex.space).pop() || "";
 			auth = new Buffer(token, "base64").toString();
 
-			if (!string.isEmpty(auth)) {
+			if (!isEmpty(auth)) {
 				auth += "@";
 			}
 		}
@@ -2019,11 +2013,11 @@ class TurtleIO {
 	 * Watches `path` for changes & updated LRU
 	 *
 	 * @method watcher
-	 * @param  {String} url   LRUItem url
+	 * @param  {String} uri   LRUItem url
 	 * @param  {String} fpath File path
 	 * @return {Object}       TurtleIO instance
 	 */
-	watch (url, fpath) {
+	watch (uri, fpath) {
 		let watcher;
 
 		/**
@@ -2035,7 +2029,7 @@ class TurtleIO {
 		 */
 		let cleanup = () => {
 			watcher.close();
-			this.unregister(url);
+			this.unregister(uri);
 			delete this.watching[fpath];
 		};
 
@@ -2054,12 +2048,12 @@ class TurtleIO {
 						if (e) {
 							this.log(e);
 							cleanup();
-						} else if (this.etags.cache[url]) {
-							value = this.etags.cache[url].value;
-							value.etag = this.etag(url, stat.size, stat.mtime).toString();
+						} else if (this.etags.cache[uri]) {
+							value = this.etags.cache[uri].value;
+							value.etag = this.etag(uri, stat.size, stat.mtime).toString();
 							value.headers.etag = "\"" + value.etag + "\"";
 							value.timestamp = parseInt(new Date().getTime() / 1000, 10);
-							this.register(url, value, true);
+							this.register(uri, value, true);
 						} else {
 							cleanup();
 						}
@@ -2099,7 +2093,7 @@ class TurtleIO {
 
 			deferred.resolve(this.respond(req, res, this.page(status, this.hostname(req)), status, {allow: allow}, false));
 		} else {
-			allow = array.remove(string.explode(allow), "POST").join(", ");
+			allow = array.remove(explode(allow), "POST").join(", ");
 
 			fs.lstat(fpath, (e, stat) => {
 				let etag;
