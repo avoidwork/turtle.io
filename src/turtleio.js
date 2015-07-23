@@ -5,7 +5,7 @@
  */
 class TurtleIO {
 	constructor () {
-		this.config = {};
+		this.config = clone(defaultConfig);
 		this.codes = CODES;
 		this.dtp = null;
 		this.etags = lru(1000);
@@ -629,8 +629,7 @@ class TurtleIO {
 		if (status !== this.codes.NOT_MODIFIED && status >= this.codes.MULTIPLE_CHOICE && status < this.codes.BAD_REQUEST) {
 			headers = rHeaders;
 		} else {
-			headers = clone(this.config.headers);
-			merge(headers, rHeaders);
+			headers = merge(clone(this.config.headers), rHeaders);
 			headers.allow = req.allow;
 
 			if (!headers.date) {
@@ -1598,13 +1597,11 @@ class TurtleIO {
 	 * @param  {Function} err Error handler
 	 * @return {Object}       TurtleIO instance
 	 */
-	start (cfg, err) {
+	start (cfg={}, err) {
 		let config, headers, pages;
 
-		config = clone(defaultConfig);
-
 		// Merging custom with default config
-		merge(config, cfg || {});
+		config = merge(clone(defaultConfig), cfg);
 
 		this.dtp = dtrace.createDTraceProvider(config.id || "turtle-io");
 
@@ -1621,7 +1618,7 @@ class TurtleIO {
 			config.port = 8000;
 		}
 
-		merge(this.config, config);
+		this.config = merge(this.config, config);
 
 		// Setting temp folder
 		this.config.tmp = this.config.tmp || os.tmpdir();
@@ -1646,7 +1643,7 @@ class TurtleIO {
 
 		// Setting `Server` HTTP header
 		if (!this.config.headers.server) {
-			this.config.headers.server = "turtle.io/{{VERSION}}";
+			this.config.headers.server = "turtle.io/" + VERSION;
 			this.config.headers["x-powered-by"] = "node.js/" + process.versions.node.replace(/^v/, "") + " " + capitalize(process.platform) + " V8/" + trim(process.versions.v8.toString());
 		}
 
@@ -1793,7 +1790,7 @@ class TurtleIO {
 		let port = this.config.port;
 
 		this.log("Stopping " + this.config.id + " on port " + port, "debug");
-		this.config = {};
+		this.config = clone(defaultConfig);
 		this.dtp = null;
 		this.etags = lru(1000);
 		this.pages = {all: {}};

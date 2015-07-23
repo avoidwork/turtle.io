@@ -44,7 +44,6 @@
     "grunt-eslint": "^14.0.0",
     "grunt-mocha-test": "^0.11.0",
     "grunt-nsp-package": "^0.0.5",
-    "grunt-sed": "~0.1.1",
     "hippie": "~0.3.0"
   },
   "keywords": [

@@ -51,13 +51,6 @@ module.exports = function (grunt) {
 				src : ["test/*_test.js"]
 			}
 		},
-		sed : {
-			"version" : {
-				pattern : "{{VERSION}}",
-				replacement : "<%= pkg.version %>",
-				path : ["<%= concat.dist.dest %>"]
-			}
-		},
 		watch : {
 			js : {
 				files : "<%= concat.dist.src %>",
@@ -71,7 +64,6 @@ module.exports = function (grunt) {
 	});
 
 	// tasks
-	grunt.loadNpmTasks("grunt-sed");
 	grunt.loadNpmTasks("grunt-contrib-concat");
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks("grunt-mocha-test");
@@ -81,7 +73,7 @@ module.exports = function (grunt) {
 
 	// aliases
 	grunt.registerTask("test", ["eslint", "mochaTest"]);
-	grunt.registerTask("build", ["concat", "sed", "babel"]);
+	grunt.registerTask("build", ["concat", "babel"]);
 	grunt.registerTask("validate", "validate-package");
 	grunt.registerTask("default", ["build", "test"]);
 	grunt.registerTask("package", ["validate", "default"]);
