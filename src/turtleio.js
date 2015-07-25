@@ -1598,8 +1598,10 @@ class TurtleIO {
 	 * @return {Object}       TurtleIO instance
 	 */
 	start (cfg={}, err) {
-		let config = merge(clone(defaultConfig), cfg),
-			headers, pages;
+		let config, headers, pages;
+
+		// Merging custom with default config
+		config = merge(clone(defaultConfig), cfg);
 
 		this.dtp = dtrace.createDTraceProvider(config.id || "turtle-io");
 
@@ -1621,7 +1623,7 @@ class TurtleIO {
 		// Setting temp folder
 		this.config.tmp = this.config.tmp || os.tmpdir();
 
-		pages = this.config.pages ? path.join(this.config.root, this.config.pages) : path.join(__dirname, "..", "pages");
+		pages = this.config.pages ? path.join(this.config.root, this.config.pages) : path.join(__dirname, "../pages");
 		LOGLEVEL = this.levels.indexOf(this.config.logs.level);
 		LOGGING = this.config.logs.dtrace || this.config.logs.stdout;
 
