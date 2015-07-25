@@ -63,11 +63,11 @@ function isEmpty (obj) {
 
 function iterate (obj, fn) {
 	if (obj instanceof Object) {
-		array.each(Object.keys(obj), function (i) {
+		Object.keys(obj).forEach(function (i) {
 			fn.call(obj, obj[i], i);
 		});
 	} else {
-		array.each(obj, fn);
+		obj.forEach(fn);
 	}
 }
 
@@ -76,7 +76,7 @@ function merge (a, b) {
 		d = clone(b);
 
 	if ((c instanceof Object) && (d instanceof Object)) {
-		array.each(Object.keys(d), function (i) {
+		Object.keys(d).forEach(function (i) {
 			if ((c[i] instanceof Object) && (d[i] instanceof Object)) {
 				c[i] = merge(c[i], d[i]);
 			} else if ((c[i] instanceof Array) && (d[i] instanceof Array)) {
