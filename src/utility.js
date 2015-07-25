@@ -162,7 +162,7 @@ function parse (uri) {
 	});
 
 	parsed = {
-		auth: obj.auth || "",
+		auth: "",
 		protocol: obj.protocol,
 		hostname: obj.hostname,
 		port: obj.port || "",
@@ -172,6 +172,7 @@ function parse (uri) {
 		host: obj.host
 	};
 
+	parsed.auth = obj.auth || parsed.auth;
 	parsed.href = obj.href || (parsed.protocol + "//" + (isEmpty(parsed.auth) ? "" : parsed.auth + "@") + parsed.host + parsed.pathname + parsed.search + parsed.hash);
 	parsed.path = obj.path || parsed.pathname + parsed.search;
 	parsed.query = queryString(parsed.search);
