@@ -1,6 +1,6 @@
 "use strict";
 
-let constants = require("constants"),
+const constants = require("constants"),
 	mmh3 = require("murmurhash3js").x86.hash32,
 	path = require("path"),
 	fs = require("fs"),
@@ -20,7 +20,8 @@ let constants = require("constants"),
 	Promise = require("es6-promise").Promise,
 	ALL = "all",
 	VERSION = require(path.join(__dirname, "..", "package.json")).version,
-	LOGGING = false,
-	STALE = 60000,
-	VERBS = ["delete", "get", "post", "put", "patch"],
-	LOGLEVEL;
+	VERBS = ["delete", "get", "post", "put", "patch"];
+
+let LOGLEVEL,
+	LOGGING,
+	STALE;
