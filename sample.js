@@ -11,6 +11,9 @@ server.get("/status", function (req, res) {
 server.start({
 	default: "test",
 	root: path.join(__dirname, "sites"),
+	logs: {
+		stdout: true
+	},
 	vhosts: {
 		test: "test"
 	}

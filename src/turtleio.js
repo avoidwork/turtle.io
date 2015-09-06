@@ -275,12 +275,11 @@ class TurtleIO {
 	 */
 	compression (agent, encoding, mimetype) {
 		let timer = precise().start(),
-			result = null,
+			result = "",
 			encodings = typeof encoding === "string" ? utility.explode(encoding) : [];
 
 		// No soup for IE!
 		if (this.config.compress === true && regex.comp.test(mimetype) && !regex.ie.test(agent)) {
-			// Iterating supported encodings
 			array.each(encodings, function (i) {
 				if (regex.gzip.test(i)) {
 					result = "gz";
@@ -290,8 +289,7 @@ class TurtleIO {
 					result = "zz";
 				}
 
-				// Found a supported encoding
-				if (result !== null) {
+				if (!utility.isEmpty(result)) {
 					return false;
 				}
 			});
@@ -1365,7 +1363,7 @@ class TurtleIO {
 		}
 
 		// Determining if response should be compressed
-		if (ua && (lstatus === this.codes.OK || lstatus === this.codes.PARTIAL_CONTENT) && lbody !== this.messages.NO_CONTENT && this.config.compress && (type = this.compression(ua, encoding, lheaders["content-type"])) && type !== null) {
+		if (ua && (lstatus === this.codes.OK || lstatus === this.codes.PARTIAL_CONTENT) && lbody !== this.messages.NO_CONTENT && this.config.compress && (type = this.compression(ua, encoding, lheaders["content-type"])) && !utility.isEmpty(type)) {
 			lheaders["content-encoding"] = regex.gzip.test(type) ? "gzip" : "deflate";
 
 			if (file) {
@@ -1446,8 +1444,7 @@ class TurtleIO {
 		}
 
 		let last = err => {
-			let errorCode = !isNaN(err.message) ? err.message : this.codes[(err.message || err).toUpperCase()] || this.codes.SERVER_ERROR,
-				error, status;
+			let errorCode, error, status;
 
 			if (!err) {
 				if (regex.get.test(method)) {
@@ -1458,6 +1455,7 @@ class TurtleIO {
 					deferred.reject(new Error(this.codes.NOT_FOUND));
 				}
 			} else {
+				errorCode = !isNaN(err.message) ? err.message : this.codes[(err.message || err).toUpperCase()] || this.codes.SERVER_ERROR;
 				status = res.statusCode >= this.codes.BAD_REQUEST ? res.statusCode : errorCode;
 				error = new Error(status);
 				error.extended = isNaN(err.message) ? err.message : undefined;
@@ -1580,7 +1578,7 @@ class TurtleIO {
 	 * @param  {Function} err Error handler
 	 * @return {Object}       TurtleIO instance
 	 */
-	start (cfg = {}, err) {
+	start (cfg = {}, err = undefined) {
 		let config = utility.merge(utility.clone(defaultConfig), cfg),
 			headers, pages;
 
@@ -1710,55 +1708,6 @@ class TurtleIO {
 		});
 
 		return this;
-	}
-
-	/**
-	 * Returns an Object describing the instance's status
-	 *
-	 * @method status
-	 * @public
-	 * @return {Object} Status
-	 */
-	status () {
-		let timer = precise().start(),
-			ram = process.memoryUsage(),
-			uptime = process.uptime(),
-			state = {config: {}, etags: {}, process: {}, server: {}},
-			invalid = /^(auth|session|ssl)$/;
-
-		// Startup parameters
-		utility.iterate(this.config, function (v, k) {
-			if (!invalid.test(k)) {
-				state.config[k] = v;
-			}
-		});
-
-		// Process information
-		state.process = {
-			memory: ram,
-			pid: process.pid
-		};
-
-		// Server information
-		state.server = {
-			address: this.server.address(),
-			uptime: uptime
-		};
-
-		// LRU cache
-		state.etags = {
-			items: this.etags.length,
-			bytes: Buffer.byteLength(array.cast(this.etags.cache).map(function (i) {
-				return i.value;
-			}).join(""))
-		};
-
-		timer.stop();
-		this.signal("status", function () {
-			return [state.server.connections, uptime, ram.heapUsed, ram.heapTotal, timer.diff()];
-		});
-
-		return state;
 	}
 
 	/**
@@ -2001,8 +1950,6 @@ class TurtleIO {
 	 * @return {Object}       TurtleIO instance
 	 */
 	watch (uri, fpath) {
-		let watcher;
-
 		/**
 		 * Cleans up caches
 		 *
@@ -2011,17 +1958,13 @@ class TurtleIO {
 		 * @return {Undefined} undefined
 		 */
 		let cleanup = () => {
-			watcher.close();
+			this.watching[fpath].close();
 			this.unregister(uri);
 			delete this.watching[fpath];
 		};
 
 		if (this.watching[fpath] === undefined) {
-			// Tracking
-			this.watching[fpath] = 1;
-
-			// Watching path for changes
-			watcher = fs.watch(fpath, ev => {
+			this.watching[fpath] = fs.watch(fpath, ev => {
 				if (regex.rename.test(ev)) {
 					cleanup();
 				} else {
