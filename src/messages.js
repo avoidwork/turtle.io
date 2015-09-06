@@ -1,7 +1,7 @@
 const messages = {
 	CONTINUE: "Continue",
 	SWITCH_PROTOCOL: "Switching protocols",
-	SUCCESS: "Success",
+	OK: "OK",
 	CREATED: "Created",
 	ACCEPTED: "Accepted",
 	NON_AUTHORITATIVE: "Non-Authoritative Information",

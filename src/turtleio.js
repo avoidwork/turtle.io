@@ -522,14 +522,14 @@ class TurtleIO {
 							});
 							break;
 						default:
-							this.respond(req, res, fpath, this.codes.SUCCESS, headers, true).then(function (arg) {
+							this.respond(req, res, fpath, this.codes.OK, headers, true).then(function (arg) {
 								deferred.resolve(arg);
 							}, function (e) {
 								deferred.reject(e);
 							});
 					}
 				} else {
-					this.respond(req, res, this.messages.NO_CONTENT, this.codes.SUCCESS, headers, true).then(function (arg) {
+					this.respond(req, res, this.messages.NO_CONTENT, this.codes.OK, headers, true).then(function (arg) {
 						deferred.resolve(arg);
 					}, function (e) {
 						deferred.reject(e);
@@ -605,7 +605,7 @@ class TurtleIO {
 	 * @param  {Number}  status   HTTP status code, default is 200
 	 * @return {Object}           Response headers
 	 */
-	headers (req, lRHeaders = {}, status = codes.SUCCESS) {
+	headers (req, lRHeaders = {}, status = codes.OK) {
 		let timer = precise().start(),
 			rHeaders = utility.clone(lRHeaders),
 			lheaders;
@@ -670,7 +670,7 @@ class TurtleIO {
 			}
 		}
 
-		lheaders.status = status + " " + (http.STATUS_codes[status] || "");
+		lheaders.status = status + " " + (http.STATUS_CODES[status] || "");
 
 		timer.stop();
 		this.signal("headers", function () {
@@ -842,7 +842,7 @@ class TurtleIO {
 				});
 			} else {
 				// Determining if the response will be cached
-				if (get && (status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED) && !regex.nocache.test(headers["cache-control"]) && !regex.private.test(headers["cache-control"])) {
+				if (get && (status === this.codes.OK || status === this.codes.NOT_MODIFIED) && !regex.nocache.test(headers["cache-control"]) && !regex.private.test(headers["cache-control"])) {
 					// Determining how long rep is valid
 					if (headers["cache-control"] && regex.number.test(headers["cache-control"])) {
 						lstale = parseInt(regex.number.exec(headers["cache-control"])[0], 10);
@@ -862,7 +862,7 @@ class TurtleIO {
 					rewrite = regex.rewrite.test((headers["content-type"] || "").replace(regex.nval, ""));
 
 					// Setting headers
-					if (get && status === this.codes.SUCCESS) {
+					if (get && status === this.codes.OK) {
 						letag = headers.etag || "\"" + this.etag(uri, headers["content-length"] || 0, headers["last-modified"] || 0, this.encode(arg)) + "\"";
 
 						if (headers.etag !== letag) {
@@ -1216,7 +1216,7 @@ class TurtleIO {
 	 * @param  {Boolean} file    [Optional] Indicates `body` is a file path
 	 * @return {Object}          TurtleIO instance
 	 */
-	respond (req, res, body, status = codes.SUCCESS, headers = {"content-type": "text/plain"}, file = false) {
+	respond (req, res, body, status = codes.OK, headers = {"content-type": "text/plain"}, file = false) {
 		let timer = precise().start(),
 			deferred = defer(),
 			head = regex.head.test(req.method),
@@ -1230,7 +1230,7 @@ class TurtleIO {
 		let finalize = () => {
 			let cheaders, cached;
 
-			if (regex.get_only.test(req.method) && (lstatus === this.codes.SUCCESS || lstatus === this.codes.NOT_MODIFIED)) {
+			if (regex.get_only.test(req.method) && (lstatus === this.codes.OK || lstatus === this.codes.NOT_MODIFIED)) {
 				// Updating cache
 				if (!regex.nocache.test(lheaders["cache-control"]) && !regex.private.test(lheaders["cache-control"])) {
 					cached = this.etags.get(req.parsed.href);
@@ -1303,7 +1303,7 @@ class TurtleIO {
 			}
 
 			// CSV hook
-			if (regex.get_only.test(req.method) && lstatus === this.codes.SUCCESS && lbody && lheaders["content-type"] === "application/json" && req.headers.accept && regex.csv.test(utility.explode(req.headers.accept)[0].replace(regex.nval, ""))) {
+			if (regex.get_only.test(req.method) && lstatus === this.codes.OK && lbody && lheaders["content-type"] === "application/json" && req.headers.accept && regex.csv.test(utility.explode(req.headers.accept)[0].replace(regex.nval, ""))) {
 				lheaders["content-type"] = "text/csv";
 
 				if (!lheaders["content-disposition"]) {
@@ -1365,7 +1365,7 @@ class TurtleIO {
 		}
 
 		// Determining if response should be compressed
-		if (ua && (lstatus === this.codes.SUCCESS || lstatus === this.codes.PARTIAL_CONTENT) && lbody !== this.messages.NO_CONTENT && this.config.compress && (type = this.compression(ua, encoding, lheaders["content-type"])) && type !== null) {
+		if (ua && (lstatus === this.codes.OK || lstatus === this.codes.PARTIAL_CONTENT) && lbody !== this.messages.NO_CONTENT && this.config.compress && (type = this.compression(ua, encoding, lheaders["content-type"])) && type !== null) {
 			lheaders["content-encoding"] = regex.gzip.test(type) ? "gzip" : "deflate";
 
 			if (file) {
@@ -1379,7 +1379,7 @@ class TurtleIO {
 			}, function (e) {
 				deferred.reject(e);
 			});
-		} else if ((lstatus === this.codes.SUCCESS || lstatus === this.codes.PARTIAL_CONTENT) && file && regex.get_only.test(req.method)) {
+		} else if ((lstatus === this.codes.OK || lstatus === this.codes.PARTIAL_CONTENT) && file && regex.get_only.test(req.method)) {
 			lheaders["transfer-encoding"] = "chunked";
 			delete lheaders["content-length"];
 			finalize();

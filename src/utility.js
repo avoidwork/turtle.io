@@ -162,6 +162,7 @@ module.exports = {
 	capitalize: capitalize,
 	clone: clone,
 	coerce: coerce,
+	explode: explode,
 	isEmpty: isEmpty,
 	iterate: iterate,
 	merge: merge,
