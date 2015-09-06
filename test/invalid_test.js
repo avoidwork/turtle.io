@@ -1,24 +1,24 @@
-var hippie = require( "hippie" ),
-	turtleio = require( "../lib/turtle.io" ),
+var hippie = require("hippie"),
+	path = require("path"),
+	turtleio = require(path.join("..", "lib", "index.js")),
 	etag = "";
 
 function request () {
 	return hippie().base( "http://localhost:8002" );
 }
 
-turtleio().start( {
+turtleio().start({
 	default: "test",
-	root: __dirname + "/../sites",
+	root: path.join(__dirname, "..", "sites"),
 	port: 8002,
 	logs: {
 		stdout: false,
-		dtrace: true,
-		syslog: false
+		dtrace: true
 	},
 	vhosts: {
 		"test": "test"
 	}
-} );
+});
 
 describe( "Invalid Requests", function () {
 	it( "GET / (416 / 'Partial response - invalid')", function ( done ) {

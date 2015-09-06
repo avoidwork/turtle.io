@@ -1,8 +1,8 @@
 const path = require("path");
-const utility = require(path.join(__dirname, "lib", "utility.js"));
-const regex = require(path.join(__dirname, "lib", "regex.js"));
-const messages = require(path.join(__dirname, "lib", "messages.js"));
-const codes = require(path.join(__dirname, "lib", "codes.js"));
+const utility = require(path.join(__dirname, "utility.js"));
+const regex = require(path.join(__dirname, "regex.js"));
+const messages = require(path.join(__dirname, "messages.js"));
+const codes = require(path.join(__dirname, "codes.js"));
 
 function connect (req, res, next) {
 	let server = req.server,

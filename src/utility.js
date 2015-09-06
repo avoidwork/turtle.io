@@ -1,6 +1,6 @@
 const path = require("path");
 const array = require("retsu");
-const regex = require(path.join(__dirname, "lib", "regex.js"));
+const regex = require(path.join(__dirname, "regex.js"));
 const url = require("url");
 
 function trim (obj) {
