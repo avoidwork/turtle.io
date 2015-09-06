@@ -134,7 +134,7 @@ function queryString (qstring = "") {
 
 function parse (uri) {
 	let luri = uri;
-	let idxAscii, idxQ, parsed, obj;
+	let idxAscii, idxQ, parsed;
 
 	if (luri === undefined || luri === null) {
 		luri = "";
@@ -152,28 +152,8 @@ function parse (uri) {
 		}
 	}
 
-	obj = url.parse(luri);
-
-	iterate(obj, function (v, k) {
-		if (v === null) {
-			obj[k] = undefined;
-		}
-	});
-
-	parsed = {
-		auth: obj.auth || "",
-		protocol: obj.protocol,
-		hostname: obj.hostname,
-		port: obj.port || "",
-		pathname: obj.pathname,
-		search: obj.search,
-		hash: obj.hash || "",
-		host: obj.host
-	};
-
-	parsed.href = obj.href || (parsed.protocol + "//" + (isEmpty(parsed.auth) ? "" : parsed.auth + "@") + parsed.host + parsed.pathname + parsed.search + parsed.hash);
-	parsed.path = obj.path || parsed.pathname + parsed.search;
-	parsed.query = queryString(parsed.search);
+	parsed = url.parse(luri);
+	parsed.query = parsed.search ? queryString(parsed.search) : {};
 
 	return parsed;
 }
