@@ -2,7 +2,6 @@ const constants = require("constants"),
 	mmh3 = require("murmurhash3js").x86.hash32,
 	path = require("path"),
 	fs = require("fs"),
-	url = require("url"),
 	http = require("http"),
 	https = require("https"),
 	mime = require("mime"),
@@ -14,7 +13,7 @@ const constants = require("constants"),
 	array = require("retsu"),
 	csv = require("csv.js"),
 	lru = require("tiny-lru"),
-	Promise = require("es6-promise").Promise,
+	defer = require("tiny-defer"),
 	levels = require(path.join(__dirname, "lib", "levels.js")),
 	messages = require(path.join(__dirname, "lib", "messages.js")),
 	codes = require(path.join(__dirname, "lib", "codes.js")),
@@ -188,7 +187,7 @@ class TurtleIO {
 
 							timer.stop();
 							this.signal("compress", function () {
-								return [etag, fp || "dynamic", timer.diff()];
+								return [letag, fp || "dynamic", timer.diff()];
 							});
 							deferred.resolve(true);
 						}
@@ -250,7 +249,7 @@ class TurtleIO {
 							}).pipe(res);
 							timer.stop();
 							this.signal("compress", function () {
-								return [etag, fp, timer.diff()];
+								return [letag, fp, timer.diff()];
 							});
 						}
 					});
@@ -324,7 +323,7 @@ class TurtleIO {
 		// Decorating parsed Object on request
 		req.body = "";
 		res.header = res.setHeader;
-		req.ip = req.headers["x-forwarded-for"] ? array.last(explode(req.headers["x-forwarded-for"])) : req.connection.remoteAddress;
+		req.ip = req.headers["x-forwarded-for"] ? array.last(utility.explode(req.headers["x-forwarded-for"])) : req.connection.remoteAddress;
 		res.locals = {};
 		req.parsed = parsed;
 		req.query = parsed.query;
@@ -978,7 +977,7 @@ class TurtleIO {
 				agent: false
 			};
 
-			if (!isEmpty(parsed.auth)) {
+			if (!utility.isEmpty(parsed.auth)) {
 				options.auth = parsed.auth;
 			}
 
@@ -1204,7 +1203,7 @@ class TurtleIO {
 	 * @param  {Boolean} file    [Optional] Indicates `body` is a file path
 	 * @return {Object}          TurtleIO instance
 	 */
-	respond (req, res, body, status=codes.SUCCESS, headers={"content-type": "text/plain"}, file=false) {
+	respond (req, res, body, status = codes.SUCCESS, headers = {"content-type": "text/plain"}, file = false) {
 		let timer = precise().start(),
 			deferred = defer(),
 			head = regex.head.test(req.method),
@@ -1291,7 +1290,7 @@ class TurtleIO {
 			}
 
 			// CSV hook
-			if (regex.get_only.test(req.method) && lstatus === this.codes.SUCCESS && lbody && lheaders["content-type"] === "application/json" && req.headers.accept && regex.csv.test(explode(req.headers.accept)[0].replace(regex.nval, ""))) {
+			if (regex.get_only.test(req.method) && lstatus === this.codes.SUCCESS && lbody && lheaders["content-type"] === "application/json" && req.headers.accept && regex.csv.test(utility.explode(req.headers.accept)[0].replace(regex.nval, ""))) {
 				lheaders["content-type"] = "text/csv";
 
 				if (!lheaders["content-disposition"]) {
@@ -1517,17 +1516,17 @@ class TurtleIO {
 	routes (uri, host, method, override = false) {
 		let id = method + ":" + host + ":" + uri,
 			cached = !override ? this.routeCache.get(id) : undefined,
-			all, h, result;
+			lall, h, result;
 
 		if (cached) {
 			return cached;
 		}
 
-		all = this.middleware.all || {};
+		lall = this.middleware.all || {};
 		h = this.middleware[host] || {};
 		result = [];
 
-		array.each([all.all, all[method], h.all, h[method]], function (c) {
+		array.each([lall.all, lall[method], h.all, h[method]], function (c) {
 			if (c) {
 				array.each(array.keys(c).filter(function (i) {
 					return new RegExp("^" + i + "$", "i").test(uri);
@@ -1566,7 +1565,7 @@ class TurtleIO {
 	 * @param  {Function} err Error handler
 	 * @return {Object}       TurtleIO instance
 	 */
-	start (cfg={}, err) {
+	start (cfg = {}, err) {
 		let config = utility.merge(utility.clone(defaultConfig), cfg),
 			headers, pages;
 
@@ -1604,7 +1603,7 @@ class TurtleIO {
 		delete this.config.headers;
 		this.config.headers = {};
 
-		iterate(headers, (value, key) => {
+		utility.iterate(headers, (value, key) => {
 			this.config.headers[key.toLowerCase()] = value;
 		});
 
@@ -1618,7 +1617,7 @@ class TurtleIO {
 		regex.rewrite = new RegExp("^(" + this.config.proxy.rewrite.join("|") + ")$");
 
 		// Setting default routes
-		this.host(ALL);
+		this.host(all);
 
 		// Registering DTrace probes
 		this.probes();
@@ -1667,7 +1666,7 @@ class TurtleIO {
 						this.config.ssl.key = fs.readFileSync(this.config.ssl.key);
 
 						// Starting server
-						this.server = https.createServer(merge(this.config.ssl, {
+						this.server = https.createServer(utility.merge(this.config.ssl, {
 							port: this.config.port,
 							host: this.config.address,
 							secureProtocol: this.config.secureProtocol,
@@ -1713,7 +1712,7 @@ class TurtleIO {
 			invalid = /^(auth|session|ssl)$/;
 
 		// Startup parameters
-		iterate(this.config, function (v, k) {
+		utility.iterate(this.config, function (v, k) {
 			if (!invalid.test(k)) {
 				state.config[k] = v;
 			}
@@ -1820,11 +1819,11 @@ class TurtleIO {
 			auth = "",
 			token;
 
-		if (!isEmpty(header)) {
+		if (!utility.isEmpty(header)) {
 			token = header.split(regex.space).pop() || "";
 			auth = new Buffer(token, "base64").toString();
 
-			if (!isEmpty(auth)) {
+			if (!utility.isEmpty(auth)) {
 				auth += "@";
 			}
 		}
@@ -2062,7 +2061,7 @@ class TurtleIO {
 
 			deferred.resolve(this.respond(req, res, this.page(status, this.hostname(req)), status, {allow: allow}, false));
 		} else {
-			allow = array.remove(explode(allow), "POST").join(", ");
+			allow = array.remove(utility.explode(allow), "POST").join(", ");
 
 			fs.lstat(fpath, (e, stat) => {
 				let letag;
@@ -2096,3 +2095,5 @@ class TurtleIO {
 		return deferred.promise;
 	}
 }
+
+module.exports = TurtleIO;
