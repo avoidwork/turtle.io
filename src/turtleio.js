@@ -490,7 +490,9 @@ class TurtleIO {
 			in_dir = !invalid ? (pathname.match(/\w+?(\.\w+|\/)+/g) || []).length : 0;
 
 			// Are we still in the virtual host root?
-			if (invalid || (out_dir > 0 && out_dir >= in_dir)) {
+			if (invalid) {
+				deferred.reject(new Error(this.codes.NOT_FOUND));
+			} else if (out_dir > 0 && out_dir >= in_dir) {
 				deferred.reject(new Error(this.codes.NOT_FOUND));
 			} else if (regex.get.test(method)) {
 				mimetype = mime.lookup(fpath);
@@ -510,18 +512,21 @@ class TurtleIO {
 					req.path = fpath;
 
 					// Client has current version
-					if ((req.headers["if-none-match"] === letag) || (!req.headers["if-none-match"] && Date.parse(req.headers["if-modified-since"]) >= stat.mtime)) {
-						this.respond(req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, headers, true).then(function (arg) {
-							deferred.resolve(arg);
-						}, function (e) {
-							deferred.reject(e);
-						});
-					} else {
-						this.respond(req, res, fpath, this.codes.SUCCESS, headers, true).then(function (arg) {
-							deferred.resolve(arg);
-						}, function (e) {
-							deferred.reject(e);
-						});
+					switch (true) {
+						case req.headers["if-none-match"] === letag:
+						case !req.headers["if-none-match"] && Date.parse(req.headers["if-modified-since"]) >= stat.mtime:
+							this.respond(req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, headers, true).then(function (arg) {
+								deferred.resolve(arg);
+							}, function (e) {
+								deferred.reject(e);
+							});
+							break;
+						default:
+							this.respond(req, res, fpath, this.codes.SUCCESS, headers, true).then(function (arg) {
+								deferred.resolve(arg);
+							}, function (e) {
+								deferred.reject(e);
+							});
 					}
 				} else {
 					this.respond(req, res, this.messages.NO_CONTENT, this.codes.SUCCESS, headers, true).then(function (arg) {
@@ -652,7 +657,11 @@ class TurtleIO {
 				delete lheaders["last-modified"];
 			}
 
-			if ((status === this.codes.NOT_FOUND && lheaders.allow) || status >= this.codes.SERVER_ERROR) {
+			if (status === this.codes.NOT_FOUND && lheaders.allow) {
+				delete lheaders["accept-ranges"];
+			}
+
+			if (status >= this.codes.SERVER_ERROR) {
 				delete lheaders["accept-ranges"];
 			}
 
@@ -744,13 +753,17 @@ class TurtleIO {
 	 */
 	prep (req, res, headers) {
 		let msg = this.config.logs.format,
-			user = req.parsed ? (req.parsed.auth.split(":")[0] || "-") : "-";
+			user = "-";
+
+		if (req.parsed.auth && req.parsed.auth.indexOf(":") > -1) {
+			user = req.parsed.auth.split(":")[0] || "-";
+		}
 
 		msg = msg.replace("%v", req.headers.host)
 			.replace("%h", req.ip || "-")
 			.replace("%l", "-")
 			.replace("%u", user)
-			.replace("%t", ("[" + moment().format(this.config.logs.time) + "]"))
+			.replace("%t", "[" + moment().format(this.config.logs.time) + "]")
 			.replace("%r", req.method + " " + req.url + " HTTP/1.1")
 			.replace("%>s", res.statusCode)
 			.replace("%b", headers["content-length"] || "-")
@@ -893,7 +906,7 @@ class TurtleIO {
 								larg = larg.replace(regexOrigin, rewriteOrigin);
 
 								if (route !== "/") {
-									larg = larg.replace(/(href|src)=("|')([^http|mailto|<|_|\s|\/\/].*?)("|')/g, ("$1=$2" + route + "/$3$4"))
+									larg = larg.replace(/(href|src)=("|')([^http|mailto|<|_|\s|\/\/].*?)("|')/g, "$1=$2" + route + "/$3$4")
 										.replace(new RegExp(route + "//", "g"), route + "/");
 								}
 							}
@@ -932,7 +945,7 @@ class TurtleIO {
 				uri = origin + (route !== "/" ? req.url.replace(new RegExp("^" + route), "") : req.url),
 				headerz = utility.clone(req.headers),
 				parsed = utility.parse(uri),
-				streamd = (stream === true),
+				streamd = stream === true,
 				mimetype = mime.lookup(!regex.ext.test(parsed.pathname) ? "index.htm" : parsed.pathname),
 				fn, options, proxyReq, next, obj;
 
@@ -1347,7 +1360,8 @@ class TurtleIO {
 			lstatus = this.codes.PARTIAL_CONTENT;
 			lheaders.status = lstatus + " " + http.STATUS_codes[lstatus];
 			lheaders["content-range"] = "bytes " + options.start + "-" + options.end + "/" + lheaders["content-length"];
-			lheaders["content-length"] = (options.end - options.start) + 1;
+			lheaders["content-length"] = options.end - options.start;
+			++lheaders["content-length"];
 		}
 
 		// Determining if response should be compressed
@@ -1432,7 +1446,8 @@ class TurtleIO {
 		}
 
 		let last = err => {
-			let error, status;
+			let errorCode = !isNaN(err.message) ? err.message : this.codes[(err.message || err).toUpperCase()] || this.codes.SERVER_ERROR,
+				error, status;
 
 			if (!err) {
 				if (regex.get.test(method)) {
@@ -1443,7 +1458,7 @@ class TurtleIO {
 					deferred.reject(new Error(this.codes.NOT_FOUND));
 				}
 			} else {
-				status = res.statusCode >= this.codes.BAD_REQUEST ? res.statusCode : (!isNaN(err.message) ? err.message : (this.codes[(err.message || err).toUpperCase()] || this.codes.SERVER_ERROR));
+				status = res.statusCode >= this.codes.BAD_REQUEST ? res.statusCode : errorCode;
 				error = new Error(status);
 				error.extended = isNaN(err.message) ? err.message : undefined;
 
@@ -2001,7 +2016,7 @@ class TurtleIO {
 			delete this.watching[fpath];
 		};
 
-		if (!(this.watching[fpath])) {
+		if (this.watching[fpath] === undefined) {
 			// Tracking
 			this.watching[fpath] = 1;
 
