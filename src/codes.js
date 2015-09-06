@@ -1,6 +1,4 @@
-"use strict";
-
-var codes = {
+const codes = {
 	CONTINUE: 100,
 	SWITCH_PROTOCOL: 101,
 	SUCCESS: 200,

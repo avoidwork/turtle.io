@@ -1,6 +1,4 @@
-"use strict";
-
-var regex = {
+const regex = {
 	body: /^(put|post|patch)$/i,
 	comp: /javascript|json|text|xml/,
 	csv: /text\/csv/,

@@ -1,6 +1,4 @@
-"use strict";
-
-var messages = {
+const messages = {
 	CONTINUE: "Continue",
 	SWITCH_PROTOCOL: "Switching protocols",
 	SUCCESS: "Success",

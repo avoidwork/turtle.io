@@ -1,8 +1,21 @@
 module.exports = function (grunt) {
 	grunt.initConfig({
-		pkg : grunt.file.readJSON("package.json"),
+		babel: {
+			options: {
+				sourceMap: false
+			},
+			dist: {
+				files: [{
+					expand: true,
+					cwd: 'src',
+					src: ['*.js'],
+					dest: 'lib',
+					ext: '.js'
+				}]
+			}
+		},
 		eslint: {
-			target: ["lib/<%= pkg.name %>.es6.js"]
+			target: ["src/*.js"]
 		},
 		mochaTest : {
 			options: {
@@ -11,28 +24,18 @@ module.exports = function (grunt) {
 			test : {
 				src : ["test/*_test.js"]
 			}
-		},
-		watch : {
-			js : {
-				files : "<%= concat.dist.src %>",
-				tasks : "default"
-			},
-			pkg: {
-				files : "package.json",
-				tasks : "default"
-			}
 		}
 	});
 
 	// tasks
-	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks("grunt-babel");
+	grunt.loadNpmTasks("grunt-eslint");
 	grunt.loadNpmTasks("grunt-mocha-test");
 	grunt.loadNpmTasks("grunt-nsp-package");
-	grunt.loadNpmTasks("grunt-eslint");
 
 	// aliases
 	grunt.registerTask("test", ["eslint", "mochaTest"]);
 	grunt.registerTask("validate", "validate-package");
-	grunt.registerTask("default", ["test"]);
+	grunt.registerTask("default", ["babel", "test"]);
 	grunt.registerTask("package", ["validate", "default"]);
 };

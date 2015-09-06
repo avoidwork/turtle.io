@@ -1,10 +1,8 @@
-"use strict";
-
 const path = require("path");
-const middleware = require(path.join(__dirname, "lib", "middleware"));
-const TurtleIO = require(path.join(__dirname, "lib", "turtleio"));
+const middleware = require(path.join(__dirname, "lib", "middleware.js"));
+const TurtleIO = require(path.join(__dirname, "lib", "turtleio.js"));
 
-module.exports = function () {
+function factory () {
 	let app = new TurtleIO();
 
 	// Setting default middleware
@@ -13,4 +11,6 @@ module.exports = function () {
 	});
 
 	return app;
-};
+}
+
+module.exports = factory;

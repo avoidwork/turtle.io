@@ -1,7 +1,7 @@
 "use strict";
 
 var path = require("path"),
-    turtleio = require(path.join(__dirname, "index")),
+    turtleio = require(path.join(__dirname, "lib", "index")),
     server = turtleio();
 
 server.get("/status", function (req, res) {

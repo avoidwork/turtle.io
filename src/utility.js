@@ -1,19 +1,18 @@
-"use strict";
+const path = require("path");
+const array = require("retsu");
+const regex = require(path.join(__dirname, "lib", "regex.js"));
+const url = require("url");
 
-function trim(obj) {
+function trim (obj) {
 	return obj.replace(/^(\s+|\t+|\n+)|(\s+|\t+|\n+)$/g, "");
 }
 
-function explode(obj) {
-	var arg = arguments.length <= 1 || arguments[1] === undefined ? "," : arguments[1];
-
+function explode (obj, arg = ",") {
 	return trim(obj).split(new RegExp("\\s*" + arg + "\\s*"));
 }
 
-function capitalize(obj) {
-	var all = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-	var result = undefined;
+function capitalize (obj, all = false) {
+	let result;
 
 	if (all) {
 		result = explode(obj, " ").map(capitalize).join(" ");
@@ -24,12 +23,12 @@ function capitalize(obj) {
 	return result;
 }
 
-function clone(arg) {
+function clone (arg) {
 	return JSON.parse(JSON.stringify(arg));
 }
 
-function coerce(value) {
-	var tmp = undefined;
+function coerce (value) {
+	let tmp;
 
 	if (value === null || value === undefined) {
 		return undefined;
@@ -52,11 +51,11 @@ function coerce(value) {
 	}
 }
 
-function isEmpty(obj) {
+function isEmpty (obj) {
 	return trim(obj) === "";
 }
 
-function iterate(obj, fn) {
+function iterate (obj, fn) {
 	if (obj instanceof Object) {
 		array.each(Object.keys(obj), function (i) {
 			fn.call(obj, obj[i], i);
@@ -66,9 +65,9 @@ function iterate(obj, fn) {
 	}
 }
 
-function merge(a, b) {
-	var c = clone(a),
-	    d = clone(b);
+function merge (a, b) {
+	let c = clone(a),
+		d = clone(b);
 
 	if (c instanceof Object && d instanceof Object) {
 		array.each(Object.keys(d), function (i) {
@@ -89,12 +88,10 @@ function merge(a, b) {
 	return c;
 }
 
-function queryString() {
-	var qstring = arguments.length <= 0 || arguments[0] === undefined ? "" : arguments[0];
-
-	var obj = {};
-	var aresult = qstring.split("?");
-	var result = undefined;
+function queryString (qstring = "") {
+	let obj = {};
+	let aresult = qstring.split("?");
+	let result;
 
 	if (aresult.length > 1) {
 		aresult.shift();
@@ -103,8 +100,8 @@ function queryString() {
 	result = aresult.join("?");
 
 	array.each(result.split("&"), function (prop) {
-		var aitem = prop.replace(/\+/g, " ").split("=");
-		var item = undefined;
+		let aitem = prop.replace(/\+/g, " ").split("=");
+		let item;
 
 		if (aitem.length > 2) {
 			item = [aitem.shift(), aitem.join("=")];
@@ -124,7 +121,7 @@ function queryString() {
 
 		if (obj[item[0]] === undefined) {
 			obj[item[0]] = item[1];
-		} else if (!(obj[item[0]] instanceof Array)) {
+		} else if (obj[item[0]] instanceof Array === false) {
 			obj[item[0]] = [obj[item[0]]];
 			obj[item[0]].push(item[1]);
 		} else {
@@ -135,12 +132,9 @@ function queryString() {
 	return obj;
 }
 
-function parse(uri) {
-	var luri = uri;
-	var idxAscii = undefined,
-	    idxQ = undefined,
-	    parsed = undefined,
-	    obj = undefined;
+function parse (uri) {
+	let luri = uri;
+	let idxAscii, idxQ, parsed, obj;
 
 	if (luri === undefined || luri === null) {
 		luri = "";
@@ -148,8 +142,13 @@ function parse(uri) {
 		idxAscii = luri.indexOf("%3F");
 		idxQ = luri.indexOf("?");
 
-		if (idxQ === -1 && idxAscii > -1 || idxAscii < idxQ) {
-			luri = luri.replace("%3F", "?");
+		switch (true) {
+			case idxQ === -1 && idxAscii > -1:
+			case idxAscii < idxQ:
+				luri = luri.replace("%3F", "?");
+				break;
+			default:
+				void 0;
 		}
 	}
 
@@ -172,7 +171,7 @@ function parse(uri) {
 		host: obj.host
 	};
 
-	parsed.href = obj.href || parsed.protocol + "//" + (isEmpty(parsed.auth) ? "" : parsed.auth + "@") + parsed.host + parsed.pathname + parsed.search + parsed.hash;
+	parsed.href = obj.href || (parsed.protocol + "//" + (isEmpty(parsed.auth) ? "" : parsed.auth + "@") + parsed.host + parsed.pathname + parsed.search + parsed.hash);
 	parsed.path = obj.path || parsed.pathname + parsed.search;
 	parsed.query = queryString(parsed.search);
 

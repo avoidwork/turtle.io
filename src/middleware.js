@@ -1,19 +1,17 @@
-"use strict";
+const path = require("path");
+const utility = require(path.join(__dirname, "lib", "utility.js"));
+const regex = require(path.join(__dirname, "lib", "regex.js"));
+const messages = require(path.join(__dirname, "lib", "messages.js"));
+const codes = require(path.join(__dirname, "lib", "codes.js"));
 
-var path = require("path");
-var utility = require(path.join(__dirname, "lib", "utility.js"));
-var regex = require(path.join(__dirname, "lib", "regex.js"));
-var messages = require(path.join(__dirname, "lib", "messages.js"));
-var codes = require(path.join(__dirname, "lib", "codes.js"));
-
-function connect(req, res, next) {
-	var server = req.server,
-	    payload = undefined;
+function connect (req, res, next) {
+	let server = req.server,
+		payload;
 
 	if (regex.body.test(req.method)) {
 		req.setEncoding("utf-8");
 
-		req.on("data", function (data) {
+		req.on("data", data => {
 			payload = payload === undefined ? data : payload + data;
 
 			if (server.config.maxBytes > 0 && Buffer.byteLength(payload) > server.config.maxBytes) {
@@ -36,14 +34,13 @@ function connect(req, res, next) {
 	}
 }
 
-function cors(req, res, next) {
+function cors (req, res, next) {
 	req.cors = req.headers.origin !== undefined;
 	next();
 }
 
-function etag(req, res, next) {
-	var cached = undefined,
-	    headers = undefined;
+function etag (req, res, next) {
+	let cached, headers;
 
 	if (regex.get_only.test(req.method) && !req.headers.range && req.headers["if-none-match"] !== undefined) {
 		// Not mutating cache, because `respond()` will do it
