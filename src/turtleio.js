@@ -1,19 +1,19 @@
-const constants = require("constants"),
-	mmh3 = require("murmurhash3js").x86.hash32,
-	path = require("path"),
+const array = require("retsu"),
+	constants = require("constants"),
+	csv = require("csv.js"),
+	defer = require("tiny-defer"),
+	dtrace = require("dtrace-provider"),
 	fs = require("fs"),
 	http = require("http"),
 	https = require("https"),
 	mime = require("mime"),
+	mmh3 = require("murmurhash3js").x86.hash32,
 	moment = require("moment"),
 	os = require("os"),
-	zlib = require("zlib"),
-	dtrace = require("dtrace-provider"),
+	path = require("path"),
 	precise = require("precise"),
-	array = require("retsu"),
-	csv = require("csv.js"),
 	lru = require("tiny-lru"),
-	defer = require("tiny-defer"),
+	zlib = require("zlib"),
 	levels = require(path.join(__dirname, "lib", "levels.js")),
 	messages = require(path.join(__dirname, "lib", "messages.js")),
 	codes = require(path.join(__dirname, "lib", "codes.js")),
@@ -24,9 +24,9 @@ const constants = require("constants"),
 	all = "all",
 	verbs = ["delete", "get", "post", "put", "patch"];
 
-let LOGLEVEL,
-	LOGGING,
-	STALE;
+let loglevel,
+	logging,
+	stale;
 
 class TurtleIO {
 	constructor () {
@@ -698,11 +698,11 @@ class TurtleIO {
 	log (arg, level = "notice") {
 		let timer, e;
 
-		if (LOGGING) {
+		if (logging) {
 			timer = precise().start();
 			e = arg instanceof Error;
 
-			if (this.config.logs.stdout && this.levels.indexOf(level) <= LOGLEVEL) {
+			if (this.config.logs.stdout && this.levels.indexOf(level) <= loglevel) {
 				if (e) {
 					console.error("[" + moment().format(this.config.logs.time) + "] [" + level + "] " + (arg.stack || arg.message || arg));
 				} else {
@@ -811,7 +811,7 @@ class TurtleIO {
 				letag = "",
 				regexOrigin = new RegExp(origin.replace(regex.end_slash, ""), "g"),
 				uri = req.parsed.href,
-				stale = STALE,
+				lstale = stale,
 				get = regex.get_only.test(req.method),
 				rewriteOrigin = req.parsed.protocol + "//" + req.parsed.host + (route === "/" ? "" : route),
 				larg = arg,
@@ -832,16 +832,16 @@ class TurtleIO {
 				if (get && (status === this.codes.SUCCESS || status === this.codes.NOT_MODIFIED) && !regex.nocache.test(headers["cache-control"]) && !regex.private.test(headers["cache-control"])) {
 					// Determining how long rep is valid
 					if (headers["cache-control"] && regex.number.test(headers["cache-control"])) {
-						stale = parseInt(regex.number.exec(headers["cache-control"])[0], 10);
+						lstale = parseInt(regex.number.exec(headers["cache-control"])[0], 10);
 					} else if (headers.expires !== undefined) {
-						stale = new Date().getTime() - new Date(headers.expires);
+						lstale = new Date().getTime() - new Date(headers.expires);
 					}
 
 					// Removing from LRU when invalid
-					if (stale > 0) {
+					if (lstale > 0) {
 						setTimeout(() => {
 							this.unregister(uri);
-						}, stale * 1000);
+						}, lstale * 1000);
 					}
 				}
 
@@ -1064,14 +1064,14 @@ class TurtleIO {
 	 * @method register
 	 * @param  {String}  uri   URL requested
 	 * @param  {Object}  state Object describing state `{etag: $etag, mimetype: $mimetype}`
-	 * @param  {Boolean} stale [Optional] Remove cache from disk
+	 * @param  {Boolean} purge [Optional] Remove cache from disk
 	 * @return {Object}        TurtleIO instance
 	 */
-	register (uri, state, stale) {
+	register (uri, state, purge) {
 		let cached;
 
 		// Removing stale cache from disk
-		if (stale === true) {
+		if (purge === true) {
 			cached = this.etags.cache[uri];
 
 			if (cached && cached.value.etag !== state.etag) {
@@ -1590,8 +1590,8 @@ class TurtleIO {
 		this.config.tmp = this.config.tmp || os.tmpdir();
 
 		pages = this.config.pages ? path.join(this.config.root, this.config.pages) : path.join(__dirname, "..", "pages");
-		LOGLEVEL = this.levels.indexOf(this.config.logs.level);
-		LOGGING = this.config.logs.dtrace || this.config.logs.stdout;
+		loglevel = this.levels.indexOf(this.config.logs.level);
+		logging = this.config.logs.dtrace || this.config.logs.stdout;
 
 		// Looking for required setting
 		if (!this.config.default) {
