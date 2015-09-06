@@ -54,12 +54,12 @@ describe("Valid Requests", function () {
 	it("GET / (206 / 'Partial response - 0 offset')", function (done) {
 		request()
 			.get("/")
-			.header("range", "0-5")
+			.header("range", "1-5")
 			.expectStatus(206)
 			.expectHeader("status", "206 Partial Content")
 			.expectHeader("transfer-encoding", "chunked")
 			.expectHeader("content-length", undefined)
-			.expectBody(/^\<html\>$/)
+			.expectBody(/^\<html$/)
 			.end(function (err, res) {
 				if (err) throw err;
 				etag = res.headers.etag;
@@ -70,12 +70,12 @@ describe("Valid Requests", function () {
 	it("GET / (206 / 'Partial response - offset')", function (done) {
 		request()
 			.get("/")
-			.header("range", "1-4")
+			.header("range", "2-4")
 			.expectStatus(206)
 			.expectHeader("status", "206 Partial Content")
 			.expectHeader("transfer-encoding", "chunked")
 			.expectHeader("content-length", undefined)
-			.expectBody(/^html$/)
+			.expectBody(/^htm$/)
 			.end(function (err, res) {
 				if (err) throw err;
 				etag = res.headers.etag;

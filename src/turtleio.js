@@ -1359,7 +1359,13 @@ class TurtleIO {
 			lheaders.status = lstatus + " " + http.STATUS_CODES[lstatus];
 			lheaders["content-range"] = "bytes " + options.start + "-" + options.end + "/" + lheaders["content-length"];
 			lheaders["content-length"] = options.end - options.start;
+
+			// Complete range
 			++lheaders["content-length"];
+
+			// Accounting for 0 byte start position
+			--options.start;
+			--options.end;
 		}
 
 		// Determining if response should be compressed
