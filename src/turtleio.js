@@ -1356,7 +1356,7 @@ class TurtleIO {
 			}
 
 			lstatus = this.codes.PARTIAL_CONTENT;
-			lheaders.status = lstatus + " " + http.STATUS_codes[lstatus];
+			lheaders.status = lstatus + " " + http.STATUS_CODES[lstatus];
 			lheaders["content-range"] = "bytes " + options.start + "-" + options.end + "/" + lheaders["content-length"];
 			lheaders["content-length"] = options.end - options.start;
 			++lheaders["content-length"];
