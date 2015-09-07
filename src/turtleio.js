@@ -1312,11 +1312,6 @@ class TurtleIO {
 			}
 		}
 
-		// Fixing 'accept-ranges' for non-filesystem based responses
-		if (!file) {
-			delete lheaders["accept-ranges"];
-		}
-
 		if (lstatus === this.codes.NOT_MODIFIED) {
 			delete lheaders["accept-ranges"];
 			delete lheaders["content-encoding"];
