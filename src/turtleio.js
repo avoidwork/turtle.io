@@ -1467,7 +1467,15 @@ class TurtleIO {
 			[lall.all, lall[method], h.all, h[method]].forEach(function (c) {
 				if (c) {
 					array.keys(c).filter(function (i) {
-						return new RegExp("^" + utility.escape(i) + "$", "i").test(uri);
+						let valid;
+
+						try {
+							valid = new RegExp("^" + i + "$", "i").test(uri);
+						} catch (e) {
+							valid = new RegExp("^" + utility.escape(i) + "$", "i").test(uri);
+						}
+
+						return valid;
 					}).forEach(function (i) {
 						result = result.concat(c[i]);
 					});
