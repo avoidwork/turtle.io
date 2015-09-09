@@ -2,8 +2,6 @@
 
 [![build status](https://secure.travis-ci.org/avoidwork/turtle.io.svg)](http://travis-ci.org/avoidwork/turtle.io) [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/avoidwork/turtle.io?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-turtle.io is an HTTP server that gets faster by learning as it handles traffic (memoization). It achieves > 99% concurrency with a higher amount of HTTP transactions/s than other popular servers.
-
 turtle.io is very easy to get up and running! All you need to do is install it, and tell it what directory holds your web sites, & which hostnames to answer for.
 
 You can also create complex web applications, with a familiar API.
@@ -105,11 +103,6 @@ Transaction rates are similar.
 - **turtle.io** ```[1233.78, 1203.2, 1187.44]  (1208.14 avg)```
 - **express**   ```[1105.85, 1124.25, 1167.57] (1132.56 avg)```
 
-#### Concurrency
-`turtle.io` averages more than double the concurrent load of express.js!
-- **turtle.io** ```[99.33, 99.47, 99.57] (99.46 avg)```
-- **express**   ```[42.81, 41.2, 44.27]  (42.76 avg)```
-
 ## Handling Uploads
 The `request` object is passed to every route handler as the second argument, will have a `body` property with the payload from the Client. It will not be coerced to another format, so if you expect JSON, you'll have to `JSON.parse()` it yourself (for now).
 
@@ -157,6 +150,11 @@ _Function (url)_
 Send a redirection.
 
 ##### respond
+_Function (body[, status, headers])_
+
+Send a response.
+
+##### send
 _Function (body[, status, headers])_
 
 Send a response.

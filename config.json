@@ -1,46 +1,46 @@
 {
 	"noaction": {},
-	"cache"   : 1000,
+	"cache": 1000,
 	"catchAll": true,
 	"compress": true,
-	"default" : null,
-	"headers" : {
-		"access-control-allow-origin"   : "*",
-		"access-control-allow-headers"  : "allow, content-type, etag, last-modified, x-requested-with, x-csrftoken, x-csrf-token",
-		"access-control-allow-methods"  : "",
-		"accept-ranges"                 : "bytes",
-		"allow"                         : "",
-		"content-type"                  : "text/html; charset=utf-8",
-		"date"                          : "",
-		"last-modified"                 : ""
+	"default": null,
+	"headers": {
+		"access-control-allow-origin": "*",
+		"access-control-allow-headers": "allow, content-type, etag, last-modified, x-requested-with, x-csrftoken, x-csrf-token",
+		"access-control-allow-methods": "",
+		"accept-ranges": "bytes",
+		"allow": "",
+		"content-type": "text/html; charset=utf-8",
+		"date": "",
+		"last-modified": ""
 	},
-	"id"      : "turtle_io",
-	"index"   : ["index.htm", "index.html"],
-	"json"    : 2,
-	"logs"    : {
-		"time"   : "D/MMM/YYYY:HH:mm:ss ZZ",
-		"format" : "%v %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"",
-		"level"  : "info",
-		"stdout" : true,
-		"dtrace" : false
+	"id": "turtle_io",
+	"index": ["index.htm", "index.html"],
+	"json": 2,
+	"logs": {
+		"time": "D/MMM/YYYY:HH:mm:ss ZZ",
+		"format": "%v %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"",
+		"level": "info",
+		"stdout": true,
+		"dtrace": false
 	},
 	"maxBytes": 0,
-	"pages"   : null,
-	"port"    : 8000,
-	"proxy"   : {
-		"rewrite" : [
+	"pages": null,
+	"port": 8000,
+	"proxy": {
+		"rewrite": [
 			"text/html",
 			"text/plain",
 			"application/json"
 		]
 	},
-	"root"    : "",
-	"seed"    : 20110625,
-	"ssl"     : {
-		"key"  : null,
-		"cert" : null
+	"root": "",
+	"seed": 20110625,
+	"ssl": {
+		"key": null,
+		"cert": null
 	},
-	"tmp"     : null,
-	"uid"     : null,
-	"vhosts"  : {}
+	"tmp": null,
+	"uid": null,
+	"vhosts": {}
 }

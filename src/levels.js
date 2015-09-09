@@ -1,9 +1,4 @@
-/**
- * Log levels
- *
- * @type {Array}
- */
-const LEVELS = [
+const levels = [
 	"emerg",
 	"alert",
 	"crit",
@@ -13,3 +8,5 @@ const LEVELS = [
 	"info",
 	"debug"
 ];
+
+module.exports = levels;
