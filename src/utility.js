@@ -10,6 +10,10 @@ function explode (obj, arg = ",") {
 	return trim(obj).split(new RegExp("\\s*" + arg + "\\s*"));
 }
 
+function escape (arg) {
+	return arg.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
+}
+
 function capitalize (obj, all = false) {
 	let result;
 
@@ -167,6 +171,7 @@ module.exports = {
 	coerce: coerce,
 	contains: contains,
 	explode: explode,
+	escape: escape,
 	getArity: getArity,
 	isEmpty: isEmpty,
 	iterate: iterate,
