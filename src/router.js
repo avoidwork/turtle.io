@@ -30,44 +30,46 @@ function router (req, res) {
 	}
 
 	function next (err) {
-		let arity = 3,
-			item = middleware.next();
-
-		if (!item.done) {
-			if (err) {
-				// Finding the next error handling middleware
-				arity = utility.getArity(item.value);
-				do {
-					arity = utility.getArity(item.value);
-				} while (arity < 4 && (item = middleware.next()) && !item.done)
-			}
+		process.nextTick(function () {
+			let arity = 3,
+				item = middleware.next();
 
 			if (!item.done) {
 				if (err) {
-					if (arity === 4) {
+					// Finding the next error handling middleware
+					arity = utility.getArity(item.value);
+					do {
+						arity = utility.getArity(item.value);
+					} while (arity < 4 && (item = middleware.next()) && !item.done)
+				}
+
+				if (!item.done) {
+					if (err) {
+						if (arity === 4) {
+							try {
+								item.value(err, req, res, next);
+							} catch (e) {
+								next(e);
+							}
+						} else {
+							last(err);
+						}
+					} else {
 						try {
-							item.value(err, req, res, next);
+							item.value(req, res, next);
 						} catch (e) {
 							next(e);
 						}
-					} else {
-						last(err);
 					}
 				} else {
-					try {
-						item.value(req, res, next);
-					} catch (e) {
-						next(e);
-					}
+					last(err);
 				}
-			} else {
+			} else if (!res._header && req.server.config.catchAll) {
 				last(err);
+			} else if (res._header) {
+				deferred.resolve([req, res]);
 			}
-		} else if (!res._header && req.server.config.catchAll) {
-			last(err);
-		} else if (res._header) {
-			deferred.resolve([req, res]);
-		}
+		});
 	}
 
 	if (regex.head.test(method)) {
@@ -75,7 +77,7 @@ function router (req, res) {
 	}
 
 	middleware = array.iterator(req.server.routes(req.parsed.pathname, req.vhost, method));
-	process.nextTick(next);
+	next();
 
 	return deferred.promise;
 }
