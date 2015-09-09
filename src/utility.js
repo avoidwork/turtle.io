@@ -1,5 +1,4 @@
 const path = require("path");
-const array = require("retsu");
 const regex = require(path.join(__dirname, "regex.js"));
 const url = require("url");
 
@@ -51,6 +50,10 @@ function coerce (value) {
 	}
 }
 
+function contains (haystack, needle) {
+	return haystack.indexOf(needle) > -1;
+}
+
 function getArity (arg) {
 	return arg.toString().replace(/(^.*\()|(\).*)|(\n.*)/g, "").split(",").length;
 }
@@ -61,11 +64,11 @@ function isEmpty (obj) {
 
 function iterate (obj, fn) {
 	if (obj instanceof Object) {
-		array.each(Object.keys(obj), function (i) {
+		Object.keys(obj).forEach(function (i) {
 			fn.call(obj, obj[i], i);
 		});
 	} else {
-		array.each(obj, fn);
+		obj.forEach(fn);
 	}
 }
 
@@ -74,7 +77,7 @@ function merge (a, b) {
 		d = clone(b);
 
 	if (c instanceof Object && d instanceof Object) {
-		array.each(Object.keys(d), function (i) {
+		Object.keys(d).forEach(function (i) {
 			if (c[i] instanceof Object && d[i] instanceof Object) {
 				c[i] = merge(c[i], d[i]);
 			} else if (c[i] instanceof Array && d[i] instanceof Array) {
@@ -102,8 +105,7 @@ function queryString (qstring = "") {
 	}
 
 	result = aresult.join("?");
-
-	array.each(result.split("&"), function (prop) {
+	result.split("&").forEach(function (prop) {
 		let aitem = prop.replace(/\+/g, " ").split("=");
 		let item;
 
@@ -166,6 +168,7 @@ module.exports = {
 	capitalize: capitalize,
 	clone: clone,
 	coerce: coerce,
+	contains: contains,
 	explode: explode,
 	getArity: getArity,
 	isEmpty: isEmpty,

@@ -328,7 +328,7 @@ class TurtleIO {
 		req.timer = timer;
 
 		// Finding a matching virtual host
-		array.each(this.vhostsRegExp, (i, idx) => {
+		this.vhostsRegExp.forEach((i, idx) => {
 			if (i.test(hostname)) {
 				return !(req.vhost = this.vhosts[idx]);
 			}
@@ -420,7 +420,7 @@ class TurtleIO {
 			}
 		}
 
-		array.each(array.cast(this.codes), function (i, idx) {
+		array.cast(this.codes).forEach(function (i, idx) {
 			if (i === lstatus) {
 				kdx = idx;
 				return false;
@@ -1031,7 +1031,7 @@ class TurtleIO {
 		};
 
 		// Setting route
-		array.each(verbs, i => {
+		verbs.forEach(i => {
 			if (route === "/") {
 				this[i]("/.*", wrapper, host);
 			} else {
@@ -1090,7 +1090,7 @@ class TurtleIO {
 		}
 
 		// Removing superficial headers
-		array.each([
+		[
 			"content-encoding",
 			"server",
 			"status",
@@ -1103,7 +1103,7 @@ class TurtleIO {
 			"access-control-allow-credentials",
 			"access-control-allow-methods",
 			"access-control-allow-headers"
-		], function (i) {
+		].forEach(function (i) {
 			delete state.headers[i];
 		});
 
@@ -1176,7 +1176,7 @@ class TurtleIO {
 					count = 0;
 					nth = this.config.index.length;
 
-					array.each(this.config.index, i => {
+					this.config.index.forEach(i => {
 						let npath = path.join(lpath, i);
 
 						fs.lstat(npath, (err, lstats) => {
@@ -1332,7 +1332,7 @@ class TurtleIO {
 		// Setting the partial content headers
 		if (req.headers.range) {
 			options = {};
-			array.each(req.headers.range.match(/\d+/g) || [], (i, idx) => {
+			(req.headers.range.match(/\d+/g) || []).forEach((i, idx) => {
 				options[idx === 0 ? "start" : "end"] = parseInt(i, 10);
 			});
 
@@ -1448,11 +1448,11 @@ class TurtleIO {
 			h = this.middleware[host] || {};
 			result = [];
 
-			array.each([lall.all, lall[method], h.all, h[method]], function (c) {
+			[lall.all, lall[method], h.all, h[method]].forEach(function (c) {
 				if (c) {
-					array.each(array.keys(c).filter(function (i) {
+					array.keys(c).filter(function (i) {
 						return new RegExp("^" + i + "$", "i").test(uri);
-					}), function (i) {
+					}).forEach(function (i) {
 						result = result.concat(c[i]);
 					});
 				}
@@ -1546,7 +1546,7 @@ class TurtleIO {
 		this.probes();
 
 		// Registering virtual hosts
-		array.each(array.cast(config.vhosts, true), i => {
+		array.cast(config.vhosts, true).forEach(i => {
 			this.host(i);
 		});
 
@@ -1574,7 +1574,7 @@ class TurtleIO {
 					});
 				};
 
-				array.each(files, i => {
+				files.forEach(i => {
 					this.pages.all[i.replace(regex.next, "")] = fs.readFileSync(path.join(pages, i), "utf8");
 				});
 
@@ -1664,7 +1664,7 @@ class TurtleIO {
 		if (cached) {
 			lpath = path.join(lpath, cached.value.etag);
 			this.etags.remove(uri);
-			array.each(ext, i => {
+			ext.forEach(i => {
 				let lfile = lpath + "." + i;
 
 				fs.exists(lfile, (exists) => {
@@ -1767,7 +1767,7 @@ class TurtleIO {
 	 * @return {Object}         TurtleIO instance
 	 */
 	all (route, fn, host) {
-		array.each(verbs, i => {
+		verbs.forEach(i => {
 			this.use(route, fn, host, i);
 		});
 

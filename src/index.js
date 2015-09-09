@@ -7,7 +7,7 @@ function factory () {
 	let app = new TurtleIO();
 
 	// Setting default middleware
-	array.each([middleware.cors, middleware.etag, middleware.connect], function (i) {
+	[middleware.cors, middleware.etag, middleware.connect].forEach(function (i) {
 		app.use(i).blacklist(i);
 	});
 
