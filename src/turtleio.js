@@ -18,15 +18,12 @@ const array = require("retsu"),
 	messages = require(path.join(__dirname, "messages.js")),
 	codes = require(path.join(__dirname, "codes.js")),
 	regex = require(path.join(__dirname, "regex.js")),
+	router = require(path.join(__dirname, "router.js")),
 	utility = require(path.join(__dirname, "utility.js")),
 	version = require(path.join(__dirname, "..", "package.json")).version,
 	defaultConfig = require(path.join(__dirname, "..", "config.json")),
 	all = "all",
 	verbs = ["delete", "get", "post", "put", "patch"];
-
-let loglevel,
-	logging,
-	stale;
 
 class TurtleIO {
 	constructor () {
@@ -37,10 +34,13 @@ class TurtleIO {
 		this.levels = levels;
 		this.messages = messages;
 		this.middleware = {all: {}};
+		this.loglevel = "";
+		this.logging = false;
 		this.permissions = lru(1000);
 		this.routeCache = lru(5000); // verbs * etags
 		this.pages = {all: {}};
 		this.server = null;
+		this.stale = 0;
 		this.vhosts = [];
 		this.vhostsRegExp = [];
 		this.watching = {};
@@ -65,7 +65,6 @@ class TurtleIO {
 		});
 
 		timer.stop();
-
 		this.signal("allowed", function () {
 			return [host, uri, method.toUpperCase(), timer.diff()];
 		});
@@ -705,11 +704,11 @@ class TurtleIO {
 	log (arg, level = "notice") {
 		let timer, e;
 
-		if (logging) {
+		if (this.logging) {
 			timer = precise().start();
 			e = arg instanceof Error;
 
-			if (this.config.logs.stdout && this.levels.indexOf(level) <= loglevel) {
+			if (this.config.logs.stdout && this.levels.indexOf(level) <= this.loglevel) {
 				if (e) {
 					console.error("[" + moment().format(this.config.logs.time) + "] [" + level + "] " + (arg.stack || arg.message || arg));
 				} else {
@@ -822,7 +821,7 @@ class TurtleIO {
 				letag = "",
 				regexOrigin = new RegExp(origin.replace(regex.end_slash, ""), "g"),
 				uri = req.parsed.href,
-				lstale = stale,
+				lstale = this.stale,
 				get = regex.get_only.test(req.method),
 				rewriteOrigin = req.parsed.protocol + "//" + req.parsed.host + (route === "/" ? "" : route),
 				larg = arg,
@@ -1428,96 +1427,6 @@ class TurtleIO {
 	}
 
 	/**
-	 * Runs middleware in a chain
-	 *
-	 * @method route
-	 * @param  {Object} req HTTP request Object
-	 * @param  {Object} res HTTP response Object
-	 * @return {Object}     Promise
-	 */
-	route (req, res) {
-		let deferred = defer(),
-			method = req.method.toLowerCase(),
-			middleware;
-
-		function get_arity (arg) {
-			return arg.toString().replace(/(^.*\()|(\).*)|(\n.*)/g, "").split(",").length;
-		}
-
-		let last = err => {
-			let errorCode, error, status;
-
-			if (!err) {
-				if (regex.get.test(method)) {
-					deferred.resolve([req, res]);
-				} else if (this.allowed("get", req.parsed.pathname, req.vhost)) {
-					deferred.reject(new Error(this.codes.NOT_ALLOWED));
-				} else {
-					deferred.reject(new Error(this.codes.NOT_FOUND));
-				}
-			} else {
-				errorCode = !isNaN(err.message) ? err.message : this.codes[(err.message || err).toUpperCase()] || this.codes.SERVER_ERROR;
-				status = res.statusCode >= this.codes.BAD_REQUEST ? res.statusCode : errorCode;
-				error = new Error(status);
-				error.extended = isNaN(err.message) ? err.message : undefined;
-
-				deferred.reject(error);
-			}
-		};
-
-		let next = err => {
-			let arity = 3,
-				item = middleware.next();
-
-			if (!item.done) {
-				if (err) {
-					// Finding the next error handling middleware
-					arity = get_arity(item.value);
-					do {
-						arity = get_arity(item.value);
-					} while (arity < 4 && (item = middleware.next()) && !item.done)
-				}
-
-				if (!item.done) {
-					if (err) {
-						if (arity === 4) {
-							try {
-								item.value(err, req, res, next);
-							} catch (e) {
-								next(e);
-							}
-						} else {
-							last(err);
-						}
-					} else {
-						try {
-							item.value(req, res, next);
-						} catch (e) {
-							next(e);
-						}
-					}
-				} else {
-					last(err);
-				}
-			} else if (!res._header && this.config.catchAll) {
-				last(err);
-			} else if (res._header) {
-				deferred.resolve([req, res]);
-			}
-		};
-
-		if (regex.head.test(method)) {
-			method = "get";
-		}
-
-		this.decorate(req, res);
-		middleware = array.iterator(this.routes(req.parsed.pathname, req.vhost, method));
-		process.nextTick(next);
-
-		return deferred.promise;
-	}
-
-	/**
 	 * Returns middleware for the uri
 	 *
 	 * @method result
@@ -1533,24 +1442,24 @@ class TurtleIO {
 			lall, h, result;
 
 		if (cached) {
-			return cached;
+			result = cached;
+		} else {
+			lall = this.middleware.all || {};
+			h = this.middleware[host] || {};
+			result = [];
+
+			array.each([lall.all, lall[method], h.all, h[method]], function (c) {
+				if (c) {
+					array.each(array.keys(c).filter(function (i) {
+						return new RegExp("^" + i + "$", "i").test(uri);
+					}), function (i) {
+						result = result.concat(c[i]);
+					});
+				}
+			});
+
+			this.routeCache.set(id, result);
 		}
-
-		lall = this.middleware.all || {};
-		h = this.middleware[host] || {};
-		result = [];
-
-		array.each([lall.all, lall[method], h.all, h[method]], function (c) {
-			if (c) {
-				array.each(array.keys(c).filter(function (i) {
-					return new RegExp("^" + i + "$", "i").test(uri);
-				}), function (i) {
-					result = result.concat(c[i]);
-				});
-			}
-		});
-
-		this.routeCache.set(id, result);
 
 		return result;
 	}
@@ -1604,8 +1513,8 @@ class TurtleIO {
 		this.config.tmp = this.config.tmp || os.tmpdir();
 
 		pages = this.config.pages ? path.join(this.config.root, this.config.pages) : path.join(__dirname, "..", "pages");
-		loglevel = this.levels.indexOf(this.config.logs.level);
-		logging = this.config.logs.dtrace || this.config.logs.stdout;
+		this.loglevel = this.levels.indexOf(this.config.logs.level);
+		this.logging = this.config.logs.dtrace || this.config.logs.stdout;
 
 		// Looking for required setting
 		if (!this.config.default) {
@@ -1647,7 +1556,8 @@ class TurtleIO {
 				this.log(new Error("[client 0.0.0.0] " + e.message), "error");
 			} else if (array.keys(this.config).length > 0) {
 				let next = (req, res) => {
-					this.route(req, res).then(function (arg) {
+					this.decorate(req, res);
+					router(req, res).then(function (arg) {
 						return arg;
 					}, errz => {
 						let body, status;

@@ -51,6 +51,10 @@ function coerce (value) {
 	}
 }
 
+function getArity (arg) {
+	return arg.toString().replace(/(^.*\()|(\).*)|(\n.*)/g, "").split(",").length;
+}
+
 function isEmpty (obj) {
 	return trim(obj) === "";
 }
@@ -163,6 +167,7 @@ module.exports = {
 	clone: clone,
 	coerce: coerce,
 	explode: explode,
+	getArity: getArity,
 	isEmpty: isEmpty,
 	iterate: iterate,
 	merge: merge,
