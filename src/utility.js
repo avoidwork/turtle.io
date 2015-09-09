@@ -73,26 +73,23 @@ function iterate (obj, fn) {
 }
 
 function merge (a, b) {
-	let c = clone(a),
-		d = clone(b);
-
-	if (c instanceof Object && d instanceof Object) {
-		Object.keys(d).forEach(function (i) {
-			if (c[i] instanceof Object && d[i] instanceof Object) {
-				c[i] = merge(c[i], d[i]);
-			} else if (c[i] instanceof Array && d[i] instanceof Array) {
-				c[i] = c[i].concat(d[i]);
+	if (a instanceof Object && b instanceof Object) {
+		Object.keys(b).forEach(function (i) {
+			if (a[i] instanceof Object && b[i] instanceof Object) {
+				a[i] = merge(a[i], b[i]);
+			} else if (a[i] instanceof Array && b[i] instanceof Array) {
+				a[i] = a[i].concat(b[i]);
 			} else {
-				c[i] = d[i];
+				a[i] = b[i];
 			}
 		});
-	} else if (c instanceof Array && d instanceof Array) {
-		c = c.concat(d);
+	} else if (a instanceof Array && b instanceof Array) {
+		a = a.concat(b);
 	} else {
-		c = d;
+		a = b;
 	}
 
-	return c;
+	return a;
 }
 
 function queryString (qstring = "") {
