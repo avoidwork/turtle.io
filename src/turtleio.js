@@ -363,6 +363,10 @@ class TurtleIO {
 		res.error = (status, arg) => {
 			return this.error.call(this, req, res, status, arg);
 		};
+
+		res.send = (arg, status, headers) => {
+			return this.respond.call(this, req, res, arg, status, headers);
+		};
 	}
 
 	/**
