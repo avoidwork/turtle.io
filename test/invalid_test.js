@@ -26,7 +26,6 @@ describe("Invalid Requests", function () {
 			.get("/")
 			.header("range", "a-b")
 			.expectStatus(416)
-			.expectHeader("status", "416 Requested Range Not Satisfiable")
 			.expectHeader("transfer-encoding", "identity")
 			.expectBody(/Requested Range not Satisfiable/)
 			.end(function (err, res) {
@@ -41,7 +40,6 @@ describe("Invalid Requests", function () {
 			.get("/")
 			.header("range", "5-0")
 			.expectStatus(416)
-			.expectHeader("status", "416 Requested Range Not Satisfiable")
 			.expectHeader("transfer-encoding", "identity")
 			.expectBody(/Requested Range not Satisfiable/)
 			.end(function (err, res) {

@@ -1331,7 +1331,7 @@ class TurtleIO {
 		}
 
 		// Setting `x-response-time`
-		lheaders["x-response-time"] = ((req.timer.stopped === null ? req.timer.stop() : req.timer).diff() / 1000000).toFixed(2) + " ms";
+		lheaders["x-response-time"] = ((req.timer.stopped.length === 0 ? req.timer.stop() : req.timer).diff() / 1000000).toFixed(2) + " ms";
 
 		// Setting the partial content headers
 		if (req.headers.range) {
