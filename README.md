@@ -154,6 +154,11 @@ _Function (body[, status, headers])_
 
 Send a response.
 
+##### send
+_Function (body[, status, headers])_
+
+Send a response.
+
 ## Configuration
 Configuration values can be set by editing `config.json` in the turtle.io directory, or by passing an Object to `start()`.
 
