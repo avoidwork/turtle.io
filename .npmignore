@@ -7,7 +7,8 @@
 .travis.yml
 .git
 .gitignore
-.jshintrc
+.eslintrc
+.travis.yml
 Gruntfile.js
 CHANGELOG.md
 sample.js
