@@ -1466,7 +1466,7 @@ class TurtleIO {
 
 			[lall.all, lall[method], h.all, h[method]].forEach(function (c) {
 				if (c) {
-					array.keys(c).filter(function (i) {
+					Object.keys(c).filter(function (i) {
 						let valid;
 
 						try {
@@ -1578,7 +1578,7 @@ class TurtleIO {
 		fs.readdir(pages, (e, files) => {
 			if (e) {
 				this.log(new Error("[client 0.0.0.0] " + e.message), "error");
-			} else if (array.keys(this.config).length > 0) {
+			} else if (Object.keys(this.config).length > 0) {
 				let next = (req, res) => {
 					this.decorate(req, res);
 					router(req, res).then(function (arg) {

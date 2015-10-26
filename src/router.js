@@ -40,7 +40,7 @@ function router (req, res) {
 					arity = utility.getArity(item.value);
 					do {
 						arity = utility.getArity(item.value);
-					} while (arity < 4 && (item = middleware.next()) && !item.done)
+					} while (arity < 4 && (item = middleware.next()) && !item.done);
 				}
 
 				if (!item.done) {
