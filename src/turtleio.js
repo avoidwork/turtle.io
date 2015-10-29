@@ -11,6 +11,7 @@ const array = require("retsu"),
 	moment = require("moment"),
 	os = require("os"),
 	path = require("path"),
+	haro = require("haro"),
 	precise = require("precise"),
 	lru = require("tiny-lru"),
 	zlib = require("zlib"),
@@ -30,15 +31,15 @@ class TurtleIO {
 		this.config = utility.clone(defaultConfig);
 		this.codes = codes;
 		this.dtp = null;
-		this.etags = lru(1000);
+		this.etags = lru(this.config.cache);
 		this.levels = levels;
 		this.messages = messages;
-		this.middleware = {all: {}};
+		this.middleware = this.middleware = {all: {}};
 		this.loglevel = "";
 		this.logging = false;
-		this.permissions = lru(1000);
-		this.routeCache = lru(5000); // verbs * etags
-		this.pages = {all: {}};
+		this.permissions = lru(this.config.cache);
+		this.routeCache = lru(this.config.cache * verbs.length);
+		this.pages = haro(null, {id: "pages", versioning: false, index: ["host|status"]});
 		this.server = null;
 		this.stale = 0;
 		this.vhosts = [];
@@ -733,14 +734,18 @@ class TurtleIO {
 	 * Gets an HTTP status page
 	 *
 	 * @method page
-	 * @param  {Number} code HTTP status code
-	 * @param  {String} host Virtual hostname
-	 * @return {String}      Response body
+	 * @param  {Number} status HTTP status code
+	 * @param  {String} host   Virtual hostname
+	 * @return {String}        Response body
 	 */
-	page (code, host) {
-		let lhost = host !== undefined && this.pages[host] ? host : all;
+	page (status = 500, host = all) {
+		let result = this.pages.find({host: host, status: status});
 
-		return this.pages[lhost][code] || this.pages[lhost]["500"] || this.pages.all["500"];
+		if (result.length === 0) {
+			result = this.pages.find({host: all, status: status});
+		}
+
+		return result.length > 0 ? result[0][1].body : http.STATUS_CODES[status];
 	}
 
 	/**
@@ -1598,9 +1603,13 @@ class TurtleIO {
 					});
 				};
 
-				files.forEach(i => {
-					this.pages.all[i.replace(regex.next, "")] = fs.readFileSync(path.join(pages, i), "utf8");
-				});
+				this.pages.batch(files.map(function (i) {
+					return {
+						host: all,
+						status: parseInt(i.replace(regex.next, ""), 10),
+						body: fs.readFileSync(path.join(pages, i), "utf8")
+					};
+				}), "set");
 
 				// Starting server
 				if (this.server === null) {
@@ -1657,10 +1666,10 @@ class TurtleIO {
 		this.log("Stopping " + this.config.id + " on port " + port, "debug");
 		this.config = utility.clone(defaultConfig);
 		this.dtp = null;
-		this.etags = lru(1000);
-		this.pages = {all: {}};
-		this.permissions = lru(1000);
-		this.routeCache = lru(5000); // verbs * etags
+		this.etags = lru(this.config.cache);
+		this.pages.clear();
+		this.permissions = lru(this.config.cache);
+		this.routeCache = lru(this.config.cache * verbs.length);
 		this.vhosts = [];
 		this.vhostsRegExp = [];
 		this.watching = {};

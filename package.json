@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Elastic web server framework with easy virtual hosts & reverse proxies",
-  "version": "4.1.5",
+  "version": "4.1.6",
   "homepage": "http://turtle.io",
   "author": {
     "name": "Jason Mulligan",
@@ -26,6 +26,7 @@
     "csv.js": "^1.0.2",
     "dtrace-provider": "^0.6.0",
     "es6-promise": "^3.0.2",
+    "haro": "^1.9.5",
     "mime": "^1.3.4",
     "moment": "^2.10.6",
     "murmurhash3js": "^3.0.1",
