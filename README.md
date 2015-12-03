@@ -14,7 +14,7 @@ You can also create complex web applications, with a familiar API.
 The following examples assume you've installed turtle.io into `/opt/turtleio`, if this is not the case you need to edit the applicable file to correct the path.
 
 #### Upstart
-Use the provided upstart recipe: `sudo sh -c 'cp node_modules/turtle.io/turtleio.conf /etc/init; service start turtleio;'`
+Use the provided upstart recipe: `sudo sh -c 'cp node_modules/turtle.io/turtleio.conf /etc/init; initctl reload-configuration; service turtleio start;'`
 
 #### Systemd
 Use the provided systemd service: `sudo sh -c 'cp node_modules/turtle.io/turtleio.service /etc/systemd/system; systemctl enable turtleio; systemctl start turtleio;'`
