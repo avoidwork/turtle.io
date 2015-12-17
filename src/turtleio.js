@@ -35,7 +35,7 @@ class TurtleIO {
 		this.levels = levels;
 		this.messages = messages;
 		this.middleware = this.middleware = {all: {}};
-		this.loglevel = "";
+		this.loglevel = "info";
 		this.logging = false;
 		this.permissions = lru(this.config.cache);
 		this.routeCache = lru(this.config.cache * verbs.length);
@@ -58,19 +58,9 @@ class TurtleIO {
 	 * @return {Boolean}          Boolean indicating if method is allowed
 	 */
 	allowed (method, uri, host, override) {
-		let timer = precise().start(),
-			result;
-
-		result = this.routes(uri, host, method, override).filter(i => {
+		return this.routes(uri, host, method, override).filter(i => {
 			return this.config.noaction[i.hash || this.hash(i)] === undefined;
-		});
-
-		timer.stop();
-		this.signal("allowed", function () {
-			return [host, uri, method.toUpperCase(), timer.diff()];
-		});
-
-		return result.length > 0;
+		}).length > 0;
 	}
 
 	/**
@@ -155,14 +145,17 @@ class TurtleIO {
 						res.writeHead(status, headers);
 					}
 
-					body.pipe(zlib[method]()).on("end", function () {
+					// Stream a compressed body to client
+					body.pipe(zlib[method]()).on("end", () => {
+						timer.stop();
+						this.signal("compress", function () {
+							return [letag, fp, timer.diff()];
+						});
 						deferred.resolve(true);
 					}).pipe(res);
+
+					// Stream a compressed body to disk
 					body.pipe(zlib[method]()).pipe(fs.createWriteStream(fp));
-					timer.stop();
-					this.signal("compress", function () {
-						return [letag, fp, timer.diff()];
-					});
 				} else { // Raw response body, compress and send to Client & disk
 					zlib[sMethod](body, (e, data) => {
 						if (e) {
@@ -204,7 +197,11 @@ class TurtleIO {
 				fs.createReadStream(body, options).on("error", () => {
 					this.unregister(req.parsed.href);
 					deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
-				}).pipe(zlib[method]()).on("close", function () {
+				}).pipe(zlib[method]()).on("close", () => {
+					timer.stop();
+					this.signal("compress", function () {
+						return [letag, fp, timer.diff()];
+					});
 					deferred.resolve(true);
 				}).pipe(res);
 
@@ -214,11 +211,6 @@ class TurtleIO {
 						this.unregister(req.parsed.href);
 					}).pipe(zlib[method]()).pipe(fs.createWriteStream(fp));
 				}
-
-				timer.stop();
-				this.signal("compress", function () {
-					return [letag, fp, timer.diff()];
-				});
 			}
 		};
 
@@ -244,13 +236,13 @@ class TurtleIO {
 							fs.createReadStream(fp, options).on("error", () => {
 								this.unregister(req.parsed.href);
 								deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
-							}).on("close", function () {
+							}).on("close", () => {
+								timer.stop();
+								this.signal("compress", function () {
+									return [letag, fp, timer.diff()];
+								});
 								deferred.resolve(true);
 							}).pipe(res);
-							timer.stop();
-							this.signal("compress", function () {
-								return [letag, fp, timer.diff()];
-							});
 						}
 					});
 				} else {
@@ -517,25 +509,13 @@ class TurtleIO {
 					switch (true) {
 						case req.headers["if-none-match"] === letag:
 						case !req.headers["if-none-match"] && Date.parse(req.headers["if-modified-since"]) >= stat.mtime:
-							this.respond(req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, headers, true).then(function (arg) {
-								deferred.resolve(arg);
-							}, function (e) {
-								deferred.reject(e);
-							});
+							this.respond(req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, headers, true).then(deferred.resolve, deferred.reject);
 							break;
 						default:
-							this.respond(req, res, fpath, this.codes.OK, headers, true).then(function (arg) {
-								deferred.resolve(arg);
-							}, function (e) {
-								deferred.reject(e);
-							});
+							this.respond(req, res, fpath, this.codes.OK, headers, true).then(deferred.resolve, deferred.reject);
 					}
 				} else {
-					this.respond(req, res, this.messages.NO_CONTENT, this.codes.OK, headers, true).then(function (arg) {
-						deferred.resolve(arg);
-					}, function (e) {
-						deferred.reject(e);
-					});
+					this.respond(req, res, this.messages.NO_CONTENT, this.codes.OK, headers, true).then(deferred.resolve, deferred.reject);
 				}
 			} else if (regex.del.test(method) && del) {
 				this.unregister(this.url(req));
@@ -544,28 +524,16 @@ class TurtleIO {
 					if (e) {
 						deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
 					} else {
-						this.respond(req, res, this.messages.NO_CONTENT, this.codes.NO_CONTENT, {}).then(function (arg) {
-							deferred.resolve(arg);
-						}, function (err) {
-							deferred.reject(err);
-						});
+						this.respond(req, res, this.messages.NO_CONTENT, this.codes.NO_CONTENT, {}).then(deferred.resolve, deferred.reject);
 					}
 				});
 			} else if (regex.put.test(method) && write) {
-				this.write(req, res, fpath).then(function (arg) {
-					deferred.resolve(arg);
-				}, function (e) {
-					deferred.reject(e);
-				});
+				this.write(req, res, fpath).then(deferred.resolve, deferred.reject);
 			} else {
 				deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
 			}
 		} else if ((regex.post.test(method) || regex.put.test(method)) && write) {
-			this.write(req, res, fpath).then(function (arg) {
-				deferred.resolve(arg);
-			}, function (e) {
-				deferred.reject(e);
-			});
+			this.write(req, res, fpath).then(deferred.resolve, deferred.reject);
 		} else if (regex.del.test(method) && del) {
 			this.unregister(req.parsed.href);
 
@@ -573,11 +541,7 @@ class TurtleIO {
 				if (e) {
 					deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
 				} else {
-					this.respond(req, res, this.messages.NO_CONTENT, this.codes.NO_CONTENT, {}).then(function (arg) {
-						deferred.resolve(arg);
-					}, function (err) {
-						deferred.reject(err);
-					});
+					this.respond(req, res, this.messages.NO_CONTENT, this.codes.NO_CONTENT, {}).then(deferred.resolve, deferred.reject);
 				}
 			});
 		} else {
@@ -961,11 +925,7 @@ class TurtleIO {
 				this.signal("proxy", function () {
 					return [req.vhost, req.method, route, origin, timer.diff()];
 				});
-				handle(req, res, headers, status, body).then(function (arg) {
-					deferred.resolve(arg);
-				}, function (e) {
-					deferred.reject(e);
-				});
+				handle(req, res, headers, status, body).then(deferred.resolve, deferred.reject);
 			};
 
 			// Streaming formats that do not need to be rewritten
@@ -1162,25 +1122,13 @@ class TurtleIO {
 					deferred.reject(new Error(this.codes.NOT_FOUND));
 				} else if (!stats.isDirectory()) {
 					end();
-					this.handle(req, res, lpath, req.parsed.href, false, stats).then(function (arg) {
-						deferred.resolve(arg);
-					}, function (err) {
-						deferred.reject(err);
-					});
+					this.handle(req, res, lpath, req.parsed.href, false, stats).then(deferred.resolve, deferred.reject);
 				} else if (regex.get.test(method) && !regex.dir.test(req.parsed.pathname)) {
 					end();
-					this.respond(req, res, this.messages.NO_CONTENT, this.codes.TEMPORARY_REDIRECT, {"location": (req.parsed.pathname !== "/" ? req.parsed.pathname : "") + "/" + req.parsed.search}).then(function (arg) {
-						deferred.resolve(arg);
-					}, function (err) {
-						deferred.reject(err);
-					});
+					this.respond(req, res, this.messages.NO_CONTENT, this.codes.TEMPORARY_REDIRECT, {"location": (req.parsed.pathname !== "/" ? req.parsed.pathname : "") + "/" + req.parsed.search}).then(deferred.resolve, deferred.reject);
 				} else if (!regex.get.test(method)) {
 					end();
-					this.handle(req, res, lpath, req.parsed.href, true).then(function (arg) {
-						deferred.resolve(arg);
-					}, function (err) {
-						deferred.reject(err);
-					});
+					this.handle(req, res, lpath, req.parsed.href, true).then(deferred.resolve, deferred.reject);
 				} else {
 					count = 0;
 					nth = this.config.index.length;
@@ -1192,11 +1140,7 @@ class TurtleIO {
 							if (!err && !handled) {
 								handled = true;
 								end();
-								this.handle(req, res, npath, (req.parsed.pathname !== "/" ? req.parsed.pathname : "") + "/" + i + req.parsed.search, false, lstats).then(function (arg) {
-									deferred.resolve(arg);
-								}, function (errz) {
-									deferred.reject(errz);
-								});
+								this.handle(req, res, npath, (req.parsed.pathname !== "/" ? req.parsed.pathname : "") + "/" + i + req.parsed.search, false, lstats).then(deferred.resolve, deferred.reject);
 							} else if (++count === nth && !handled) {
 								end();
 								deferred.reject(new Error(this.codes.NOT_FOUND));
@@ -1584,7 +1528,7 @@ class TurtleIO {
 			if (e) {
 				this.log(new Error("[client 0.0.0.0] " + e.message), "error");
 			} else if (Object.keys(this.config).length > 0) {
-				let next = (req, res) => {
+				let pipe = (req, res) => {
 					this.decorate(req, res);
 					router(req, res).then(function (arg) {
 						return arg;
@@ -1628,9 +1572,9 @@ class TurtleIO {
 							host: this.config.address,
 							secureProtocol: this.config.secureProtocol,
 							secureOptions: this.config.secureOptions
-						}), next).listen(this.config.port, this.config.address);
+						}), pipe).listen(this.config.port, this.config.address);
 					} else {
-						this.server = http.createServer(next).listen(this.config.port, this.config.address);
+						this.server = http.createServer(pipe).listen(this.config.port, this.config.address);
 					}
 				} else {
 					this.server.listen(this.config.port, this.config.address);
