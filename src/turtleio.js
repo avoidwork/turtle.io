@@ -1,5 +1,4 @@
-const Map = global.Map || require("es6-map"),
-	array = require("retsu"),
+const array = require("retsu"),
 	constants = require("constants"),
 	csv = require("csv.js"),
 	defer = require("tiny-defer"),
