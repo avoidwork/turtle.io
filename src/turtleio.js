@@ -1000,11 +1000,13 @@ class TurtleIO {
 
 		// Setting route
 		verbs.forEach(i => {
+			let x = i.toLowerCase();
+
 			if (route === "/") {
-				this[i]("/.*", wrapper, host);
+				this[x]("/.*", wrapper, host);
 			} else {
-				this[i](route, wrapper, host);
-				this[i](route + "/.*", wrapper, host);
+				this[x](route, wrapper, host);
+				this[x](route + "/.*", wrapper, host);
 			}
 		});
 

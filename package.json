@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Elastic web server framework with easy virtual hosts & reverse proxies",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "homepage": "http://turtle.io",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
