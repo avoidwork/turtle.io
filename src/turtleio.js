@@ -1465,7 +1465,7 @@ class TurtleIO {
 		let config = utility.merge(utility.clone(defaultConfig), cfg),
 			headers, pages;
 
-		this.dtp = dtrace.createDTraceProvider(config.id || "turtle-io");
+		this.dtp = dtrace.createDTraceProvider(config.id || "turtleio");
 
 		// Duplicating headers for re-decoration
 		headers = utility.clone(config.headers);
