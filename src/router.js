@@ -6,7 +6,7 @@ const regex = require(path.join(__dirname, "regex.js"));
 
 function router (req, res) {
 	let deferred = defer(),
-		method = req.method.toLowerCase(),
+		method = req.method,
 		middleware;
 
 	function last (err) {
@@ -15,7 +15,7 @@ function router (req, res) {
 		if (!err) {
 			if (regex.get.test(method)) {
 				deferred.resolve([req, res]);
-			} else if (req.server.allowed("get", req.parsed.pathname, req.vhost)) {
+			} else if (req.server.allowed("GET", req.parsed.pathname, req.vhost)) {
 				deferred.reject(new Error(req.server.codes.NOT_ALLOWED));
 			} else {
 				deferred.reject(new Error(req.server.codes.NOT_FOUND));
@@ -73,7 +73,7 @@ function router (req, res) {
 	}
 
 	if (regex.head.test(method)) {
-		method = "get";
+		method = "GET";
 	}
 
 	middleware = array.iterator(req.server.routes(req.parsed.pathname, req.vhost, method));

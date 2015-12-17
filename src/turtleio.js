@@ -24,7 +24,7 @@ const array = require("retsu"),
 	version = require(path.join(__dirname, "..", "package.json")).version,
 	defaultConfig = require(path.join(__dirname, "..", "config.json")),
 	all = "all",
-	verbs = ["delete", "get", "post", "put", "patch"];
+	verbs = ["DELETE", "GET", "POST", "PUT", "PATCH"];
 
 class TurtleIO {
 	constructor () {
@@ -91,7 +91,7 @@ class TurtleIO {
 				return this.allowed(i, uri, host, override);
 			});
 
-			result = result.join(", ").toUpperCase().replace("GET", "GET, HEAD, OPTIONS");
+			result = result.join(", ").replace("GET", "GET, HEAD, OPTIONS");
 			this.permissions.set(host + "_" + uri, result);
 		}
 
@@ -338,7 +338,7 @@ class TurtleIO {
 		req.vhost = req.vhost || this.config.default;
 
 		// Adding middleware to avoid the round trip next time
-		if (!this.allowed("get", req.parsed.pathname, req.vhost)) {
+		if (!this.allowed("GET", req.parsed.pathname, req.vhost)) {
 			this.get(req.parsed.pathname, (req2, res2, next2) => {
 				this.request(req2, res2).then(function () {
 					next2();
@@ -406,7 +406,7 @@ class TurtleIO {
 	error (req, res, status, msg) {
 		let timer = precise().start(),
 			deferred = defer(),
-			method = req.method.toLowerCase(),
+			method = req.method,
 			host = req.parsed ? req.parsed.hostname : all,
 			kdx = -1,
 			lstatus = status,
@@ -478,8 +478,8 @@ class TurtleIO {
 	handle (req, res, fpath, uri, dir, stat) {
 		let deferred = defer(),
 			allow = req.allow,
-			write = allow.indexOf(dir ? "POST" : "PUT") > -1,
-			del = allow.indexOf("DELETE") > -1,
+			write = utility.contains(allow, dir ? "POST" : "PUT"),
+			del = utility.contains(allow, "DELETE"),
 			method = req.method,
 			letag, headers, mimetype, modified, size, pathname, invalid, out_dir, in_dir;
 
@@ -761,7 +761,7 @@ class TurtleIO {
 		let msg = this.config.logs.format,
 			user = "-";
 
-		if (req.parsed.auth && req.parsed.auth.indexOf(":") > -1) {
+		if (req.parsed.auth && utility.contains(req.parsed.auth, ":")) {
 			user = req.parsed.auth.split(":")[0] || "-";
 		}
 
@@ -894,7 +894,7 @@ class TurtleIO {
 							deferred.reject(e);
 						});
 					} else {
-						if (regex.head.test(req.method.toLowerCase())) {
+						if (regex.head.test(req.method)) {
 							larg = this.messages.NO_CONTENT;
 						} else if (rewrite) {
 							// Changing the size of the response body
@@ -1018,7 +1018,7 @@ class TurtleIO {
 				};
 			}
 
-			if (parsed.protocol.indexOf("https") > -1) {
+			if (utility.contains(parsed.protocol, "https")) {
 				options.rejectUnauthorized = false;
 				obj = https;
 			} else {
@@ -1817,7 +1817,7 @@ class TurtleIO {
 	 * @return {Object}         TurtleIO instance
 	 */
 	del (route, fn, host) {
-		return this.use(route, fn, host, "delete");
+		return this.use(route, fn, host, "DELETE");
 	}
 
 	/**
@@ -1830,7 +1830,7 @@ class TurtleIO {
 	 * @return {Object}         TurtleIO instance
 	 */
 	delete (route, fn, host) {
-		return this.use(route, fn, host, "delete");
+		return this.use(route, fn, host, "DELETE");
 	}
 
 	/**
@@ -1843,7 +1843,7 @@ class TurtleIO {
 	 * @return {Object}         TurtleIO instance
 	 */
 	get (route, fn, host) {
-		return this.use(route, fn, host, "get");
+		return this.use(route, fn, host, "GET");
 	}
 
 	/**
@@ -1856,7 +1856,7 @@ class TurtleIO {
 	 * @return {Object}         TurtleIO instance
 	 */
 	patch (route, fn, host) {
-		return this.use(route, fn, host, "patch");
+		return this.use(route, fn, host, "PATCH");
 	}
 
 	/**
@@ -1869,7 +1869,7 @@ class TurtleIO {
 	 * @return {Object}         TurtleIO instance
 	 */
 	post (route, fn, host) {
-		return this.use(route, fn, host, "post");
+		return this.use(route, fn, host, "POST");
 	}
 
 	/**
@@ -1882,7 +1882,7 @@ class TurtleIO {
 	 * @return {Object}         TurtleIO instance
 	 */
 	put (route, fn, host) {
-		return this.use(route, fn, host, "put");
+		return this.use(route, fn, host, "PUT");
 	}
 
 	/**
