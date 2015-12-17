@@ -16,12 +16,12 @@ function router (req, res) {
 			if (regex.get.test(method)) {
 				deferred.resolve([req, res]);
 			} else if (req.server.allowed("GET", req.parsed.pathname, req.vhost)) {
-				deferred.reject(new Error(req.server.codes.NOT_ALLOWED));
+				deferred.reject(new Error(req.server.codes.METHOD_NOT_ALLOWED));
 			} else {
 				deferred.reject(new Error(req.server.codes.NOT_FOUND));
 			}
 		} else {
-			errorCode = !isNaN(err.message) ? err.message : req.server.codes[(err.message || err).toUpperCase()] || req.server.codes.SERVER_ERROR;
+			errorCode = !isNaN(err.message) ? err.message : req.server.codes[(err.message || err).toUpperCase()] || req.server.codes.INTERNAL_SERVER_ERROR;
 			status = res.statusCode >= req.server.codes.BAD_REQUEST ? res.statusCode : errorCode;
 			error = new Error(status);
 			error.extended = isNaN(err.message) ? err.message : undefined;

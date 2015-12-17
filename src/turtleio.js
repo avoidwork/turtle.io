@@ -167,7 +167,7 @@ class TurtleIO {
 					zlib[sMethod](body, (e, data) => {
 						if (e) {
 							this.unregister(req.parsed.href);
-							deferred.reject(new Error(this.codes.SERVER_ERROR));
+							deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
 						} else {
 							if (!res._header && !res._headerSent) {
 								headers["content-length"] = data.length;
@@ -203,7 +203,7 @@ class TurtleIO {
 				// Pipe compressed asset to Client
 				fs.createReadStream(body, options).on("error", () => {
 					this.unregister(req.parsed.href);
-					deferred.reject(new Error(this.codes.SERVER_ERROR));
+					deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
 				}).pipe(zlib[method]()).on("close", function () {
 					deferred.resolve(true);
 				}).pipe(res);
@@ -228,7 +228,7 @@ class TurtleIO {
 				if (exist) {
 					fs.lstat(fp, (e, stats) => {
 						if (e) {
-							deferred.reject(new Error(this.codes.SERVER_ERROR));
+							deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
 						} else {
 							if (!res._header && !res._headerSent) {
 								headers["transfer-encoding"] = "chunked";
@@ -243,7 +243,7 @@ class TurtleIO {
 
 							fs.createReadStream(fp, options).on("error", () => {
 								this.unregister(req.parsed.href);
-								deferred.reject(new Error(this.codes.SERVER_ERROR));
+								deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
 							}).on("close", function () {
 								deferred.resolve(true);
 							}).pipe(res);
@@ -418,9 +418,9 @@ class TurtleIO {
 			// If valid, determine what kind of error to respond with
 			if (!regex.get.test(method)) {
 				if (this.allowed(method, req.parsed.pathname, req.vhost)) {
-					lstatus = this.codes.SERVER_ERROR;
+					lstatus = this.codes.INTERNAL_SERVER_ERROR;
 				} else {
-					lstatus = this.codes.NOT_ALLOWED;
+					lstatus = this.codes.METHOD_NOT_ALLOWED;
 				}
 			}
 		}
@@ -542,7 +542,7 @@ class TurtleIO {
 
 				fs.unlink(fpath, e => {
 					if (e) {
-						deferred.reject(new Error(this.codes.SERVER_ERROR));
+						deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
 					} else {
 						this.respond(req, res, this.messages.NO_CONTENT, this.codes.NO_CONTENT, {}).then(function (arg) {
 							deferred.resolve(arg);
@@ -558,7 +558,7 @@ class TurtleIO {
 					deferred.reject(e);
 				});
 			} else {
-				deferred.reject(new Error(this.codes.SERVER_ERROR));
+				deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
 			}
 		} else if ((regex.post.test(method) || regex.put.test(method)) && write) {
 			this.write(req, res, fpath).then(function (arg) {
@@ -571,7 +571,7 @@ class TurtleIO {
 
 			fs.unlink(fpath, e => {
 				if (e) {
-					deferred.reject(new Error(this.codes.SERVER_ERROR));
+					deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
 				} else {
 					this.respond(req, res, this.messages.NO_CONTENT, this.codes.NO_CONTENT, {}).then(function (arg) {
 						deferred.resolve(arg);
@@ -581,7 +581,7 @@ class TurtleIO {
 				}
 			});
 		} else {
-			deferred.reject(new Error(this.codes.NOT_ALLOWED));
+			deferred.reject(new Error(this.codes.METHOD_NOT_ALLOWED));
 		}
 
 		return deferred.promise;
@@ -663,7 +663,7 @@ class TurtleIO {
 				delete lheaders["accept-ranges"];
 			}
 
-			if (status >= this.codes.SERVER_ERROR) {
+			if (status >= this.codes.INTERNAL_SERVER_ERROR) {
 				delete lheaders["accept-ranges"];
 			}
 
@@ -1169,7 +1169,7 @@ class TurtleIO {
 					});
 				} else if (regex.get.test(method) && !regex.dir.test(req.parsed.pathname)) {
 					end();
-					this.respond(req, res, this.messages.NO_CONTENT, this.codes.REDIRECT, {"location": (req.parsed.pathname !== "/" ? req.parsed.pathname : "") + "/" + req.parsed.search}).then(function (arg) {
+					this.respond(req, res, this.messages.NO_CONTENT, this.codes.TEMPORARY_REDIRECT, {"location": (req.parsed.pathname !== "/" ? req.parsed.pathname : "") + "/" + req.parsed.search}).then(function (arg) {
 						deferred.resolve(arg);
 					}, function (err) {
 						deferred.reject(err);
@@ -1351,7 +1351,7 @@ class TurtleIO {
 
 			if (isNaN(options.start) || isNaN(options.end) || options.start >= options.end) {
 				delete req.headers.range;
-				return this.error(req, res, this.codes.NOT_SATISFIABLE).then(function () {
+				return this.error(req, res, this.codes.RANGE_NOT_SATISFIABLE).then(function () {
 					deferred.resolve(true);
 				}, function (e) {
 					deferred.reject(e);
@@ -1396,7 +1396,7 @@ class TurtleIO {
 			}
 
 			fs.createReadStream(lbody, options).on("error", () => {
-				deferred.reject(new Error(this.codes.SERVER_ERROR));
+				deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
 			}).on("close", function () {
 				deferred.resolve(true);
 			}).pipe(res);
@@ -1593,7 +1593,7 @@ class TurtleIO {
 
 						if (isNaN(errz.message)) {
 							body = errz;
-							status = new Error(this.codes.SERVER_ERROR);
+							status = new Error(this.codes.INTERNAL_SERVER_ERROR);
 						} else {
 							body = errz.extended;
 							status = Number(errz.message);
@@ -1976,14 +1976,14 @@ class TurtleIO {
 					if (!req.headers.hasOwnProperty("etag") || req.headers.etag === letag) {
 						fs.writeFile(fpath, body, err => {
 							if (err) {
-								deferred.reject(new Error(this.codes.SERVER_ERROR));
+								deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
 							} else {
 								status = this.codes[put ? "NO_CONTENT" : "CREATED"];
 								deferred.resolve(this.respond(req, res, this.page(status, this.hostname(req)), status, {allow: allow}, false));
 							}
 						});
 					} else if (req.headers.etag !== letag) {
-						deferred.resolve(this.respond(req, res, this.messages.NO_CONTENT, this.codes.FAILED, {}, false));
+						deferred.resolve(this.respond(req, res, this.messages.NO_CONTENT, this.codes.PRECONDITION_FAILED, {}, false));
 					}
 				}
 			});
