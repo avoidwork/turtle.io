@@ -14,7 +14,7 @@
   "license": "BSD-3-Clause",
   "main": "lib/index",
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=4.0.0"
   },
   "scripts": {
     "test": "grunt test"
