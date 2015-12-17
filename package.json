@@ -22,6 +22,7 @@
   "dependencies": {
     "csv.js": "^1.0.2",
     "dtrace-provider": "^0.6.0",
+    "es6-map": "^0.1.3",
     "es6-promise": "^3.0.2",
     "haro": "^1.9.5",
     "mime": "^1.3.4",

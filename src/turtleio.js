@@ -1,4 +1,5 @@
-const array = require("retsu"),
+const Map = global.Map || require("es6-map"),
+	array = require("retsu"),
 	constants = require("constants"),
 	csv = require("csv.js"),
 	defer = require("tiny-defer"),
@@ -34,8 +35,8 @@ class TurtleIO {
 		this.etags = lru(this.config.cache);
 		this.levels = levels;
 		this.messages = messages;
-		this.middleware = this.middleware = {all: {}};
-		this.loglevel = "info";
+		this.middleware = new Map();
+		this.loglevel = 6;
 		this.logging = false;
 		this.permissions = lru(this.config.cache);
 		this.routeCache = lru(this.config.cache * verbs.length);
@@ -409,7 +410,7 @@ class TurtleIO {
 
 			// If valid, determine what kind of error to respond with
 			if (!regex.get.test(method)) {
-				if (this.allowed(method, req.parsed.pathname, req.vhost)) {
+				if (utility.contains(req.allow, method)) {
 					lstatus = this.codes.INTERNAL_SERVER_ERROR;
 				} else {
 					lstatus = this.codes.METHOD_NOT_ALLOWED;
@@ -750,7 +751,6 @@ class TurtleIO {
 	 * @return {Object} TurtleIO instance
 	 */
 	probes () {
-		this.dtp.addProbe("allowed", "char *", "char *", "char *", "int");
 		this.dtp.addProbe("allows", "char *", "char *", "int");
 		this.dtp.addProbe("compress", "char *", "char *", "int");
 		this.dtp.addProbe("compression", "char *", "int");
@@ -1409,13 +1409,13 @@ class TurtleIO {
 		if (cached) {
 			result = cached;
 		} else {
-			lall = this.middleware.all || {};
-			h = this.middleware[host] || {};
+			lall = this.middleware.get(all);
+			h = this.middleware.get(host) || new Map();
 			result = [];
 
-			[lall.all, lall[method], h.all, h[method]].forEach(function (c) {
+			[lall.get(all), lall.get(method), h.get(all), h.get(method)].forEach(function (c) {
 				if (c) {
-					Object.keys(c).filter(function (i) {
+					Array.from(c.keys()).filter(function (i) {
 						let valid;
 
 						try {
@@ -1426,7 +1426,7 @@ class TurtleIO {
 
 						return valid;
 					}).forEach(function (i) {
-						result = result.concat(c[i]);
+						result = result.concat(c.get(i));
 					});
 				}
 			});
@@ -1697,7 +1697,8 @@ class TurtleIO {
 		let lpath = rpath,
 			lfn = fn,
 			lhost = host,
-			lmethod = method;
+			lmethod = method,
+			mhost, mmethod;
 
 		if (typeof lpath !== "string") {
 			lhost = lfn;
@@ -1712,16 +1713,20 @@ class TurtleIO {
 			throw new Error("Invalid middleware");
 		}
 
-		if (!this.middleware[lhost]) {
-			this.middleware[lhost] = {};
+		if (!this.middleware.has(lhost)) {
+			this.middleware.set(lhost, new Map());
 		}
 
-		if (!this.middleware[lhost][lmethod]) {
-			this.middleware[lhost][lmethod] = {};
+		mhost = this.middleware.get(lhost);
+
+		if (!mhost.has(lmethod)) {
+			mhost.set(lmethod, new Map());
 		}
 
-		if (!this.middleware[lhost][lmethod][lpath]) {
-			this.middleware[lhost][lmethod][lpath] = [];
+		mmethod = mhost.get(lmethod);
+
+		if (!mmethod.has(lpath)) {
+			mmethod.set(lpath, []);
 		}
 
 		if (lfn.handle) {
@@ -1729,7 +1734,7 @@ class TurtleIO {
 		}
 
 		lfn.hash = this.hash(lfn.toString());
-		this.middleware[lhost][lmethod][lpath].push(lfn);
+		mmethod.get(lpath).push(lfn);
 
 		return this;
 	}
@@ -1894,7 +1899,7 @@ class TurtleIO {
 			put = regex.put.test(req.method),
 			body = req.body,
 			allow = req.allow,
-			del = this.allowed("DELETE", req.parsed.pathname, req.vhost),
+			del = utility.contains(req.allow, "DELETE"),
 			status;
 
 		if (!put && regex.end_slash.test(req.url)) {
