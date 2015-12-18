@@ -25,6 +25,9 @@ module.exports = function (grunt) {
 			test : {
 				src : ["test/*_test.js"]
 			}
+		},
+		nsp: {
+			package: grunt.file.readJSON("package.json")
 		}
 	});
 
@@ -32,11 +35,9 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-babel");
 	grunt.loadNpmTasks("grunt-eslint");
 	grunt.loadNpmTasks("grunt-mocha-test");
-	grunt.loadNpmTasks("grunt-nsp-package");
+	grunt.loadNpmTasks("grunt-nsp");
 
 	// aliases
-	grunt.registerTask("test", ["eslint", "mochaTest"]);
-	grunt.registerTask("validate", "validate-package");
+	grunt.registerTask("test", ["eslint", "mochaTest", "nsp"]);
 	grunt.registerTask("default", ["babel", "test"]);
-	grunt.registerTask("package", ["validate", "default"]);
 };
