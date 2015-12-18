@@ -321,7 +321,7 @@ class TurtleIO {
 		req.timer = timer;
 
 		// Finding a matching virtual host
-		this.vhostsRegExp.forEach((i, idx) => {
+		array.each(this.vhostsRegExp, (i, idx) => {
 			if (i.test(hostname)) {
 				return !(req.vhost = this.vhosts[idx]);
 			}
