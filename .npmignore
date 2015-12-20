@@ -10,5 +10,4 @@
 .eslintrc
 .travis.yml
 Gruntfile.js
-CHANGELOG.md
 sample.js
