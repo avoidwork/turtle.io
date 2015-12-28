@@ -1,5 +1,4 @@
-const path = require("path");
-const regex = require(path.join(__dirname, "regex.js"));
+const coerce = require("tiny-coerce");
 const url = require("url");
 
 function trim (obj) {
@@ -28,30 +27,6 @@ function capitalize (obj, all = false) {
 
 function clone (arg) {
 	return JSON.parse(JSON.stringify(arg));
-}
-
-function coerce (value) {
-	let tmp;
-
-	if (value === null || value === undefined) {
-		return undefined;
-	} else if (value === "true") {
-		return true;
-	} else if (value === "false") {
-		return false;
-	} else if (value === "null") {
-		return null;
-	} else if (value === "undefined") {
-		return undefined;
-	} else if (value === "") {
-		return value;
-	} else if (!isNaN(tmp = Number(value))) {
-		return tmp;
-	} else if (regex.json_wrap.test(value)) {
-		return JSON.parse(value);
-	} else {
-		return value;
-	}
 }
 
 function contains (haystack, needle) {
@@ -174,7 +149,6 @@ function parse (uri) {
 module.exports = {
 	capitalize: capitalize,
 	clone: clone,
-	coerce: coerce,
 	contains: contains,
 	explode: explode,
 	escape: escape,

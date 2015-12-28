@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Elastic web server framework with easy virtual hosts & reverse proxies",
-  "version": "5.0.3",
+  "version": "5.0.4",
   "homepage": "http://turtle.io",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -29,6 +29,7 @@
     "murmurhash3js": "^3.0.1",
     "precise": "^1.1.0",
     "retsu": "^2.0.0",
+    "tiny-coerce": "^1.0.0",
     "tiny-defer": "^1.0.3",
     "tiny-lru": "^1.0.2"
   },
