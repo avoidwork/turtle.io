@@ -31,11 +31,11 @@ Virtual host keys are the hostname, and the value is the directory relative to "
 ```javascript
 var turtleio = require("turtle.io");
 var server = turtleio({
-    default : "mysite.com",
-    port    : 80,
-    uid     : 100,
-    root    : "/var/www",
-    hosts  : {
+    default: "mysite.com",
+    port: 80,
+    uid: 100,
+    root: "/var/www",
+    hosts: {
         "mysite.com"         : "mysite.com",
         "another-domain.com" : "another-domain.com"
     }
