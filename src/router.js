@@ -88,7 +88,7 @@ class Router {
 	route (req, res) {
 		let deferred = defer(),
 			method = regex.head.test(req.method) ? "GET" : req.method,
-			middleware = array.iterator(this.routes(req.parsed.pathname, req.vhost, method));
+			middleware = array.iterator(this.routes(req.parsed.pathname, req.host, method));
 
 		let next = err => {
 			process.nextTick(() => {

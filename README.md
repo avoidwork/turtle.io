@@ -44,15 +44,6 @@ var server = turtleio({
 server.start();
 ```
 
-#### Proxy routes
-This example has `/api` act as a reverse proxy to another service.
-
-```javascript
-var server = require("turtle.io")();
-server.proxy("/api", "https://api.github.com");
-server.start(require(__dirname + "/config.json"));
-```
-
 ## Benchmark with express.js
 `siege` was used instead of `ab` because we want to compare _accurate_ transaction rates.
 
@@ -84,19 +75,20 @@ app.listen(3000);
 ```javascript
 "use strict";
 
-var dir    = __dirname,
-    server = require(dir + "/lib/turtle.io")();
+var turtleio = require("index.js"),
+    app;
 
-server.start( {
-	default : "test",
-	root    : dir + "/sites",
-	vhosts  : {
+app = turtleio({
+	default: "test",
+	root: __dirname + "/sites",
+	port: 8000,
+	hosts: {
 		"test" : "test"
 	},
-	logs: {
-		stdout: false
+	logging: {
+		enabled: false
 	}
-} );
+}).start();
 ```
 
 #### Transactions/s
@@ -134,12 +126,12 @@ _Object_
 
 turtle.io instance
 
-##### vhost
+##### host
 _String_
 
 Virtual host handling the request.
 
-#### respond
+#### response
 ##### error
 _Function (status, body)_
 
@@ -161,9 +153,14 @@ _Function (body[, status, headers])_
 Send a response.
 
 ## Configuration
-Configuration values can be set by editing `config.json` in the turtle.io directory, or by passing an Object to `start()`.
+Configuration values can be set by passing an Object to the factory, or any time afterward.
 
-#### cache
+#### address
+_String (0.0.0.0)_
+
+Network address to listen on.
+
+#### cacheSize
 _Number (1000)_
 
 Size of LRU cache for Etag validation.
@@ -171,7 +168,12 @@ Size of LRU cache for Etag validation.
 #### catchAll
 _Boolean (true)_
 
-Handle unterminated requests
+Handle unterminated requests.
+
+#### compress
+_Boolean (true)_
+
+Compress responses when supported.
 
 #### default
 _String_
@@ -183,10 +185,10 @@ _Object_
 
 Response headers. CORS is enabled by default.
 
-#### id
-_String (turtle_io)_
+#### hosts
+_Object_
 
-DTrace application identifier
+***[Required]*** Virtual hosts the server will respond for, `key` is the hostname & `value` is the directory relative to `root`.
 
 #### index
 _Array_
@@ -198,65 +200,50 @@ _Number (2)_
 
 Default "pretty" ident size
 
-#### logs
+#### logging
 _Object_
 
 Logging configuration.
 
-#### logs.format
-_String_ (%v %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\")
-
-Common Log Format string of tokens, defaulting to standard Virtual Host format.
-
-#### logs.level
-_String_ ("info")
-
-Minimum Common Log Level which is emitted to `stdout`.
-
-#### logs.stdout
+#### logging.enabled
 _Boolean_ (true)
 
 Override & disable `stdout` emitting by setting to `false`.
 
-#### logs.dtrace
-_Boolean_ (false)
+#### logging.format
+_String_ (%v %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\")
 
-Override & enable `dtrace` probes which emit nanosecond timing of hot paths.
+Common Log Format string of tokens, defaulting to standard Virtual Host format.
 
-#### logs.time
+#### logging.level
+_String_ ("info")
+
+Minimum Common Log Level which is emitted to `stdout`.
+
+#### logging.time
 _String_ (D/MMM/YYYY:HH:mm:ss ZZ)
 
 Format for the date/time portion of a log message.
 
 #### maxBytes
-_Number (0/unlimited)_
+_Number (1048576)_
 
-Default maximum request body size, when exceeded a 429 is sent.
-
-#### pages
-_String (null)_
-
-Directory relative to `root` which has files named for HTTP status codes, to be served upon error, e.g. `404.htm`.
+Maximum request body size; when exceeded a 429 is sent.
 
 #### port
 _Number (8000)_
 
 Port the server will listen on.
 
-#### proxy
-_Object_
-
-Proxy configuration.
-
-#### proxy.rewrite
-_Array (["index.htm", "index.html"])_
-
-Content-Type header values to apply URL rewrites to.
-
 #### root
 _String ("")_
 
 Relative path to the web root directory.
+
+#### seed
+_Number (625)_
+
+Seed for hashing of middleware with MurmurHash3.
 
 #### ssl.cert
 _Object_
@@ -273,11 +260,6 @@ _Number (null)_
 
 [Optional] UID the server runs as.
 
-#### vhosts
-_Object_
-
-***[Required]*** Virtual hosts the server will respond for, `key` is the hostname & `value` is the directory relative to `root`.
-
 ## License
-Copyright (c) 2015 Jason Mulligan  
+Copyright (c) 2016 Jason Mulligan  
 Licensed under the BSD-3 license.

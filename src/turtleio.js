@@ -18,7 +18,6 @@ const array = require("retsu"),
 class TurtleIO {
 	constructor () {
 		this.config = {
-			id: "jnz",
 			address: "0.0.0.0",
 			default: "localhost",
 			cacheSize: 1000,
@@ -123,17 +122,17 @@ class TurtleIO {
 		req.query = parsed.query;
 		req.server = this;
 		req.timer = timer;
-		req.vhost = this.router.host(parsed.hostname) || this.config.default;
+		req.host = this.router.host(parsed.hostname) || this.config.default;
 
-		if (!this.router.allowed("GET", req.parsed.pathname, req.vhost)) {
+		if (!this.router.allowed("GET", req.parsed.pathname, req.host)) {
 			this.get(req.parsed.pathname, (req2, res2, next2) => {
 				this.request(req2, res2).then(next2, next2);
-			}, req.vhost);
+			}, req.host);
 
 			update = true;
 		}
 
-		req.allow = this.router.allows(req.parsed.pathname, req.vhost, update);
+		req.allow = this.router.allows(req.parsed.pathname, req.host, update);
 
 		res.redirect = target => {
 			return this.send(req, res, "", 302, {location: target});
@@ -447,7 +446,7 @@ class TurtleIO {
 		if (req.headers.expect) {
 			deferred.reject(new Error(417));
 		} else {
-			root = path.join(this.config.root, this.config.hosts[req.vhost]);
+			root = path.join(this.config.root, this.config.hosts[req.host]);
 			lpath = path.join(root, req.parsed.pathname.replace(regex.dir, ""));
 
 			fs.lstat(lpath, (e, stats) => {
