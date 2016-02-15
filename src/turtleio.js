@@ -702,6 +702,10 @@ class TurtleIO {
 		return "http" + (this.config.ssl.cert ? "s" : "") + "://" + auth + req.headers.host + req.url;
 	}
 
+	use (...args) {
+		return this.router.use.apply(this.router, args);
+	}
+
 	watch (uri, fpath) {
 		if (this.watching[fpath] === undefined) {
 			this.watching[fpath] = fs.watch(fpath, () => {
@@ -770,15 +774,15 @@ function factory (cfg = {}, errHandler = null) {
 		obj.error = errHandler;
 	}
 
-	// Setting default middleware
-	obj.router.setHost("all");
-	[middleware.etag, middleware.cors, middleware.connect].forEach(i => {
-		obj.router.use(i).blacklist(i);
-	});
-
 	// Registering virtual hosts
+	obj.router.setHost("all");
 	Object.keys(obj.config.hosts).forEach(i => {
 		obj.router.setHost(i);
+	});
+
+	// Setting default middleware
+	[middleware.etag, middleware.cors, middleware.connect].forEach(i => {
+		obj.use(i).blacklist(i);
 	});
 
 	return obj;
