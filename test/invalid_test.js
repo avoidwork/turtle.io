@@ -1,14 +1,13 @@
 var hippie = require("hippie"),
 	path = require("path"),
-	instance = require(path.join("..", "index.js")),
-	etag = "",
-	server;
+	server = require(path.join("..", "index.js")),
+	etag = "";
 
 function request () {
 	return hippie().base("http://localhost:8002");
 }
 
-server = instance({
+server({
 	default: "test",
 	root: path.join(__dirname, "..", "sites"),
 	port: 8002,
@@ -18,11 +17,7 @@ server = instance({
 	hosts: {
 		test: "test"
 	}
-});
-
-console.log(server);
-
-server.start();
+}).start();
 
 describe("Invalid Requests", function () {
 	it("GET / (416 / 'Partial response - invalid')", function (done) {

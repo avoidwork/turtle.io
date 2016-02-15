@@ -9,7 +9,7 @@ You can also create complex web applications, with a familiar API.
 ## Getting Started
 1. Install the module with: `npm install turtle.io`
 2. Create a script to load & start a server. You could use `sample.js` in the turtle.io directory (./node_modules/turtle.io) as a template, or see the examples below
-3. [Optional] Edit `config.json` in the turtle.io directory to configure server defaults; you can override defaults by passing `start()` an Object
+3. [Optional] You can override defaults by passing the factory an Object
 
 The following examples assume you've installed turtle.io into `/opt/turtleio`, if this is not the case you need to edit the applicable file to correct the path.
 
@@ -29,18 +29,19 @@ turtle.io requires a ***default*** virtual host to be specified, because it is t
 Virtual host keys are the hostname, and the value is the directory relative to "root".
 
 ```javascript
-var server = require("turtle.io")();
-server.start({
-	default : "mysite.com",
-	port    : 80,
-	uid     : 100,
-	root    : "/var/www",
-	pages   : "errors",
-	vhosts  : {
-		"mysite.com"         : "mysite.com",
-		"another-domain.com" : "another-domain.com"
-	}
+var turtleio = require("turtle.io");
+var server = turtleio({
+    default : "mysite.com",
+    port    : 80,
+    uid     : 100,
+    root    : "/var/www",
+    hosts  : {
+        "mysite.com"         : "mysite.com",
+        "another-domain.com" : "another-domain.com"
+    }
 });
+
+server.start();
 ```
 
 #### Proxy routes

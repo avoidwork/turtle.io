@@ -55,7 +55,7 @@ class TurtleIO {
 				key: null,
 				cert: null
 			},
-			uid: ""
+			uid: 0
 		};
 		this.etags = null;
 		this.router = null;
@@ -580,6 +580,11 @@ class TurtleIO {
 				}, (req, res) => {
 					this.pipeline(req, res);
 				}).listen(this.config.port, this.config.address);
+			}
+
+			// Dropping process
+			if (this.config.uid && !isNaN(this.config.uid)) {
+				process.setuid(this.config.uid);
 			}
 
 			this.log("Started server on port " + this.config.address + ":" + this.config.port, "debug");
