@@ -71,6 +71,10 @@ class TurtleIO {
 		return this;
 	}
 
+	blacklist (...args) {
+		return this.router.blacklist.apply(this.router, args);
+	}
+
 	clf (req, res, headers) {
 		let user = "-";
 
