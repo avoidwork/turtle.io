@@ -49,6 +49,36 @@ describe("Valid Requests", function () {
 			});
 	});
 
+	it("GET / (304 / empty)", function (done) {
+		request()
+			.get("/")
+			.header("If-None-Match", etag)
+			.expectStatus(304)
+			.expectHeader("status", "304 Not Modified")
+			.expectHeader("content-length", undefined)
+			.expectHeader("etag", etag)
+			.expectBody(/^$/)
+			.end(function (err) {
+				if (err) { console.log(err); throw err; }
+				done();
+			});
+	});
+
+	it("GET / (304 / empty / validation)", function (done) {
+		request()
+			.get("/")
+			.header("If-None-Match", etag)
+			.expectStatus(304)
+			.expectHeader("status", "304 Not Modified")
+			.expectHeader("content-length", undefined)
+			.expectHeader("etag", etag)
+			.expectBody(/^$/)
+			.end(function (err) {
+				if (err) throw err;
+				done();
+			});
+	});
+
 	it("GET / (206 / 'Partial response - 0 offset')", function (done) {
 		request()
 			.get("/")
@@ -79,36 +109,6 @@ describe("Valid Requests", function () {
 			.end(function (err, res) {
 				if (err) throw err;
 				etag = res.headers.etag;
-				done();
-			});
-	});
-
-	it("GET / (304 / empty)", function (done) {
-		request()
-			.header("If-None-Match", etag)
-			.get("/")
-			.expectStatus(304)
-			.expectHeader("status", "304 Not Modified")
-			.expectHeader("content-length", undefined)
-			.expectHeader("etag", etag)
-			.expectBody(/^$/)
-			.end(function (err) {
-				if (err) { console.log(err); throw err; }
-				done();
-			});
-	});
-
-	it("GET / (304 / empty / validation)", function (done) {
-		request()
-			.header("If-None-Match", etag)
-			.get("/")
-			.expectStatus(304)
-			.expectHeader("status", "304 Not Modified")
-			.expectHeader("content-length", undefined)
-			.expectHeader("etag", etag)
-			.expectBody(/^$/)
-			.end(function (err) {
-				if (err) throw err;
 				done();
 			});
 	});

@@ -43,9 +43,9 @@ function etag (req, res, next) {
 	if (regex.get_only.test(req.method) && !req.headers.range && req.headers["if-none-match"] !== undefined) {
 		cached = req.server.etags.get(req.parsed.href);
 
-		if (cached && (req.headers["if-none-match"] || "").replace(/\"/g, "") === cached.value.etag) {
-			headers = utility.clone(cached.value.headers);
-			headers.age = parseInt(new Date().getTime() / 1000 - cached.value.timestamp, 10);
+		if (cached && (req.headers["if-none-match"] || "").replace(/\"/g, "") === cached.etag) {
+			headers = utility.clone(cached.headers);
+			headers.age = parseInt(new Date().getTime() / 1000 - cached.timestamp, 10);
 			res.send("", 304, headers).then(null, next);
 		} else {
 			next();

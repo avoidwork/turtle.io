@@ -44,8 +44,8 @@ class Router {
 	blacklist (fn) {
 		let hfn = fn.hash || this.hash(fn.toString());
 
-		if (!this.config.noaction[hfn]) {
-			this.config.noaction[hfn] = 1;
+		if (!this.noaction[hfn]) {
+			this.noaction[hfn] = 1;
 		}
 
 		return hfn;

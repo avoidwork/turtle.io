@@ -10,6 +10,7 @@ const array = require("retsu"),
 	moment = require("moment"),
 	mmh3 = require("murmurhash3js").x86.hash32,
 	zlib = require("zlib"),
+	middleware = require(path.join(__dirname, "middleware.js")),
 	regex = require(path.join(__dirname, "regex.js")),
 	router = require(path.join(__dirname, "router.js")),
 	utility = require(path.join(__dirname, "utility.js")),
@@ -292,7 +293,9 @@ class TurtleIO {
 				"access-control-expose-headers",
 				"access-control-max-age",
 				"access-control-allow-methods",
-				"access-control-allow-headers"];
+				"access-control-allow-headers"],
+			options = {},
+			size = headers["content-length"];
 
 		if (!result.allow) {
 			result.allow = req.allow;
@@ -316,7 +319,29 @@ class TurtleIO {
 			result["access-control-allow-methods"] = result.allow;
 		}
 
-		if (!pipe && result["content-length"]) {
+		if (!pipe && req.headers.range && headers["content-range"] === undefined) {
+			req.headers.range.split(",")[0].split("-").forEach((i, idx) => {
+				options[idx === 0 ? "start" : "end"] = i ? parseInt(i, 10) : undefined;
+			});
+
+			// Byte offsets
+			if (isNaN(options.start) && !isNaN(options.end)) {
+				options.start = size - options.end;
+				options.end = size;
+			} else if (isNaN(options.end)) {
+				options.end = size;
+			}
+
+			if (options.start >= options.end || isNaN(options.start) || isNaN(options.start)) {
+				result["content-range"] = "";
+			} else {
+				req.range = options;
+				result["content-range"] = "bytes " + options.start + "-" + options.end + "/" + size;
+				result["content-length"] = options.end - options.start + 1;
+			}
+		}
+
+		if (!pipe && result["content-length"] === undefined) {
 			result["content-length"] = Buffer.byteLength(body.toString());
 		} else if (pipe) {
 			delete result["content-length"];
@@ -349,7 +374,8 @@ class TurtleIO {
 		}
 
 		result.status = status + " " + (http.STATUS_CODES[status] || "");
-		result["x-response-time"] = (req.timer.stop().diff() / 1000000).toFixed(2) + " ms";
+		result["x-response-time"] = ((req.timer.stopped.length === 0 ? req.timer.stop() : req.timer).diff() / 1000000).toFixed(2) + " ms";
+
 		this.log("Generated headers", "debug");
 
 		return result;
@@ -392,6 +418,10 @@ class TurtleIO {
 			} else {
 				status = Number(e.message);
 				body = e.extended || http.STATUS_CODES[status] || http.STATUS_CODES[500];
+
+				if (e.extended) {
+					this.log(e.extended, "error");
+				}
 			}
 
 			return this.error(req, res, status, body);
@@ -416,6 +446,7 @@ class TurtleIO {
 		[
 			"content-length",
 			"content-encoding",
+			"date",
 			"server",
 			"status",
 			"transfer-encoding",
@@ -508,11 +539,19 @@ class TurtleIO {
 				}
 
 				body = JSON.stringify(body, null, indent);
+				headers["content-length"] = Buffer.byteLength(body);
 				headers["content-type"] = "application/json";
 			}
 
 			lheaders = this.headers(req, res, status, body, headers, pipe);
-			compression = this.compression(req.headers["accept-encoding"], lheaders["content-type"]);
+
+			if (status !== 416 && req.headers.range && !lheaders["content-range"]) {
+				return this.error(req, res, 416, http.STATUS_CODES[416]);
+			}
+
+			if (body) {
+				compression = this.compression(req.headers["accept-encoding"], lheaders["content-type"]);
+			}
 
 			if (compression) {
 				if (regex.gzip.test(compression)) {
@@ -527,7 +566,7 @@ class TurtleIO {
 					lheaders["transfer-encoding"] = "chunked";
 					delete lheaders["content-length"];
 					res.writeHead(status, lheaders);
-					body.pipe(zlib[compressionMethod]()).on("error", errHandler).on("end", () => {
+					body.pipe(zlib[compressionMethod]()).on("error", errHandler).on("close", () => {
 						deferred.resolve(true);
 					}).pipe(res);
 				} else {
@@ -543,6 +582,11 @@ class TurtleIO {
 					});
 				}
 			} else {
+				if (lheaders["content-range"]) {
+					status = 206;
+					lheaders.status = status + " " + http.STATUS_CODES[status];
+				}
+
 				res.writeHead(status, lheaders);
 
 				if (pipe) {
@@ -550,9 +594,22 @@ class TurtleIO {
 						deferred.resolve(true);
 					}).pipe(res);
 				} else {
-					res.end(body.toString());
+					if (req.range) {
+						res.end(new Buffer(body.toString()).slice(req.range.start, req.range.end + 1).toString());
+					} else {
+						res.end(body.toString());
+					}
+
 					deferred.resolve(true);
 				}
+			}
+
+			if (status < 400 && lheaders.etag) {
+				this.register(req.parsed.href, {
+					etag: lheaders.etag.replace(/"/g, ""),
+					headers: utility.clone(lheaders),
+					timestamp: parseInt(new Date().getTime() / 1000, 10)
+				}, true);
 			}
 
 			this.log(this.clf(req, res, lheaders), "info");
@@ -713,8 +770,11 @@ function factory (cfg = {}, errHandler = null) {
 		obj.error = errHandler;
 	}
 
-	// Setting default routes
+	// Setting default middleware
 	obj.router.setHost("all");
+	[middleware.etag, middleware.cors, middleware.connect].forEach(i => {
+		obj.router.use(i).blacklist(i);
+	});
 
 	// Registering virtual hosts
 	Object.keys(obj.config.hosts).forEach(i => {
