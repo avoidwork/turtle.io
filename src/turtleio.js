@@ -71,6 +71,14 @@ class TurtleIO {
 		return this;
 	}
 
+	allows (...args) {
+		return this.router.allows.apply(this.router, args);
+	}
+
+	allowed (...args) {
+		return this.router.allowed.apply(this.router, args);
+	}
+
 	blacklist (...args) {
 		return this.router.blacklist.apply(this.router, args);
 	}
