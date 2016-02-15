@@ -1,6 +1,6 @@
 const regex = {
 	body: /^(PUT|POST|PATCH)$/,
-	comp: /javascript|json|text|xml/,
+	compress: /javascript|json|text|xml/,
 	csv: /text\/csv/,
 	del: /^DELETE$/,
 	end_slash: /\/$/,

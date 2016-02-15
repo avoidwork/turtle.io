@@ -1,479 +1,197 @@
 const array = require("retsu"),
-	constants = require("constants"),
-	csv = require("csv.js"),
 	defer = require("tiny-defer"),
-	dtrace = require("dtrace-provider"),
-	fs = require("fs"),
+	lru = require("tiny-lru"),
 	http = require("http"),
 	https = require("https"),
-	mime = require("mime"),
-	mmh3 = require("murmurhash3js").x86.hash32,
-	moment = require("moment"),
-	os = require("os"),
 	path = require("path"),
-	haro = require("haro"),
+	fs = require("fs"),
 	precise = require("precise"),
-	lru = require("tiny-lru"),
+	mime = require("mimetype"),
+	moment = require("moment"),
+	mmh3 = require("murmurhash3js").x86.hash32,
 	zlib = require("zlib"),
-	levels = require(path.join(__dirname, "levels.js")),
-	messages = require(path.join(__dirname, "messages.js")),
-	codes = require(path.join(__dirname, "codes.js")),
 	regex = require(path.join(__dirname, "regex.js")),
 	router = require(path.join(__dirname, "router.js")),
 	utility = require(path.join(__dirname, "utility.js")),
-	version = require(path.join(__dirname, "..", "package.json")).version,
-	defaultConfig = require(path.join(__dirname, "..", "config.json")),
-	all = "all",
-	verbs = ["DELETE", "GET", "POST", "PUT", "PATCH"];
+	version = require(path.join(__dirname, "..", "package.json")).version;
 
 class TurtleIO {
 	constructor () {
-		this.config = utility.clone(defaultConfig);
-		this.codes = codes;
-		this.dtp = null;
-		this.etags = lru(this.config.cache);
-		this.levels = levels;
-		this.messages = messages;
-		this.middleware = new Map();
-		this.loglevel = 6;
-		this.logging = false;
-		this.permissions = lru(this.config.cache);
-		this.routeCache = lru(this.config.cache * verbs.length);
-		this.pages = haro(null, {id: "pages", versioning: false, index: ["host|status"]});
+		this.config = {
+			id: "jnz",
+			address: "0.0.0.0",
+			default: "localhost",
+			cacheSize: 1000,
+			catchAll: true,
+			compress: true,
+			headers: {
+				"accept-ranges": "bytes",
+				"content-type": "text/html; charset=utf-8"
+			},
+			hosts: {},
+			index: ["index.htm", "index.html"],
+			json: 2,
+			logging: {
+				enabled: true,
+				format: "%v %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"",
+				level: "debug",
+				levels: {
+					"emerg": 0,
+					"alert": 1,
+					"crit": 2,
+					"error": 3,
+					"warn": 4,
+					"notice": 5,
+					"info": 6,
+					"debug": 7
+				},
+				time: "D/MMM/YYYY:HH:mm:ss ZZ"
+			},
+			maxBytes: 1048576,
+			port: 8000,
+			root: "",
+			seed: 625,
+			ssl: {
+				key: null,
+				cert: null
+			},
+			uid: ""
+		};
+		this.etags = null;
+		this.router = null;
 		this.server = null;
-		this.stale = 0;
-		this.vhosts = [];
-		this.vhostsRegExp = [];
 		this.watching = {};
 	}
 
-	/**
-	 * Verifies a method is allowed on a URI
-	 *
-	 * @method allowed
-	 * @param  {String}  method   HTTP verb
-	 * @param  {String}  uri      URI to query
-	 * @param  {String}  host     Hostname
-	 * @param  {Boolean} override Overrides cached version
-	 * @return {Boolean}          Boolean indicating if method is allowed
-	 */
-	allowed (method, uri, host, override) {
-		return this.routes(uri, host, method, override).filter(i => {
-			return this.config.noaction[i.hash || this.hash(i)] === undefined;
-		}).length > 0;
-	}
-
-	/**
-	 * Determines which verbs are allowed against a URL
-	 *
-	 * @method allows
-	 * @param  {String}  uri      URI to query
-	 * @param  {String}  host     Hostname
-	 * @param  {Boolean} override Overrides cached version
-	 * @return {String}           Allowed methods
-	 */
-	allows (uri, host, override) {
-		let timer = precise().start(),
-			result = !override ? this.permissions.get(host + "_" + uri) : undefined;
-
-		if (override || !result) {
-			result = verbs.filter(i => {
-				return this.allowed(i, uri, host, override);
-			});
-
-			result = result.join(", ").replace("GET", "GET, HEAD, OPTIONS");
-			this.permissions.set(host + "_" + uri, result);
-		}
-
-		timer.stop();
-		this.signal("allows", function () {
-			return [host, uri, timer.diff()];
+	all (route, fn, host) {
+		this.router.verbs.forEach(i => {
+			this.router.use(route, fn, host, i);
 		});
-
-		return result;
-	}
-
-	/**
-	 * Adds a function the middleware 'no action' hash
-	 *
-	 * @method blacklist
-	 * @param  {Function} fn Function to add
-	 * @return {Object}      TurtleIO instance
-	 */
-	blacklist (fn) {
-		let hfn = fn.hash || this.hash(fn.toString());
-
-		if (this.config.noaction === undefined) {
-			this.config.noaction = {};
-		}
-
-		if (!this.config.noaction[hfn]) {
-			this.config.noaction[hfn] = 1;
-		}
 
 		return this;
 	}
 
-	/**
-	 * Pipes compressed asset to Client
-	 *
-	 * @method compressed
-	 * @param  {Object}  req     HTTP(S) request Object
-	 * @param  {Object}  res     HTTP(S) response Object
-	 * @param  {Object}  body    Response body
-	 * @param  {Object}  type    gzip (gz) or deflate (df)
-	 * @param  {String}  letag   Etag
-	 * @param  {Boolean} file    Indicates `body` is a file path
-	 * @param  {Object}  options Stream options
-	 * @param  {Number}  status  HTTP status
-	 * @param  {Object}  headers HTTP headers
-	 * @return {Object}          Promise
-	 */
-	compress (req, res, body, type, letag, file, options, status, headers) {
-		let timer = precise().start(),
-			deferred = defer(),
-			method = regex.gzip.test(type) ? "createGzip" : "createDeflate",
-			sMethod = method.replace("create", "").toLowerCase(),
-			fp = letag ? path.join(this.config.tmp, letag + "." + type) : null;
+	clf (req, res, headers) {
+		let user = "-";
 
-		let next = exist => {
-			if (!file) {
-				if (typeof body.pipe === "function") { // Pipe Stream through compression to Client & disk
-					if (!res._header && !res._headerSent) {
-						headers["transfer-encoding"] = "chunked";
-						delete headers["content-length"];
-						res.writeHead(status, headers);
-					}
-
-					// Stream a compressed body to client
-					body.pipe(zlib[method]()).on("end", () => {
-						timer.stop();
-						this.signal("compress", function () {
-							return [letag, fp, timer.diff()];
-						});
-						deferred.resolve(true);
-					}).pipe(res);
-
-					// Stream a compressed body to disk
-					body.pipe(zlib[method]()).pipe(fs.createWriteStream(fp));
-				} else { // Raw response body, compress and send to Client & disk
-					zlib[sMethod](body, (e, data) => {
-						if (e) {
-							this.unregister(req.parsed.href);
-							deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
-						} else {
-							if (!res._header && !res._headerSent) {
-								headers["content-length"] = data.length;
-								headers["transfer-encoding"] = "identity";
-								res.writeHead(status, headers);
-							}
-
-							res.end(data);
-
-							if (fp) {
-								fs.writeFile(fp, data, "utf8", err => {
-									if (err) {
-										this.unregister(req.parsed.href);
-									}
-								});
-							}
-
-							timer.stop();
-							this.signal("compress", function () {
-								return [letag, fp || "dynamic", timer.diff()];
-							});
-							deferred.resolve(true);
-						}
-					});
-				}
-			} else {
-				if (!res._header && !res._headerSent) {
-					headers["transfer-encoding"] = "chunked";
-					delete headers["content-length"];
-					res.writeHead(status, headers);
-				}
-
-				// Pipe compressed asset to Client
-				fs.createReadStream(body, options).on("error", () => {
-					this.unregister(req.parsed.href);
-					deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
-				}).pipe(zlib[method]()).on("close", () => {
-					timer.stop();
-					this.signal("compress", function () {
-						return [letag, fp, timer.diff()];
-					});
-					deferred.resolve(true);
-				}).pipe(res);
-
-				// Pipe compressed asset to disk
-				if (exist === false) {
-					fs.createReadStream(body).on("error", () => {
-						this.unregister(req.parsed.href);
-					}).pipe(zlib[method]()).pipe(fs.createWriteStream(fp));
-				}
-			}
-		};
-
-		if (fp) {
-			fs.exists(fp, exist => {
-				// Pipe compressed asset to Client
-				if (exist) {
-					fs.lstat(fp, (e, stats) => {
-						if (e) {
-							deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
-						} else {
-							if (!res._header && !res._headerSent) {
-								headers["transfer-encoding"] = "chunked";
-								delete headers["content-length"];
-
-								if (options) {
-									headers["content-range"] = "bytes " + options.start + "-" + options.end + "/" + stats.size;
-								}
-
-								res.writeHead(status, headers);
-							}
-
-							fs.createReadStream(fp, options).on("error", () => {
-								this.unregister(req.parsed.href);
-								deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
-							}).on("close", () => {
-								timer.stop();
-								this.signal("compress", function () {
-									return [letag, fp, timer.diff()];
-								});
-								deferred.resolve(true);
-							}).pipe(res);
-						}
-					});
-				} else {
-					next(exist);
-				}
-			});
-		} else {
-			next(false);
+		if (req.parsed.auth && req.parsed.auth.indexOf(":") > -1) {
+			user = req.parsed.auth.split(":")[0] || "-";
 		}
 
-		return deferred.promise;
+		return this.config.logging.format.replace("%v", req.headers.host)
+			.replace("%h", req.ip || "-")
+			.replace("%l", "-")
+			.replace("%u", user)
+			.replace("%t", "[" + moment().format(this.config.logging.time) + "]")
+			.replace("%r", req.method + " " + req.url + " HTTP/1.1")
+			.replace("%>s", res.statusCode)
+			.replace("%b", headers["content-length"] || "-")
+			.replace("%{Referer}i", req.headers.referer || "-")
+			.replace("%{User-agent}i", req.headers["user-agent"] || "-");
 	}
 
-	/**
-	 * Determines what/if compression is supported for a request
-	 *
-	 * @method compression
-	 * @param  {String} agent    User-Agent header value
-	 * @param  {String} encoding Accept-Encoding header value
-	 * @param  {String} mimetype Mime type of response body
-	 * @return {Mixed}           Supported compression or null
-	 */
-	compression (agent, encoding, mimetype) {
-		let timer = precise().start(),
-			result = "",
-			encodings = typeof encoding === "string" ? utility.explode(encoding) : [];
+	compression (encoding = "", mimetype = "") {
+		let result;
 
-		// No soup for IE!
-		if (this.config.compress === true && regex.comp.test(mimetype) && !regex.ie.test(agent)) {
-			array.each(encodings, function (i) {
+		if (this.config.compress === true && regex.compress.test(mimetype)) {
+			array.each(utility.explode(encoding), i => {
 				if (regex.gzip.test(i)) {
 					result = "gz";
+					return false;
 				}
 
 				if (regex.def.test(i)) {
 					result = "zz";
-				}
-
-				if (!utility.isEmpty(result)) {
 					return false;
 				}
 			});
 		}
 
-		timer.stop();
-		this.signal("compression", function () {
-			return [agent, timer.diff()];
-		});
-
 		return result;
 	}
 
-	/**
-	 * Decorates the Request & Response
-	 *
-	 * @method decorate
-	 * @param  {Object} req Request Object
-	 * @param  {Object} res Response Object
-	 * @return {Undefined}  Undefined
-	 */
 	decorate (req, res) {
-		let timer = precise().start(), // Assigning as early as possible
-			uri = this.url(req),
-			parsed = utility.parse(uri),
-			hostname = parsed.hostname,
+		let timer = precise().start(),
+			parsed = utility.parse(this.url(req)),
 			update = false;
 
-		// Decorating parsed Object on request
 		req.body = "";
 		res.header = res.setHeader;
-		req.ip = req.headers["x-forwarded-for"] ? array.last(utility.explode(req.headers["x-forwarded-for"])) : req.connection.remoteAddress;
+		req.ip = req.headers["x-forwarded-for"] ? array.last(req.headers["x-forwarded-for"].split(/\s*,\s*/g)) : req.connection.remoteAddress;
 		res.locals = {};
 		req.parsed = parsed;
 		req.query = parsed.query;
 		req.server = this;
 		req.timer = timer;
+		req.vhost = this.router.host(parsed.hostname) || this.config.default;
 
-		// Finding a matching virtual host
-		array.each(this.vhostsRegExp, (i, idx) => {
-			if (i.test(hostname)) {
-				return !(req.vhost = this.vhosts[idx]);
-			}
-		});
-
-		req.vhost = req.vhost || this.config.default;
-
-		// Adding middleware to avoid the round trip next time
-		if (!this.allowed("GET", req.parsed.pathname, req.vhost)) {
+		if (!this.router.allowed("GET", req.parsed.pathname, req.vhost)) {
 			this.get(req.parsed.pathname, (req2, res2, next2) => {
-				this.request(req2, res2).then(function () {
-					next2();
-				}, function (e) {
-					next2(e);
-				});
+				this.request(req2, res2).then(next2, next2);
 			}, req.vhost);
 
 			update = true;
 		}
 
-		req.allow = this.allows(req.parsed.pathname, req.vhost, update);
+		req.allow = this.router.allows(req.parsed.pathname, req.vhost, update);
 
-		// Adding methods
 		res.redirect = target => {
-			return this.respond.call(this, req, res, this.messages.NO_CONTENT, this.codes.FOUND, {location: target});
+			return this.send(req, res, "", 302, {location: target});
 		};
 
 		res.respond = (arg, status, headers) => {
-			return this.respond.call(this, req, res, arg, status, headers);
+			return this.send(req, res, arg, status, headers);
 		};
 
 		res.error = (status, arg) => {
-			return this.error.call(this, req, res, status, arg);
+			return this.error(req, res, status, arg);
 		};
 
 		res.send = (arg, status, headers) => {
-			return this.respond.call(this, req, res, arg, status, headers);
+			return this.send(req, res, arg, status, headers);
 		};
 	}
 
-	/**
-	 * Encodes `arg` as JSON if applicable
-	 *
-	 * @method encode
-	 * @param  {Mixed}  arg    Object to encode
-	 * @param  {String} accept Accept HTTP header
-	 * @return {Mixed}         Original Object or JSON string
-	 */
-	encode (arg, accept) {
-		let header, indent;
+	del (route, fn, host) {
+		this.router.use(route, fn, host, "DELETE");
 
-		if (arg instanceof Buffer || typeof arg.pipe === "function") {
-			return arg;
-		} else if (arg instanceof Array || arg instanceof Object) {
-			header = regex.indent.exec(accept);
-			indent = header !== null ? parseInt(header[1], 10) : this.config.json;
-
-			return JSON.stringify(arg, null, indent);
-		} else {
-			return arg;
-		}
+		return this;
 	}
 
-	/**
-	 * Error handler for requests
-	 *
-	 * @method error
-	 * @param  {Object} req    Request Object
-	 * @param  {Object} res    Response Object
-	 * @param  {Number} status [Optional] HTTP status code
-	 * @param  {String} msg    [Optional] Response body
-	 * @return {Object}        Promise
-	 */
-	error (req, res, status, msg) {
-		let timer = precise().start(),
-			deferred = defer(),
-			method = req.method,
-			host = req.parsed ? req.parsed.hostname : all,
-			kdx = -1,
-			lstatus = status,
-			body;
+	delete (route, fn, host) {
+		this.router.use(route, fn, host, "DELETE");
 
-		if (isNaN(lstatus)) {
-			lstatus = this.codes.NOT_FOUND;
+		return this;
+	}
 
-			// If valid, determine what kind of error to respond with
-			if (!regex.get.test(method)) {
-				if (utility.contains(req.allow, method)) {
-					lstatus = this.codes.INTERNAL_SERVER_ERROR;
-				} else {
-					lstatus = this.codes.METHOD_NOT_ALLOWED;
-				}
-			}
-		}
-
-		array.cast(this.codes).forEach(function (i, idx) {
-			if (i === lstatus) {
-				kdx = idx;
-				return false;
-			}
-		});
+	error (req, res, status = 500, msg = http.STATUS_CODES[500]) {
+		let body;
 
 		if (msg === undefined) {
-			body = this.page(lstatus, host);
+			body = "<html><head><title>" + http.STATUS_CODES[status] + "</title></head><body><h1>" + http.STATUS_CODES[status] + "</h1></body></html>";
 		}
 
-		timer.stop();
-		this.signal("error", () => {
-			return [req.vhost, req.parsed.path, lstatus, msg || kdx ? array.cast(this.messages)[kdx] : "Unknown error", timer.diff()];
-		});
-
-		this.respond(req, res, msg || body, lstatus, {
-			"cache-control": "no-cache",
-			"content-length": Buffer.byteLength(msg || body)
-		}).then(function () {
-			deferred.resolve(true);
-		}, function () {
-			deferred.resolve(true);
-		});
-
-		return deferred.promise;
+		return this.send(req, res, msg || body, status, {"cache-control": "no-cache"});
 	}
 
-	/**
-	 * Generates an Etag
-	 *
-	 * @method etag
-	 * @return {String}          Etag value
-	 */
 	etag (...args) {
 		return this.hash(args.join("-"));
 	}
 
-	/**
-	 * Handles the request
-	 *
-	 * @method handle
-	 * @param  {Object}  req    HTTP(S) request Object
-	 * @param  {Object}  res    HTTP(S) response Object
-	 * @param  {String}  fpath  File path
-	 * @param  {String}  uri    Requested URL
-	 * @param  {Boolean} dir    `true` is `path` is a directory
-	 * @param  {Object}  stat   fs.Stat Object
-	 * @return {Object}         Promise
-	 */
+	get (route, fn, host) {
+		this.router.use(route, fn, host, "GET");
+
+		return this;
+	}
+
 	handle (req, res, fpath, uri, dir, stat) {
 		let deferred = defer(),
 			allow = req.allow,
 			write = utility.contains(allow, dir ? "POST" : "PUT"),
 			del = utility.contains(allow, "DELETE"),
 			method = req.method,
-			letag, headers, mimetype, modified, size, pathname, invalid, out_dir, in_dir;
+			status = 200,
+			letag, headers, mimetype, modified, size, pathname, invalid, out_dir, in_dir, options;
 
 		if (!dir) {
 			pathname = req.parsed.pathname.replace(regex.root, "");
@@ -483,11 +201,10 @@ class TurtleIO {
 			out_dir = !invalid ? (pathname.match(/\.{2}\//g) || []).length : 0;
 			in_dir = !invalid ? (pathname.match(/\w+?(\.\w+|\/)+/g) || []).length : 0;
 
-			// Are we still in the virtual host root?
 			if (invalid) {
-				deferred.reject(new Error(this.codes.NOT_FOUND));
+				deferred.reject(new Error(404));
 			} else if (out_dir > 0 && out_dir >= in_dir) {
-				deferred.reject(new Error(this.codes.NOT_FOUND));
+				deferred.reject(new Error(404));
 			} else if (regex.get.test(method)) {
 				mimetype = mime.lookup(fpath);
 				size = stat.size;
@@ -502,565 +219,203 @@ class TurtleIO {
 				};
 
 				if (regex.get_only.test(method)) {
-					// Decorating path for watcher
-					req.path = fpath;
+					this.watch(req.parsed.href, fpath);
 
-					// Client has current version
-					switch (true) {
-						case req.headers["if-none-match"] === letag:
-						case !req.headers["if-none-match"] && Date.parse(req.headers["if-modified-since"]) >= stat.mtime:
-							this.respond(req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, headers, true).then(deferred.resolve, deferred.reject);
-							break;
-						default:
-							this.respond(req, res, fpath, this.codes.OK, headers, true).then(deferred.resolve, deferred.reject);
+					if (req.headers["if-none-match"] === letag) {
+						delete headers["content-length"];
+						this.send(req, res, "", 304, headers).then(deferred.resolve, deferred.reject);
+					} else if (!req.headers["if-none-match"] && Date.parse(req.headers["if-modified-since"]) >= stat.mtime) {
+						delete headers["content-length"];
+						this.send(req, res, "", 304, headers).then(deferred.resolve, deferred.reject);
+					} else {
+						options = {};
+
+						// Setting the partial content headers
+						if (req.headers.range) {
+							req.headers.range.split(",")[0].split("-").forEach((i, idx) => {
+								options[idx === 0 ? "start" : "end"] = i ? parseInt(i, 10) : undefined;
+							});
+
+							// Byte offsets
+							if (isNaN(options.start) && !isNaN(options.end)) {
+								options.start = size - options.end;
+								options.end = size;
+							} else if (isNaN(options.end)) {
+								options.end = size;
+							}
+
+							if (options.start >= options.end || isNaN(options.start) || isNaN(options.start)) {
+								return this.error(req, res, 416, http.STATUS_CODES[416]).then(function () {
+									deferred.resolve(true);
+								}, function (e) {
+									deferred.reject(e);
+								});
+							}
+
+							status = 206;
+							headers["content-range"] = "bytes " + options.start + "-" + options.end + "/" + size;
+							headers["content-length"] = options.end - options.start + 1;
+						}
+
+						this.send(req, res, fs.createReadStream(fpath, options), status, headers).then(deferred.resolve, deferred.reject);
 					}
 				} else {
-					this.respond(req, res, this.messages.NO_CONTENT, this.codes.OK, headers, true).then(deferred.resolve, deferred.reject);
+					this.send(req, res, "", 200, headers).then(deferred.resolve, deferred.reject);
 				}
 			} else if (regex.del.test(method) && del) {
-				this.unregister(this.url(req));
+				this.unregister(req.parsed.href, fpath);
 
 				fs.unlink(fpath, e => {
 					if (e) {
-						deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
+						this.error(req, res, 500).then(deferred.resolve, deferred.reject);
 					} else {
-						this.respond(req, res, this.messages.NO_CONTENT, this.codes.NO_CONTENT, {}).then(deferred.resolve, deferred.reject);
+						this.send(req, res, "", 204, {}).then(deferred.resolve, deferred.reject);
 					}
 				});
 			} else if (regex.put.test(method) && write) {
 				this.write(req, res, fpath).then(deferred.resolve, deferred.reject);
 			} else {
-				deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
+				this.error(req, res, 500).then(deferred.resolve, deferred.reject);
 			}
 		} else if ((regex.post.test(method) || regex.put.test(method)) && write) {
 			this.write(req, res, fpath).then(deferred.resolve, deferred.reject);
-		} else if (regex.del.test(method) && del) {
-			this.unregister(req.parsed.href);
-
-			fs.unlink(fpath, e => {
-				if (e) {
-					deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
-				} else {
-					this.respond(req, res, this.messages.NO_CONTENT, this.codes.NO_CONTENT, {}).then(deferred.resolve, deferred.reject);
-				}
-			});
 		} else {
-			deferred.reject(new Error(this.codes.METHOD_NOT_ALLOWED));
+			this.error(req, res, 405, http.STATUS_CODES[405]).then(deferred.resolve, deferred.reject);
 		}
 
 		return deferred.promise;
 	}
 
-	/**
-	 * Creates a hash of arg
-	 *
-	 * @method hash
-	 * @param  {Mixed}  arg String or Buffer
-	 * @return {String} Hash of arg
-	 */
+	headers (req, res, status, body, headers, pipe) {
+		let result = utility.merge(utility.clone(this.config.headers), headers),
+			cors = ["access-control-allow-origin",
+				"access-control-allow-credentials",
+				"access-control-expose-headers",
+				"access-control-max-age",
+				"access-control-allow-methods",
+				"access-control-allow-headers"];
+
+		if (!result.allow) {
+			result.allow = req.allow;
+		}
+
+		if (!result.date) {
+			result.date = new Date().toUTCString();
+		}
+
+		if (!req.cors) {
+			cors.forEach(i => {
+				delete result[i];
+			});
+		} else {
+			cors.forEach(i => {
+				result[i] = result[i.replace("access-control-", "")] || "";
+			});
+
+			result["access-control-allow-origin"] = req.headers.origin || req.headers.referer.replace(/\/$/, "");
+			result["access-control-allow-credentials"] = "true";
+			result["access-control-allow-methods"] = result.allow;
+		}
+
+		if (!pipe && result["content-length"]) {
+			result["content-length"] = Buffer.byteLength(body.toString());
+		} else if (pipe) {
+			delete result["content-length"];
+			result["transfer-encoding"] = "chunked";
+		}
+
+		if (!regex.get.test(req.method) || status >= 400 || result["x-ratelimit-limit"]) {
+			delete result["cache-control"];
+			delete result.etag;
+			delete result["last-modified"];
+		}
+
+		if (status === 304) {
+			delete result["content-length"];
+			delete result["last-modified"];
+		}
+
+		if (status === 404 && result.allow) {
+			delete result.allow;
+			delete result["accept-ranges"];
+			delete result["access-control-allow-methods"];
+		}
+
+		if (status >= 500) {
+			delete result["accept-ranges"];
+		}
+
+		if (result["last-modified"] === "") {
+			delete result["last-modified"];
+		}
+
+		result.status = status + " " + (http.STATUS_CODES[status] || "");
+		result["x-response-time"] = (req.timer.stop().diff() / 1000000).toFixed(2) + " ms";
+		this.log("Generated headers", "debug");
+
+		return result;
+	}
+
 	hash (arg) {
 		return mmh3(arg, this.config.seed);
 	}
 
-	/**
-	 * Sets response headers
-	 *
-	 * @method headers
-	 * @param  {Object}  req      Request Object
-	 * @param  {Object}  rHeaders Response headers
-	 * @param  {Number}  status   HTTP status code, default is 200
-	 * @return {Object}           Response headers
-	 */
-	headers (req, lRHeaders = {}, status = codes.OK) {
-		let timer = precise().start(),
-			rHeaders = utility.clone(lRHeaders),
-			lheaders;
+	log (msg, level = "debug") {
+		let idx;
 
-		// Decorating response headers
-		if (status !== this.codes.NOT_MODIFIED && status >= this.codes.MULTIPLE_CHOICE && status < this.codes.BAD_REQUEST) {
-			lheaders = rHeaders;
-		} else {
-			lheaders = utility.merge(utility.clone(this.config.headers), rHeaders);
+		if (this.config.logging.enabled) {
+			idx = this.config.logging.levels[level];
 
-			if (!lheaders.allow) {
-				lheaders.allow = req.allow;
+			if (idx <= this.config.logging.levels[this.config.logging.level]) {
+				process.nextTick(() => {
+					console[idx < 4 ? "log" : "error"](msg);
+				});
 			}
-
-			if (!lheaders.date) {
-				lheaders.date = new Date().toUTCString();
-			}
-
-			if (req.cors) {
-				lheaders["access-control-allow-origin"] = req.headers.origin || req.headers.referer.replace(/\/$/, "");
-				lheaders["access-control-allow-credentials"] = "true";
-				lheaders["access-control-allow-methods"] = lheaders.allow;
-			} else {
-				delete lheaders["access-control-allow-origin"];
-				delete lheaders["access-control-expose-headers"];
-				delete lheaders["access-control-max-age"];
-				delete lheaders["access-control-allow-credentials"];
-				delete lheaders["access-control-allow-methods"];
-				delete lheaders["access-control-allow-headers"];
-			}
-
-			// Decorating "Transfer-Encoding" header
-			if (!lheaders["transfer-encoding"]) {
-				lheaders["transfer-encoding"] = "identity";
-			}
-
-			// Removing headers not wanted in the response
-			if (!regex.get.test(req.method) || status >= this.codes.BAD_REQUEST || lheaders["x-ratelimit-limit"]) {
-				delete lheaders["cache-control"];
-				delete lheaders.etag;
-				delete lheaders["last-modified"];
-			}
-
-			if (lheaders["x-ratelimit-limit"]) {
-				lheaders["cache-control"] = "no-cache";
-			}
-
-			if (status === this.codes.NOT_MODIFIED) {
-				delete lheaders["last-modified"];
-			}
-
-			if (status === this.codes.NOT_FOUND && lheaders.allow) {
-				delete lheaders["accept-ranges"];
-			}
-
-			if (status >= this.codes.INTERNAL_SERVER_ERROR) {
-				delete lheaders["accept-ranges"];
-			}
-
-			if (!lheaders["last-modified"]) {
-				delete lheaders["last-modified"];
-			}
-		}
-
-		lheaders.status = status + " " + (http.STATUS_CODES[status] || "");
-
-		timer.stop();
-		this.signal("headers", function () {
-			return [status, timer.diff()];
-		});
-
-		return lheaders;
-	}
-
-	/**
-	 * Registers a virtual host
-	 *
-	 * @method host
-	 * @param  {String} arg Virtual host
-	 * @return {Object}     TurtleIO instance
-	 */
-	host (arg) {
-		if (!array.contains(this.vhosts, arg)) {
-			this.vhosts.push(arg);
-			this.vhostsRegExp.push(new RegExp("^" + arg.replace(/\*/g, ".*") + "$"));
 		}
 
 		return this;
 	}
 
-	/**
-	 * Logs a message
-	 *
-	 * @method log
-	 * @param  {Mixed}  arg   Error Object or String
-	 * @param  {String} level [Optional] `level` must match a valid LogLevel - http://httpd.apache.org/docs/1.3/mod/core.html#loglevel, default is `notice`
-	 * @return {Object}       TurtleIO instance
-	 */
-	log (arg, level = "notice") {
-		let timer, e;
-
-		if (this.logging) {
-			timer = precise().start();
-			e = arg instanceof Error;
-
-			if (this.config.logs.stdout && this.levels.indexOf(level) <= this.loglevel) {
-				if (e) {
-					console.error("[" + moment().format(this.config.logs.time) + "] [" + level + "] " + (arg.stack || arg.message || arg));
-				} else {
-					console.log(arg);
-				}
-			}
-
-			timer.stop();
-			this.signal("log", () => {
-				return [level, this.config.logs.stdout, false, timer.diff()];
-			});
-		}
+	patch (route, fn, host) {
+		this.router.use(route, fn, host, "PATCH");
 
 		return this;
 	}
 
-	/**
-	 * Gets an HTTP status page
-	 *
-	 * @method page
-	 * @param  {Number} status HTTP status code
-	 * @param  {String} host   Virtual hostname
-	 * @return {String}        Response body
-	 */
-	page (status = 500, host = all) {
-		let result = this.pages.find({host: host, status: status});
+	pipeline (req, res) {
+		this.decorate(req, res);
+		this.router.route(req, res).catch(e => {
+			let body, status;
 
-		if (result.length === 0) {
-			result = this.pages.find({host: all, status: status});
-		}
-
-		return result.length > 0 ? result[0][1].body : http.STATUS_CODES[status];
-	}
-
-	/**
-	 * Preparing log message
-	 *
-	 * @method prep
-	 * @param  {Object} req     HTTP(S) request Object
-	 * @param  {Object} res     HTTP(S) response Object
-	 * @param  {Object} headers HTTP(S) response headers
-	 * @return {String}         Log message
-	 */
-	prep (req, res, headers) {
-		let msg = this.config.logs.format,
-			user = "-";
-
-		if (req.parsed.auth && utility.contains(req.parsed.auth, ":")) {
-			user = req.parsed.auth.split(":")[0] || "-";
-		}
-
-		msg = msg.replace("%v", req.headers.host)
-			.replace("%h", req.ip || "-")
-			.replace("%l", "-")
-			.replace("%u", user)
-			.replace("%t", "[" + moment().format(this.config.logs.time) + "]")
-			.replace("%r", req.method + " " + req.url + " HTTP/1.1")
-			.replace("%>s", res.statusCode)
-			.replace("%b", headers["content-length"] || "-")
-			.replace("%{Referer}i", req.headers.referer || "-")
-			.replace("%{User-agent}i", req.headers["user-agent"] || "-");
-
-		return msg;
-	}
-
-	/**
-	 * Registers dtrace probes
-	 *
-	 * @method probes
-	 * @return {Object} TurtleIO instance
-	 */
-	probes () {
-		this.dtp.addProbe("allows", "char *", "char *", "int");
-		this.dtp.addProbe("compress", "char *", "char *", "int");
-		this.dtp.addProbe("compression", "char *", "int");
-		this.dtp.addProbe("error", "char *", "char *", "int", "char *", "int");
-		this.dtp.addProbe("headers", "int", "int");
-		this.dtp.addProbe("log", "char *", "int", "int", "int");
-		this.dtp.addProbe("proxy", "char *", "char *", "char *", "char *", "int");
-		this.dtp.addProbe("middleware", "char *", "char *", "int");
-		this.dtp.addProbe("request", "char *", "int");
-		this.dtp.addProbe("respond", "char *", "char *", "char *", "int", "int");
-		this.dtp.addProbe("status", "int", "int", "int", "int", "int");
-		this.dtp.addProbe("write", "char *", "char *", "char *", "char *", "int");
-		this.dtp.enable();
-	}
-
-	/**
-	 * Proxies a URL to a route
-	 *
-	 * @method proxy
-	 * @param  {String}  route  Route to proxy
-	 * @param  {String}  origin Host to proxy (e.g. http://hostname)
-	 * @param  {String}  host   [Optional] Hostname this route is for (default is all)
-	 * @param  {Boolean} stream [Optional] Stream response to client (default is false)
-	 * @return {Object}         TurtleIO instance
-	 */
-	proxy (route, origin, host, stream = false) {
-		/**
-		 * Response handler
-		 *
-		 * @method handle
-		 * @private
-		 * @param  {Object} req     Request Object
-		 * @param  {Object} res     Response Object
-		 * @param  {Object} headers Proxy Response headers
-		 * @param  {Object} status  Proxy Response status
-		 * @param  {String} arg     Proxy Response body
-		 * @return {Undefined}      undefined
-		 */
-		let handle = (req, res, headers, status, arg) => {
-			let deferred = defer(),
-				letag = "",
-				regexOrigin = new RegExp(origin.replace(regex.end_slash, ""), "g"),
-				uri = req.parsed.href,
-				lstale = this.stale,
-				get = regex.get_only.test(req.method),
-				rewriteOrigin = req.parsed.protocol + "//" + req.parsed.host + (route === "/" ? "" : route),
-				larg = arg,
-				cached, rewrite;
-
-			if (headers.server) {
-				headers.via = (headers.via ? headers.via + ", " : "") + headers.server;
-			}
-
-			headers.server = this.config.headers.server;
-
-			if (status >= this.codes.BAD_REQUEST) {
-				this.error(req, res, status, arg).then(function (argz) {
-					deferred.resolve(argz);
-				});
+			if (isNaN(e.message)) {
+				status = new Error(http.STATUS_CODES[500]);
+				body = e;
 			} else {
-				// Determining if the response will be cached
-				if (get && (status === this.codes.OK || status === this.codes.NOT_MODIFIED) && !regex.nocache.test(headers["cache-control"]) && !regex.private.test(headers["cache-control"])) {
-					// Determining how long rep is valid
-					if (headers["cache-control"] && regex.number.test(headers["cache-control"])) {
-						lstale = parseInt(regex.number.exec(headers["cache-control"])[0], 10);
-					} else if (headers.expires !== undefined) {
-						lstale = new Date().getTime() - new Date(headers.expires);
-					}
-
-					// Removing from LRU when invalid
-					if (lstale > 0) {
-						setTimeout(() => {
-							this.unregister(uri);
-						}, lstale * 1000);
-					}
-				}
-
-				if (status !== this.codes.NOT_MODIFIED) {
-					rewrite = regex.rewrite.test((headers["content-type"] || "").replace(regex.nval, ""));
-
-					// Setting headers
-					if (get && status === this.codes.OK) {
-						letag = headers.etag || "\"" + this.etag(uri, headers["content-length"] || 0, headers["last-modified"] || 0, this.encode(arg)) + "\"";
-
-						if (headers.etag !== letag) {
-							headers.etag = letag;
-						}
-					}
-
-					if (headers.allow === undefined || utility.isEmpty(headers.allow)) {
-						headers.allow = headers["access-control-allow-methods"] || "GET";
-					}
-
-					// Determining if a 304 response is valid based on Etag only (no timestamp is kept)
-					if (get && req.headers["if-none-match"] === letag) {
-						cached = this.etags.get(uri);
-
-						if (cached) {
-							headers.age = parseInt(new Date().getTime() / 1000 - cached.value.timestamp, 10);
-						}
-
-						this.respond(req, res, this.messages.NO_CONTENT, this.codes.NOT_MODIFIED, headers).then(function (argz) {
-							deferred.resolve(argz);
-						}, function (e) {
-							deferred.reject(e);
-						});
-					} else {
-						if (regex.head.test(req.method)) {
-							larg = this.messages.NO_CONTENT;
-						} else if (rewrite) {
-							// Changing the size of the response body
-							delete headers["content-length"];
-
-							if (larg instanceof Array || larg instanceof Object) {
-								larg = JSON.stringify(larg).replace(regexOrigin, rewriteOrigin);
-
-								if (route !== "/") {
-									larg = larg.replace(/"(\/[^?\/]\w+)\//g, "\"" + route + "$1/");
-								}
-
-								larg = JSON.parse(larg);
-							} else if (typeof larg === "string") {
-								larg = larg.replace(regexOrigin, rewriteOrigin);
-
-								if (route !== "/") {
-									larg = larg.replace(/(href|src)=("|')([^http|mailto|<|_|\s|\/\/].*?)("|')/g, "$1=$2" + route + "/$3$4")
-										.replace(new RegExp(route + "//", "g"), route + "/");
-								}
-							}
-						}
-
-						this.respond(req, res, larg, status, headers).then(function (argz) {
-							deferred.resolve(argz);
-						}, function (e) {
-							deferred.reject(e);
-						});
-					}
-				} else {
-					this.respond(req, res, arg, status, headers).then(function (argz) {
-						deferred.resolve(argz);
-					}, function (e) {
-						deferred.reject(e);
-					});
-				}
+				status = Number(e.message);
+				body = e.extended || http.STATUS_CODES[status] || http.STATUS_CODES[500];
 			}
 
-			return deferred.promise;
-		};
-
-		/**
-		 * Wraps the proxy request
-		 *
-		 * @method wrapper
-		 * @private
-		 * @param  {Object} req HTTP(S) request Object
-		 * @param  {Object} res HTTP(S) response Object
-		 * @return {Undefined}  undefined
-		 */
-		let wrapper = (req, res) => {
-			let timer = precise().start(),
-				deferred = defer(),
-				uri = origin + (route !== "/" ? req.url.replace(new RegExp("^" + route), "") : req.url),
-				headerz = utility.clone(req.headers),
-				parsed = utility.parse(uri),
-				streamd = stream === true,
-				mimetype = mime.lookup(!regex.ext.test(parsed.pathname) ? "index.htm" : parsed.pathname),
-				fn, options, proxyReq, next, obj;
-
-			// Facade to handle()
-			fn = (headers, status, body) => {
-				timer.stop();
-				this.signal("proxy", function () {
-					return [req.vhost, req.method, route, origin, timer.diff()];
-				});
-				handle(req, res, headers, status, body).then(deferred.resolve, deferred.reject);
-			};
-
-			// Streaming formats that do not need to be rewritten
-			if (!streamd && (regex.ext.test(parsed.pathname) && !regex.json.test(mimetype)) && regex.stream.test(mimetype)) {
-				streamd = true;
-			}
-
-			// Identifying proxy behavior
-			headerz["x-host"] = parsed.host;
-			headerz["x-forwarded-for"] = headerz["x-forwarded-for"] ? headerz["x-forwarded-for"] + ", " + req.ip : req.ip;
-			headerz["x-forwarded-proto"] = parsed.protocol.replace(":", "");
-			headerz["x-forwarded-server"] = this.config.headers.server;
-
-			if (!headerz["x-real-ip"]) {
-				headerz["x-real-ip"] = req.ip;
-			}
-
-			// Removing compression for rewriting
-			delete headerz["accept-encoding"];
-
-			headerz.host = req.headers.host;
-			options = {
-				headers: headerz,
-				hostname: parsed.hostname,
-				method: req.method,
-				path: parsed.path,
-				port: parsed.port || (headerz["x-forwarded-proto"] === "https" ? 443 : 80),
-				agent: false
-			};
-
-			if (!utility.isEmpty(parsed.auth)) {
-				options.auth = parsed.auth;
-			}
-
-			if (streamd) {
-				next = function (proxyRes) {
-					res.writeHeader(proxyRes.statusCode, proxyRes.headers);
-					proxyRes.pipe(res);
-				};
-			} else {
-				next = function (proxyRes) {
-					var data = "";
-
-					proxyRes.setEncoding("utf8");
-					proxyRes.on("data", function (chunk) {
-						data += chunk;
-					}).on("end", function () {
-						fn(proxyRes.headers, proxyRes.statusCode, data);
-					});
-				};
-			}
-
-			if (utility.contains(parsed.protocol, "https")) {
-				options.rejectUnauthorized = false;
-				obj = https;
-			} else {
-				obj = http;
-			}
-
-			proxyReq = obj.request(options, next);
-			proxyReq.on("error", e => {
-				this.error(req, res, this.codes[regex.refused.test(e.message) ? "SERVER_UNAVAILABLE" : "SERVER_ERROR"], e.message);
-			});
-
-			if (regex.body.test(req.method)) {
-				proxyReq.write(req.body);
-			}
-
-			proxyReq.end();
-
-			return deferred.promise;
-		};
-
-		// Setting route
-		verbs.forEach(i => {
-			let x = i.toLowerCase();
-
-			if (route === "/") {
-				this[x]("/.*", wrapper, host);
-			} else {
-				this[x](route, wrapper, host);
-				this[x](route + "/.*", wrapper, host);
-			}
+			return this.error(req, res, status, body);
 		});
 
 		return this;
 	}
 
-	/**
-	 * Redirects GETs for a route to another URL
-	 *
-	 * @method redirect
-	 * @param  {String}  route     Route to redirect
-	 * @param  {String}  uri       URL to redirect the Client to
-	 * @param  {String}  host      [Optional] Hostname this route is for (default is all)
-	 * @param  {Boolean} permanent [Optional] `true` will indicate the redirection is permanent
-	 * @return {Object}            instance
-	 */
-	redirect (route, uri, host, permanent = false) {
-		let pattern = new RegExp("^" + route + "$");
-
-		this.get(route, (req, res) => {
-			let rewrite = (pattern.exec(req.url) || []).length > 0;
-
-			this.respond(req, res, this.messages.NO_CONTENT, this.codes[permanent ? "MOVED" : "REDIRECT"], {
-				location: rewrite ? req.url.replace(pattern, uri) : uri,
-				"cache-control": "no-cache"
-			});
-		}, host);
+	post (route, fn, host) {
+		this.router.use(route, fn, host, "POST");
 
 		return this;
 	}
 
-	/**
-	 * Registers an Etag in the LRU cache
-	 *
-	 * @method register
-	 * @param  {String}  uri   URL requested
-	 * @param  {Object}  state Object describing state `{etag: $etag, mimetype: $mimetype}`
-	 * @param  {Boolean} purge [Optional] Remove cache from disk
-	 * @return {Object}        TurtleIO instance
-	 */
-	register (uri, state, purge) {
-		let cached;
+	put (route, fn, host) {
+		this.router.use(route, fn, host, "PUT");
 
-		// Removing stale cache from disk
-		if (purge === true) {
-			cached = this.etags.cache[uri];
+		return this;
+	}
 
-			if (cached && cached.value.etag !== state.etag) {
-				this.unregister(uri);
-			}
-		}
-
-		// Removing superficial headers
+	register (uri, state) {
 		[
+			"content-length",
 			"content-encoding",
 			"server",
 			"status",
@@ -1077,58 +432,32 @@ class TurtleIO {
 			delete state.headers[i];
 		});
 
-		// Updating LRU
 		this.etags.set(uri, state);
+		this.log("Registered " + uri + " in cache", "debug");
 
 		return this;
 	}
 
-	/**
-	 * Request handler which provides RESTful CRUD operations
-	 *
-	 * @method request
-	 * @public
-	 * @param  {Object} req HTTP(S) request Object
-	 * @param  {Object} res HTTP(S) response Object
-	 * @return {Object}     TurtleIO instance
-	 */
 	request (req, res) {
-		let timer = precise().start(),
-			deferred = defer(),
+		let deferred = defer(),
 			method = req.method,
 			handled = false,
-			host = req.vhost,
 			count, lpath, nth, root;
 
-		let end = () => {
-			timer.stop();
-			this.signal("request", function () {
-				return [req.parsed.href, timer.diff()];
-			});
-		};
-
-		// If an expectation can't be met, don't try!
 		if (req.headers.expect) {
-			end();
-			deferred.reject(new Error(this.codes.EXPECTATION_FAILED));
+			deferred.reject(new Error(417));
 		} else {
-			// Preparing file path
-			root = path.join(this.config.root, this.config.vhosts[host]);
+			root = path.join(this.config.root, this.config.hosts[req.vhost]);
 			lpath = path.join(root, req.parsed.pathname.replace(regex.dir, ""));
 
-			// Determining if the request is valid
 			fs.lstat(lpath, (e, stats) => {
 				if (e) {
-					end();
-					deferred.reject(new Error(this.codes.NOT_FOUND));
+					deferred.reject(new Error(404));
 				} else if (!stats.isDirectory()) {
-					end();
 					this.handle(req, res, lpath, req.parsed.href, false, stats).then(deferred.resolve, deferred.reject);
 				} else if (regex.get.test(method) && !regex.dir.test(req.parsed.pathname)) {
-					end();
-					this.respond(req, res, this.messages.NO_CONTENT, this.codes.TEMPORARY_REDIRECT, {"location": (req.parsed.pathname !== "/" ? req.parsed.pathname : "") + "/" + req.parsed.search}).then(deferred.resolve, deferred.reject);
+					this.send(req, res, "", 301, {"location": (req.parsed.pathname !== "/" ? req.parsed.pathname : "") + "/" + req.parsed.search}).then(deferred.resolve, deferred.reject);
 				} else if (!regex.get.test(method)) {
-					end();
 					this.handle(req, res, lpath, req.parsed.href, true).then(deferred.resolve, deferred.reject);
 				} else {
 					count = 0;
@@ -1140,11 +469,9 @@ class TurtleIO {
 						fs.lstat(npath, (err, lstats) => {
 							if (!err && !handled) {
 								handled = true;
-								end();
 								this.handle(req, res, npath, (req.parsed.pathname !== "/" ? req.parsed.pathname : "") + "/" + i + req.parsed.search, false, lstats).then(deferred.resolve, deferred.reject);
 							} else if (++count === nth && !handled) {
-								end();
-								deferred.reject(new Error(this.codes.NOT_FOUND));
+								deferred.reject(new Error(404));
 							}
 						});
 					});
@@ -1152,521 +479,151 @@ class TurtleIO {
 			});
 		}
 
+		this.log("Routed request to disk", "debug");
+
 		return deferred.promise;
 	}
 
-	/**
-	 * Send a response
-	 *
-	 * @method respond
-	 * @param  {Object}  req     Request Object
-	 * @param  {Object}  res     Response Object
-	 * @param  {Mixed}   body    Primitive, Buffer or Stream
-	 * @param  {Number}  status  [Optional] HTTP status, default is `200`
-	 * @param  {Object}  headers [Optional] HTTP headers
-	 * @param  {Boolean} file    [Optional] Indicates `body` is a file path
-	 * @return {Object}          TurtleIO instance
-	 */
-	respond (req, res, body, status = codes.OK, headers = {"content-type": "text/plain"}, file = false) {
-		let timer = precise().start(),
-			deferred = defer(),
-			head = regex.head.test(req.method),
-			ua = req.headers["user-agent"],
-			encoding = req.headers["accept-encoding"],
-			lheaders = headers,
-			lstatus = status,
-			lbody = body,
-			type, options;
+	send (req, res, body = "", status = 200, headers = {"content-type": "text/plain"}) {
+		let deferred = defer(),
+			pipe = typeof body.on === "function",
+			indent = this.config.json,
+			header, lheaders, compression, compressionMethod, errHandler;
 
-		let finalize = () => {
-			let cheaders, cached;
-
-			if (regex.get_only.test(req.method) && (lstatus === this.codes.OK || lstatus === this.codes.NOT_MODIFIED)) {
-				// Updating cache
-				if (!regex.nocache.test(lheaders["cache-control"]) && !regex.private.test(lheaders["cache-control"])) {
-					cached = this.etags.get(req.parsed.href);
-
-					if (!cached) {
-						if (lheaders.etag === undefined) {
-							lheaders.etag = "\"" + this.etag(req.parsed.href, lbody.length || 0, lheaders["last-modified"] || 0, lbody || 0) + "\"";
-						}
-
-						cheaders = utility.clone(lheaders);
-
-						// Ensuring the content type is known
-						if (!cheaders["content-type"]) {
-							cheaders["content-type"] = mime.lookup(req.path || req.parsed.pathname);
-						}
-
-						this.register(req.parsed.href, {
-							etag: cheaders.etag.replace(/"/g, ""),
-							headers: cheaders,
-							mimetype: cheaders["content-type"],
-							timestamp: parseInt(new Date().getTime() / 1000, 10)
-						}, true);
-					}
-				}
-
-				// Setting a watcher on the local path
-				if (req.path) {
-					this.watch(req.parsed.href, req.path);
-				}
-			} else if (lstatus === this.codes.NOT_FOUND) {
-				delete lheaders.allow;
-				delete lheaders["access-control-allow-methods"];
+		errHandler = e => {
+			try {
+				res.end(http.STATUS_CODES[500]);
+			} catch (err) {
+				void 0;
 			}
+
+			this.log(e.stack, "warn");
+			deferred.reject(e);
 		};
 
-		lheaders = this.headers(req, lheaders, lstatus);
-
-		if (head) {
-			lbody = this.messages.NO_CONTENT;
-
-			if (regex.options.test(req.method)) {
-				lheaders["content-length"] = 0;
-				delete lheaders["content-type"];
-			}
-
-			delete lheaders.etag;
-			delete lheaders["last-modified"];
-		} else if (lbody === null || lbody === undefined) {
-			lbody = this.messages.NO_CONTENT;
-		}
-
-		if (!file && lbody !== this.messages.NO_CONTENT) {
-			lbody = this.encode(lbody, req.headers.accept);
-
-			if (lheaders["content-length"] === undefined) {
-				if (lbody instanceof Buffer) {
-					lheaders["content-length"] = Buffer.byteLength(lbody.toString());
+		if (!res._header && !res._headerSent) {
+			if (!pipe && body instanceof Object || body instanceof Array) {
+				if (req.headers.accept) {
+					header = regex.indent.exec(req.headers.accept);
+					indent = header !== null ? parseInt(header[1], 10) : this.config.json;
 				}
 
-				if (typeof lbody === "string") {
-					lheaders["content-length"] = Buffer.byteLength(lbody);
-				}
+				body = JSON.stringify(body, null, indent);
+				headers["content-type"] = "application/json";
 			}
 
-			lheaders["content-length"] = lheaders["content-length"] || 0;
+			lheaders = this.headers(req, res, status, body, headers, pipe);
+			compression = this.compression(req.headers["accept-encoding"], lheaders["content-type"]);
 
-			// Ensuring JSON has proper mimetype
-			if (regex.json_wrap.test(lbody)) {
-				lheaders["content-type"] = "application/json";
-			}
-
-			// CSV hook
-			if (regex.get_only.test(req.method) && lstatus === this.codes.OK && lbody && lheaders["content-type"] === "application/json" && req.headers.accept && regex.csv.test(utility.explode(req.headers.accept)[0].replace(regex.nval, ""))) {
-				lheaders["content-type"] = "text/csv";
-
-				if (!lheaders["content-disposition"]) {
-					lheaders["content-disposition"] = "attachment; filename=\"" + req.parsed.pathname.replace(/.*\//g, "").replace(/\..*/, "_") + req.parsed.search.replace("?", "").replace(/\&/, "_") + ".csv\"";
-				}
-
-				lbody = csv.encode(lbody);
-			}
-		}
-
-		if (lstatus === this.codes.NOT_MODIFIED) {
-			delete lheaders["accept-ranges"];
-			delete lheaders["content-encoding"];
-			delete lheaders["content-length"];
-			delete lheaders["content-type"];
-			delete lheaders.date;
-			delete lheaders["transfer-encoding"];
-		}
-
-		// Clean up, in case it these are still hanging around
-		if (lstatus === this.codes.NOT_FOUND) {
-			delete lheaders.allow;
-			delete lheaders["access-control-allow-methods"];
-		}
-
-		// Setting `x-response-time`
-		lheaders["x-response-time"] = ((req.timer.stopped.length === 0 ? req.timer.stop() : req.timer).diff() / 1000000).toFixed(2) + " ms";
-
-		// Setting the partial content headers
-		if (req.headers.range) {
-			options = {};
-			(req.headers.range.match(/\d+/g) || []).forEach((i, idx) => {
-				options[idx === 0 ? "start" : "end"] = parseInt(i, 10);
-			});
-
-			if (options.end === undefined) {
-				options.end = lheaders["content-length"];
-			}
-
-			if (isNaN(options.start) || isNaN(options.end) || options.start >= options.end) {
-				delete req.headers.range;
-				return this.error(req, res, this.codes.RANGE_NOT_SATISFIABLE).then(function () {
-					deferred.resolve(true);
-				}, function (e) {
-					deferred.reject(e);
-				});
-			}
-
-			lstatus = this.codes.PARTIAL_CONTENT;
-			lheaders.status = lstatus + " " + http.STATUS_CODES[lstatus];
-			lheaders["content-range"] = "bytes " + options.start + "-" + options.end + "/" + lheaders["content-length"];
-			lheaders["content-length"] = options.end - options.start;
-
-			// Complete range
-			++lheaders["content-length"];
-
-			// Accounting for 0 byte start position
-			--options.start;
-			--options.end;
-		}
-
-		// Determining if response should be compressed
-		if (ua && (lstatus === this.codes.OK || lstatus === this.codes.PARTIAL_CONTENT) && lbody !== this.messages.NO_CONTENT && this.config.compress && (type = this.compression(ua, encoding, lheaders["content-type"])) && !utility.isEmpty(type)) {
-			lheaders["content-encoding"] = regex.gzip.test(type) ? "gzip" : "deflate";
-
-			if (file) {
-				lheaders["transfer-encoding"] = "chunked";
-				delete lheaders["content-length"];
-			}
-
-			finalize();
-			this.compress(req, res, lbody, type, lheaders.etag ? lheaders.etag.replace(/"/g, "") : undefined, file, options, lstatus, lheaders).then(function () {
-				deferred.resolve(true);
-			}, function (e) {
-				deferred.reject(e);
-			});
-		} else if ((lstatus === this.codes.OK || lstatus === this.codes.PARTIAL_CONTENT) && file && regex.get_only.test(req.method)) {
-			lheaders["transfer-encoding"] = "chunked";
-			delete lheaders["content-length"];
-			finalize();
-
-			if (!res._header && !res._headerSent) {
-				res.writeHead(lstatus, lheaders);
-			}
-
-			fs.createReadStream(lbody, options).on("error", () => {
-				deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
-			}).on("close", function () {
-				deferred.resolve(true);
-			}).pipe(res);
-		} else {
-			finalize();
-
-			if (!res._header && !res._headerSent) {
-				res.writeHead(lstatus, lheaders);
-			}
-
-			if (lstatus === this.codes.PARTIAL_CONTENT) {
-				// Accounting for Buffer/String `slice()`
-				++options.end;
-
-				if (lbody instanceof Buffer) {
-					res.end(lbody.slice(options.start, options.end).toString());
+			if (compression) {
+				if (regex.gzip.test(compression)) {
+					lheaders["content-encoding"] = "gzip";
+					compressionMethod = "createGzip";
 				} else {
-					res.end(new Buffer(lbody).slice(options.start, options.end).toString());
+					lheaders["content-encoding"] = "deflate";
+					compressionMethod = "createDeflate";
+				}
+
+				if (pipe) {
+					lheaders["transfer-encoding"] = "chunked";
+					delete lheaders["content-length"];
+					res.writeHead(status, lheaders);
+					body.pipe(zlib[compressionMethod]()).on("error", errHandler).on("end", () => {
+						deferred.resolve(true);
+					}).pipe(res);
+				} else {
+					zlib[compressionMethod](body, (e, data) => {
+						if (e) {
+							errHandler(e);
+						} else {
+							lheaders["content-length"] = data.length;
+							res.writeHead(status, lheaders);
+							res.end(data);
+							deferred.resolve(true);
+						}
+					});
 				}
 			} else {
-				res.end(lbody);
+				res.writeHead(status, lheaders);
+
+				if (pipe) {
+					body.on("error", errHandler).on("close", function () {
+						deferred.resolve(true);
+					}).pipe(res);
+				} else {
+					res.end(body.toString());
+					deferred.resolve(true);
+				}
 			}
 
-			deferred.resolve(true);
+			this.log(this.clf(req, res, lheaders), "info");
+		} else {
+			this.log("Response already sent", "warn");
+			deferred.reject(new Error("Response already sent"));
 		}
-
-		timer.stop();
-		this.signal("respond", function () {
-			return [req.vhost, req.method, req.url, lstatus, timer.diff()];
-		});
-
-		process.nextTick(() => {
-			this.log(this.prep(req, res, lheaders), "info");
-		});
 
 		return deferred.promise;
 	}
 
-	/**
-	 * Restarts the instance
-	 *
-	 * @method restart
-	 * @return {Object} TurtleIO instance
-	 */
-	restart () {
-		let config = this.config;
-
-		return this.stop().start(config);
-	}
-
-	/**
-	 * Returns middleware for the uri
-	 *
-	 * @method result
-	 * @param  {String}  uri      URI to query
-	 * @param  {String}  host     Hostname
-	 * @param  {String}  method   HTTP verb
-	 * @param  {Boolean} override Overrides cached version
-	 * @return {Array}
-	 */
-	routes (uri, host, method, override = false) {
-		let id = method + ":" + host + ":" + uri,
-			cached = !override ? this.routeCache.get(id) : undefined,
-			lall, h, result;
-
-		if (cached) {
-			result = cached;
-		} else {
-			lall = this.middleware.get(all);
-			h = this.middleware.get(host) || new Map();
-			result = [];
-
-			[lall.get(all), lall.get(method), h.get(all), h.get(method)].forEach(function (c) {
-				if (c) {
-					Array.from(c.keys()).filter(function (i) {
-						let valid;
-
-						try {
-							valid = new RegExp("^" + i + "$", "i").test(uri);
-						} catch (e) {
-							valid = new RegExp("^" + utility.escape(i) + "$", "i").test(uri);
-						}
-
-						return valid;
-					}).forEach(function (i) {
-						result = result.concat(c.get(i));
-					});
-				}
-			});
-
-			this.routeCache.set(id, result);
-		}
-
-		return result;
-	}
-
-	/**
-	 * Signals a probe
-	 *
-	 * @method signal
-	 * @param  {String}   name Name of probe
-	 * @param  {Function} fn   DTP handler
-	 * @return {Object}        TurtleIO instance
-	 */
-	signal (name, fn) {
-		if (this.config.logs.dtrace) {
-			this.dtp.fire(name, fn);
-		}
-
-		return this;
-	}
-
-	/**
-	 * Starts the instance
-	 *
-	 * @method start
-	 * @param  {Object}   cfg Configuration
-	 * @param  {Function} err Error handler
-	 * @return {Object}       TurtleIO instance
-	 */
-	start (cfg = {}, err = undefined) {
-		let config = utility.merge(utility.clone(defaultConfig), cfg),
-			headers, pages;
-
-		this.dtp = dtrace.createDTraceProvider(config.id || "turtleio");
-
-		// Duplicating headers for re-decoration
-		headers = utility.clone(config.headers);
-
-		// Overriding default error handler
-		if (typeof err === "function") {
-			this.error = err;
-		}
-
-		// Setting configuration
-		if (!config.port) {
-			config.port = 8000;
-		}
-
-		this.config = utility.merge(this.config, config);
-
-		// Setting temp folder
-		this.config.tmp = this.config.tmp || os.tmpdir();
-
-		pages = this.config.pages ? path.join(this.config.root, this.config.pages) : path.join(__dirname, "..", "pages");
-		this.loglevel = this.levels.indexOf(this.config.logs.level);
-		this.logging = this.config.logs.dtrace || this.config.logs.stdout;
-
-		// Looking for required setting
-		if (!this.config.default) {
-			this.log(new Error("[client 0.0.0.0] Invalid default virtual host"), "error");
-			process.exit(1);
-		}
-
-		// Lowercasing default headers
-		delete this.config.headers;
-		this.config.headers = {};
-
-		utility.iterate(headers, (value, key) => {
-			this.config.headers[key.toLowerCase()] = value;
-		});
-
-		// Setting `Server` HTTP header
-		if (!this.config.headers.server) {
-			this.config.headers.server = "turtle.io/" + version;
-			this.config.headers["x-powered-by"] = "node.js/" + process.versions.node.replace(/^v/, "") + " " + utility.capitalize(process.platform) + " V8/" + utility.trim(process.versions.v8.toString());
-		}
-
-		// Creating regex.rewrite
-		regex.rewrite = new RegExp("^(" + this.config.proxy.rewrite.join("|") + ")$");
-
-		// Setting default routes
-		this.host(all);
-
-		// Registering DTrace probes
-		this.probes();
-
-		// Registering virtual hosts
-		array.cast(config.vhosts, true).forEach(i => {
-			this.host(i);
-		});
-
-		// Loading default error pages
-		fs.readdir(pages, (e, files) => {
-			if (e) {
-				this.log(new Error("[client 0.0.0.0] " + e.message), "error");
-			} else if (Object.keys(this.config).length > 0) {
-				let pipe = (req, res) => {
-					this.decorate(req, res);
-					router(req, res).then(function (arg) {
-						return arg;
-					}, errz => {
-						let body, status;
-
-						if (isNaN(errz.message)) {
-							body = errz;
-							status = new Error(this.codes.INTERNAL_SERVER_ERROR);
-						} else {
-							body = errz.extended;
-							status = Number(errz.message);
-						}
-
-						return this.error(req, res, status, body);
-					});
-				};
-
-				this.pages.batch(files.map(function (i) {
-					return {
-						host: all,
-						status: parseInt(i.replace(regex.next, ""), 10),
-						body: fs.readFileSync(path.join(pages, i), "utf8")
-					};
-				}), "set");
-
-				// Starting server
-				if (this.server === null) {
-					if (this.config.ssl.cert !== null && this.config.ssl.key !== null) {
-						// POODLE
-						this.config.secureProtocol = "SSLv23_method";
-						this.config.secureOptions = constants.SSL_OP_NO_SSLv3 | constants.SSL_OP_NO_SSLv2;
-
-						// Reading files
-						this.config.ssl.cert = fs.readFileSync(this.config.ssl.cert);
-						this.config.ssl.key = fs.readFileSync(this.config.ssl.key);
-
-						// Starting server
-						this.server = https.createServer(utility.merge(this.config.ssl, {
-							port: this.config.port,
-							host: this.config.address,
-							secureProtocol: this.config.secureProtocol,
-							secureOptions: this.config.secureOptions
-						}), pipe).listen(this.config.port, this.config.address);
-					} else {
-						this.server = http.createServer(pipe).listen(this.config.port, this.config.address);
-					}
-				} else {
-					this.server.listen(this.config.port, this.config.address);
-				}
-
-				// Dropping process
-				if (this.config.uid && !isNaN(this.config.uid)) {
-					process.setuid(this.config.uid);
-				}
-
-				this.log("Started " + this.config.id + " on port " + this.config.port, "debug");
+	start () {
+		if (!this.server) {
+			if (!this.config.ssl.key && !this.config.ssl.cert) {
+				this.server = http.createServer((req, res) => {
+					this.pipeline(req, res);
+				}).listen(this.config.port, this.config.address);
+			} else {
+				this.server = https.createServer({
+					cert: fs.readFileSync(this.config.ssl.cert),
+					key: fs.readFileSync(this.config.ssl.key),
+					port: this.config.port,
+					host: this.config.address
+				}, (req, res) => {
+					this.pipeline(req, res);
+				}).listen(this.config.port, this.config.address);
 			}
-		});
 
-		// Something went wrong, server must restart
-		process.on("uncaughtException", e => {
-			this.log(e, "error");
-			process.exit(1);
-		});
+			this.log("Started server on port " + this.config.address + ":" + this.config.port, "debug");
+		}
 
 		return this;
 	}
 
-	/**
-	 * Stops the instance
-	 *
-	 * @method stop
-	 * @return {Object} TurtleIO instance
-	 */
 	stop () {
-		let port = this.config.port;
-
-		this.log("Stopping " + this.config.id + " on port " + port, "debug");
-		this.config = utility.clone(defaultConfig);
-		this.dtp = null;
-		this.etags = lru(this.config.cache);
-		this.pages.clear();
-		this.permissions = lru(this.config.cache);
-		this.routeCache = lru(this.config.cache * verbs.length);
-		this.vhosts = [];
-		this.vhostsRegExp = [];
-		this.watching = {};
-
-		if (this.server !== null) {
-			this.server.close();
+		if (!this.server) {
+			// Stopping inbound requests
+			this.server.stop();
 			this.server = null;
-		}
 
-		return this;
-	}
-
-	/**
-	 * Unregisters an Etag in the LRU cache and removes stale representation from disk
-	 *
-	 * @method unregister
-	 * @param  {String} uri URL requested
-	 * @return {Object}     TurtleIO instance
-	 */
-	unregister (uri) {
-		let cached = this.etags.cache[uri],
-			lpath = this.config.tmp,
-			ext = ["gz", "zz"];
-
-		if (cached) {
-			lpath = path.join(lpath, cached.value.etag);
-			this.etags.remove(uri);
-			ext.forEach(i => {
-				let lfile = lpath + "." + i;
-
-				fs.exists(lfile, (exists) => {
-					if (exists) {
-						fs.unlink(lfile, e => {
-							if (e) {
-								this.log(e);
-							}
-						});
-					}
-				});
+			// Clearing watchers
+			Object.keys(this.watching).forEach(i => {
+				if (i) {
+					i.close();
+				}
 			});
+
+			// Resetting state
+			this.etags = lru(this.config.cacheSize);
+			this.watching = {};
+
+			this.log("Stopped server on port " + this.config.address + ":" + this.config.port, "debug");
 		}
 
 		return this;
 	}
 
-	/**
-	 * Constructs a URL
-	 *
-	 * @method url
-	 * @param  {Object} req Request Object
-	 * @return {String}     Requested URL
-	 */
+	unregister (uri, fpath) {
+		this.etags.remove(uri);
+		this.log("Unregistered " + uri + " from cache", "debug");
+
+		if (fpath && this.watching[fpath]) {
+			this.watching[fpath].close();
+			delete this.watching[fpath];
+			this.log("Deleted file watcher for " + fpath, "debug");
+		}
+
+		return this;
+	}
+
 	url (req) {
 		let header = req.headers.authorization || "",
 			auth = "",
@@ -1684,219 +641,20 @@ class TurtleIO {
 		return "http" + (this.config.ssl.cert ? "s" : "") + "://" + auth + req.headers.host + req.url;
 	}
 
-	/**
-	 * Adds middleware to processing chain
-	 *
-	 * @method use
-	 * @param  {String}   rpath   [Optional] Path the middleware applies to, default is `/*`
-	 * @param  {Function} fn      Middlware to chain
-	 * @param  {String}   host    [Optional] Host
-	 * @param  {String}   method  [Optional] HTTP method
-	 * @return {Object}           TurtleIO instance
-	 */
-	use (rpath, fn, host, method) {
-		let lpath = rpath,
-			lfn = fn,
-			lhost = host,
-			lmethod = method,
-			mhost, mmethod;
-
-		if (typeof lpath !== "string") {
-			lhost = lfn;
-			lfn = lpath;
-			lpath = "/.*";
-		}
-
-		lhost = lhost || all;
-		lmethod = lmethod || all;
-
-		if (typeof lfn !== "function" && (lfn && typeof lfn.handle !== "function")) {
-			throw new Error("Invalid middleware");
-		}
-
-		if (!this.middleware.has(lhost)) {
-			this.middleware.set(lhost, new Map());
-		}
-
-		mhost = this.middleware.get(lhost);
-
-		if (!mhost.has(lmethod)) {
-			mhost.set(lmethod, new Map());
-		}
-
-		mmethod = mhost.get(lmethod);
-
-		if (!mmethod.has(lpath)) {
-			mmethod.set(lpath, []);
-		}
-
-		if (lfn.handle) {
-			lfn = lfn.handle;
-		}
-
-		lfn.hash = this.hash(lfn.toString());
-		mmethod.get(lpath).push(lfn);
-
-		return this;
-	}
-
-	/**
-	 * Sets a handler for all methods
-	 *
-	 * @method all
-	 * @param  {String}   route RegExp pattern
-	 * @param  {Function} fn    Handler
-	 * @param  {String}   host  [Optional] Virtual host, default is `all`
-	 * @return {Object}         TurtleIO instance
-	 */
-	all (route, fn, host) {
-		verbs.forEach(i => {
-			this.use(route, fn, host, i);
-		});
-
-		return this;
-	}
-
-	/**
-	 * Sets a DELETE handler
-	 *
-	 * @method delete
-	 * @param  {String}   route RegExp pattern
-	 * @param  {Function} fn    Handler
-	 * @param  {String}   host  [Optional] Virtual host, default is `all`
-	 * @return {Object}         TurtleIO instance
-	 */
-	del (route, fn, host) {
-		return this.use(route, fn, host, "DELETE");
-	}
-
-	/**
-	 * Sets a DELETE handler
-	 *
-	 * @method delete
-	 * @param  {String}   route RegExp pattern
-	 * @param  {Function} fn    Handler
-	 * @param  {String}   host  [Optional] Virtual host, default is `all`
-	 * @return {Object}         TurtleIO instance
-	 */
-	delete (route, fn, host) {
-		return this.use(route, fn, host, "DELETE");
-	}
-
-	/**
-	 * Sets a GET handler
-	 *
-	 * @method delete
-	 * @param  {String}   route RegExp pattern
-	 * @param  {Function} fn    Handler
-	 * @param  {String}   host  [Optional] Virtual host, default is `all`
-	 * @return {Object}         TurtleIO instance
-	 */
-	get (route, fn, host) {
-		return this.use(route, fn, host, "GET");
-	}
-
-	/**
-	 * Sets a PATCH handler
-	 *
-	 * @method delete
-	 * @param  {String}   route RegExp pattern
-	 * @param  {Function} fn    Handler
-	 * @param  {String}   host  [Optional] Virtual host, default is `all`
-	 * @return {Object}         TurtleIO instance
-	 */
-	patch (route, fn, host) {
-		return this.use(route, fn, host, "PATCH");
-	}
-
-	/**
-	 * Sets a POST handler
-	 *
-	 * @method delete
-	 * @param  {String}   route RegExp pattern
-	 * @param  {Function} fn    Handler
-	 * @param  {String}   host  [Optional] Virtual host, default is `all`
-	 * @return {Object}         TurtleIO instance
-	 */
-	post (route, fn, host) {
-		return this.use(route, fn, host, "POST");
-	}
-
-	/**
-	 * Sets a PUT handler
-	 *
-	 * @method delete
-	 * @param  {String}   route RegExp pattern
-	 * @param  {Function} fn    Handler
-	 * @param  {String}   host  [Optional] Virtual host, default is `all`
-	 * @return {Object}         TurtleIO instance
-	 */
-	put (route, fn, host) {
-		return this.use(route, fn, host, "PUT");
-	}
-
-	/**
-	 * Watches `path` for changes & updated LRU
-	 *
-	 * @method watcher
-	 * @param  {String} uri   LRUItem url
-	 * @param  {String} fpath File path
-	 * @return {Object}       TurtleIO instance
-	 */
 	watch (uri, fpath) {
-		/**
-		 * Cleans up caches
-		 *
-		 * @method cleanup
-		 * @private
-		 * @return {Undefined} undefined
-		 */
-		let cleanup = () => {
-			this.watching[fpath].close();
-			this.unregister(uri);
-			delete this.watching[fpath];
-		};
-
 		if (this.watching[fpath] === undefined) {
-			this.watching[fpath] = fs.watch(fpath, ev => {
-				if (regex.rename.test(ev)) {
-					cleanup();
-				} else {
-					fs.lstat(fpath, (e, stat) => {
-						let value;
-
-						if (e) {
-							this.log(e);
-							cleanup();
-						} else if (this.etags.cache[uri]) {
-							value = this.etags.cache[uri].value;
-							value.etag = this.etag(uri, stat.size, stat.mtime).toString();
-							value.headers.etag = "\"" + value.etag + "\"";
-							value.timestamp = parseInt(new Date().getTime() / 1000, 10);
-							this.register(uri, value, true);
-						} else {
-							cleanup();
-						}
-					});
-				}
+			this.watching[fpath] = fs.watch(fpath, () => {
+				this.unregister(uri, fpath);
 			});
+
+			this.log("Created watcher for " + fpath + " (" + uri + ")", "debug");
 		}
 
 		return this;
 	}
 
-	/**
-	 * Writes files to disk
-	 *
-	 * @method write
-	 * @param  {Object} req   HTTP request Object
-	 * @param  {Object} res   HTTP response Object
-	 * @param  {String} fpath File path
-	 * @return {Object}       Promise
-	 */
 	write (req, res, fpath) {
-		let timer = precise().start(),
-			deferred = defer(),
+		let deferred = defer(),
 			put = regex.put.test(req.method),
 			body = req.body,
 			allow = req.allow,
@@ -1904,14 +662,9 @@ class TurtleIO {
 			status;
 
 		if (!put && regex.end_slash.test(req.url)) {
-			status = this.codes[del ? "CONFLICT" : "SERVER_ERROR"];
-			timer.stop();
-
-			this.signal("write", function () {
-				return [req.vhost, req.url, req.method, fpath, timer.diff()];
-			});
-
-			deferred.resolve(this.respond(req, res, this.page(status, this.hostname(req)), status, {allow: allow}, false));
+			status = del ? 409 : 500;
+			this.error(req, res, status, http.STATUS_CODES[status]);
+			deferred.resolve(true);
 		} else {
 			allow = array.remove(utility.explode(allow), "POST").join(", ");
 
@@ -1919,28 +672,23 @@ class TurtleIO {
 				let letag;
 
 				if (e) {
-					deferred.reject(new Error(this.codes.NOT_FOUND));
+					deferred.reject(new Error(404));
 				} else {
 					letag = "\"" + this.etag(req.parsed.href, stat.size, stat.mtime) + "\"";
 
-					if (!req.headers.hasOwnProperty("etag") || req.headers.etag === letag) {
+					if (req.headers["if-none-match"] === undefined || req.headers["if-none-match"] === letag) {
 						fs.writeFile(fpath, body, err => {
 							if (err) {
-								deferred.reject(new Error(this.codes.INTERNAL_SERVER_ERROR));
+								deferred.reject(new Error(500));
 							} else {
-								status = this.codes[put ? "NO_CONTENT" : "CREATED"];
-								deferred.resolve(this.respond(req, res, this.page(status, this.hostname(req)), status, {allow: allow}, false));
+								status = put ? 204 : 201;
+								deferred.resolve(this.send(req, res, http.STATUS_CODE[status], status, {allow: allow}, false));
 							}
 						});
-					} else if (req.headers.etag !== letag) {
-						deferred.resolve(this.respond(req, res, this.messages.NO_CONTENT, this.codes.PRECONDITION_FAILED, {}, false));
+					} else if (req.headers["if-none-match"] !== letag) {
+						deferred.resolve(this.send(req, res, "", 412, {}, false));
 					}
 				}
-			});
-
-			timer.stop();
-			this.signal("write", function () {
-				return [req.vhost, req.url, req.method, fpath, timer.diff()];
 			});
 		}
 
@@ -1948,4 +696,20 @@ class TurtleIO {
 	}
 }
 
-module.exports = TurtleIO;
+function factory (cfg = {}, errHandler = null) {
+	let obj = new TurtleIO();
+
+	utility.merge(obj.config, cfg);
+	obj.config.headers.server = "turtle.io/" + version;
+	obj.config.headers["x-powered-by"] = "node.js/" + process.versions.node.replace(/^v/, "") + " " + utility.capitalize(process.platform) + " V8/" + utility.trim(process.versions.v8.toString());
+	obj.etags = lru(obj.config.cacheSize);
+	obj.router = router(obj.config.cacheSize, obj.config.seed);
+
+	if (typeof errHandler === "function") {
+		obj.error = errHandler;
+	}
+
+	return obj;
+}
+
+module.exports = factory;

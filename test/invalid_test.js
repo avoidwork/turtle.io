@@ -1,24 +1,28 @@
 var hippie = require("hippie"),
 	path = require("path"),
-	turtleio = require(path.join("..", "lib", "index.js")),
-	etag = "";
+	instance = require(path.join("..", "index.js")),
+	etag = "",
+	server;
 
 function request () {
 	return hippie().base("http://localhost:8002");
 }
 
-turtleio().start({
+server = instance({
 	default: "test",
 	root: path.join(__dirname, "..", "sites"),
 	port: 8002,
-	logs: {
-		stdout: false,
-		dtrace: true
+	logging: {
+		enabled: false
 	},
-	vhosts: {
-		"test": "test"
+	hosts: {
+		test: "test"
 	}
 });
+
+console.log(server);
+
+server.start();
 
 describe("Invalid Requests", function () {
 	it("GET / (416 / 'Partial response - invalid')", function (done) {
@@ -26,8 +30,7 @@ describe("Invalid Requests", function () {
 			.get("/")
 			.header("range", "a-b")
 			.expectStatus(416)
-			.expectHeader("transfer-encoding", "identity")
-			.expectBody(/Requested Range not Satisfiable/)
+			.expectBody(/Range Not Satisfiable/)
 			.end(function (err, res) {
 				if (err) throw err;
 				etag = res.headers.etag;
@@ -40,8 +43,7 @@ describe("Invalid Requests", function () {
 			.get("/")
 			.header("range", "5-0")
 			.expectStatus(416)
-			.expectHeader("transfer-encoding", "identity")
-			.expectBody(/Requested Range not Satisfiable/)
+			.expectBody(/Range Not Satisfiable/)
 			.end(function (err, res) {
 				if (err) throw err;
 				etag = res.headers.etag;
@@ -49,81 +51,76 @@ describe("Invalid Requests", function () {
 			});
 	});
 
-	it("POST / (405 / 'Method not allowed')", function (done) {
+	it("POST / (405 / 'Method Not Allowed')", function (done) {
 		request()
 			.post("/")
 			.expectStatus(405)
 			.expectHeader("status", "405 Method Not Allowed")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("transfer-encoding", "identity")
-			.expectBody(/Method not allowed/)
+			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
 	});
 
-	it("PUT / (405 / 'Method not allowed')", function (done) {
+	it("PUT / (405 / 'Method Not Allowed')", function (done) {
 		request()
 			.put("/")
 			.expectStatus(405)
 			.expectHeader("status", "405 Method Not Allowed")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("transfer-encoding", "identity")
-			.expectBody(/Method not allowed/)
+			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
 	});
 
-	it("PATCH / (405 / 'Method not allowed')", function (done) {
+	it("PATCH / (405 / 'Method Not Allowed')", function (done) {
 		request()
 			.patch("/")
 			.expectStatus(405)
 			.expectHeader("status", "405 Method Not Allowed")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("transfer-encoding", "identity")
-			.expectBody(/Method not allowed/)
+			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
 	});
 
-	it("DELETE / (405 / 'Method not allowed')", function (done) {
+	it("DELETE / (405 / 'Method Not Allowed')", function (done) {
 		request()
 			.del("/")
 			.expectStatus(405)
 			.expectHeader("status", "405 Method Not Allowed")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectBody(/Method not allowed/)
+			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
 	});
 
-	it("GET /nothere.html (404 / 'File not found')", function (done) {
+	it("GET /nothere.html (404 / 'Not Found')", function (done) {
 		request()
 			.get("/nothere.html")
 			.expectStatus(404)
 			.expectHeader("status", "404 Not Found")
-			.expectHeader("transfer-encoding", "identity")
-			.expectBody(/File not found/)
+			.expectBody(/Not Found/)
 			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
 	});
 
-	it("GET /nothere.html%3fa=b?=c (404 / 'File not found')", function (done) {
+	it("GET /nothere.html%3fa=b?=c (404 / 'Not Found')", function (done) {
 		request()
 			.get("/nothere.html%3fa=b?=c")
 			.expectStatus(404)
 			.expectHeader("status", "404 Not Found")
-			.expectHeader("transfer-encoding", "identity")
-			.expectBody(/File not found/)
+			.expectBody(/Not Found/)
 			.end(function (err) {
 				if (err) throw err;
 				done();
@@ -131,82 +128,76 @@ describe("Invalid Requests", function () {
 	});
 
 	// 405 is a result of a cached route that leads to a file system based 404 on GET
-	it("POST /nothere.html (405 / 'Method not allowed')", function (done) {
+	it("POST /nothere.html (405 / 'Method Not Allowed')", function (done) {
 		request()
 			.post("/nothere.html")
 			.expectStatus(405)
 			.expectHeader("status", "405 Method Not Allowed")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("transfer-encoding", "identity")
-			.expectBody(/Method not allowed/)
+			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
 	});
 
-	it("PUT /nothere.html (405 / 'Method not allowed')", function (done) {
+	it("PUT /nothere.html (405 / 'Method Not Allowed')", function (done) {
 		request()
 			.put("/nothere.html")
 			.expectStatus(405)
 			.expectHeader("status", "405 Method Not Allowed")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("transfer-encoding", "identity")
-			.expectBody(/Method not allowed/)
+			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
 	});
 
-	it("PATCH /nothere.html (405 / 'Method not allowed')", function (done) {
+	it("PATCH /nothere.html (405 / 'Method Not Allowed')", function (done) {
 		request()
 			.patch("/nothere.html")
 			.expectStatus(405)
 			.expectHeader("status", "405 Method Not Allowed")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("transfer-encoding", "identity")
-			.expectBody(/Method not allowed/)
+			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
 	});
 
-	it("DELETE /nothere.html (405 / 'Method not allowed')", function (done) {
+	it("DELETE /nothere.html (405 / 'Method Not Allowed')", function (done) {
 		request()
 			.del("/nothere.html")
 			.expectStatus(405)
 			.expectHeader("status", "405 Method Not Allowed")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("transfer-encoding", "identity")
-			.expectBody(/Method not allowed/)
+			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
 	});
 
-	it("GET /../README (404 / 'File not found')", function (done) {
+	it("GET /../README (404 / 'Not Found')", function (done) {
 		request()
 			.get("/../README")
 			.expectStatus(404)
 			.expectHeader("status", "404 Not Found")
-			.expectHeader("transfer-encoding", "identity")
-			.expectBody(/File not found/)
+			.expectBody(/Not Found/)
 			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
 	});
 
-	it("GET /././../README (404 / 'File not found')", function (done) {
+	it("GET /././../README (404 / 'Not Found')", function (done) {
 		request()
 			.get("/././../README")
 			.expectStatus(404)
 			.expectHeader("status", "404 Not Found")
-			.expectHeader("transfer-encoding", "identity")
-			.expectBody(/File not found/)
+			.expectBody(/Not Found/)
 			.end(function (err) {
 				if (err) throw err;
 				done();

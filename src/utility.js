@@ -1,5 +1,6 @@
-const coerce = require("tiny-coerce");
-const url = require("url");
+const coerce = require("tiny-coerce"),
+	merge = require("tiny-merge"),
+	url = require("url");
 
 function trim (obj) {
 	return obj.replace(/^(\s+|\t+|\n+)|(\s+|\t+|\n+)$/g, "");
@@ -13,11 +14,11 @@ function escape (arg) {
 	return arg.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
 }
 
-function capitalize (obj, all = false) {
+function capitalize (obj, all = false, delimiter = " ") {
 	let result;
 
 	if (all) {
-		result = explode(obj, " ").map(capitalize).join(" ");
+		result = explode(obj, delimiter).map(capitalize).join(delimiter);
 	} else {
 		result = obj.charAt(0).toUpperCase() + obj.slice(1);
 	}
@@ -51,30 +52,10 @@ function iterate (obj, fn) {
 	}
 }
 
-function merge (a, b) {
-	if (a instanceof Object && b instanceof Object) {
-		Object.keys(b).forEach(function (i) {
-			if (a[i] instanceof Object && b[i] instanceof Object) {
-				a[i] = merge(a[i], b[i]);
-			} else if (a[i] instanceof Array && b[i] instanceof Array) {
-				a[i] = a[i].concat(b[i]);
-			} else {
-				a[i] = b[i];
-			}
-		});
-	} else if (a instanceof Array && b instanceof Array) {
-		a = a.concat(b);
-	} else {
-		a = b;
-	}
-
-	return a;
-}
-
 function queryString (qstring = "") {
-	let obj = {};
-	let aresult = qstring.split("?");
-	let result;
+	let obj = {},
+		aresult = qstring.split("?"),
+		result;
 
 	if (aresult.length > 1) {
 		aresult.shift();
@@ -135,6 +116,8 @@ function parse (uri) {
 	}
 
 	parsed = url.parse(luri);
+	parsed.pathname = parsed.pathname.replace(/%20/g, " ");
+	parsed.path = parsed.pathname + (parsed.search || "");
 	parsed.query = parsed.search ? queryString(parsed.search) : {};
 
 	iterate(parsed, function (v, k) {
@@ -155,8 +138,8 @@ module.exports = {
 	getArity: getArity,
 	isEmpty: isEmpty,
 	iterate: iterate,
-	merge: merge,
 	queryString: queryString,
+	merge: merge,
 	parse: parse,
 	trim: trim
 };

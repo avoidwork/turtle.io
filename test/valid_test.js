@@ -1,25 +1,23 @@
 var hippie = require("hippie"),
 	path = require("path"),
-	turtleio = require(path.join("..", "lib", "index.js")),
+	server = require(path.join("..", "index.js")),
 	etag = "";
 
 function request () {
 	return hippie().base("http://localhost:8001");
 }
 
-turtleio().start({
+server({
 	default: "test",
-	root: __dirname + "/../sites",
+	root: path.join(__dirname, "..", "sites"),
 	port: 8001,
-	logs: {
-		stdout: false,
-		dtrace: true,
-		syslog: false
+	logging: {
+		enabled: false
 	},
-	vhosts: {
+	hosts: {
 		"test": "test"
 	}
-});
+}).start();
 
 describe("Valid Requests", function () {
 	it("GET / (200 / 'Hello World!')", function (done) {
@@ -54,12 +52,13 @@ describe("Valid Requests", function () {
 	it("GET / (206 / 'Partial response - 0 offset')", function (done) {
 		request()
 			.get("/")
-			.header("range", "1-5")
+			.header("range", "0-5")
 			.expectStatus(206)
 			.expectHeader("status", "206 Partial Content")
 			.expectHeader("transfer-encoding", "chunked")
+			.expectHeader("content-range", "bytes 0-5/53")
 			.expectHeader("content-length", undefined)
-			.expectBody(/^\<html$/)
+			.expectBody(/^\<html>$/)
 			.end(function (err, res) {
 				if (err) throw err;
 				etag = res.headers.etag;
@@ -74,8 +73,9 @@ describe("Valid Requests", function () {
 			.expectStatus(206)
 			.expectHeader("status", "206 Partial Content")
 			.expectHeader("transfer-encoding", "chunked")
+			.expectHeader("content-range", "bytes 2-4/53")
 			.expectHeader("content-length", undefined)
-			.expectBody(/^htm$/)
+			.expectBody(/^tml$/)
 			.end(function (err, res) {
 				if (err) throw err;
 				etag = res.headers.etag;

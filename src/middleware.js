@@ -1,8 +1,6 @@
 const path = require("path");
 const utility = require(path.join(__dirname, "utility.js"));
 const regex = require(path.join(__dirname, "regex.js"));
-const messages = require(path.join(__dirname, "messages.js"));
-const codes = require(path.join(__dirname, "codes.js"));
 
 function connect (req, res, next) {
 	let server = req.server,
@@ -16,11 +14,11 @@ function connect (req, res, next) {
 
 			if (server.config.maxBytes > 0 && Buffer.byteLength(payload) > server.config.maxBytes) {
 				req.invalid = true;
-				next(new Error(server.codes.PAYLOAD_TOO_LARGE));
+				next(new Error(413));
 			}
 		});
 
-		req.on("end", function () {
+		req.on("end", () => {
 			if (!req.invalid) {
 				if (payload) {
 					req.body = payload;
@@ -43,16 +41,12 @@ function etag (req, res, next) {
 	let cached, headers;
 
 	if (regex.get_only.test(req.method) && !req.headers.range && req.headers["if-none-match"] !== undefined) {
-		// Not mutating cache, because `respond()` will do it
-		cached = req.server.etags.cache[req.parsed.href];
+		cached = req.server.etags.get(req.parsed.href);
 
-		// Sending a 304 if Client is making a GET & has current representation
 		if (cached && (req.headers["if-none-match"] || "").replace(/\"/g, "") === cached.value.etag) {
 			headers = utility.clone(cached.value.headers);
 			headers.age = parseInt(new Date().getTime() / 1000 - cached.value.timestamp, 10);
-			res.respond(messages.NO_CONTENT, codes.NOT_MODIFIED, headers).then(null, function (e) {
-				next(e);
-			});
+			res.send("", 304, headers).then(null, next);
 		} else {
 			next();
 		}
