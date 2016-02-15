@@ -713,6 +713,14 @@ function factory (cfg = {}, errHandler = null) {
 		obj.error = errHandler;
 	}
 
+	// Setting default routes
+	obj.router.setHost("all");
+
+	// Registering virtual hosts
+	Object.keys(obj.config.hosts).forEach(i => {
+		obj.router.setHost(i);
+	});
+
 	return obj;
 }
 

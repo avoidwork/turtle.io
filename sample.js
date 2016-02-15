@@ -11,7 +11,8 @@ server = require(path.join(__dirname, "index"))({
 		level: "debug"
 	},
 	hosts: {
-		test: "test"
+		test: "test",
+		test2: "test2"
 	}
 }, function (req, res, status, body) {
 	var deferred = defer();

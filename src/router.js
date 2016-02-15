@@ -173,6 +173,15 @@ class Router {
 		return result;
 	}
 
+	setHost (arg) {
+		if (!array.contains(this.hosts, arg)) {
+			this.hosts.push(arg);
+			this.patterns.push(new RegExp("^" + arg.replace(/\*/g, ".*") + "$"));
+		}
+
+		return this;
+	}
+
 	use (rpath, fn, host, method) {
 		let lpath = rpath,
 			lfn = fn,
