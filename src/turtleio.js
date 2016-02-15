@@ -367,7 +367,7 @@ class TurtleIO {
 
 			if (idx <= this.config.logging.levels[this.config.logging.level]) {
 				process.nextTick(() => {
-					console[idx < 4 ? "log" : "error"](msg);
+					console[idx > 4 ? "log" : "error"](msg);
 				});
 			}
 		}
