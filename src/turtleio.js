@@ -26,6 +26,7 @@ class TurtleIO {
 			compress: true,
 			headers: {
 				"accept-ranges": "bytes",
+				"cache-control": "public max-age=300",
 				"content-type": "text/html; charset=utf-8"
 			},
 			hosts: {},
@@ -455,25 +456,21 @@ class TurtleIO {
 	}
 
 	register (uri, state) {
-		[
-			"content-length",
-			"content-encoding",
-			"date",
-			"server",
-			"status",
-			"transfer-encoding",
-			"x-powered-by",
-			"x-response-time",
-			"access-control-allow-origin",
-			"access-control-expose-headers",
-			"access-control-max-age",
-			"access-control-allow-credentials",
-			"access-control-allow-methods",
-			"access-control-allow-headers"
-		].forEach(function (i) {
-			delete state.headers[i];
-		});
-
+		delete state.headers["cache-control"];
+		delete state.headers["content-length"];
+		delete state.headers["content-encoding"];
+		delete state.headers.date;
+		delete state.headers.server;
+		delete state.headers.status;
+		delete state.headers["transfer-encoding"];
+		delete state.headers["x-powered-by"];
+		delete state.headers["x-response-time"];
+		delete state.headers["access-control-allow-origin"];
+		delete state.headers["access-control-expose-headers"];
+		delete state.headers["access-control-max-age"];
+		delete state.headers["access-control-allow-credentials"];
+		delete state.headers["access-control-allow-methods"];
+		delete state.headers["access-control-allow-headers"];
 		this.etags.set(uri, state);
 		this.log("Registered " + uri + " in cache", "debug");
 
