@@ -34,6 +34,7 @@ class TurtleIO {
 			json: 2,
 			logging: {
 				enabled: true,
+				stack: true,
 				format: "%v %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"",
 				level: "debug",
 				levels: {

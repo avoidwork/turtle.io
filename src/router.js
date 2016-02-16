@@ -80,7 +80,7 @@ class Router {
 			errorCode = !isNaN(err.message) ? err.message : http.STATUS_CODES[err.message || err] || 500;
 			status = res.statusCode >= 400 ? res.statusCode : errorCode;
 			error = new Error(status);
-			error.extended = isNaN(err.message) ? err.stack : undefined;
+			error.extended = isNaN(err.message) ? req.server.config.logging.stack ? err.stack : err.message : undefined;
 			deferred.reject(error);
 		}
 	}
