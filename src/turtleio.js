@@ -567,11 +567,9 @@ class TurtleIO {
 
 			if (compression) {
 				if (regex.gzip.test(compression)) {
-					lheaders["content-encoding"] = "gzip";
-					compressionMethod = "createGzip";
+					compressionMethod = lheaders["content-encoding"] = "gzip";
 				} else {
-					lheaders["content-encoding"] = "deflate";
-					compressionMethod = "createDeflate";
+					compressionMethod = lheaders["content-encoding"] = "deflate";
 				}
 
 				if (pipe) {
