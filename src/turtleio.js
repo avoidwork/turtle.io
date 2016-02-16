@@ -567,9 +567,11 @@ class TurtleIO {
 
 			if (compression) {
 				if (regex.gzip.test(compression)) {
-					compressionMethod = lheaders["content-encoding"] = "gzip";
+					lheaders["content-encoding"] = "gzip";
+					compressionMethod = "createGzip";
 				} else {
-					compressionMethod = lheaders["content-encoding"] = "deflate";
+					lheaders["content-encoding"] = "deflate";
+					compressionMethod = "createDeflate";
 				}
 
 				if (pipe) {
@@ -580,7 +582,7 @@ class TurtleIO {
 						deferred.resolve(true);
 					}).pipe(res);
 				} else {
-					zlib[compressionMethod](body, (e, data) => {
+					zlib[compressionMethod.replace("create", "").toLowerCase()](body, (e, data) => {
 						if (e) {
 							errHandler(e);
 						} else {
