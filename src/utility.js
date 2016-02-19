@@ -44,7 +44,7 @@ function isEmpty (obj) {
 
 function iterate (obj, fn) {
 	if (obj instanceof Object) {
-		Object.keys(obj).forEach(function (i) {
+		Object.keys(obj).forEach(i => {
 			fn.call(obj, obj[i], i);
 		});
 	} else {
@@ -62,9 +62,9 @@ function queryString (qstring = "") {
 	}
 
 	result = aresult.join("?");
-	result.split("&").forEach(function (prop) {
-		let aitem = prop.replace(/\+/g, " ").split("=");
-		let item;
+	result.split("&").forEach(prop => {
+		let aitem = prop.replace(/\+/g, " ").split("="),
+			item;
 
 		if (aitem.length > 2) {
 			item = [aitem.shift(), aitem.join("=")];
@@ -96,8 +96,8 @@ function queryString (qstring = "") {
 }
 
 function parse (uri) {
-	let luri = uri;
-	let idxAscii, idxQ, parsed;
+	let luri = uri,
+		idxAscii, idxQ, parsed;
 
 	if (luri === undefined || luri === null) {
 		luri = "";
@@ -120,7 +120,7 @@ function parse (uri) {
 	parsed.path = parsed.pathname + (parsed.search || "");
 	parsed.query = parsed.search ? queryString(parsed.search) : {};
 
-	iterate(parsed, function (v, k) {
+	iterate(parsed, (v, k) => {
 		if (v === null) {
 			parsed[k] = "";
 		}

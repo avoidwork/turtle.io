@@ -209,7 +209,7 @@ class TurtleIO {
 
 		if (!dir) {
 			pathname = req.parsed.pathname.replace(regex.root, "");
-			invalid = (pathname.replace(regex.dir, "").split("/").filter(function (i) {
+			invalid = (pathname.replace(regex.dir, "").split("/").filter(i => {
 					return i !== ".";
 				})[0] || "") === "..";
 			out_dir = !invalid ? (pathname.match(/\.{2}\//g) || []).length : 0;
@@ -259,11 +259,7 @@ class TurtleIO {
 							}
 
 							if (options.start >= options.end || isNaN(options.start) || isNaN(options.start)) {
-								return this.error(req, res, 416, http.STATUS_CODES[416]).then(function () {
-									deferred.resolve(true);
-								}, function (e) {
-									deferred.reject(e);
-								});
+								return this.error(req, res, 416, http.STATUS_CODES[416]).then(deferred.resolve, deferred.reject);
 							}
 
 							status = 206;
@@ -600,7 +596,7 @@ class TurtleIO {
 				res.writeHead(status, lheaders);
 
 				if (pipe) {
-					body.on("error", errHandler).on("close", function () {
+					body.on("error", errHandler).on("close", () => {
 						deferred.resolve(true);
 					}).pipe(res);
 				} else {
