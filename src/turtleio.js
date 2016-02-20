@@ -36,7 +36,7 @@ class TurtleIO {
 				enabled: true,
 				stack: true,
 				format: "%v %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"",
-				level: "debug",
+				level: "info",
 				levels: {
 					"emerg": 0,
 					"alert": 1,
