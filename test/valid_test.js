@@ -36,6 +36,38 @@ describe("Valid Requests", function () {
 			});
 	});
 
+	it("GET / (200 / 'Hello World!' - gzip)", function (done) {
+		request()
+			.get("/")
+			.header("accept-encoding", "gzip")
+			.expectStatus(200)
+			.expectHeader("content-encoding", "gzip")
+			.expectHeader("status", "200 OK")
+			.expectHeader("allow", "GET, HEAD, OPTIONS")
+			.expectHeader("transfer-encoding", "chunked")
+			.expectHeader("content-length", undefined)
+			.end(function (err, res) {
+				if (err) throw err;
+				done();
+			});
+	});
+
+	it("GET / (200 / 'Hello World!' - deflate)", function (done) {
+		request()
+			.get("/")
+			.header("accept-encoding", "deflate")
+			.expectStatus(200)
+			.expectHeader("content-encoding", "deflate")
+			.expectHeader("status", "200 OK")
+			.expectHeader("allow", "GET, HEAD, OPTIONS")
+			.expectHeader("transfer-encoding", "chunked")
+			.expectHeader("content-length", undefined)
+			.end(function (err, res) {
+				if (err) throw err;
+				done();
+			});
+	});
+
 	it("HEAD / (200 / empty)", function (done) {
 		request()
 			.head("/")
