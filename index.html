@@ -1,159 +1,409 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<title>turtle.io</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="keywords" content="node.js web server,node web server,node webserver,web,server,webserver,node.js,node,nodejs,abaaso,turtle,turtle.io,turtleio,rest,api,proxy,reverse proxy" />
-<meta name="description" content="asynchronous application / web server for node.js with virtual hosts" />
-<meta charset="utf-8">
-<link rel="stylesheet" type="text/css" href="assets/style.css" media="print,screen" />
-<link rel="stylesheet" type="text/css" href="assets/font-awesome/css/font-awesome.min.css" media="print,screen" />
-<!--[if lt IE 9]>
-	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-	<script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
-<![endif]-->
-</head>
-<body>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>turtle.io by avoidwork</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">turtle.io</h1>
+      <h2 class="project-tagline">Web server with virtual hosts for node.js</h2>
+      <a href="https://github.com/avoidwork/turtle.io" class="btn">View on GitHub</a>
+      <a href="https://github.com/avoidwork/turtle.io/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/avoidwork/turtle.io/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-<header>
-	<div class="container">
-		<h1>turtle <strong>i/o</strong></h1>
-	</div>
-</header>
-<nav>
-	<ul class="pills">
-		<li><a href="#features">Features</a></li>
-		<li><a href="#quickstart">Quick Start</a></li>
-		<li><a href="#tutorials">Tutorials</a></li>
-		<li><a href="#config">Configuration</a></li>
-		<li><a href="#faq">FAQ</a></li>
-	</ul>
-</nav>
-<article>
-	<section class="copy">
-		<div id="features" class="hidden">
-			<h2>Elastic node.js web server / API server</h2>
-			<p>turtle.io was created to reduce resource requirements, and simplify creation &amp; deployment of modern web applications &amp; API facades. Unlike other web servers, turtle.io is extremely easy to configure.</p>
-			<ul class="thirds">
-				<li>
-					<h3><i class="fa fa-cubes"></i> Middleware</h3>
-					<p>Connect middleware allows you to create custom applications easily.</p>
-				</li>
-				<li>
-					<h3><i class="fa fa-asterisk"></i> Virtual Hosts</h3>
-					<p>Designed to host many websites and APIs from a single server.</p>
-				</li>
-				<li>
-					<h3><i class="fa fa-hand-o-right"></i> Simplify your stack</h3>
-					<p>turtle.io can replace Apache, NGINX, etc., in your application stack.</p>
-				</li>
-			</ul>
-		</div>
-		<div id="quickstart" class="hidden">
-			<h2>Getting started with turtle.io</h2>
-			<p>turtle.io can be defined as a dependency for your node.js application, or run as a stand alone server. This quick start guide assumes you're setting up a production web server on port 80, and your account is part of the `www-data` group.</p>
-			<p>First, we need to install turtle.io:</p>
-			<script src="https://gist.github.com/avoidwork/a8c4097c2a596d260222.js"></script>
-			<p>Now we need to create a server script, lets call it "server.js". The "uid" property is the account that the server will run as. This is important to configure because to run on a "low port" such as 80, the server needs to start with elevated permissions, but we do not want it to continue to run with those permissions.</p>
-			<script src="https://gist.github.com/avoidwork/5350198.js"></script>
-			<p>To test our server, lets start is manually:</p>
-			<script src="https://gist.github.com/avoidwork/149256d408983591b94d.js"></script>
-			<p>Once you're statisfied with the server configuration, it's recommended to use "upstart" or a similar daemon to start &amp; respawn your turtle.io server.</p>
-		</div>
-		<div id="tutorials" class="hidden">
-			<h2>Get to know turtle.io</h2>
-			<h3>Coming soon!</h3>
-		</div>
-		<div id="config" class="hidden">
-			<h2>Configuration</h2>
-			<p>Configuration values can be set by passing an Object to <code>start()</code>.</p>
+    <section class="main-content">
+      <h1>
+<a id="turtleio" class="anchor" href="#turtleio" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>turtle.io</h1>
 
-			<h3>cache</h3>
-			<p><em>Number (1000)</em></p>
-			<p>Size of LRU cache for Etag validation.</p>
+<p><a href="http://travis-ci.org/avoidwork/turtle.io"><img src="https://secure.travis-ci.org/avoidwork/turtle.io.svg" alt="build status"></a> <a href="https://gitter.im/avoidwork/turtle.io?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter"></a></p>
 
-			<h3>default</h3>
-			<p><em>String</em></p>
-			<p><strong><em>[Required]</em></strong> Default hostname to handle requests which are not specified within <em>vhosts</em>; must be a valid entry within <em>vhosts</em>.</p>
+<p>turtle.io is very easy to get up and running! All you need to do is install it, and tell it what directory holds your web sites, &amp; which hostnames to answer for.</p>
 
-			<h3>headers</h3>
-			<p><em>Object</em></p>
-			<p>Response headers. CORS is enabled by default.</p>
+<p>You can also create complex web applications, with a familiar API.</p>
 
-			<h3>index</h3>
-			<p><em>Array</em></p>
-			<p>Files to look for when accessing a directory resource.</p>
+<h2>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting Started</h2>
 
-			<h3>logs</h3>
-			<p><em>Object</em></p>
-			<p>Logging configuration.</p>
-			<ul>
-				<li>format - Common Log Format string of tokens, defaulting to standard Virtual Host format (%v %h %l %u %t \"%r\" %&gt;s %b \"%{Referer}i\" \"%{User-agent}i\")</li>
-				<li>level - Minimum Common Log Level which is emitted to <code>stdout</code> ("info")</li>
-				<li>stdout - Override &amp; disable <code>stdout</code> emitting by setting to <code>false</code> (true)</li>
-				<li>syslog - Override &amp; disable <code>syslog</code> emitting by setting to <code>false</code> (true)</li>
-				<li>time - Format for the date/time portion of a log message. (D/MMM/YYYY:HH:mm:ss ZZ)</li>
-			</ul>
+<ol>
+<li>Install the module with: <code>npm install turtle.io</code>
+</li>
+<li>Create a script to load &amp; start a server. You could use <code>sample.js</code> in the turtle.io directory (./node_modules/turtle.io) as a template, or see the examples below</li>
+<li>[Optional] You can override defaults by passing the factory an Object</li>
+</ol>
 
-			<h3>pages</h3>
-			<p><em>String (null)</em></p>
-			<p>Directory relative to <code>root</code> which has files named for HTTP status codes, to be served upon error, e.g. <code>404.htm</code>.</p>
+<p>The following examples assume you've installed turtle.io into <code>/opt/turtleio</code>, if this is not the case you need to edit the applicable file to correct the path.</p>
 
-			<h3>port</h3>
-			<p><em>Number (8000)</em></p>
-			<p>Port the server will listen on.</p>
+<h4>
+<a id="upstart" class="anchor" href="#upstart" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Upstart</h4>
 
-			<h3>proxy</h3>
-			<p><em>Object</em></p>
-			<p>Proxy configuration.</p>
+<p>Use the provided upstart recipe: <code>sudo sh -c 'cp node_modules/turtle.io/turtleio.conf /etc/init; initctl reload-configuration; service turtleio start;'</code></p>
 
-			<ul>
-				<li>rewrite - Content-Type header values to apply URL rewrites to. (Array)</li>
-				<li>maxConnections - Maximum number of outbound connections for reverse proxies. (1000)</li>
-			</ul>
+<h4>
+<a id="systemd" class="anchor" href="#systemd" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Systemd</h4>
 
-			<h3>root</h3>
-			<p><em>String (./sites)</em></p>
-			<p>Relative path to the web root directory.</p>
+<p>Use the provided systemd service: <code>sudo sh -c 'cp node_modules/turtle.io/turtleio.service /etc/systemd/system; systemctl enable turtleio; systemctl start turtleio;'</code></p>
 
-			<h3>session</h3>
-			<p><em>Object</em></p>
-			<p>[Optional] Session configuration.</p>
-			<ul>
-				<li>id - Session cookie name (sid)</li>
-				<li>valid - Semantic representation of how long a session is valid ("15m")</li>
-				<li>gc - Milliseconds between garbage collection of expired sessions (60000)</li>
-			</ul>
+<h4>
+<a id="what-about-windows" class="anchor" href="#what-about-windows" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What about Windows?</h4>
 
-			<h3>ssl</h3>
-			<p><em>Object</em></p>
-			<p>[Optional] SSL configuration.</p>
-			<ul>
-				<li>cert - Path to certificate file</li>
-				<li>key - Path to key file</li>
-			</ul>
+<p>It runs great on Windows, but you're on your own to daemonize it!</p>
 
-			<h3>uid</h3>
-			<p><em>Number (null)</em></p>
-			<p>[Optional] UID the server runs as.</p>
+<h2>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Examples</h2>
 
-			<h3>vhosts</h3>
-			<p><em>Object</em></p>
-			<p><strong><em>[Required]</em></strong> Virtual hosts the server will respond for, <code>key</code> is the hostname &amp; <code>value</code> is the directory relative to <code>root</code>.</p>
-		</div>
-		<div id="faq" class="hidden">
-			<h2>Frequently Asked Questions</h2>
-			<p>Developer API documentation is available at <a href="http://api.turtle.io" title="turtle.io API documentation">api.turtle.io</a>.</p>
-			<h3>Coming soon!</h3>
-		</div>
-	</section>
-</article>
-<footer>
-	<p>Copyright &copy; <span id="year"></span> <a href="http://avoidwork.com">Jason Mulligan</a> | <a href="https://raw.github.com/avoidwork/turtle.io/master/LICENSE">BSD 3 Licensed</a> | <span id="version"></span></p>
-</footer>
-<a href="https://github.com/avoidwork/turtle.io" class="github"><img src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub" /></a>
-<script type="text/javascript" src="assets/keigai.min.js"></script>
-<script type="text/javascript" src="assets/app.min.js"></script>
-</body>
+<p>turtle.io requires a <strong><em>default</em></strong> virtual host to be specified, because it is the failover when a request can't be routed.</p>
+
+<h4>
+<a id="virtual-hosts" class="anchor" href="#virtual-hosts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Virtual hosts</h4>
+
+<p>Virtual host keys are the hostname, and the value is the directory relative to "root".</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> turtleio <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">"</span>turtle.io<span class="pl-pds">"</span></span>);
+<span class="pl-k">var</span> server <span class="pl-k">=</span> <span class="pl-en">turtleio</span>({
+    <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>mysite.com<span class="pl-pds">"</span></span>,
+    port<span class="pl-k">:</span> <span class="pl-c1">80</span>,
+    uid<span class="pl-k">:</span> <span class="pl-c1">100</span>,
+    root<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>/var/www<span class="pl-pds">"</span></span>,
+    hosts<span class="pl-k">:</span> {
+        <span class="pl-s"><span class="pl-pds">"</span>mysite.com<span class="pl-pds">"</span></span>         <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>mysite.com<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>another-domain.com<span class="pl-pds">"</span></span> <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>another-domain.com<span class="pl-pds">"</span></span>
+    }
+});
+
+<span class="pl-smi">server</span>.<span class="pl-c1">start</span>();</pre></div>
+
+<h2>
+<a id="benchmark-with-expressjs" class="anchor" href="#benchmark-with-expressjs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Benchmark with express.js</h2>
+
+<p><code>siege</code> was used instead of <code>ab</code> because we want to compare <em>accurate</em> transaction rates.</p>
+
+<h4>
+<a id="specs" class="anchor" href="#specs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Specs</h4>
+
+<ul>
+<li>
+<strong>Machine</strong> MacBook Air (Early '14) / Core i7 @ 1.7Ghz / 8GB ram / 512 flash / OS X 10.10.2</li>
+<li>
+<strong>ulimit</strong> 2560</li>
+<li>
+<strong>express</strong> 4.11.2</li>
+<li>
+<strong>turtle.io</strong> 3.2.2</li>
+<li>
+<strong>benchmark</strong> <code>siege -c100 -b -q -H 'Connection: Keep-Alive' -t15S localhost:$@</code>
+</li>
+</ul>
+
+<h4>
+<a id="test" class="anchor" href="#test" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Test</h4>
+
+<h5>
+<a id="expressjs" class="anchor" href="#expressjs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>express.js</h5>
+
+<p><code>Hello World!</code> from a route (content-length: 12), no <code>allow</code> header.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> express <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">"</span>express<span class="pl-pds">"</span></span>),
+    app <span class="pl-k">=</span> <span class="pl-en">express</span>();
+
+<span class="pl-smi">app</span>.<span class="pl-en">get</span>(<span class="pl-s"><span class="pl-pds">'</span>/<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> (<span class="pl-smi">req</span>, <span class="pl-smi">res</span>) {
+  <span class="pl-smi">res</span>.<span class="pl-c1">send</span>(<span class="pl-s"><span class="pl-pds">'</span>Hello World!<span class="pl-pds">'</span></span>)
+})
+
+<span class="pl-smi">app</span>.<span class="pl-en">listen</span>(<span class="pl-c1">3000</span>);</pre></div>
+
+<h5>
+<a id="turtleio-1" class="anchor" href="#turtleio-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>turtle.io</h5>
+
+<p><code>Hello World!</code> html file streamed from disk (content-length: 53), has accurate <code>allow</code> header.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-s"><span class="pl-pds">"</span>use strict<span class="pl-pds">"</span></span>;
+
+<span class="pl-k">var</span> turtleio <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">"</span>index.js<span class="pl-pds">"</span></span>),
+    app;
+
+app <span class="pl-k">=</span> <span class="pl-en">turtleio</span>({
+    <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>,
+    root<span class="pl-k">:</span> <span class="pl-c1">__dirname</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">"</span>/sites<span class="pl-pds">"</span></span>,
+    port<span class="pl-k">:</span> <span class="pl-c1">8000</span>,
+    hosts<span class="pl-k">:</span> {
+        <span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span> <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>
+    },
+    logging<span class="pl-k">:</span> {
+        enabled<span class="pl-k">:</span> <span class="pl-c1">false</span>
+    }
+}).<span class="pl-c1">start</span>();</pre></div>
+
+<h4>
+<a id="transactionss" class="anchor" href="#transactionss" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Transactions/s</h4>
+
+<p>Transaction rates are similar.</p>
+
+<ul>
+<li>
+<strong>turtle.io</strong> <code>[1233.78, 1203.2, 1187.44]  (1208.14 avg)</code>
+</li>
+<li>
+<strong>express</strong>   <code>[1105.85, 1124.25, 1167.57] (1132.56 avg)</code>
+</li>
+</ul>
+
+<h2>
+<a id="handling-uploads" class="anchor" href="#handling-uploads" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Handling Uploads</h2>
+
+<p>The <code>request</code> object is passed to every route handler as the second argument, will have a <code>body</code> property with the payload from the Client. It will not be coerced to another format, so if you expect JSON, you'll have to <code>JSON.parse()</code> it yourself (for now).</p>
+
+<h2>
+<a id="api--decoration" class="anchor" href="#api--decoration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>API &amp; decoration</h2>
+
+<h4>
+<a id="request" class="anchor" href="#request" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>request</h4>
+
+<h5>
+<a id="allow" class="anchor" href="#allow" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>allow</h5>
+
+<p><em>String</em></p>
+
+<p>Allowed HTTP methods</p>
+
+<h5>
+<a id="ip" class="anchor" href="#ip" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ip</h5>
+
+<p><em>Number</em></p>
+
+<p>Request IP</p>
+
+<h5>
+<a id="parsed" class="anchor" href="#parsed" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>parsed</h5>
+
+<p><em>Object</em></p>
+
+<p>Parsed HTTP request</p>
+
+<h5>
+<a id="query" class="anchor" href="#query" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>query</h5>
+
+<p><em>String</em></p>
+
+<p>Parsed query string</p>
+
+<h5>
+<a id="server" class="anchor" href="#server" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>server</h5>
+
+<p><em>Object</em></p>
+
+<p>turtle.io instance</p>
+
+<h5>
+<a id="host" class="anchor" href="#host" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>host</h5>
+
+<p><em>String</em></p>
+
+<p>Virtual host handling the request.</p>
+
+<h4>
+<a id="response" class="anchor" href="#response" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>response</h4>
+
+<h5>
+<a id="error" class="anchor" href="#error" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>error</h5>
+
+<p><em>Function (status, body)</em></p>
+
+<p>Send an error response.</p>
+
+<h5>
+<a id="redirect" class="anchor" href="#redirect" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>redirect</h5>
+
+<p><em>Function (url)</em></p>
+
+<p>Send a redirection.</p>
+
+<h5>
+<a id="respond" class="anchor" href="#respond" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>respond</h5>
+
+<p><em>Function (body[, status, headers])</em></p>
+
+<p>Send a response.</p>
+
+<h5>
+<a id="send" class="anchor" href="#send" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>send</h5>
+
+<p><em>Function (body[, status, headers])</em></p>
+
+<p>Send a response.</p>
+
+<h2>
+<a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuration</h2>
+
+<p>Configuration values can be set by passing an Object to the factory, or any time afterward.</p>
+
+<h4>
+<a id="address" class="anchor" href="#address" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>address</h4>
+
+<p><em>String (0.0.0.0)</em></p>
+
+<p>Network address to listen on.</p>
+
+<h4>
+<a id="cachesize" class="anchor" href="#cachesize" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>cacheSize</h4>
+
+<p><em>Number (1000)</em></p>
+
+<p>Size of LRU cache for Etag validation.</p>
+
+<h4>
+<a id="catchall" class="anchor" href="#catchall" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>catchAll</h4>
+
+<p><em>Boolean (true)</em></p>
+
+<p>Handle unterminated requests.</p>
+
+<h4>
+<a id="compress" class="anchor" href="#compress" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>compress</h4>
+
+<p><em>Boolean (true)</em></p>
+
+<p>Compress responses when supported.</p>
+
+<h4>
+<a id="default" class="anchor" href="#default" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>default</h4>
+
+<p><em>String</em></p>
+
+<p><strong><em>[Required]</em></strong> Default hostname to handle requests which are not specified within <em>vhosts</em>; must be a valid entry within <em>vhosts</em>.</p>
+
+<h4>
+<a id="headers" class="anchor" href="#headers" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>headers</h4>
+
+<p><em>Object</em></p>
+
+<p>Response headers. CORS is enabled by default.</p>
+
+<h4>
+<a id="hosts" class="anchor" href="#hosts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>hosts</h4>
+
+<p><em>Object</em></p>
+
+<p><strong><em>[Required]</em></strong> Virtual hosts the server will respond for, <code>key</code> is the hostname &amp; <code>value</code> is the directory relative to <code>root</code>.</p>
+
+<h4>
+<a id="index" class="anchor" href="#index" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>index</h4>
+
+<p><em>Array</em></p>
+
+<p>Files to look for when accessing a directory resource.</p>
+
+<h4>
+<a id="json" class="anchor" href="#json" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>json</h4>
+
+<p><em>Number (2)</em></p>
+
+<p>Default "pretty" ident size</p>
+
+<h4>
+<a id="logging" class="anchor" href="#logging" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>logging</h4>
+
+<p><em>Object</em></p>
+
+<p>Logging configuration.</p>
+
+<h4>
+<a id="loggingenabled" class="anchor" href="#loggingenabled" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>logging.enabled</h4>
+
+<p><em>Boolean</em> (true)</p>
+
+<p>Override &amp; disable <code>stdout</code> emitting by setting to <code>false</code>.</p>
+
+<h4>
+<a id="loggingformat" class="anchor" href="#loggingformat" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>logging.format</h4>
+
+<p><em>String</em> (%v %h %l %u %t \"%r\" %&gt;s %b \"%{Referer}i\" \"%{User-agent}i\")</p>
+
+<p>Common Log Format string of tokens, defaulting to standard Virtual Host format.</p>
+
+<h4>
+<a id="logginglevel" class="anchor" href="#logginglevel" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>logging.level</h4>
+
+<p><em>String</em> ("info")</p>
+
+<p>Minimum Common Log Level which is emitted to <code>stdout</code>.</p>
+
+<h4>
+<a id="loggingtime" class="anchor" href="#loggingtime" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>logging.time</h4>
+
+<p><em>String</em> (D/MMM/YYYY:HH:mm:ss ZZ)</p>
+
+<p>Format for the date/time portion of a log message.</p>
+
+<h4>
+<a id="maxbytes" class="anchor" href="#maxbytes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>maxBytes</h4>
+
+<p><em>Number (1048576)</em></p>
+
+<p>Maximum request body size; when exceeded a 429 is sent.</p>
+
+<h4>
+<a id="port" class="anchor" href="#port" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>port</h4>
+
+<p><em>Number (8000)</em></p>
+
+<p>Port the server will listen on.</p>
+
+<h4>
+<a id="root" class="anchor" href="#root" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>root</h4>
+
+<p><em>String ("")</em></p>
+
+<p>Relative path to the web root directory.</p>
+
+<h4>
+<a id="seed" class="anchor" href="#seed" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>seed</h4>
+
+<p><em>Number (625)</em></p>
+
+<p>Seed for hashing of middleware with MurmurHash3.</p>
+
+<h4>
+<a id="sslcert" class="anchor" href="#sslcert" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ssl.cert</h4>
+
+<p><em>Object</em></p>
+
+<p>[Optional] SSL certificate</p>
+
+<h4>
+<a id="sslkey" class="anchor" href="#sslkey" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ssl.key</h4>
+
+<p><em>Object</em></p>
+
+<p>[Optional] SSL certificate key/pem</p>
+
+<h4>
+<a id="uid" class="anchor" href="#uid" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>uid</h4>
+
+<p><em>Number (null)</em></p>
+
+<p>[Optional] UID the server runs as.</p>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
+
+<p>Copyright (c) 2016 Jason Mulligan<br>
+Licensed under the BSD-3 license.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/avoidwork/turtle.io">turtle.io</a> is maintained by <a href="https://github.com/avoidwork">avoidwork</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
 </html>
