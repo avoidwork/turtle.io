@@ -126,7 +126,7 @@ class TurtleIO {
 
 	decorate (req, res) {
 		let timer = precise().start(),
-			parsed = utility.parse(this.url(req)),
+			parsed = this.parse(this.url(req)),
 			update = false;
 
 		req.body = "";
@@ -409,6 +409,10 @@ class TurtleIO {
 		}
 
 		return this;
+	}
+
+	parse (arg) {
+		return utility.parse(arg);
 	}
 
 	patch (route, fn, host) {
