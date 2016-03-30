@@ -305,7 +305,7 @@ class TurtleIO {
 				"access-control-allow-methods",
 				"access-control-allow-headers"],
 			options = {},
-			size = headers["content-length"];
+			size;
 
 		if (!result.allow) {
 			result.allow = req.allow;
@@ -329,6 +329,15 @@ class TurtleIO {
 			result["access-control-allow-methods"] = result.allow;
 		}
 
+		if (!pipe && result["content-length"] === undefined) {
+			result["content-length"] = Buffer.byteLength(body.toString());
+		} else if (pipe) {
+			delete result["content-length"];
+			result["transfer-encoding"] = "chunked";
+		}
+
+		size = result["content-length"] || 0;
+
 		if (!pipe && req.headers.range && headers["content-range"] === undefined) {
 			req.headers.range.split(",")[0].split("-").forEach((i, idx) => {
 				options[idx === 0 ? "start" : "end"] = i ? parseInt(i, 10) : undefined;
@@ -349,13 +358,6 @@ class TurtleIO {
 				result["content-range"] = "bytes " + options.start + "-" + options.end + "/" + size;
 				result["content-length"] = options.end - options.start + 1;
 			}
-		}
-
-		if (!pipe && result["content-length"] === undefined) {
-			result["content-length"] = Buffer.byteLength(body.toString());
-		} else if (pipe) {
-			delete result["content-length"];
-			result["transfer-encoding"] = "chunked";
 		}
 
 		if (!regex.get.test(req.method) || status >= 400 || result["x-ratelimit-limit"]) {
