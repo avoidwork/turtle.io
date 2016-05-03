@@ -360,7 +360,7 @@ class TurtleIO {
 			}
 		}
 
-		if (!regex.get.test(req.method) || status >= 400 || result["x-ratelimit-limit"]) {
+		if (!regex.get.test(req.method) || status >= 400) {
 			delete result["cache-control"];
 			delete result.etag;
 			delete result["last-modified"];
