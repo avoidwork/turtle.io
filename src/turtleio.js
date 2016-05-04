@@ -537,6 +537,7 @@ class TurtleIO {
 
 		errHandler = e => {
 			try {
+				res.statusCode = 500;
 				res.end(http.STATUS_CODES[500]);
 			} catch (err) {
 				void 0;
@@ -547,6 +548,8 @@ class TurtleIO {
 		};
 
 		if (!res._header && !res._headerSent) {
+			res.statusCode = status;
+
 			if (!pipe && body instanceof Object || body instanceof Array) {
 				if (req.headers.accept) {
 					header = regex.indent.exec(req.headers.accept);
@@ -580,6 +583,7 @@ class TurtleIO {
 				if (pipe) {
 					lheaders["transfer-encoding"] = "chunked";
 					delete lheaders["content-length"];
+					lheaders.status = status + " " + http.STATUS_CODES[status];
 					res.writeHead(status, lheaders);
 					body.pipe(zlib[compressionMethod]()).on("error", errHandler).on("close", () => {
 						deferred.resolve(true);
@@ -590,6 +594,7 @@ class TurtleIO {
 							errHandler(e);
 						} else {
 							lheaders["content-length"] = data.length;
+							lheaders.status = status + " " + http.STATUS_CODES[status];
 							res.writeHead(status, lheaders);
 							res.end(data);
 							deferred.resolve(true);
@@ -598,7 +603,7 @@ class TurtleIO {
 				}
 			} else {
 				if (lheaders["content-range"]) {
-					status = 206;
+					status = res.statusCode = 206;
 					lheaders.status = status + " " + http.STATUS_CODES[status];
 				}
 
