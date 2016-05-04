@@ -26,7 +26,7 @@ class TurtleIO {
 			compress: true,
 			headers: {
 				"accept-ranges": "bytes",
-				"cache-control": "public max-age=300",
+				"cache-control": "public, max-age=300, must-revalidate",
 				"content-type": "text/html; charset=utf-8"
 			},
 			hosts: {},
@@ -361,7 +361,10 @@ class TurtleIO {
 		}
 
 		if (!regex.get.test(req.method) || status >= 400) {
-			delete result["cache-control"];
+			if (result["cache-control"] === undefined) {
+				result["cache-control"] = "no-cache";
+			}
+
 			delete result.etag;
 			delete result["last-modified"];
 		}

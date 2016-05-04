@@ -25,6 +25,7 @@ describe("Invalid Requests", function () {
 			.get("/")
 			.header("range", "a-b")
 			.expectStatus(416)
+			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Range Not Satisfiable/)
 			.end(function (err, res) {
 				if (err) throw err;
@@ -38,6 +39,7 @@ describe("Invalid Requests", function () {
 			.get("/")
 			.header("range", "5-0")
 			.expectStatus(416)
+			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Range Not Satisfiable/)
 			.end(function (err, res) {
 				if (err) throw err;
@@ -52,6 +54,7 @@ describe("Invalid Requests", function () {
 			.expectStatus(405)
 			.expectHeader("status", "405 Method Not Allowed")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
+			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
@@ -65,6 +68,7 @@ describe("Invalid Requests", function () {
 			.expectStatus(405)
 			.expectHeader("status", "405 Method Not Allowed")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
+			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
@@ -78,6 +82,7 @@ describe("Invalid Requests", function () {
 			.expectStatus(405)
 			.expectHeader("status", "405 Method Not Allowed")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
+			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
@@ -91,6 +96,7 @@ describe("Invalid Requests", function () {
 			.expectStatus(405)
 			.expectHeader("status", "405 Method Not Allowed")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
+			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
@@ -103,6 +109,7 @@ describe("Invalid Requests", function () {
 			.get("/nothere.html")
 			.expectStatus(404)
 			.expectHeader("status", "404 Not Found")
+			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Not Found/)
 			.end(function (err) {
 				if (err) throw err;
@@ -115,6 +122,7 @@ describe("Invalid Requests", function () {
 			.get("/nothere.html%3fa=b?=c")
 			.expectStatus(404)
 			.expectHeader("status", "404 Not Found")
+			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Not Found/)
 			.end(function (err) {
 				if (err) throw err;
@@ -129,6 +137,7 @@ describe("Invalid Requests", function () {
 			.expectStatus(405)
 			.expectHeader("status", "405 Method Not Allowed")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
+			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
@@ -142,6 +151,7 @@ describe("Invalid Requests", function () {
 			.expectStatus(405)
 			.expectHeader("status", "405 Method Not Allowed")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
+			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
@@ -155,6 +165,7 @@ describe("Invalid Requests", function () {
 			.expectStatus(405)
 			.expectHeader("status", "405 Method Not Allowed")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
+			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
@@ -168,6 +179,7 @@ describe("Invalid Requests", function () {
 			.expectStatus(405)
 			.expectHeader("status", "405 Method Not Allowed")
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
+			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
@@ -180,6 +192,7 @@ describe("Invalid Requests", function () {
 			.get("/../README")
 			.expectStatus(404)
 			.expectHeader("status", "404 Not Found")
+			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Not Found/)
 			.end(function (err) {
 				if (err) throw err;
@@ -192,6 +205,7 @@ describe("Invalid Requests", function () {
 			.get("/././../README")
 			.expectStatus(404)
 			.expectHeader("status", "404 Not Found")
+			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Not Found/)
 			.end(function (err) {
 				if (err) throw err;
