@@ -118,7 +118,7 @@ describe("Valid Requests", function () {
 			.expectStatus(206)
 			.expectHeader("status", "206 Partial Content")
 			.expectHeader("transfer-encoding", "chunked")
-			.expectHeader("content-range", "bytes 0-5/53")
+			.expectHeader("content-range", /^bytes 0-5\/5(3|8)$/)
 			.expectHeader("content-length", undefined)
 			.expectBody(/^\<html>$/)
 			.end(function (err, res) {
@@ -135,7 +135,7 @@ describe("Valid Requests", function () {
 			.expectStatus(206)
 			.expectHeader("status", "206 Partial Content")
 			.expectHeader("transfer-encoding", "chunked")
-			.expectHeader("content-range", "bytes 2-4/53")
+			.expectHeader("content-range", /^bytes 2-4\/5(3|8)$/)
 			.expectHeader("content-length", undefined)
 			.expectBody(/^tml$/)
 			.end(function (err, res) {
