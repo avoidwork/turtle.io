@@ -130,6 +130,19 @@ describe("Invalid Requests", function () {
 			});
 	});
 
+	it("GET /nothere.x_%22%3E%3Cimg%20src=x%20onerror=prompt(1)%3E.html (404 / 'Not Found')", function (done) {
+		request()
+			.get("/nothere.x_%22%3E%3Cimg%20src=x%20onerror=prompt(1)%3E.html")
+			.expectStatus(404)
+			.expectHeader("status", "404 Not Found")
+			.expectHeader("cache-control", "no-cache")
+			.expectBody(/Not Found/)
+			.end(function (err) {
+				if (err) throw err;
+				done();
+			});
+	});
+
 	// 405 is a result of a cached route that leads to a file system based 404 on GET
 	it("POST /nothere.html (405 / 'Method Not Allowed')", function (done) {
 		request()

@@ -67,14 +67,10 @@ class Router {
 		return result;
 	}
 
-	last (req, res, method, deferred, err) {
+	last (req, res, deferred, err) {
 		let errorCode, error, status;
 
 		if (!err) {
-			if (regex.get.test(method)) {
-				deferred.resolve([req, res]);
-			}
-
 			deferred.reject(req.allow.indexOf("GET") > -1 ? new Error(405) : new Error(404));
 		} else {
 			errorCode = !isNaN(err.message) ? err.message : http.STATUS_CODES[err.message || err] || 500;
@@ -112,7 +108,7 @@ class Router {
 									next(e);
 								}
 							} else {
-								this.last(req, res, method, deferred, err);
+								this.last(req, res, deferred, err);
 							}
 						} else {
 							try {
@@ -122,10 +118,10 @@ class Router {
 							}
 						}
 					} else {
-						this.last(req, res, method, deferred, err);
+						this.last(req, res, deferred, err);
 					}
 				} else if (!res._header && req.server.config.catchAll) {
-					this.last(req, res, method, deferred, err);
+					this.last(req, res, deferred, err);
 				} else if (res._header) {
 					deferred.resolve([req, res]);
 				}
