@@ -1,5 +1,6 @@
 const coerce = require("tiny-coerce"),
 	merge = require("tiny-merge"),
+	array = require("retsu"),
 	url = require("url");
 
 function trim (obj) {
@@ -30,25 +31,21 @@ function clone (arg) {
 	return JSON.parse(JSON.stringify(arg));
 }
 
-function contains (haystack, needle) {
-	return haystack.indexOf(needle) > -1;
-}
-
 function getArity (arg) {
 	return arg.toString().replace(/(^.*\()|(\).*)|(\n.*)/g, "").split(",").length;
 }
 
 function isEmpty (obj) {
-	return trim(obj) === "";
+	return trim(obj).length < 1;
 }
 
 function iterate (obj, fn) {
 	if (obj instanceof Object) {
-		Object.keys(obj).forEach(i => {
+		array.each(Object.keys(obj), i => {
 			fn.call(obj, obj[i], i);
 		});
 	} else {
-		obj.forEach(fn);
+		array.each(obj, fn);
 	}
 }
 
@@ -62,7 +59,7 @@ function queryString (qstring = "") {
 	}
 
 	result = aresult.join("?");
-	result.split("&").forEach(prop => {
+	array.each(result.split("&"), prop => {
 		let aitem = prop.replace(/\+/g, " ").split("="),
 			item;
 
@@ -132,7 +129,6 @@ function parse (uri) {
 module.exports = {
 	capitalize: capitalize,
 	clone: clone,
-	contains: contains,
 	explode: explode,
 	escape: escape,
 	getArity: getArity,

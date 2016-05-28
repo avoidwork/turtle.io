@@ -62,11 +62,12 @@ class TurtleIO {
 		this.etags = null;
 		this.router = null;
 		this.server = null;
-		this.watching = {};
+		this.server = null;
+		this.watching = new Map();
 	}
 
 	all (route, fn, host) {
-		this.router.verbs.forEach(i => {
+		array.each(this.router.verbs, i => {
 			this.router.use(route, fn, host, i);
 		});
 
@@ -74,15 +75,15 @@ class TurtleIO {
 	}
 
 	allows (...args) {
-		return this.router.allows.apply(this.router, args);
+		return this.router.allows(...args);
 	}
 
 	allowed (...args) {
-		return this.router.allowed.apply(this.router, args);
+		return this.router.allowed(...args);
 	}
 
 	blacklist (...args) {
-		return this.router.blacklist.apply(this.router, args);
+		return this.router.blacklist(...args);
 	}
 
 	clf (req, res, headers) {
@@ -105,7 +106,7 @@ class TurtleIO {
 	}
 
 	compression (encoding = "", mimetype = "") {
-		let result;
+		let result = "";
 
 		if (this.config.compress === true && regex.compress.test(mimetype)) {
 			array.each(utility.explode(encoding), i => {
@@ -178,7 +179,7 @@ class TurtleIO {
 		return this;
 	}
 
-	error (req, res, status = 500, msg = http.STATUS_CODES[500]) {
+	error (req, res, status = 500, msg) {
 		let body;
 
 		if (msg === undefined) {
@@ -201,8 +202,8 @@ class TurtleIO {
 	handle (req, res, fpath, uri, dir, stat) {
 		let deferred = defer(),
 			allow = req.allow,
-			write = utility.contains(allow, dir ? "POST" : "PUT"),
-			del = utility.contains(allow, "DELETE"),
+			write = array.contains(allow, dir ? "POST" : "PUT"),
+			del = array.contains(allow, "DELETE"),
 			method = req.method,
 			status = 200,
 			letag, headers, mimetype, modified, size, pathname, invalid, out_dir, in_dir, options;
@@ -246,7 +247,7 @@ class TurtleIO {
 
 						// Setting the partial content headers
 						if (req.headers.range) {
-							req.headers.range.split(",")[0].split("-").forEach((i, idx) => {
+							array.each(req.headers.range.split(",")[0].split("-"), (i, idx) => {
 								options[idx === 0 ? "start" : "end"] = i ? parseInt(i, 10) : undefined;
 							});
 
@@ -316,11 +317,11 @@ class TurtleIO {
 		}
 
 		if (!req.cors) {
-			cors.forEach(i => {
+			array.each(cors, i => {
 				delete result[i];
 			});
 		} else {
-			cors.forEach(i => {
+			array.each(cors, i => {
 				result[i] = result[i.replace("access-control-", "")] || "";
 			});
 
@@ -339,7 +340,7 @@ class TurtleIO {
 		size = result["content-length"] || 0;
 
 		if (!pipe && req.headers.range && headers["content-range"] === undefined) {
-			req.headers.range.split(",")[0].split("-").forEach((i, idx) => {
+			array.each(req.headers.range.split(",")[0].split("-"), (i, idx) => {
 				options[idx === 0 ? "start" : "end"] = i ? parseInt(i, 10) : undefined;
 			});
 
@@ -508,7 +509,7 @@ class TurtleIO {
 					count = 0;
 					nth = this.config.index.length;
 
-					this.config.index.forEach(i => {
+					array.each(this.config.index, i => {
 						let npath = path.join(lpath, i);
 
 						fs.lstat(npath, (err, lstats) => {
@@ -533,9 +534,9 @@ class TurtleIO {
 		let deferred = defer(),
 			pipe = typeof body.on === "function",
 			indent = this.config.json,
-			header, lheaders, compression, compressionMethod, errHandler;
+			header, lheaders, compression, compressionMethod;
 
-		errHandler = e => {
+		let errHandler = e => {
 			try {
 				res.statusCode = 500;
 				res.end(http.STATUS_CODES[500]);
@@ -676,15 +677,13 @@ class TurtleIO {
 			this.server = null;
 
 			// Clearing watchers
-			Object.keys(this.watching).forEach(i => {
-				if (i) {
-					i.close();
-				}
+			array.each(this.watching, (key, watcher) => {
+				watcher.close();
 			});
 
 			// Resetting state
 			this.etags = lru(this.config.cacheSize);
-			this.watching = {};
+			this.watching = new Map();
 
 			this.log("Stopped server on port " + this.config.address + ":" + this.config.port, "debug");
 		}
@@ -696,9 +695,9 @@ class TurtleIO {
 		this.etags.remove(uri);
 		this.log("Unregistered " + uri + " from cache", "debug");
 
-		if (fpath && this.watching[fpath]) {
-			this.watching[fpath].close();
-			delete this.watching[fpath];
+		if (fpath && this.watching.has(fpath)) {
+			this.watching.get(fpath).close();
+			this.watching.delete(fpath);
 			this.log("Deleted file watcher for " + fpath, "debug");
 		}
 
@@ -727,10 +726,10 @@ class TurtleIO {
 	}
 
 	watch (uri, fpath) {
-		if (this.watching[fpath] === undefined) {
-			this.watching[fpath] = fs.watch(fpath, () => {
+		if (!this.watching.has(fpath)) {
+			this.watching.set(fpath, fs.watch(fpath, () => {
 				this.unregister(uri, fpath);
-			});
+			}));
 
 			this.log("Created watcher for " + fpath + " (" + uri + ")", "debug");
 		}
@@ -743,7 +742,7 @@ class TurtleIO {
 			put = regex.put.test(req.method),
 			body = req.body,
 			allow = req.allow,
-			del = utility.contains(req.allow, "DELETE"),
+			del = array.contains(req.allow, "DELETE"),
 			status;
 
 		if (!put && regex.end_slash.test(req.url)) {
@@ -803,12 +802,12 @@ function factory (cfg = {}, errHandler = null) {
 
 	// Registering virtual hosts
 	obj.router.setHost("all");
-	Object.keys(obj.config.hosts).forEach(i => {
+	array.each(Object.keys(obj.config.hosts), i => {
 		obj.router.setHost(i);
 	});
 
 	// Setting default middleware
-	[middleware.etag, middleware.cors, middleware.connect].forEach(i => {
+	array.each([middleware.etag, middleware.cors, middleware.connect], i => {
 		obj.use(i).blacklist(i);
 	});
 

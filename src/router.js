@@ -10,7 +10,7 @@ const array = require("retsu"),
 
 class Router {
 	constructor (max, seed) {
-		this.noaction = {};
+		this.noaction = new Set();
 		this.cache = lru(max);
 		this.permissions = lru(max);
 		this.middleware = new Map();
@@ -22,7 +22,7 @@ class Router {
 
 	allowed (method, uri, host, override) {
 		return this.routes(uri, host, method, override).filter(i => {
-				return this.noaction[i.hash || this.hash(i)] === undefined;
+				return !this.noaction.has(i.hash || this.hash(i));
 			}).length > 0;
 	}
 
@@ -44,8 +44,8 @@ class Router {
 	blacklist (fn) {
 		let hfn = fn.hash || this.hash(fn.toString());
 
-		if (!this.noaction[hfn]) {
-			this.noaction[hfn] = 1;
+		if (!this.noaction.has(hfn)) {
+			this.noaction.add(hfn);
 		}
 
 		return hfn;
@@ -93,21 +93,21 @@ class Router {
 		let next = err => {
 			process.nextTick(() => {
 				let arity = 3,
-					item = middleware.next();
+					step = middleware.next();
 
-				if (!item.done) {
+				if (!step.done) {
 					if (err) {
-						arity = utility.getArity(item.value);
+						arity = utility.getArity(step.value);
 						do {
-							arity = utility.getArity(item.value);
-						} while (arity < 4 && (item = middleware.next()) && !item.done);
+							arity = utility.getArity(step.value);
+						} while (arity < 4 && (step = middleware.next()) && !step.done);
 					}
 
-					if (!item.done) {
+					if (!step.done) {
 						if (err) {
 							if (arity === 4) {
 								try {
-									item.value(err, req, res, next);
+									step.value(err, req, res, next);
 								} catch (e) {
 									next(e);
 								}
@@ -116,7 +116,7 @@ class Router {
 							}
 						} else {
 							try {
-								item.value(req, res, next);
+								step.value(req, res, next);
 							} catch (e) {
 								next(e);
 							}
@@ -149,9 +149,9 @@ class Router {
 			h = this.middleware.get(host) || new Map();
 			result = [];
 
-			[lall.get(all), lall.get(method), h.get(all), h.get(method)].forEach(c => {
+			array.each([lall.get(all), lall.get(method), h.get(all), h.get(method)], c => {
 				if (c) {
-					Array.from(c.keys()).filter(i => {
+					array.each(Array.from(c.keys()).filter(i => {
 						let valid;
 
 						try {
@@ -161,7 +161,7 @@ class Router {
 						}
 
 						return valid;
-					}).forEach(i => {
+					}), i => {
 						result = result.concat(c.get(i));
 					});
 				}
