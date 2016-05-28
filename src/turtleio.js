@@ -433,8 +433,8 @@ class TurtleIO {
 			let body, status;
 
 			if (isNaN(e.message)) {
-				status = new Error(http.STATUS_CODES[500]);
-				body = e;
+				status = 500;
+				body = e.message;
 			} else {
 				status = Number(e.message);
 				body = e.extended || http.STATUS_CODES[status] || http.STATUS_CODES[500];
