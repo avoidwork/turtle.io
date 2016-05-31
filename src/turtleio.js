@@ -375,7 +375,7 @@ class TurtleIO {
 			delete result["last-modified"];
 		}
 
-		if (status === 404 && result.allow) {
+		if (status === 404) {
 			delete result.allow;
 			delete result["accept-ranges"];
 			delete result["access-control-allow-methods"];
