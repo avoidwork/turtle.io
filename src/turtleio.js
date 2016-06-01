@@ -183,7 +183,7 @@ class TurtleIO {
 		let body;
 
 		if (msg === undefined) {
-			body = "<html><head><title>" + http.STATUS_CODES[status] + "</title></head><body><h1>" + http.STATUS_CODES[status] + "</h1></body></html>";
+			body = "<!DOCTYPE html><html><head><title>" + http.STATUS_CODES[status] + "</title></head><body><h1>" + http.STATUS_CODES[status] + "</h1></body></html>";
 		}
 
 		return this.send(req, res, msg || body, status, {"cache-control": "no-cache"});
@@ -437,7 +437,7 @@ class TurtleIO {
 				body = e.message;
 			} else {
 				status = Number(e.message);
-				body = e.extended || http.STATUS_CODES[status] || http.STATUS_CODES[500];
+				body = e.extended || undefined;
 
 				if (e.extended) {
 					this.log(e.extended, "error");

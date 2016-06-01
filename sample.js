@@ -14,18 +14,6 @@ server = require(path.join(__dirname, "index"))({
 		test: "test",
 		test2: "test2"
 	}
-}, function (req, res, status, body) {
-	var deferred = defer();
-
-	res.send(body, status).then(() => {
-		deferred.resolve(true);
-		console.log("Sent custom error response");
-	}).catch(e => {
-		deferred.reject(e);
-		console.log("Failed to send custom error response");
-	});
-
-	return deferred.promise;
 });
 
 server.get("/echo", function (req, res) {
