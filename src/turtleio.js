@@ -389,7 +389,6 @@ class TurtleIO {
 			delete result["last-modified"];
 		}
 
-		result.status = status + " " + (http.STATUS_CODES[status] || "");
 		result["x-response-time"] = ((req.timer.stopped.length === 0 ? req.timer.stop() : req.timer).diff() / 1000000).toFixed(2) + " ms";
 
 		this.log("Generated headers", "debug");
@@ -468,7 +467,6 @@ class TurtleIO {
 		delete state.headers["content-encoding"];
 		delete state.headers.date;
 		delete state.headers.server;
-		delete state.headers.status;
 		delete state.headers["transfer-encoding"];
 		delete state.headers["x-powered-by"];
 		delete state.headers["x-response-time"];
@@ -584,7 +582,6 @@ class TurtleIO {
 				if (pipe) {
 					lheaders["transfer-encoding"] = "chunked";
 					delete lheaders["content-length"];
-					lheaders.status = status + " " + http.STATUS_CODES[status];
 					res.writeHead(status, lheaders);
 					body.pipe(zlib[compressionMethod]()).on("error", errHandler).on("close", () => {
 						deferred.resolve(true);
@@ -595,7 +592,6 @@ class TurtleIO {
 							errHandler(e);
 						} else {
 							lheaders["content-length"] = data.length;
-							lheaders.status = status + " " + http.STATUS_CODES[status];
 							res.writeHead(status, lheaders);
 							res.end(data);
 							deferred.resolve(true);
@@ -605,7 +601,6 @@ class TurtleIO {
 			} else {
 				if (lheaders["content-range"]) {
 					status = res.statusCode = 206;
-					lheaders.status = status + " " + http.STATUS_CODES[status];
 				}
 
 				res.writeHead(status, lheaders);
@@ -786,11 +781,11 @@ function factory (cfg = {}, errHandler = null) {
 	utility.merge(obj.config, cfg);
 
 	if (!obj.config.headers.server) {
-		obj.config.headers.server = "turtle.io/" + version;
+		obj.config.headers.server = "turtle.io/" + version + " (" + utility.capitalize(process.platform) + ")";
 	}
 
 	if (!obj.config.headers["x-powered-by"]) {
-		obj.config.headers["x-powered-by"] = "node.js/" + process.versions.node.replace(/^v/, "") + " " + utility.capitalize(process.platform) + " V8/" + utility.trim(process.versions.v8.toString());
+		obj.config.headers["x-powered-by"] = "node.js/" + process.versions.node.replace(/^v/, "");
 	}
 
 	if (typeof errHandler === "function") {
