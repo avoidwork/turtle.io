@@ -2,7 +2,6 @@
 /node_modules/
 /doc/
 /sites/
-/src/
 /test/
 .travis.yml
 .git

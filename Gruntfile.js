@@ -1,22 +1,7 @@
 module.exports = function (grunt) {
 	grunt.initConfig({
-		babel: {
-			options: {
-				sourceMap: false,
-				presets: ["babel-preset-es2015"]
-			},
-			dist: {
-				files: [{
-					expand: true,
-					cwd: 'src',
-					src: ['*.js'],
-					dest: 'lib',
-					ext: '.js'
-				}]
-			}
-		},
 		eslint: {
-			target: ["src/*.js"]
+			target: ["lib/*.js"]
 		},
 		mochaTest : {
 			options: {
@@ -32,12 +17,11 @@ module.exports = function (grunt) {
 	});
 
 	// tasks
-	grunt.loadNpmTasks("grunt-babel");
 	grunt.loadNpmTasks("grunt-eslint");
 	grunt.loadNpmTasks("grunt-mocha-test");
 	grunt.loadNpmTasks("grunt-nsp");
 
 	// aliases
 	grunt.registerTask("test", ["eslint", "mochaTest", "nsp"]);
-	grunt.registerTask("default", ["babel", "test"]);
+	grunt.registerTask("default", ["test"]);
 };
