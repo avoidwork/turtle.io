@@ -1,3 +1,5 @@
+"use strict";
+
 var hippie = require("hippie"),
 	path = require("path"),
 	server = require(path.join("..", "index.js")),
