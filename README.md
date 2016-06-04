@@ -6,8 +6,6 @@ turtle.io is very easy to get up and running! All you need to do is install it, 
 
 You can also create complex web applications, with a familiar API.
 
-The most recent stable version of node.js is ideal; ES6 syntax support is required.
-
 ## Getting Started
 1. Install the module with: `npm install turtle.io`
 2. Create a script to load & start a server. You could use `sample.js` in the turtle.io directory (./node_modules/turtle.io) as a template, or see the examples below
