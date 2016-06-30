@@ -79,7 +79,7 @@ function factory (cfg = {}, errHandler = null) {
 
 	// Routing requests to files on disk by default
 	Object.keys(obj.config.hosts).forEach(host => {
-		obj.use(obj.request, "/.*", "GET", host);
+		obj.use("/.*", obj.request.bind(obj), "GET", host);
 	});
 
 	return obj;
