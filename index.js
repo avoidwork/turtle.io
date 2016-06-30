@@ -73,7 +73,7 @@ function factory (cfg = {}, errHandler = null) {
 	};
 
 	// Setting default middleware
-	[decorate, middleware.payload, middleware.etag, middleware.cors].forEach(i => {
+	[middleware.timer, decorate, middleware.payload, middleware.etag, middleware.cors].forEach(i => {
 		obj.use(i).blacklist(i);
 	});
 
