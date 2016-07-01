@@ -65,19 +65,13 @@ function factory (cfg = {}, errHandler = null) {
 		};
 	}
 
-	// Setting default middleware
 	[
-		["all", [middleware.timer, decorate, middleware.etag, middleware.payload, middleware.cors]],
-		["get", [middleware.valid, middleware.file, middleware.stream]]
+		["all", [middleware.timer, decorate, middleware.etag, middleware.payload, middleware.cors, middleware.error]],
+		["get", [middleware.valid, middleware.file, middleware.stream, middleware.error]]
 	].forEach(list => {
 		list[1].forEach(fn => {
 			obj.use("/.*", fn, list[0], "all").blacklist(fn);
 		});
-	});
-
-	// Routing requests to files on disk by default
-	Object.keys(obj.config.hosts).forEach(host => {
-		obj.use("/.*", obj.request, "GET", host).blacklist(obj.request);
 	});
 
 	return obj;
