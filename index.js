@@ -12,6 +12,7 @@ function factory (cfg = {}, errHandler = null) {
 	let obj = new TurtleIO();
 
 	function decorate(req, res, next) {
+		req.hash = obj.hash(req.parsed.href);
 		req.server = obj;
 
 		res.redirect = (target, status = 302) => {
@@ -31,10 +32,6 @@ function factory (cfg = {}, errHandler = null) {
 		};
 
 		next();
-	}
-
-	function route (req, res) {
-		obj.route(req, res);
 	}
 
 	utility.merge(obj.config, cfg);
@@ -68,17 +65,15 @@ function factory (cfg = {}, errHandler = null) {
 		};
 	}
 
-	obj.router.onfinish = (req, res) => {
-		obj.log(obj.clf(req, res, res.headers), "info");
-	};
-
 	// Setting default middleware
-	[middleware.timer, decorate, middleware.payload, middleware.etag, middleware.cors].forEach(i => {
-		obj.use(i, "all", "all").blacklist(i);
+	[
+		["all", [middleware.timer, decorate, middleware.etag, middleware.payload, middleware.cors]],
+		["get", [middleware.valid, middleware.file, middleware.stream]]
+	].forEach(list => {
+		list[1].forEach(fn => {
+			obj.use("/.*", fn, list[0], "all").blacklist(fn);
+		});
 	});
-
-	// Binding for proper context
-	obj.request = obj.request.bind(obj);
 
 	// Routing requests to files on disk by default
 	Object.keys(obj.config.hosts).forEach(host => {

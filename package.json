@@ -29,7 +29,7 @@
     "tiny-defer": "~1.0.4",
     "tiny-lru": "~1.1.0",
     "tiny-merge": "~1.0.0",
-    "woodland": "~1.0.7"
+    "woodland": "~1.0.14"
   },
   "devDependencies": {
     "grunt": "~1.0.1",
