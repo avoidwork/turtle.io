@@ -45,7 +45,7 @@ function factory (cfg = {}, errHandler = null) {
 	}
 
 	obj.etags = lru(obj.config.cacheSize);
-	obj.router = woodland({cacheSize: obj.config.cacheSize, defaultHost: obj.config.default, defaultHeaders: obj.config.headers, hosts: Object.keys(obj.config.hosts), seed: obj.config.seed});
+	obj.router = woodland({cacheSize: obj.config.cacheSize, defaultHost: obj.config.default, hosts: Object.keys(obj.config.hosts), seed: obj.config.seed});
 
 	if (typeof errHandler === "function") {
 		obj.router.onerror = errHandler;
