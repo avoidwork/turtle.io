@@ -17,7 +17,7 @@ server({
 		enabled: false
 	},
 	hosts: {
-		"test": "test"
+		test: "test"
 	}
 }).start();
 
@@ -46,7 +46,7 @@ describe("Valid Requests", function () {
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
 			.expectHeader("transfer-encoding", "chunked")
 			.expectHeader("content-length", undefined)
-			.end(function (err, res) {
+			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
@@ -61,7 +61,7 @@ describe("Valid Requests", function () {
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
 			.expectHeader("transfer-encoding", "chunked")
 			.expectHeader("content-length", undefined)
-			.end(function (err, res) {
+			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
@@ -88,7 +88,7 @@ describe("Valid Requests", function () {
 			.expectHeader("etag", etag)
 			.expectBody(/^$/)
 			.end(function (err) {
-				if (err) { console.log(err); throw err; }
+				if (err) throw err;
 				done();
 			});
 	});
