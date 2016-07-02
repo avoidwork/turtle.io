@@ -9,6 +9,8 @@ function request () {
 	return hippie().base("http://localhost:8002");
 }
 
+console.log("directory", path.join(__dirname, "..", "sites"));
+
 server({
 	default: "test",
 	root: path.join(__dirname, "..", "sites"),
@@ -17,7 +19,8 @@ server({
 		enabled: false
 	},
 	hosts: {
-		test: "test"
+		test: "test",
+		test2: "test2"
 	}
 }).start();
 
@@ -27,7 +30,6 @@ describe("Invalid Requests", function () {
 			.get("/")
 			.header("range", "a-b")
 			.expectStatus(416)
-			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Range Not Satisfiable/)
 			.end(function (err, res) {
 				if (err) throw err;
@@ -41,7 +43,6 @@ describe("Invalid Requests", function () {
 			.get("/")
 			.header("range", "5-0")
 			.expectStatus(416)
-			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Range Not Satisfiable/)
 			.end(function (err, res) {
 				if (err) throw err;
@@ -55,7 +56,6 @@ describe("Invalid Requests", function () {
 			.post("/")
 			.expectStatus(405)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
@@ -68,7 +68,6 @@ describe("Invalid Requests", function () {
 			.put("/")
 			.expectStatus(405)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
@@ -81,7 +80,6 @@ describe("Invalid Requests", function () {
 			.patch("/")
 			.expectStatus(405)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
@@ -94,7 +92,6 @@ describe("Invalid Requests", function () {
 			.del("/")
 			.expectStatus(405)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Method Not Allowed/)
 			.end(function (err) {
 				if (err) throw err;
@@ -106,7 +103,6 @@ describe("Invalid Requests", function () {
 		request()
 			.get("/nothere.html")
 			.expectStatus(404)
-			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Not Found/)
 			.end(function (err) {
 				if (err) throw err;
@@ -118,7 +114,6 @@ describe("Invalid Requests", function () {
 		request()
 			.get("/nothere.html%3fa=b?=c")
 			.expectStatus(404)
-			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Not Found/)
 			.end(function (err) {
 				if (err) throw err;
@@ -130,7 +125,6 @@ describe("Invalid Requests", function () {
 		request()
 			.get("/nothere.x_%22%3E%3Cimg%20src=x%20onerror=prompt(1)%3E.html")
 			.expectStatus(404)
-			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Not Found/)
 			.end(function (err) {
 				if (err) throw err;
@@ -139,52 +133,44 @@ describe("Invalid Requests", function () {
 	});
 
 	// 405 is a result of a cached route that leads to a file system based 404 on GET
-	it("POST /nothere.html (405 / 'Method Not Allowed')", function (done) {
+	it("POST /nothere.html (404 / 'Not Found')", function (done) {
 		request()
 			.post("/nothere.html")
-			.expectStatus(405)
-			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("cache-control", "no-cache")
-			.expectBody(/Method Not Allowed/)
+			.expectStatus(404)
+			.expectBody(/Not Found/)
 			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
 	});
 
-	it("PUT /nothere.html (405 / 'Method Not Allowed')", function (done) {
+	it("PUT /nothere.html (404 / 'Not Found')", function (done) {
 		request()
 			.put("/nothere.html")
-			.expectStatus(405)
-			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("cache-control", "no-cache")
-			.expectBody(/Method Not Allowed/)
+			.expectStatus(404)
+			.expectBody(/Not Found/)
 			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
 	});
 
-	it("PATCH /nothere.html (405 / 'Method Not Allowed')", function (done) {
+	it("PATCH /nothere.html (404 / 'Not Found')", function (done) {
 		request()
 			.patch("/nothere.html")
-			.expectStatus(405)
-			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("cache-control", "no-cache")
-			.expectBody(/Method Not Allowed/)
+			.expectStatus(404)
+			.expectBody(/Not Found/)
 			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
 	});
 
-	it("DELETE /nothere.html (405 / 'Method Not Allowed')", function (done) {
+	it("DELETE /nothere.html (404 / 'Not Found')", function (done) {
 		request()
 			.del("/nothere.html")
-			.expectStatus(405)
-			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("cache-control", "no-cache")
-			.expectBody(/Method Not Allowed/)
+			.expectStatus(404)
+			.expectBody(/Not Found/)
 			.end(function (err) {
 				if (err) throw err;
 				done();
@@ -195,9 +181,11 @@ describe("Invalid Requests", function () {
 		request()
 			.get("/../README")
 			.expectStatus(404)
-			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Not Found/)
-			.end(function (err) {
+			.end(function (err, req, body) {
+				console("-----------");
+				console(body);
+				console("-----------");
 				if (err) throw err;
 				done();
 			});
@@ -207,7 +195,6 @@ describe("Invalid Requests", function () {
 		request()
 			.get("/././../README")
 			.expectStatus(404)
-			.expectHeader("cache-control", "no-cache")
 			.expectBody(/Not Found/)
 			.end(function (err) {
 				if (err) throw err;

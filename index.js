@@ -70,7 +70,12 @@ function factory (cfg = {}, errHandler = null) {
 		["get", [middleware.valid, middleware.file, middleware.stream, middleware.error]]
 	].forEach(list => {
 		list[1].forEach(fn => {
-			obj.use("/.*", fn, list[0], "all").blacklist(fn);
+			try {
+				obj.use("/.*", fn, list[0], "all").blacklist(fn);
+			} catch (e) {
+				console.log(list[0], list[1].toString());
+				console.log(e.stack);
+			}
 		});
 	});
 
