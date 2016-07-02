@@ -182,10 +182,7 @@ describe("Invalid Requests", function () {
 			.get("/../README")
 			.expectStatus(404)
 			.expectBody(/Not Found/)
-			.end(function (err, req, body) {
-				console("-----------");
-				console(body);
-				console("-----------");
+			.end(function (err) {
 				if (err) throw err;
 				done();
 			});
