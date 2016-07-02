@@ -9,8 +9,6 @@ function request () {
 	return hippie().base("http://localhost:8002");
 }
 
-console.log("directory", path.join(__dirname, "..", "sites"));
-
 server({
 	default: "test",
 	root: path.join(__dirname, "..", "sites"),
@@ -19,8 +17,7 @@ server({
 		enabled: false
 	},
 	hosts: {
-		test: "test",
-		test2: "test2"
+		test: "test"
 	}
 }).start();
 
