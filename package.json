@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Elastic web server framework with easy virtual hosts",
-  "version": "7.1.0",
+  "version": "7.1.1",
   "homepage": "http://turtle.io",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -29,7 +29,7 @@
     "tiny-defer": "~1.0.4",
     "tiny-lru": "~1.1.0",
     "tiny-merge": "~1.0.0",
-    "woodland": "~1.0.17"
+    "woodland": "~1.1.0"
   },
   "devDependencies": {
     "grunt": "~1.0.1",
