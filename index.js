@@ -3,6 +3,7 @@
 const path = require("path"),
 	lru = require("tiny-lru"),
 	woodland = require("woodland"),
+	tinyEtag = require("tiny-etag"),
 	middleware = require(path.join(__dirname, "lib", "middleware.js")),
 	TurtleIO = require(path.join(__dirname, "lib", "turtleio.js")),
 	utility = require(path.join(__dirname, "lib", "utility.js")),
@@ -44,7 +45,7 @@ function factory (cfg = {}, errHandler = null) {
 		obj.config.headers["x-powered-by"] = "node.js/" + process.versions.node.replace(/^v/, "");
 	}
 
-	obj.etags = lru(obj.config.cacheSize);
+	obj.etags = tinyEtag({cacheSize: obj.config.cacheSize, seed: obj.config.seed});
 	obj.router = woodland({cacheSize: obj.config.cacheSize, defaultHost: obj.config.default, hosts: Object.keys(obj.config.hosts), seed: obj.config.seed});
 
 	if (typeof errHandler === "function") {
@@ -66,7 +67,7 @@ function factory (cfg = {}, errHandler = null) {
 	}
 
 	[
-		["all", [middleware.timer, decorate, middleware.etag, middleware.payload, middleware.cors, middleware.error]],
+		["all", [obj.etags.middleware, middleware.timer, decorate, middleware.payload, middleware.cors, middleware.error]],
 		["get", [middleware.valid, middleware.file, middleware.stream, middleware.error]]
 	].forEach(list => {
 		list[1].forEach(fn => {
