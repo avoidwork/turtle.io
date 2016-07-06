@@ -1,6 +1,6 @@
 # turtle.io
 
-[![build status](https://secure.travis-ci.org/avoidwork/turtle.io.svg)](http://travis-ci.org/avoidwork/turtle.io)[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/avoidwork/turtle.io?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![build status](https://secure.travis-ci.org/avoidwork/turtle.io.svg)](http://travis-ci.org/avoidwork/turtle.io) [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/avoidwork/turtle.io?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 turtle.io is very easy to get up and running! All you need to do is install it, and tell it what directory holds your web sites, & which hostnames to answer for.
 
@@ -29,15 +29,15 @@ turtle.io requires a ***default*** virtual host to be specified, because it is t
 Virtual host keys are the hostname, and the value is the directory relative to "root".
 
 ```javascript
-var turtleio = require("turtle.io");
-var server = turtleio({
+const turtleio = require("turtle.io");
+let server = turtleio({
     default: "mysite.com",
     port: 80,
     uid: 100,
     root: "/var/www",
     hosts: {
-        "mysite.com"         : "mysite.com",
-        "another-domain.com" : "another-domain.com"
+        "mysite.com": "mysite.com",
+        "another-domain.com": "another-domain.com"
     }
 });
 
@@ -75,10 +75,7 @@ app.listen(3000);
 ```javascript
 "use strict";
 
-var turtleio = require("index.js"),
-    app;
-
-app = turtleio({
+require("index.js")({
 	default: "test",
 	root: __dirname + "/sites",
 	port: 8000,

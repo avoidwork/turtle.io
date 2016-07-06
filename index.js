@@ -3,7 +3,7 @@
 const path = require("path"),
 	lru = require("tiny-lru"),
 	woodland = require("woodland"),
-	tinyEtag = require("tiny-etag"),
+	etag = require("tiny-etag"),
 	middleware = require(path.join(__dirname, "lib", "middleware.js")),
 	TurtleIO = require(path.join(__dirname, "lib", "turtleio.js")),
 	utility = require(path.join(__dirname, "lib", "utility.js")),
@@ -45,8 +45,21 @@ function factory (cfg = {}, errHandler = null) {
 		obj.config.headers["x-powered-by"] = "node.js/" + process.versions.node.replace(/^v/, "");
 	}
 
-	obj.etags = tinyEtag({cacheSize: obj.config.cacheSize, seed: obj.config.seed});
-	obj.router = woodland({cacheSize: obj.config.cacheSize, defaultHost: obj.config.default, hosts: Object.keys(obj.config.hosts), seed: obj.config.seed});
+	obj.etags = etag({
+		cacheSize: obj.config.cacheSize,
+		seed: obj.config.seed
+	});
+
+	obj.router = woodland({
+		cacheSize: obj.config.cacheSize,
+		defaultHost: obj.config.default,
+		defaultHeaders: {
+			server: obj.config.headers.server,
+			"x-powered-by": obj.config.headers["x-powered-by"]
+		},
+		hosts: Object.keys(obj.config.hosts),
+		seed: obj.config.seed
+	});
 
 	if (typeof errHandler === "function") {
 		obj.router.onerror = errHandler;
