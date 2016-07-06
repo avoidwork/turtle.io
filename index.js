@@ -80,8 +80,8 @@ function factory (cfg = {}, errHandler = null) {
 	}
 
 	[
-		["all", [obj.etags.middleware, middleware.timer, decorate, middleware.payload, middleware.cors, middleware.error]],
-		["get", [middleware.valid, middleware.file, middleware.stream, middleware.error]]
+		["all", [obj.etags.middleware, middleware.timer, decorate, middleware.payload, middleware.cors]],
+		["get", [middleware.valid, middleware.file, middleware.stream]]
 	].forEach(list => {
 		list[1].forEach(fn => {
 			obj.use("/.*", fn, list[0], "all").blacklist(fn);
