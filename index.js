@@ -61,6 +61,13 @@ function factory (cfg = {}, errHandler = null) {
 		seed: obj.config.seed
 	});
 
+	// Making up for the ETag middleware
+	obj.router.onfinish = (req , res) => {
+		if (res.statusCode === 304) {
+			obj.log(obj.clf(req, res, res._headers), "info");
+		}
+	};
+
 	if (typeof errHandler === "function") {
 		obj.router.onerror = errHandler;
 	} else {
