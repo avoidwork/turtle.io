@@ -49,7 +49,10 @@ function factory (cfg = {}, errHandler = null) {
 		cacheSize: obj.config.cacheSize,
 		seed: obj.config.seed,
 		notify: obj.config.etags.notify,
-		onchange: obj.config.etags.onchange
+		onchange: obj.config.etags.onchange,
+		update: arg => {
+			obj.etags.cache = utility.merge(obj.etags.cache, JSON.parse(arg));
+		}
 	});
 
 	obj.router = woodland({

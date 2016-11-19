@@ -97,6 +97,11 @@ Transaction rates are similar.
 The `request` object is passed to every route handler as the second argument, will have a `body` property with the payload from the Client. It will not be coerced to another format, so if you expect JSON, you'll have to `JSON.parse()` it yourself (for now).
 
 ## API & decoration
+#### etags.update
+_Function (state)_
+
+Updates the etag cache with new state
+
 #### request
 ##### allow
 _String_
@@ -182,14 +187,20 @@ _Object_
 
 ETag middleware configuration.
 
+To enable state propagation set `notify` to `true`, and when receiving new state pass to `etags.update()`.
+
 ```
 {
 	notify: true,
 	onchange: (eventName, serializedCache) => {
-	...
+	... // serializedCache needs to be passed to other instances `etags.update()`
+	},
+	update: serializedCache => {
+	... // Override if you want to do more than set new state
 	}
 }
 ```
+
 #### headers
 _Object_
 
