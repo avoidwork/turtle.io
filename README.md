@@ -177,6 +177,19 @@ _String_
 
 ***[Required]*** Default hostname to handle requests which are not specified within _vhosts_; must be a valid entry within _vhosts_.
 
+#### etags
+_Object_
+
+ETag middleware configuration.
+
+```
+{
+	notify: true,
+	onchange: (eventName, serializedCache) => {
+	...
+	}
+}
+```
 #### headers
 _Object_
 

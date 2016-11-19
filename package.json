@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Elastic web server framework with easy virtual hosts",
-  "version": "7.1.22",
+  "version": "7.2.0",
   "homepage": "http://turtle.io",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -28,10 +28,10 @@
     "retsu": "~2.0.3",
     "tiny-coerce": "~1.0.1",
     "tiny-defer": "~1.0.4",
-    "tiny-etag": "~1.0.11",
-    "tiny-lru": "~1.1.0",
+    "tiny-etag": "~1.2.0",
+    "tiny-lru": "~1.3.0",
     "tiny-merge": "~1.0.0",
-    "woodland": "~1.1.6"
+    "woodland": "~1.1.7"
   },
   "devDependencies": {
     "grunt": "~1.0.1",

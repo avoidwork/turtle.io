@@ -47,7 +47,9 @@ function factory (cfg = {}, errHandler = null) {
 
 	obj.etags = etag({
 		cacheSize: obj.config.cacheSize,
-		seed: obj.config.seed
+		seed: obj.config.seed,
+		notify: obj.config.etags.notify,
+		onchange: obj.config.etags.onchange
 	});
 
 	obj.router = woodland({
