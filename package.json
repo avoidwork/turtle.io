@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Elastic web server framework with easy virtual hosts",
-  "version": "7.1.21",
+  "version": "7.1.22",
   "homepage": "http://turtle.io",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -31,14 +31,14 @@
     "tiny-etag": "~1.0.11",
     "tiny-lru": "~1.1.0",
     "tiny-merge": "~1.0.0",
-    "woodland": "~1.1.5"
+    "woodland": "~1.1.6"
   },
   "devDependencies": {
     "grunt": "~1.0.1",
     "grunt-cli": "~1.2.0",
     "grunt-contrib-concat": "~1.0.1",
     "grunt-contrib-watch": "~1.0.0",
-    "grunt-eslint": "~18.1.0",
+    "grunt-eslint": "~19.0.0",
     "grunt-mocha-test": "~0.12.7",
     "grunt-nsp": "~2.2.0",
     "hippie": "~0.5.0",

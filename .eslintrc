@@ -6,12 +6,14 @@
 		"amd": false
 	},
 	"ecmaFeatures": {
-		"jsx": true,
+		"jsx": false,
 		"superInFunctions": false,
 		"classes": false,
 		"modules": [2]
 	},
 	"rules": {
+		"arrow-parens": [2, "as-needed"],
+		"arrow-spacing": [2, {"before": true, "after": true}],
 		"block-scoped-var": [0],
 		"brace-style": [2, "1tbs", { "allowSingleLine": true }],
 		"camelcase": [0],
@@ -31,6 +33,7 @@
 		"generator-star-spacing": [2, "after"],
 		"guard-for-in": [0],
 		"handle-callback-err": [0],
+		"indent": ["error", "tab", {"VariableDeclarator": {"var": 1, "let": 1, "const": 1}, "SwitchCase": 1}],
 		"key-spacing": [2, { "beforeColon": false, "afterColon": true }],
 		"quotes": [2, "double", "avoid-escape"],
 		"max-depth": [0, 4],
@@ -41,6 +44,7 @@
 		"new-parens": [2],
 		"new-cap": [2, { "capIsNewExceptions": ["ToInteger", "ToObject", "ToPrimitive", "ToUint32"] }],
 		"newline-after-var": [0],
+		"newline-before-return": [2],
 		"no-alert": [2],
 		"no-array-constructor": [2],
 		"no-bitwise": [0],
@@ -125,7 +129,7 @@
 		"no-underscore-dangle": [0],
 		"no-unreachable": [2],
 		"no-unused-expressions": [2],
-		"no-unused-vars": [1, { "vars": "all", "args": "after-used" }],
+		"no-unused-vars": [2, { "vars": "all", "args": "after-used" }],
 		"no-use-before-define": [2],
 		"no-void": [0],
 		"no-warning-comments": [0, { "terms": ["todo", "fixme", "xxx"], "location": "start" }],
@@ -142,7 +146,7 @@
 		"sort-vars": [0],
 		"keyword-spacing": [2],
 		"space-before-function-paren": [2, { "anonymous": "always", "named": "always" }],
-		"space-before-blocks": [0, "always"],
+		"space-before-blocks": [2, "always"],
 		"space-in-brackets": [0, "never", {
 			"singleValue": true,
 			"arraysInArrays": false,
