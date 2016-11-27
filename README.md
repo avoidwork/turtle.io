@@ -98,6 +98,16 @@ Transaction rates are similar.
 The `request` object is passed to every route handler as the second argument, will have a `body` property with the payload from the Client. It will not be coerced to another format, so if you expect JSON, you'll have to `JSON.parse()` it yourself (for now).
 
 ## API & decoration
+##### canETag
+_Function (path, method)_
+
+Determines if a path can receive an ETag
+
+#### etags.ignore
+_Array_
+
+Array of paths to ignore for ETag generation
+
 #### etags.update
 _Function (state)_
 
