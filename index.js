@@ -64,7 +64,7 @@ function factory (cfg = {}, errHandler = null) {
 			server: obj.config.headers.server,
 			"x-powered-by": obj.config.headers["x-powered-by"]
 		},
-		hosts: Object.keys(obj.config.hosts),
+		hosts: Reflect.ownKeys(obj.config.hosts),
 		seed: obj.config.seed
 	});
 
