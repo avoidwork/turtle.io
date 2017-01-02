@@ -4,6 +4,7 @@ const path = require("path"),
 	lru = require("tiny-lru"),
 	woodland = require("woodland"),
 	etag = require("tiny-etag"),
+	each = require("retsu").each,
 	middleware = require(path.join(__dirname, "lib", "middleware.js")),
 	TurtleIO = require(path.join(__dirname, "lib", "turtleio.js")),
 	utility = require(path.join(__dirname, "lib", "utility.js")),
@@ -92,11 +93,11 @@ function factory (cfg = {}, errHandler = null) {
 		};
 	}
 
-	[
+	each([
 		["all", [obj.etags.middleware, middleware.timer, decorate, middleware.payload, middleware.cors]],
 		["get", [middleware.valid, middleware.file, middleware.stream]]
-	].forEach(list => {
-		list[1].forEach(fn => {
+	], list => {
+		each(list[1], fn => {
 			obj.use("/.*", fn, list[0], "all").blacklist(fn);
 		});
 	});

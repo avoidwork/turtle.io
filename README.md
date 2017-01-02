@@ -294,5 +294,5 @@ _Number (null)_
 [Optional] UID the server runs as.
 
 ## License
-Copyright (c) 2016 Jason Mulligan  
+Copyright (c) 2017 Jason Mulligan
 Licensed under the BSD-3 license.
