@@ -1,7 +1,6 @@
 # turtle.io
 
 [![build status](https://secure.travis-ci.org/avoidwork/turtle.io.svg)](http://travis-ci.org/avoidwork/turtle.io)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/avoidwork/turtle.io?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 turtle.io is very easy to get up and running! All you need to do is install it, and tell it what directory holds your web sites, & which hostnames to answer for.
 
