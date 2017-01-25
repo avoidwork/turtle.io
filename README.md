@@ -30,7 +30,7 @@ Virtual host keys are the hostname, and the value is the directory relative to "
 
 ```javascript
 const turtleio = require("turtle.io");
-let server = turtleio({
+const server = turtleio({
     default: "mysite.com",
     port: 80,
     uid: 100,
