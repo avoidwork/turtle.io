@@ -279,14 +279,20 @@ _Number (625)_
 Seed for hashing of middleware with MurmurHash3.
 
 #### ssl.cert
-_Object_
+_String_
 
-[Optional] SSL certificate
+[Optional] SSL certificate file path
 
 #### ssl.key
-_Object_
+_String_
 
-[Optional] SSL certificate key/pem
+[Optional] SSL certificate key/pem file path
+
+
+#### ssl.pfx
+_String_
+
+[Optional] SSL certificate pfx file path
 
 #### uid
 _Number (null)_
