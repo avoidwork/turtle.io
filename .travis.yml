@@ -1,8 +1,9 @@
 language: node_js
 node_js:
-  - "6.2"
-  - "6.1"
-  - "6.0"
+  - node
+  - 7
+  - 6
+
 
 branches:
   only:
