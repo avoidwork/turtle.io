@@ -7,6 +7,9 @@ var path = require("path"),
 server = require(path.join(__dirname, "index"))({
 	default: "test",
 	root: path.join(__dirname, "sites"),
+	headers: {
+		"cache-control": "no-cache"
+	},
 	logging: {
 		level: "debug"
 	},
