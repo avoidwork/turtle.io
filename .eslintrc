@@ -11,6 +11,10 @@
 		"classes": false,
 		"modules": [2]
 	},
+	"globals": {
+		"describe": true,
+		"it": true
+	},
 	"rules": {
 		"arrow-parens": [2, "as-needed"],
 		"arrow-spacing": [2, {"before": true, "after": true}],

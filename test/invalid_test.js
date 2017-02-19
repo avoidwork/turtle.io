@@ -1,13 +1,8 @@
 "use strict";
 
-var hippie = require("hippie"),
+const tinyhttptest = require("tiny-httptest"),
 	path = require("path"),
-	server = require(path.join("..", "index.js")),
-	etag = "";
-
-function request () {
-	return hippie().base("http://localhost:8002");
-}
+	server = require(path.join("..", "index.js"));
 
 server({
 	default: "test",
@@ -22,177 +17,120 @@ server({
 }).start();
 
 describe("Invalid Requests", function () {
-	it("GET / (416 / 'Partial response - invalid')", function (done) {
-		request()
-			.get("/")
-			.header("range", "a-b")
+	it("GET / (416 / 'Partial response - invalid')", function () {
+		return tinyhttptest({url: "http://localhost:8002/", headers: {range: "a-b"}})
 			.expectStatus(416)
 			.expectBody(/Range Not Satisfiable/)
-			.end(function (err, res) {
-				if (err) throw err;
-				etag = res.headers.etag;
-				done();
-			});
+			.end();
 	});
 
-	it("GET / (416 / 'Partial response - invalid #2')", function (done) {
-		request()
-			.get("/")
-			.header("range", "5-0")
+	it("GET / (416 / 'Partial response - invalid #2')", function () {
+		return tinyhttptest({url: "http://localhost:8002/", headers: {range: "5-0"}})
 			.expectStatus(416)
 			.expectBody(/Range Not Satisfiable/)
-			.end(function (err, res) {
-				if (err) throw err;
-				etag = res.headers.etag;
-				done();
-			});
+			.end();
 	});
 
-	it("POST / (405 / 'Method Not Allowed')", function (done) {
-		request()
-			.post("/")
+	it("POST / (405 / 'Method Not Allowed')", function () {
+		return tinyhttptest({url: "http://localhost:8002/", method: "post"})
 			.expectStatus(405)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
 			.expectBody(/Method Not Allowed/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("PUT / (405 / 'Method Not Allowed')", function (done) {
-		request()
-			.put("/")
+	it("PUT / (405 / 'Method Not Allowed')", function () {
+		return tinyhttptest({url: "http://localhost:8002/", method: "put"})
 			.expectStatus(405)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
 			.expectBody(/Method Not Allowed/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("PATCH / (405 / 'Method Not Allowed')", function (done) {
-		request()
-			.patch("/")
+	it("PATCH / (405 / 'Method Not Allowed')", function () {
+		return tinyhttptest({url: "http://localhost:8002/", method: "patch"})
 			.expectStatus(405)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
 			.expectBody(/Method Not Allowed/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("DELETE / (405 / 'Method Not Allowed')", function (done) {
-		request()
-			.del("/")
+	it("DELETE / (405 / 'Method Not Allowed')", function () {
+		return tinyhttptest({url: "http://localhost:8002/", method: "delete"})
 			.expectStatus(405)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
 			.expectBody(/Method Not Allowed/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("GET /nothere.html (404 / 'Not Found')", function (done) {
-		request()
-			.get("/nothere.html")
+	it("GET /nothere.html (404 / 'Not Found')", function () {
+		return tinyhttptest({url: "http://localhost:8002/nothere.html"})
 			.expectStatus(404)
+			.expectHeader("allow", undefined)
 			.expectBody(/Not Found/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("GET /nothere.html%3fa=b?=c (404 / 'Not Found')", function (done) {
-		request()
-			.get("/nothere.html%3fa=b?=c")
+	it("GET /nothere.html%3fa=b?=c (404 / 'Not Found')", function () {
+		return tinyhttptest({url: "http://localhost:8002/nothere.html%3fa=b?=c"})
 			.expectStatus(404)
+			.expectHeader("allow", undefined)
 			.expectBody(/Not Found/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("GET /nothere.x_%22%3E%3Cimg%20src=x%20onerror=prompt(1)%3E.html (404 / 'Not Found')", function (done) {
-		request()
-			.get("/nothere.x_%22%3E%3Cimg%20src=x%20onerror=prompt(1)%3E.html")
+	it("GET /nothere.x_%22%3E%3Cimg%20src=x%20onerror=prompt(1)%3E.html (404 / 'Not Found')", function () {
+		return tinyhttptest({url: "http://localhost:8002/nothere.x_%22%3E%3Cimg%20src=x%20onerror=prompt(1)%3E.html"})
 			.expectStatus(404)
+			.expectHeader("allow", undefined)
 			.expectBody(/Not Found/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
 	// 405 is a result of a cached route that leads to a file system based 404 on GET
-	it("POST /nothere.html (404 / 'Not Found')", function (done) {
-		request()
-			.post("/nothere.html")
+	it("POST /nothere.html (404 / 'Not Found')", function () {
+		return tinyhttptest({url: "http://localhost:8002/nothere.html", method: "post"})
 			.expectStatus(404)
+			.expectHeader("allow", undefined)
 			.expectBody(/Not Found/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("PUT /nothere.html (404 / 'Not Found')", function (done) {
-		request()
-			.put("/nothere.html")
+	it("PUT /nothere.html (404 / 'Not Found')", function () {
+		return tinyhttptest({url: "http://localhost:8002/nothere.html", method: "put"})
 			.expectStatus(404)
+			.expectHeader("allow", undefined)
 			.expectBody(/Not Found/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("PATCH /nothere.html (404 / 'Not Found')", function (done) {
-		request()
-			.patch("/nothere.html")
+	it("PATCH /nothere.html (404 / 'Not Found')", function () {
+		return tinyhttptest({url: "http://localhost:8002/nothere.html", method: "patch"})
 			.expectStatus(404)
+			.expectHeader("allow", undefined)
 			.expectBody(/Not Found/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("DELETE /nothere.html (404 / 'Not Found')", function (done) {
-		request()
-			.del("/nothere.html")
+	it("DELETE /nothere.html (404 / 'Not Found')", function () {
+		return tinyhttptest({url: "http://localhost:8002/nothere.html", method: "delete"})
 			.expectStatus(404)
+			.expectHeader("allow", undefined)
 			.expectBody(/Not Found/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("GET /../README (404 / 'Not Found')", function (done) {
-		request()
-			.get("/../README")
+	it("GET /../README (404 / 'Not Found')", function () {
+		return tinyhttptest({url: "http://localhost:8002/../README"})
 			.expectStatus(404)
 			.expectBody(/Not Found/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 
-	it("GET /././../README (404 / 'Not Found')", function (done) {
-		request()
-			.get("/././../README")
+	it("GET /././../README (404 / 'Not Found')", function () {
+		return tinyhttptest({url: "http://localhost:8002/././../README"})
 			.expectStatus(404)
 			.expectBody(/Not Found/)
-			.end(function (err) {
-				if (err) throw err;
-				done();
-			});
+			.end();
 	});
 });
