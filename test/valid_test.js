@@ -85,4 +85,21 @@ describe("Valid Requests", function () {
 			.expectBody(/^tml$/)
 			.end();
 	});
+
+	it("GET / (200 / 'Hello World!' / CORS)", function () {
+		return tinyhttptest({url: "http://localhost:8001/", method: "OPTIONS"})
+			.cors()
+			.expectStatus(200)
+			.expectHeader("allow", "GET, HEAD, OPTIONS")
+			.end().then(() => {
+				return tinyhttptest({url: "http://localhost:8001/"})
+					.cors()
+					.expectStatus(200)
+					.expectHeader("allow", "GET, HEAD, OPTIONS")
+					.expectHeader("transfer-encoding", "chunked")
+					.expectHeader("content-length", undefined)
+					.expectBody(/Hello world!/)
+					.end();
+			});
+	});
 });
