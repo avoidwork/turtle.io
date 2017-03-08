@@ -23,4 +23,8 @@ server.get("/echo", function (req, res) {
 	res.send(req.parsed.query);
 });
 
+server.options("/echo", function (req, res) {
+	res.send("stuff");
+});
+
 server.start();
