@@ -52,6 +52,16 @@ describe("Valid Requests", function () {
 		return tinyhttptest({url: "http://localhost:8001/", method: "head"})
 			.expectStatus(200)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
+			.expectHeader("content-length", 53)
+			.expectBody(/^$/)
+			.end();
+	});
+
+	it("OPTIONS / (200 / empty)", function () {
+		return tinyhttptest({url: "http://localhost:8001/", method: "options"})
+			.expectStatus(200)
+			.expectHeader("allow", "GET, HEAD, OPTIONS")
+			.expectHeader("content-length", 0)
 			.expectBody(/^$/)
 			.end();
 	});

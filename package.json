@@ -1,7 +1,7 @@
 {
   "name": "turtle.io",
   "description": "Elastic web server framework with easy virtual hosts",
-  "version": "7.4.18",
+  "version": "7.5.0",
   "homepage": "http://turtle.io",
   "author": "Jason Mulligan <jason.mulligan@avoidwork.com>",
   "repository": {
@@ -42,7 +42,7 @@
     "grunt-mocha-test": "~0.13.2",
     "grunt-nsp": "~2.3.1",
     "mocha": "~3.2.0",
-    "tiny-httptest": "~1.0.3"
+    "tiny-httptest": "~1.0.7"
   },
   "keywords": [
     "web server",
