@@ -76,6 +76,16 @@ describe("Valid Requests", function () {
 			.end();
 	});
 
+	it("GET / (206 / 'Partial response - 0 offset - bytes')", function () {
+		return tinyhttptest({url: "http://localhost:8001/", headers: {range: "bytes=0-5"}})
+			.expectStatus(206)
+			.expectHeader("transfer-encoding", "chunked")
+			.expectHeader("content-range", /^bytes 0-5\/5(3|8)$/)
+			.expectHeader("content-length", undefined)
+			.expectBody(/^\<html>$/)
+			.end();
+	});
+
 	it("GET / (206 / 'Partial response - 0 offset')", function () {
 		return tinyhttptest({url: "http://localhost:8001/", headers: {range: "0-5"}})
 			.expectStatus(206)
