@@ -52,7 +52,7 @@ describe("Valid Requests", function () {
 		return tinyhttptest({url: "http://localhost:8001/", method: "head"})
 			.expectStatus(200)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
-			.expectHeader("content-length", 53)
+			.expectHeader("content-length", /53|58/) // macOS & Windows size on disk
 			.expectBody(/^$/)
 			.end();
 	});
