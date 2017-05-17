@@ -108,12 +108,12 @@ describe("Valid Requests", function () {
 
 	it("GET / (200 / 'Hello World!' / CORS)", function () {
 		return tinyhttptest({url: "http://localhost:8001/", method: "OPTIONS"})
-			.cors()
+			.cors("http://not.localhost:8001")
 			.expectStatus(200)
 			.expectHeader("allow", "GET, HEAD, OPTIONS")
 			.end().then(() => {
 				return tinyhttptest({url: "http://localhost:8001/"})
-					.cors()
+					.cors("http://not.localhost:8001")
 					.expectStatus(200)
 					.expectHeader("allow", "GET, HEAD, OPTIONS")
 					.expectHeader("transfer-encoding", "chunked")
