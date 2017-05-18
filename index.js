@@ -16,23 +16,10 @@ function factory (cfg = {}, errHandler = null) {
 	function decorate(req, res, next) {
 		req.hash = obj.hash(req.parsed.href);
 		req.server = obj;
-
-		res.redirect = (target, status = 302) => {
-			return obj.send(req, res, "", status, {location: target});
-		};
-
-		res.respond = (arg, status, headers) => {
-			return obj.send(req, res, arg, status, headers);
-		};
-
-		res.error = (status, arg) => {
-			return obj.error(req, res, status, arg);
-		};
-
-		res.send = (arg, status, headers) => {
-			return obj.send(req, res, arg, status, headers);
-		};
-
+		res.redirect = (target, status = 302) => obj.send(req, res, "", status, {location: target});
+		res.respond = (arg, status, headers) => obj.send(req, res, arg, status, headers);
+		res.error = (status, arg) => obj.error(req, res, status, arg);
+		res.send = (arg, status, headers) => obj.send(req, res, arg, status, headers);
 		next();
 	}
 
@@ -92,8 +79,8 @@ function factory (cfg = {}, errHandler = null) {
 	}
 
 	each([
-		["all", [obj.etags.middleware, middleware.timer, decorate, middleware.payload, middleware.cors]],
-		["get", [middleware.valid, middleware.file, middleware.stream]]
+		["all", [obj.etags.middleware, middleware.timer, decorate, middleware.valid, middleware.payload, middleware.cors]],
+		["get", [middleware.file, middleware.stream]]
 	], list => {
 		each(list[1], fn => {
 			obj.use("/.*", fn, list[0], "all").blacklist(fn);
