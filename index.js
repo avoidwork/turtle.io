@@ -79,7 +79,7 @@ function factory (cfg = {}, errHandler = null) {
 	}
 
 	each([
-		["all", [obj.etags.middleware, middleware.timer, decorate, middleware.valid, middleware.payload, middleware.cors]],
+		["all", [obj.etags.middleware, middleware.timer, decorate, middleware.payload]],
 		["get", [middleware.file, middleware.stream]]
 	], list => {
 		each(list[1], fn => {
