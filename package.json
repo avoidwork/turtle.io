@@ -42,7 +42,7 @@
     "grunt-mocha-test": "~0.13.2",
     "grunt-nsp": "~2.3.1",
     "mocha": "~3.2.0",
-    "tiny-httptest": "~1.0.7"
+    "tiny-httptest": "~1.0.8"
   },
   "keywords": [
     "web server",
