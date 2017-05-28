@@ -25,11 +25,11 @@ function factory (cfg = {}, errHandler = null) {
 
 	utility.merge(obj.config, cfg);
 
-	if (obj.config.headers.server === undefined) {
+	if (obj.config.headers.server === void 0) {
 		obj.config.headers.server = "turtle.io/" + version + " (" + utility.capitalize(process.platform) + ")";
 	}
 
-	if (obj.config.headers["x-powered-by"] === undefined) {
+	if (obj.config.headers["x-powered-by"] === void 0) {
 		obj.config.headers["x-powered-by"] = "node.js/" + process.versions.node.replace(/^v/, "");
 	}
 
