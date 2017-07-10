@@ -123,6 +123,7 @@ describe("Invalid Requests", function () {
 	it("GET /../README (404 / 'Not Found')", function () {
 		return tinyhttptest({url: "http://localhost:8002/../README"})
 			.expectStatus(404)
+			.expectHeader("allow", undefined)
 			.expectBody(/Not Found/)
 			.end();
 	});
@@ -130,6 +131,7 @@ describe("Invalid Requests", function () {
 	it("GET /././../README (404 / 'Not Found')", function () {
 		return tinyhttptest({url: "http://localhost:8002/././../README"})
 			.expectStatus(404)
+			.expectHeader("allow", undefined)
 			.expectBody(/Not Found/)
 			.end();
 	});

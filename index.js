@@ -1,11 +1,11 @@
 "use strict";
 
 const path = require("path"),
-	lru = require("tiny-lru"),
 	woodland = require("woodland"),
 	etag = require("tiny-etag"),
 	each = require("retsu").each,
 	middleware = require(path.join(__dirname, "lib", "middleware.js")),
+	regex = require(path.join(__dirname, "lib", "regex.js")),
 	TurtleIO = require(path.join(__dirname, "lib", "turtleio.js")),
 	utility = require(path.join(__dirname, "lib", "utility.js")),
 	version = require(path.join(__dirname, "package.json")).version;
@@ -13,14 +13,14 @@ const path = require("path"),
 function factory (cfg = {}, errHandler = null) {
 	let obj = new TurtleIO();
 
-	function decorate(req, res, next) {
+	function decorate (req, res) {
+		req.filepath = path.join(obj.config.root, obj.config.hosts[req.host], req.parsed.pathname.replace(regex.dir, ""));
 		req.hash = obj.hash(req.parsed.href);
 		req.server = obj;
 		res.redirect = (target, status = 302) => obj.send(req, res, "", status, {location: target});
 		res.respond = (arg, status, headers) => obj.send(req, res, arg, status, headers);
 		res.error = (status, arg) => obj.error(req, res, status, arg);
 		res.send = (arg, status, headers) => obj.send(req, res, arg, status, headers);
-		next();
 	}
 
 	utility.merge(obj.config, cfg);
@@ -52,8 +52,11 @@ function factory (cfg = {}, errHandler = null) {
 		seed: obj.config.seed
 	});
 
+	// Decorating file path pre-middleware
+	obj.router.onconnect = decorate;
+
 	// Making up for the ETag middleware
-	obj.router.onfinish = (req , res) => obj.log(obj.clf(req, res, res._headers), "info");
+	obj.router.onfinish = (req, res) => obj.log(obj.clf(req, res, res._headers), "info");
 
 	if (typeof errHandler === "function") {
 		obj.router.onerror = errHandler;
@@ -65,18 +68,34 @@ function factory (cfg = {}, errHandler = null) {
 				status = 500;
 				body = e.message;
 				obj.log(body, "error");
+				obj.error(req, res, status, body);
 			} else {
 				status = Number(e.message);
-			}
 
-			return obj.error(req, res, status, body);
+				if (status === 405 && req.file === void 0) {
+					obj.validate(req, res).then(() => {
+						if (req.file === void 0) {
+							status = 404;
+							res.removeHeader("allow");
+							req.allow = "";
+						}
+
+						obj.error(req, res, status, body);
+					}).catch(() => {
+						status = 404;
+						res.removeHeader("allow");
+						req.allow = "";
+						obj.error(req, res, status, body);
+					});
+				} else {
+					obj.error(req, res, status, body);
+				}
+			}
 		};
 	}
 
-	each([
-		["all", [obj.etags.middleware, middleware.timer, decorate, middleware.payload]],
-		["get", [middleware.file, middleware.stream]]
-	], list => each(list[1], fn => obj.use("/.*", fn, list[0], "all").blacklist(fn)));
+	each([obj.etags.middleware, middleware.timer, middleware.payload], fn => obj.use("/.*", fn, "all", "all").blacklist(fn));
+	each([middleware.file, middleware.stream], fn => obj.use("/.*", fn, "get", "all"));
 
 	return obj;
 }
