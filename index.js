@@ -62,11 +62,12 @@ function factory (cfg = {}, errHandler = null) {
 		obj.router.onerror = errHandler;
 	} else {
 		obj.router.onerror = (req, res, e) => {
-			let body, status;
+			let status;
 
 			if (isNaN(e.message)) {
+				let body = e.message;
+
 				status = 500;
-				body = e.message;
 				obj.log(body, "error");
 				obj.error(req, res, status, body);
 			} else {
@@ -80,15 +81,15 @@ function factory (cfg = {}, errHandler = null) {
 							req.allow = "";
 						}
 
-						obj.error(req, res, status, body);
+						obj.error(req, res, status);
 					}).catch(() => {
 						status = 404;
 						res.removeHeader("allow");
 						req.allow = "";
-						obj.error(req, res, status, body);
+						obj.error(req, res, status);
 					});
 				} else {
-					obj.error(req, res, status, body);
+					obj.error(req, res, status);
 				}
 			}
 		};
