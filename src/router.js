@@ -22,8 +22,8 @@ class Router {
 
 	allowed (method, uri, host, override) {
 		return this.routes(uri, host, method, override).filter(i => {
-				return !this.noaction.has(i.hash || this.hash(i));
-			}).length > 0;
+			return !this.noaction.has(i.hash || this.hash(i));
+		}).length > 0;
 	}
 
 	allows (uri, host, override) {
@@ -58,11 +58,7 @@ class Router {
 	host (arg) {
 		let result;
 
-		array.each(this.patterns, (i, idx) => {
-			if (i.test(arg)) {
-				return !(result = this.hosts[idx]);
-			}
-		});
+		array.each(this.patterns, (i, idx) => i.test(arg) ? !(result = this.hosts[idx]) : void 0);
 
 		return result;
 	}

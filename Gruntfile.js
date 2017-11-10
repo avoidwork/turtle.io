@@ -3,7 +3,7 @@ module.exports = function (grunt) {
 		babel: {
 			options: {
 				sourceMap: false,
-				presets: ["babel-preset-es2015"]
+				presets: ["env"]
 			},
 			dist: {
 				files: [{
@@ -25,9 +25,6 @@ module.exports = function (grunt) {
 			test : {
 				src : ["test/*_test.js"]
 			}
-		},
-		nsp: {
-			package: grunt.file.readJSON("package.json")
 		}
 	});
 
@@ -35,9 +32,8 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-babel");
 	grunt.loadNpmTasks("grunt-eslint");
 	grunt.loadNpmTasks("grunt-mocha-test");
-	grunt.loadNpmTasks("grunt-nsp");
 
 	// aliases
-	grunt.registerTask("test", ["eslint", "mochaTest", "nsp"]);
+	grunt.registerTask("test", ["eslint", "mochaTest"]);
 	grunt.registerTask("default", ["babel", "test"]);
 };

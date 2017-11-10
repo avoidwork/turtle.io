@@ -112,13 +112,17 @@ class TurtleIO {
 			array.each(utility.explode(encoding), i => {
 				if (regex.gzip.test(i)) {
 					result = "gz";
+
 					return false;
 				}
 
 				if (regex.def.test(i)) {
 					result = "zz";
+
 					return false;
 				}
+
+				return void 0;
 			});
 		}
 
@@ -210,9 +214,7 @@ class TurtleIO {
 
 		if (!dir) {
 			pathname = req.parsed.pathname.replace(regex.root, "");
-			invalid = (pathname.replace(regex.dir, "").split("/").filter(i => {
-					return i !== ".";
-				})[0] || "") === "..";
+			invalid = (pathname.replace(regex.dir, "").split("/").filter(i => i !== ".")[0] || "") === "..";
 			out_dir = !invalid ? (pathname.match(/\.{2}\//g) || []).length : 0;
 			in_dir = !invalid ? (pathname.match(/\w+?(\.\w+|\/)+/g) || []).length : 0;
 
